@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Super Admin - ADOMINIOZ</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .shield {
+            width: 60px;
+            height: 60px;
+            background: #dc2626;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .warning {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="shield">🛡️</div>
+            <h1>Bootstrap Super Admin</h1>
+            <p>ADOMINIOZ - Sistema de Administración</p>
+        </div>
+
+        <div id="status"></div>
+
+        <div class="form-group">
+            <label for="email">Email del Super Administrador:</label>
+            <input type="email" id="email" value="superadmin@adominioz.com" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Nueva Contraseña:</label>
+            <input type="password" id="password" placeholder="Mínimo 8 caracteres" required>
+        </div>
+
+        <button onclick="createSuperAdmin()" id="createBtn">
+            Crear Super Administrador
+        </button>
+
+        <button onclick="checkExistence()" id="checkBtn" style="background: #059669; margin-top: 10px;">
+            Verificar si ya existe
+        </button>
+
+        <div style="margin-top: 30px; padding: 20px; background: #fef3c7; border-radius: 6px;">
+            <strong>⚠️ Instrucciones:</strong>
+            <ol>
+                <li>Ingresa una contraseña segura (mínimo 8 caracteres)</li>
+                <li>Haz clic en "Crear Super Administrador"</li>
+                <li>Una vez creado, ve a: <code>/sys-admin-login</code></li>
+                <li>Usa las credenciales para acceder al panel</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ksqaxdiwtrzavzyuhcwt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzcWF4ZGl3dHJ6YXZ6eXVoY3d0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxMzMyNjIsImV4cCI6MjA3MTcwOTI2Mn0.lPHhukNZV-nFBzCXT0uDqwz4YB7HbT72oQ2NikOmJXs';
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function setLoading(isLoading) {
+            const createBtn = document.getElementById('createBtn');
+            const checkBtn = document.getElementById('checkBtn');
+            
+            if (isLoading) {
+                createBtn.disabled = true;
+                checkBtn.disabled = true;
+                createBtn.innerHTML = '<span class="loading"></span> Creando...';
+            } else {
+                createBtn.disabled = false;
+                checkBtn.disabled = false;
+                createBtn.innerHTML = 'Crear Super Administrador';
+            }
+        }
+
+        async function checkExistence() {
+            setLoading(true);
+            showStatus('Verificando si existe super administrador...', 'warning');
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/super-admin-bootstrap`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        password: 'dummy',
+                        action: 'check'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.exists) {
+                        showStatus('✅ Super administrador ya existe. Puedes usar /sys-admin-login para acceder.', 'success');
+                    } else {
+                        showStatus('ℹ️ No existe super administrador. Usa el botón "Crear" para configurarlo.', 'warning');
+                    }
+                } else {
+                    showStatus('❌ Error al verificar: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Error de conexión: ' + error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function createSuperAdmin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!password || password.length < 8) {
+                showStatus('❌ La contraseña debe tener al menos 8 caracteres.', 'error');
+                return;
+            }
+
+            setLoading(true);
+            showStatus('Creando super administrador...', 'warning');
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/super-admin-bootstrap`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        action: 'create'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus(`✅ Super administrador creado exitosamente! 
+                        <br><br>
+                        <strong>Credenciales:</strong><br>
+                        Email: ${email}<br>
+                        Password: [La que ingresaste]<br><br>
+                        <strong>Próximos pasos:</strong><br>
+                        1. Ve a <code>/sys-admin-login</code><br>
+                        2. Usa estas credenciales para acceder<br>
+                        3. Serás redirigido al panel de administración
+                    `, 'success');
+                } else {
+                    if (data.error === 'SUPER_ADMIN_EXISTS') {
+                        showStatus('ℹ️ Ya existe un super administrador. Usa /sys-admin-login para acceder.', 'warning');
+                    } else {
+                        showStatus('❌ Error: ' + data.message, 'error');
+                    }
+                }
+            } catch (error) {
+                showStatus('❌ Error de conexión: ' + error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Auto-check on load
+        window.onload = function() {
+            checkExistence();
+        };
+    </script>
+</body>
+</html>

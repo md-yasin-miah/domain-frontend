@@ -1,0 +1,194 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "marketplace": "Marketplace",
+    "domains": "Dominios",
+    "websites": "Sitios Web",
+    "apps": "Apps",
+    "dashboard": "Panel",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "seller": "Vendedor",
+    "buyer": "Comprador"
+  },
+  "hero": {
+    "title": "El futuro del comercio digital",
+    "subtitle": "Plataforma avanzada de trading de activos digitales con verificación de identidad, servicios de escrow y garantías de autenticidad.",
+    "cta_start": "Comenzar Gratis",
+    "cta_explore": "Explorar Activos"
+  },
+  "stats": {
+    "transactions": "Transacciones",
+    "users": "Usuarios",
+    "assets": "Activos",
+    "verified": "Verificados",
+    "registered": "Registrados",
+    "satisfaction": "Satisfacción"
+  },
+  "trust": {
+    "title": "Confianza y Seguridad",
+    "security": "Seguridad Garantizada",
+    "security_desc": "Escrow protegido y verificación completa en cada transacción",
+    "verified": "Activos Verificados",
+    "verified_desc": "Equipo de expertos audita cada activo antes de la publicación",
+    "support": "Soporte Especializado",
+    "support_desc": "Asesoramiento 24/7 en transferencias de activos digitales"
+  },
+  "categories": {
+    "title": "Activos Digitales Premium",
+    "subtitle": "Descubre una colección curada de activos digitales de alta calidad",
+    "domains": "Dominios",
+    "domains_desc": "Dominios premium verificados",
+    "websites": "Sitios Web", 
+    "websites_desc": "Sitios con tráfico y ingresos",
+    "fba_stores": "Tiendas FBA",
+    "fba_stores_desc": "Negocios Amazon FBA",
+    "mobile_apps": "Apps Móviles",
+    "mobile_apps_desc": "Aplicaciones con usuarios activos",
+    "ecommerce": "E-commerce",
+    "ecommerce_desc": "Tiendas online operativas",
+    "software_saas": "Software/SaaS",
+    "software_saas_desc": "Aplicaciones web con suscriptores",
+    "databases": "Bases de Datos",
+    "databases_desc": "Datasets estructurados",
+    "digital_channels": "Canales Digitales",
+    "digital_channels_desc": "YouTube, TikTok, redes sociales",
+    "nfts": "NFTs",
+    "nfts_desc": "Colecciones blockchain verificadas"
+  },
+  "categories_detailed": {
+    "nfts": "NFTs",
+    "nfts_desc": "Colecciones blockchain y arte digital único",
+    "saas": "Software/SaaS",
+    "saas_desc": "Aplicaciones web con suscriptores y código fuente completo"
+  },
+  "how_it_works": {
+    "title": "Cómo Funciona",
+    "subtitle": "Proceso simple y seguro para comprar y vender activos digitales",
+    "verification": "1. Verificación",
+    "verification_desc": "Registro gratuito con verificación de identidad y capacidad financiera",
+    "escrow": "2. Escrow Seguro",
+    "escrow_desc": "Fondos protegidos en escrow hasta completar la transferencia del activo",
+    "transfer": "3. Transferencia",
+    "transfer_desc": "Transferencia completa del activo con documentación legal incluida"
+  },
+  "requirements": {
+    "title": "Requisitos",
+    "buyers": "Para Compradores",
+    "buyers_reqs": [
+      "Verificación de identidad (KYC)",
+      "Prueba de fondos disponibles",
+      "Cuenta verificada en ADOMINIOZ",
+      "Billetera crypto (Bitcoin, Ethereum, USDT)",
+      "Due diligence del activo deseado"
+    ],
+    "sellers": "Para Vendedores", 
+    "sellers_reqs": [
+      "Verificación de identidad completa",
+      "Prueba de propiedad del activo digital",
+      "Analytics y métricas verificables",
+      "Documentación legal del negocio",
+      "Auditoría técnica por nuestros expertos"
+    ]
+  },
+  "payments": {
+    "title": "Métodos de Pago",
+    "subtitle": "Acepta pagos tradicionales y criptomonedas con las mejores tasas del mercado",
+    "crypto": "Criptomonedas",
+    "traditional": "Métodos Tradicionales",
+    "bitcoin": "Bitcoin",
+    "ethereum": "Ethereum",
+    "usdt": "USDT", 
+    "cards": "Tarjetas"
+  },
+  "payment_badges": {
+    "bitcoin": "Bitcoin",
+    "cards": "Tarjetas",
+    "escrow": "Escrow"
+  },
+  "cta": {
+    "title": "¿Listo para comenzar?",
+    "subtitle": "Únete a la revolución del comercio digital. Registro gratuito y sin comisiones el primer mes.",
+    "register": "Registrarse Gratis",
+    "demo": "Ver Demo"
+  },
+  "stats_section": {
+    "verified_assets": "Activos Verificados", 
+    "in_transactions": "En Transacciones",
+    "registered_users": "Usuarios Registrados",
+    "satisfaction": "Satisfacción"
+  },
+  "footer": {
+    "description": "El marketplace más avanzado para activos digitales. Transacciones seguras con tecnología blockchain y pagos cripto.",
+    "legal": "Legal",
+    "terms": "Términos y Condiciones",
+    "privacy": "Política de Privacidad",
+    "cookies": "Política de Cookies",
+    "legal_notice": "Aviso Legal", 
+    "aml": "Política AML/KYC",
+    "data_protection": "Protección de Datos",
+    "support": "Soporte",
+    "help": "Centro de Ayuda",
+    "contact": "Contacto 24/7",
+    "verification": "Proceso de Verificación",
+    "escrow": "Cómo Funciona Escrow",
+    "disputes": "Resolución de Disputas",
+    "fees": "Tarifas y Comisiones",
+    "copyright": "© 2024 ADOMINIOZ S.L. Todos los derechos reservados.",
+    "registry": "Registro Mercantil: Madrid, Tomo 45.234, Folio 123, Sección 8, Hoja M-987654 • CIF: B-87654321",
+    "regulated": "Autorizado y regulado por la CNMV (Comisión Nacional del Mercado de Valores)",
+    "license": "Licencia de Servicios de Inversión: ESI-2024-001 • Miembro del Fondo de Garantía de Inversiones",
+    "disclaimer": "Los activos digitales conllevan riesgos. El valor de las inversiones puede fluctuar. Lea toda la documentación legal antes de invertir. ADOMINIOZ no ofrece asesoramiento financiero."
+  },
+  "services": {
+    "valuations": "Valoraciones",
+    "valuations_desc": "Evaluación de activos digitales",
+    "market_trends": "Market Trends",
+    "market_trends_desc": "Tendencias y análisis de mercado",
+    "brokers_network": "Red de Brokers",
+    "brokers_network_desc": "Asesores especializados",
+    "referral_program": "Programa de Referidos",
+    "referral_program_desc": "Gana comisiones por referir"
+  },
+  "user": {
+    "my_domains": "Mis Dominios",
+    "invoices": "Facturas", 
+    "support": "Soporte"
+  },
+  "resources": {
+    "guides": "Guías",
+    "guides_desc": "Aprende sobre activos digitales",
+    "help_center": "Centro de Ayuda",
+    "help_center_desc": "Soporte y documentación",
+    "blog": "Blog",
+    "blog_desc": "Noticias y tendencias"
+  },
+  "auth": {
+    "login_or_register": "Inicia sesión o regístrate para acceder a tu panel personal",
+    "explore_guest": "Explorar como Invitado"
+  },
+  "common": {
+    "from": "Desde",
+    "premium": "Premium",
+    "digital_commerce_future": "El futuro del comercio digital"
+  },
+  "dashboard": {
+    "welcome": "Panel de Control",
+    "total_revenue": "Ingresos Totales",
+    "active_listings": "Listados Activos",
+    "views": "Visualizaciones",
+    "offers": "Ofertas",
+    "my_listings": "Mis Listados",
+    "recent_activity": "Actividad Reciente",
+    "create_listing": "Crear Listado",
+    "login_required": "Acceso Requerido",
+    "login_desc": "Inicia sesión para acceder a tu panel personalizado",
+    "guest_explore": "Explorar como Invitado"
+  },
+  "marketplace": {
+    "explore_collection": "Explora nuestra colección curada de activos digitales rentables, desde NFTs hasta ecommerce completo",
+    "all_categories": "Todas las Categorías",
+    "premium_collection": "Colección Premium",
+    "from_premium": "Desde dominios premium hasta negocios completos en línea"
+  }
+}

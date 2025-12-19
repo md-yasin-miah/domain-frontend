@@ -1,0 +1,235 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Professional Design System - Adobe/Apple Inspired */
+
+@layer base {
+  :root {
+    /* ADOMINIOZ Professional Design System */
+    /* Base Colors */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 11%;
+
+    /* Brand Colors - Unified Red Palette */
+    --primary: 0 72% 50%;           /* Main brand red */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 50% 65%;         /* Soft coral/desaturated red */
+    --secondary-foreground: 0 0% 98%;
+
+    /* Neutral System */
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 72% 50%;
+
+    /* Status Colors - Harmonized with brand */
+    --success: 142 76% 45%;         /* Soft green for success states */
+    --success-foreground: 0 0% 98%;
+
+    --warning: 38 92% 60%;          /* Warm amber for warnings */
+    --warning-foreground: 0 0% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* System Colors */
+    --border: 0 0% 89%;
+    --input: 0 0% 89%;
+    --ring: 0 72% 50%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar Colors */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 0 72% 50%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 95%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 0 0% 89%;
+    --sidebar-ring: 0 72% 50%;
+
+    /* Professional Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 72% 50%), hsl(0 50% 65%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 97%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 96%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
+    
+    /* Professional Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 0 72% 50%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 50% 65%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 72% 50%;
+
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 98%;
+
+    --warning: 38 92% 60%;
+    --warning-foreground: 0 0% 11%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 72% 50%;
+
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 72% 50%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 0 72% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-roboto antialiased;
+  }
+
+  /* Professional Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-roboto font-bold tracking-tight;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+}
+
+@layer components {
+  /* Professional Component Styles */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-secondary text-primary-foreground px-8 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply border border-border bg-background text-foreground px-8 py-3 rounded-xl font-medium transition-all duration-300 hover:bg-muted hover:border-primary/20;
+  }
+
+  /* Unified Status Badges */
+  .badge-success {
+    @apply bg-success/10 text-success border border-success/20 px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-warning {
+    @apply bg-warning/10 text-warning border border-warning/20 px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-neutral {
+    @apply bg-muted text-muted-foreground border border-border px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  /* Professional Card Styles */
+  .card-professional {
+    @apply border border-border rounded-2xl p-8 transition-all duration-300 hover:shadow-lg hover:border-primary/20 backdrop-blur-sm;
+    background: var(--gradient-card);
+  }
+
+  .card-feature {
+    @apply bg-background/80 backdrop-blur-sm border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-md hover:border-primary/20;
+  }
+
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.8s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.4s ease-out;
+  }
+}
+
+@layer utilities {
+  /* Professional Animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  }
+
+  /* Glass Effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+  }
+}
