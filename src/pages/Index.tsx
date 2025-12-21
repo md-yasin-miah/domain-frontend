@@ -6,19 +6,19 @@ import { FlipWords } from "@/components/ui/flip-words";
 
 const Index = () => {
   const { t } = useTranslation();
-  
+
   // Dynamic words for FlipWords animation
-  const dynamicWords = t('hero.title').includes('futuro') 
+  const dynamicWords = t('hero.title').includes('futuro')
     ? ['futuro', 'presente', 'poder', 'éxito']
     : ['future', 'present', 'power', 'success'];
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background">
       {/* Hero Banner - Futuristic Commerce */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen py-16 flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
-            src="/lovable-uploads/9851ebbe-e0c7-4f47-85b7-5a275776e711.png" 
+          <img
+            src="/lovable-uploads/9851ebbe-e0c7-4f47-85b7-5a275776e711.png"
             alt="El futuro del comercio digital"
             className="w-full h-full object-cover"
           />
@@ -45,7 +45,7 @@ const Index = () => {
             <p className="text-xl md:text-3xl text-white/90 mb-8 font-roboto max-w-4xl mx-auto leading-relaxed font-light">
               {t('hero.subtitle')}
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Link to="/auth" className="btn-primary flex items-center space-x-3 text-xl px-12 py-4 shadow-2xl hover:shadow-primary/25">
                 <Wallet className="w-6 h-6" />
@@ -63,15 +63,15 @@ const Index = () => {
                 <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">$2.4M</div>
                 <div className="text-white/80 font-roboto text-sm">{t('stats.transactions')}</div>
               </div>
-              <div className="text-center animate-scale-in" style={{animationDelay: '0.1s'}}>
+              <div className="text-center animate-scale-in" style={{ animationDelay: '0.1s' }}>
                 <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">15K+</div>
                 <div className="text-white/80 font-roboto text-sm">{t('stats.users')}</div>
               </div>
-              <div className="text-center animate-scale-in" style={{animationDelay: '0.2s'}}>
+              <div className="text-center animate-scale-in" style={{ animationDelay: '0.2s' }}>
                 <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">2,247</div>
                 <div className="text-white/80 font-roboto text-sm">{t('stats.assets')}</div>
               </div>
-              <div className="text-center animate-scale-in" style={{animationDelay: '0.3s'}}>
+              <div className="text-center animate-scale-in" style={{ animationDelay: '0.3s' }}>
                 <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">98%</div>
                 <div className="text-white/80 font-roboto text-sm">{t('stats.satisfaction')}</div>
               </div>
@@ -142,7 +142,7 @@ const Index = () => {
               {t('categories.subtitle')}
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-slide-up">
             <Link to="/marketplace/dominios" className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300">
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -286,7 +286,7 @@ const Index = () => {
               {t('how_it_works.subtitle')}
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6">
@@ -297,7 +297,7 @@ const Index = () => {
                 {t('how_it_works.verification_desc')}
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shield className="w-10 h-10 text-white" />
@@ -307,7 +307,7 @@ const Index = () => {
                 {t('how_it_works.escrow_desc')}
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="w-10 h-10 text-white" />
@@ -329,7 +329,7 @@ const Index = () => {
               {t('requirements.title')}
             </h2>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Para Compradores */}
             <div className="card-professional">
@@ -397,7 +397,7 @@ const Index = () => {
           <p className="text-xl text-muted-foreground font-roboto max-w-3xl mx-auto mb-16">
             {t('payments.subtitle')}
           </p>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="card-professional text-center">
               <Bitcoin className="w-12 h-12 text-primary mx-auto mb-4" />
@@ -477,8 +477,8 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
-                <img 
-                  src="/lovable-uploads/c4e923e1-17e4-42b9-90b4-d79eed7fcc19.png" 
+                <img
+                  src="/lovable-uploads/c4e923e1-17e4-42b9-90b4-d79eed7fcc19.png"
                   alt="ADOMINIOZ"
                   className="h-12 w-auto"
                 />
@@ -492,7 +492,7 @@ const Index = () => {
                 <Zap className="w-6 h-6 text-primary" />
               </div>
             </div>
-            
+
             <div>
               <h4 className="font-roboto font-bold mb-6 text-foreground">{t('footer.legal')}</h4>
               <ul className="space-y-3 font-roboto">
@@ -504,7 +504,7 @@ const Index = () => {
                 <li><a href="/proteccion-datos" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.data_protection')}</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-roboto font-bold mb-6 text-foreground">{t('footer.support')}</h4>
               <ul className="space-y-3 font-roboto">
@@ -517,7 +517,7 @@ const Index = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-border pt-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
               <div>
@@ -545,7 +545,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
-      
+
       {/* Admin Quick Access - Solo visible para configuración */}
       <AdminQuickAccess />
     </div>
