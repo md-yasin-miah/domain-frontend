@@ -7,7 +7,7 @@ import type {
 
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getMyProfile: builder.query<UserProfile, void>({
+    getMyProfile: builder.query<ClientProfile, void>({
       query: () => ({
         url: '/profile/me',
         method: 'GET',

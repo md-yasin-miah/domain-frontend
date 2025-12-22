@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,109 +9,76 @@ import { Badge } from "@/components/ui/badge";
 import { User, Building, Globe, Phone, Mail, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useAppDispatch } from "@/store/hooks";
-import { profileApi } from "@/store/api/profileApi";
-import type { UserProfile } from "@/store/api/types";
+import { useGetMyProfileQuery, useUpdateProfileMutation } from "@/store/api/profileApi";
 
 export default function ClientProfile() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const dispatch = useAppDispatch();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { data: profile, isLoading: loading, error: profileError, refetch } = useGetMyProfileQuery(undefined, {
+    skip: !user,
+  });
+  const [updateProfile, { isLoading: saving }] = useUpdateProfileMutation();
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientProfile>({
     first_name: '',
     last_name: '',
     phone: '',
     bio: '',
     avatar_url: '',
     address_line1: '',
+    address_line2: '',
     city: '',
+    state: '',
     country: '',
     postal_code: '',
     company_name: '',
     website: '',
+    social_links: {},
+    id: 0,
+    user_id: 0,
+    is_verified: false,
+    verification_date: '',
+    created_at: '',
+    updated_at: ''
   });
+  useEffect(() => {
+    if (profile) {
+      setFormData(profile);
+    }
+  }, [profile]);
 
-  const fetchClientProfile = useCallback(async () => {
-    if (!user) return;
-    try {
-      const profileData = await dispatch(
-        profileApi.endpoints.getMyProfile.initiate(undefined)
-      ).unwrap();
-
-      if (profileData) {
-        setProfile(profileData);
-        setFormData({
-          first_name: profileData.first_name || '',
-          last_name: profileData.last_name || '',
-          phone: profileData.phone || '',
-          bio: profileData.bio || '',
-          avatar_url: profileData.avatar_url || '',
-          address_line1: profileData.address_line1 || '',
-          city: profileData.city || '',
-          country: profileData.country || '',
-          postal_code: profileData.postal_code || '',
-          company_name: profileData.company_name || '',
-          website: profileData.website || '',
-        });
-      }
-    } catch (error: any) {
-      console.error('Error fetching profile:', error);
+  // Show error toast if profile fetch fails
+  useEffect(() => {
+    if (profileError) {
       toast({
         title: t('profile.client.error_loading'),
         description: t('profile.client.error_loading_desc'),
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
-  }, [user, dispatch, toast, t]);
-
-  useEffect(() => {
-    fetchClientProfile();
-  }, [fetchClientProfile]);
+  }, [profileError, toast, t]);
 
   const handleSave = async () => {
     if (!profile || !user) return;
 
-    setSaving(true);
     try {
-      await dispatch(
-        profileApi.endpoints.updateProfile.initiate({
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          phone: formData.phone,
-          bio: formData.bio,
-          avatar_url: formData.avatar_url,
-          address_line1: formData.address_line1,
-          city: formData.city,
-          country: formData.country,
-          postal_code: formData.postal_code,
-          company_name: formData.company_name,
-          website: formData.website,
-        })
-      ).unwrap();
-
+      await updateProfile(formData).unwrap();
       toast({
         title: t('profile.client.success_update'),
         description: t('profile.client.success_update_desc')
       });
 
       setIsEditing(false);
-      fetchClientProfile();
+      // Refetch profile data to get updated information
+      refetch();
     } catch (error: any) {
       toast({
         title: t('profile.client.error_update'),
         description: `${t('profile.client.error_update_desc')}: ${error.message || t('common.error')}`,
         variant: "destructive"
       });
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -189,19 +156,7 @@ export default function ClientProfile() {
               <Button variant="outline" onClick={() => {
                 setIsEditing(false);
                 if (profile) {
-                  setFormData({
-                    first_name: profile.first_name || '',
-                    last_name: profile.last_name || '',
-                    phone: profile.phone || '',
-                    bio: profile.bio || '',
-                    avatar_url: profile.avatar_url || '',
-                    address_line1: profile.address_line1 || '',
-                    city: profile.city || '',
-                    country: profile.country || '',
-                    postal_code: profile.postal_code || '',
-                    company_name: profile.company_name || '',
-                    website: profile.website || '',
-                  });
+                  setFormData(profile);
                 }
               }}>
                 {t('profile.client.cancel')}
