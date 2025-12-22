@@ -1,7 +1,7 @@
 import { apiSlice } from './apiSlice';
 import type { LoginRequest, RegisterRequest, LoginResponse, UserResponse, RefreshTokenRequest, RefreshTokenResponse } from './types';
 
-export const authApi = apiSlice.injectEndpoints({
+const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
@@ -51,3 +51,6 @@ export const {
   useRefreshTokenMutation,
   useLogoutMutation,
 } = authApi;
+
+// Export authApi for manual query initiation
+export { authApi };

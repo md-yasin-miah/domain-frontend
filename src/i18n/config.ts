@@ -24,6 +24,12 @@ i18n.use(initReactI18next).init({
     }
   })(), // Default to English
   fallbackLng: "en",
+  
+  // Disable automatic language detection and storage
+  detection: {
+    order: [],
+    caches: [], // Don't use any cache/backend
+  },
 
   interpolation: {
     escapeValue: false, // React already does escaping

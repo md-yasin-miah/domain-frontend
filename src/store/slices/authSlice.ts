@@ -11,27 +11,25 @@ interface AuthState {
   error: string | null;
 }
 
-// Initialize from localStorage if available
+// Initialize from localStorage - only token, user data will be fetched from API
 const getStoredAuth = () => {
   try {
     const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('auth_user');
     const storedRefreshToken = localStorage.getItem('refresh_token');
-    
-    if (storedToken && storedUser) {
-      const user = JSON.parse(storedUser);
+
+    if (storedToken) {
       return {
-        user,
+        user: null, // User data will be fetched from /auth/me
         token: storedToken,
         refreshToken: storedRefreshToken,
-        isAuthenticated: true,
-        isAdmin: user.roles?.some((r: any) => r.name === 'Admin') || false,
+        isAuthenticated: false, // Will be set to true after fetching user data
+        isAdmin: false, // Will be set after fetching user data
       };
     }
   } catch (error) {
     console.error('Error parsing stored auth:', error);
   }
-  
+
   return {
     user: null,
     token: null,
@@ -59,12 +57,22 @@ const authSlice = createSlice({
       state.token = token;
       state.refreshToken = refreshToken || null;
       state.isAuthenticated = true;
-      state.isAdmin = user.roles?.some((r) => r.name === 'Admin') || false;
+      // Handle both formats: array of strings ["admin"] or array of objects [{name: "admin"}]
+      // API may return roles as strings, but type definition expects Role objects
+      state.isAdmin = user.roles?.some((r: unknown) => {
+        if (typeof r === 'string') {
+          return r.toLowerCase() === 'admin';
+        }
+        if (typeof r === 'object' && r !== null && 'name' in r) {
+          const roleObj = r as { name: string };
+          return roleObj.name?.toLowerCase() === 'admin' || roleObj.name === 'Admin';
+        }
+        return false;
+      }) || false;
       state.error = null;
-      
-      // Store in localStorage
+
+      // Store only token in localStorage (not user data for security)
       localStorage.setItem('auth_token', token);
-      localStorage.setItem('auth_user', JSON.stringify(user));
       if (refreshToken) {
         localStorage.setItem('refresh_token', refreshToken);
       }
@@ -76,10 +84,9 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.isAdmin = false;
       state.error = null;
-      
+
       // Clear localStorage
       localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
       localStorage.removeItem('refresh_token');
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -92,9 +99,7 @@ const authSlice = createSlice({
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
         state.isAdmin = state.user.roles?.some((r) => r.name === 'Admin') || false;
-        
-        // Update stored user
-        localStorage.setItem('auth_user', JSON.stringify(state.user));
+        // User data is not stored in localStorage for security
       }
     },
     setToken: (state, action: PayloadAction<string>) => {

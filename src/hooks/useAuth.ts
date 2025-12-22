@@ -1,10 +1,11 @@
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout, setCredentials, setToken, setError } from '@/store/slices/authSlice';
-import { 
-  useLoginMutation, 
-  useRegisterMutation, 
+import {
+  useLoginMutation,
+  useRegisterMutation,
   useLogoutMutation,
-  useGetCurrentUserQuery 
+  useGetCurrentUserQuery,
+  authApi
 } from '@/store/api/authApi';
 import { extractErrorMessage } from '@/lib/errorHandler';
 
@@ -18,32 +19,36 @@ export const useAuth = () => {
   const [loginMutation, { isLoading: loginLoading }] = useLoginMutation();
   const [registerMutation, { isLoading: signupLoading }] = useRegisterMutation();
   const [logoutMutation] = useLogoutMutation();
-  const { data: currentUser, refetch: refetchUser } = useGetCurrentUserQuery(undefined, {
+  const { data: currentUser } = useGetCurrentUserQuery(undefined, {
     skip: !authState.token,
   });
 
   const signIn = async (email: string, password: string) => {
     try {
       dispatch(setError(null));
-      // Login returns { access_token, token_type }
-      const loginResult = await loginMutation({ 
+      // Login returns { access_token, refresh_token, token_type }
+      const loginResult = await loginMutation({
         username: email, // Backend accepts username or email in username field
-        password 
+        password
       }).unwrap();
-      
+
       // Store token first
       dispatch(setToken(loginResult.access_token));
-      
-      // Then fetch user data
-      const userResult = await refetchUser();
-      if (userResult.data) {
-        dispatch(setCredentials({ 
-          user: userResult.data, 
+
+      // Fetch user data using the API directly (since query is skipped initially)
+      const userResult = await dispatch(
+        authApi.endpoints.getCurrentUser.initiate(undefined)
+      ).unwrap();
+
+      if (userResult) {
+        dispatch(setCredentials({
+          user: userResult,
           token: loginResult.access_token,
+          refreshToken: loginResult.refresh_token, // Store refresh token from login response
         }));
-        return { error: null, user: userResult.data };
+        return { error: null, user: userResult };
       }
-      
+
       return { error: { message: 'Failed to fetch user data' }, user: null };
     } catch (error: unknown) {
       const errorMessage = extractErrorMessage(error);
@@ -55,12 +60,12 @@ export const useAuth = () => {
   const signUp = async (email: string, password: string, username?: string) => {
     try {
       dispatch(setError(null));
-      const result = await registerMutation({ 
-        email, 
+      const result = await registerMutation({
+        email,
         password,
         username: username || email.split('@')[0]
       }).unwrap();
-      
+
       // After registration, user is returned but no token
       // User needs to login separately
       return { error: null, user: result };

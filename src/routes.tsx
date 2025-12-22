@@ -15,6 +15,7 @@ import Cookies from "./pages/legal/Cookies";
 import AvisoLegal from "./pages/legal/AvisoLegal";
 import ProteccionDatos from "./pages/legal/ProteccionDatos";
 import Login from "./pages/auth/Login";
+import { AuthRedirectHandler } from "./components/auth/AuthRedirectHandler";
 import SellerDashboard from "./pages/admin/SellerDashboard";
 import BuyerDashboard from "./pages/admin/BuyerDashboard";
 import SuperAdminDashboard from "./pages/admin/SuperAdminDashboard";
@@ -66,9 +67,12 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
+      <>
+        <AuthRedirectHandler />
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      </>
     ),
     children: [
       {
@@ -276,7 +280,12 @@ export const router = createBrowserRouter([
   // Auth routes (no layout)
   {
     path: "/auth",
-    element: <Login />,
+    element: (
+      <>
+        <AuthRedirectHandler />
+        <Login />
+      </>
+    ),
   },
   // Protected routes with AppLayout
   {

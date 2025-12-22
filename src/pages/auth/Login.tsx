@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -55,26 +55,32 @@ export default function Login() {
     },
   });
 
-  // Redirect based on user role after login (for cases where auth state changes outside this page)
+  // Helper function to redirect based on role
+  const redirectBasedOnRole = useCallback((role: string) => {
+    const normalizedRole = role.toLowerCase();
+    switch (normalizedRole) {
+      case 'admin':
+        navigate('/admin/dashboard', { replace: true });
+        break;
+      case 'support':
+        navigate('/support/dashboard', { replace: true });
+        break;
+      case 'accounts':
+        navigate('/accounts/dashboard', { replace: true });
+        break;
+      case 'customer':
+      default:
+        navigate('/client/dashboard', { replace: true });
+        break;
+    }
+  }, [navigate]);
+
+  // Redirect authenticated users away from login page
   useEffect(() => {
     if (user && !loading && primaryRole) {
-      switch (primaryRole) {
-        case 'Admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'Support':
-          navigate('/support/dashboard');
-          break;
-        case 'Accounts':
-          navigate('/accounts/dashboard');
-          break;
-        case 'Customer':
-        default:
-          navigate('/client/dashboard');
-          break;
-      }
+      redirectBasedOnRole(primaryRole);
     }
-  }, [user, loading, primaryRole, navigate]);
+  }, [user, loading, primaryRole, redirectBasedOnRole]);
 
   const handleLogin = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -94,33 +100,36 @@ export default function Login() {
         description: t('auth.login_page.login_success'),
       });
 
-      // Redirect immediately based on role - will be handled by useEffect with primaryRole
-      if (signedInUser) {
-        // Small delay to let useUserRole hook update
-        setTimeout(() => {
-          if (primaryRole) {
-            switch (primaryRole) {
-              case 'Admin':
-                navigate('/admin/dashboard');
-                break;
-              case 'Support':
-                navigate('/support/dashboard');
-                break;
-              case 'Accounts':
-                navigate('/accounts/dashboard');
-                break;
-              case 'Customer':
-              default:
-                navigate('/client/dashboard');
-                break;
-            }
-          } else {
-            navigate('/client/dashboard');
-          }
-        }, 100);
+      // Redirect immediately based on role from API response
+      if (signedInUser && signedInUser.roles && signedInUser.roles.length > 0) {
+        // Handle both formats: array of strings ["admin"] or array of objects [{name: "admin"}]
+        const roles = signedInUser.roles;
+        const roleNames = roles.map((r: string | { name: string }) =>
+          typeof r === 'string' ? r.toLowerCase() : (r?.name || '').toLowerCase()
+        );
+
+        // Prioritize admin role
+        const adminRole = roleNames.find((r: string) => r === 'admin');
+        const primaryRole = adminRole || roleNames[0] || 'customer';
+
+        switch (primaryRole) {
+          case 'admin':
+            navigate('/admin/dashboard', { replace: true });
+            break;
+          case 'support':
+            navigate('/support/dashboard', { replace: true });
+            break;
+          case 'accounts':
+            navigate('/accounts/dashboard', { replace: true });
+            break;
+          case 'customer':
+          default:
+            navigate('/client/dashboard', { replace: true });
+            break;
+        }
       } else {
-        // Fallback: if for some reason we don't have the user, go to client dashboard
-        navigate('/client/dashboard');
+        // Fallback: if no roles, go to client dashboard
+        navigate('/client/dashboard', { replace: true });
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : t('auth.login_page.unexpected_error');
