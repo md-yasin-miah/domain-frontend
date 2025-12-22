@@ -5,6 +5,32 @@ import type {
   ProfileCompletionResponse,
 } from './types';
 
+// ClientProfile type from API response
+export interface ClientProfile {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  bio: string;
+  avatar_url: string;
+  address_line1: string;
+  address_line2: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
+  company_name: string;
+  website: string;
+  social_links: {
+    [key: string]: string;
+  } | null;
+  id: number;
+  user_id: number;
+  is_verified: boolean;
+  verification_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getMyProfile: builder.query<ClientProfile, void>({
@@ -14,7 +40,7 @@ export const profileApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['User'],
     }),
-    createProfile: builder.mutation<UserProfile, ProfileCreateRequest>({
+    createProfile: builder.mutation<ClientProfile, ProfileCreateRequest>({
       query: (data) => ({
         url: '/profile/me',
         method: 'POST',
@@ -22,7 +48,7 @@ export const profileApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['User', 'Auth'],
     }),
-    updateProfile: builder.mutation<UserProfile, ProfileCreateRequest>({
+    updateProfile: builder.mutation<ClientProfile, Partial<ClientProfile>>({
       query: (data) => ({
         url: '/profile/me',
         method: 'PUT',
@@ -37,7 +63,7 @@ export const profileApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['User'],
     }),
-    getPublicProfile: builder.query<UserProfile, number>({
+    getPublicProfile: builder.query<ClientProfile, number>({
       query: (userId) => ({
         url: `/profile/${userId}`,
         method: 'GET',

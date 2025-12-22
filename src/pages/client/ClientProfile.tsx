@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { User, Building, Globe, Phone, Mail, Calendar } from "lucide-react";
+import { User, Building, Globe, Phone, Mail, Calendar, Image, MapPin, Link2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useGetMyProfileQuery, useUpdateProfileMutation } from "@/store/api/profileApi";
+import { useGetMyProfileQuery, useUpdateProfileMutation, type ClientProfile } from "@/store/api/profileApi";
 
 export default function ClientProfile() {
   const { t } = useTranslation();
@@ -45,7 +45,28 @@ export default function ClientProfile() {
   });
   useEffect(() => {
     if (profile) {
-      setFormData(profile);
+      setFormData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        phone: profile.phone || '',
+        bio: profile.bio || '',
+        avatar_url: profile.avatar_url || '',
+        address_line1: profile.address_line1 || '',
+        address_line2: '',
+        city: profile.city || '',
+        state: '',
+        country: profile.country || '',
+        postal_code: profile.postal_code || '',
+        company_name: profile.company_name || '',
+        website: profile.website || '',
+        social_links: {} as { [key: string]: string },
+        id: profile.id,
+        user_id: profile.user_id,
+        is_verified: profile.is_verified,
+        verification_date: '',
+        created_at: profile.created_at,
+        updated_at: profile.updated_at
+      });
     }
   }, [profile]);
 
@@ -64,7 +85,32 @@ export default function ClientProfile() {
     if (!profile || !user) return;
 
     try {
-      await updateProfile(formData).unwrap();
+      // Send all editable fields from ClientProfile (exclude read-only fields: id, user_id, is_verified, verification_date, created_at, updated_at)
+      const updateData: Partial<ClientProfile> = {
+        first_name: formData.first_name || undefined,
+        last_name: formData.last_name || undefined,
+        phone: formData.phone || undefined,
+        bio: formData.bio || undefined,
+        avatar_url: formData.avatar_url || undefined,
+        address_line1: formData.address_line1 || undefined,
+        address_line2: formData.address_line2 || undefined,
+        city: formData.city || undefined,
+        state: formData.state || undefined,
+        country: formData.country || undefined,
+        postal_code: formData.postal_code || undefined,
+        company_name: formData.company_name || undefined,
+        website: formData.website || undefined,
+        social_links: formData.social_links && Object.keys(formData.social_links).length > 0
+          ? formData.social_links
+          : null,
+      };
+
+      // Remove undefined values to send only defined fields
+      const cleanedData = Object.fromEntries(
+        Object.entries(updateData).filter(([_, value]) => value !== undefined)
+      ) as Partial<ClientProfile>;
+
+      await updateProfile(cleanedData).unwrap();
       toast({
         title: t('profile.client.success_update'),
         description: t('profile.client.success_update_desc')
@@ -156,7 +202,28 @@ export default function ClientProfile() {
               <Button variant="outline" onClick={() => {
                 setIsEditing(false);
                 if (profile) {
-                  setFormData(profile);
+                  setFormData({
+                    first_name: profile.first_name || '',
+                    last_name: profile.last_name || '',
+                    phone: profile.phone || '',
+                    bio: profile.bio || '',
+                    avatar_url: profile.avatar_url || '',
+                    address_line1: profile.address_line1 || '',
+                    address_line2: '',
+                    city: profile.city || '',
+                    state: '',
+                    country: profile.country || '',
+                    postal_code: profile.postal_code || '',
+                    company_name: profile.company_name || '',
+                    website: profile.website || '',
+                    social_links: {} as { [key: string]: string },
+                    id: profile.id,
+                    user_id: profile.user_id,
+                    is_verified: profile.is_verified,
+                    verification_date: '',
+                    created_at: profile.created_at,
+                    updated_at: profile.updated_at
+                  });
                 }
               }}>
                 {t('profile.client.cancel')}
@@ -182,6 +249,29 @@ export default function ClientProfile() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="avatar_url">{t('profile.client.avatar_url')}</Label>
+              <Input
+                id="avatar_url"
+                type="url"
+                value={formData.avatar_url || ''}
+                onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
+                disabled={!isEditing}
+                placeholder={t('profile.client.avatar_url_placeholder')}
+              />
+              {formData.avatar_url && (
+                <div className="mt-2">
+                  <img
+                    src={formData.avatar_url}
+                    alt="Avatar"
+                    className="w-20 h-20 rounded-full object-cover border"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+            </div>
             <div className="space-y-2">
               <Label htmlFor="company_name">{t('profile.client.company_name')}</Label>
               <Input
@@ -213,6 +303,7 @@ export default function ClientProfile() {
               <Label htmlFor="phone">{t('profile.client.phone')}</Label>
               <Input
                 id="phone"
+                type="tel"
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 disabled={!isEditing}
@@ -278,13 +369,24 @@ export default function ClientProfile() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-2">
             <Label htmlFor="address_line1">{t('profile.client.address')}</Label>
             <Input
               id="address_line1"
               value={formData.address_line1 || ''}
               onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
               disabled={!isEditing}
+              placeholder={t('profile.client.address_placeholder')}
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="address_line2">{t('profile.client.address_line2')}</Label>
+            <Input
+              id="address_line2"
+              value={formData.address_line2 || ''}
+              onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
+              disabled={!isEditing}
+              placeholder={t('profile.client.address_line2_placeholder')}
             />
           </div>
           <div className="space-y-2">
@@ -293,6 +395,15 @@ export default function ClientProfile() {
               id="city"
               value={formData.city || ''}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="state">{t('profile.client.state')}</Label>
+            <Input
+              id="state"
+              value={formData.state || ''}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
               disabled={!isEditing}
             />
           </div>
@@ -313,6 +424,107 @@ export default function ClientProfile() {
               onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
               disabled={!isEditing}
             />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Social Links */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Link2 className="h-5 w-5 text-muted-foreground" />
+            {t('profile.client.social_links')}
+          </CardTitle>
+          <CardDescription>
+            {t('profile.client.social_links_desc')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="social_facebook">{t('profile.client.social_facebook')}</Label>
+              <Input
+                id="social_facebook"
+                type="url"
+                value={formData.social_links?.facebook || ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  social_links: { ...formData.social_links, facebook: e.target.value }
+                })}
+                disabled={!isEditing}
+                placeholder="https://facebook.com/username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="social_twitter">{t('profile.client.social_twitter')}</Label>
+              <Input
+                id="social_twitter"
+                type="url"
+                value={formData.social_links?.twitter || ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  social_links: { ...formData.social_links, twitter: e.target.value }
+                })}
+                disabled={!isEditing}
+                placeholder="https://twitter.com/username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="social_linkedin">{t('profile.client.social_linkedin')}</Label>
+              <Input
+                id="social_linkedin"
+                type="url"
+                value={formData.social_links?.linkedin || ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  social_links: { ...formData.social_links, linkedin: e.target.value }
+                })}
+                disabled={!isEditing}
+                placeholder="https://linkedin.com/in/username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="social_instagram">{t('profile.client.social_instagram')}</Label>
+              <Input
+                id="social_instagram"
+                type="url"
+                value={formData.social_links?.instagram || ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  social_links: { ...formData.social_links, instagram: e.target.value }
+                })}
+                disabled={!isEditing}
+                placeholder="https://instagram.com/username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="social_github">{t('profile.client.social_github')}</Label>
+              <Input
+                id="social_github"
+                type="url"
+                value={formData.social_links?.github || ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  social_links: { ...formData.social_links, github: e.target.value }
+                })}
+                disabled={!isEditing}
+                placeholder="https://github.com/username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="social_youtube">{t('profile.client.social_youtube')}</Label>
+              <Input
+                id="social_youtube"
+                type="url"
+                value={formData.social_links?.youtube || ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  social_links: { ...formData.social_links, youtube: e.target.value }
+                })}
+                disabled={!isEditing}
+                placeholder="https://youtube.com/@username"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

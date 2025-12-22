@@ -66,11 +66,16 @@ export interface ProfileCreateRequest {
   bio?: string;
   avatar_url?: string;
   address_line1?: string;
+  address_line2?: string;
   city?: string;
+  state?: string;
   country?: string;
   postal_code?: string;
   company_name?: string;
   website?: string;
+  social_links?: {
+    [key: string]: string;
+  } | null;
 }
 
 export interface ProfileCompletionResponse {
