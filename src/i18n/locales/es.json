@@ -39,7 +39,7 @@
     "subtitle": "Descubre una colección curada de activos digitales de alta calidad",
     "domains": "Dominios",
     "domains_desc": "Dominios premium verificados",
-    "websites": "Sitios Web", 
+    "websites": "Sitios Web",
     "websites_desc": "Sitios con tráfico y ingresos",
     "fba_stores": "Tiendas FBA",
     "fba_stores_desc": "Negocios Amazon FBA",
@@ -82,7 +82,7 @@
       "Billetera crypto (Bitcoin, Ethereum, USDT)",
       "Due diligence del activo deseado"
     ],
-    "sellers": "Para Vendedores", 
+    "sellers": "Para Vendedores",
     "sellers_reqs": [
       "Verificación de identidad completa",
       "Prueba de propiedad del activo digital",
@@ -98,7 +98,7 @@
     "traditional": "Métodos Tradicionales",
     "bitcoin": "Bitcoin",
     "ethereum": "Ethereum",
-    "usdt": "USDT", 
+    "usdt": "USDT",
     "cards": "Tarjetas"
   },
   "payment_badges": {
@@ -113,7 +113,7 @@
     "demo": "Ver Demo"
   },
   "stats_section": {
-    "verified_assets": "Activos Verificados", 
+    "verified_assets": "Activos Verificados",
     "in_transactions": "En Transacciones",
     "registered_users": "Usuarios Registrados",
     "satisfaction": "Satisfacción"
@@ -124,7 +124,7 @@
     "terms": "Términos y Condiciones",
     "privacy": "Política de Privacidad",
     "cookies": "Política de Cookies",
-    "legal_notice": "Aviso Legal", 
+    "legal_notice": "Aviso Legal",
     "aml": "Política AML/KYC",
     "data_protection": "Protección de Datos",
     "support": "Soporte",
@@ -152,7 +152,7 @@
   },
   "user": {
     "my_domains": "Mis Dominios",
-    "invoices": "Facturas", 
+    "invoices": "Facturas",
     "support": "Soporte"
   },
   "resources": {
@@ -190,5 +190,47 @@
     "all_categories": "Todas las Categorías",
     "premium_collection": "Colección Premium",
     "from_premium": "Desde dominios premium hasta negocios completos en línea"
+  },
+  "profile": {
+    "client": {
+      "title": "Perfil del Cliente",
+      "subtitle": "Gestiona tu información de contacto y configuración",
+      "company_info": "Información de la Empresa",
+      "company_info_desc": "Datos generales de tu empresa",
+      "service_info": "Información del Servicio",
+      "service_info_desc": "Detalles de tu plan y servicios",
+      "address_info": "Información de Dirección",
+      "address_info_desc": "Dirección de contacto",
+      "company_name": "Nombre de la Empresa",
+      "first_name": "Nombre",
+      "last_name": "Apellido",
+      "phone": "Teléfono",
+      "website": "URL del Sitio Web",
+      "website_placeholder": "https://example.com",
+      "bio": "Biografía",
+      "bio_placeholder": "Escribe una breve biografía...",
+      "verification_status": "Estado de Verificación",
+      "verified": "Verificado",
+      "not_verified": "No Verificado",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "country": "País",
+      "postal_code": "Código Postal",
+      "edit_profile": "Editar Perfil",
+      "saving": "Guardando...",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "profile_not_found": "Perfil No Encontrado",
+      "profile_not_found_desc": "No se encontró información del cliente.",
+      "error_loading": "Error",
+      "error_loading_desc": "No se pudo cargar el perfil del cliente",
+      "success_update": "Éxito",
+      "success_update_desc": "Perfil actualizado correctamente",
+      "error_update": "Error",
+      "error_update_desc": "Error al actualizar el perfil"
+    }
+  },
+  "common": {
+    "error": "Error"
   }
 }

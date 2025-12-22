@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { profileApi } from "@/store/api/profileApi";
 import type { UserProfile } from "@/store/api/types";
 
 export default function ClientProfile() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const dispatch = useAppDispatch();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -61,14 +63,14 @@ export default function ClientProfile() {
     } catch (error: any) {
       console.error('Error fetching profile:', error);
       toast({
-        title: "Error",
-        description: "No se pudo cargar el perfil del cliente",
+        title: t('profile.client.error_loading'),
+        description: t('profile.client.error_loading_desc'),
         variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
-  }, [user, dispatch, toast]);
+  }, [user, dispatch, toast, t]);
 
   useEffect(() => {
     fetchClientProfile();
@@ -96,16 +98,16 @@ export default function ClientProfile() {
       ).unwrap();
 
       toast({
-        title: "Éxito",
-        description: "Perfil actualizado correctamente"
+        title: t('profile.client.success_update'),
+        description: t('profile.client.success_update_desc')
       });
 
       setIsEditing(false);
       fetchClientProfile();
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: `Error al actualizar el perfil: ${error.message || 'Error desconocido'}`,
+        title: t('profile.client.error_update'),
+        description: `${t('profile.client.error_update_desc')}: ${error.message || t('common.error')}`,
         variant: "destructive"
       });
     } finally {
@@ -156,9 +158,9 @@ export default function ClientProfile() {
         <Card>
           <CardContent className="text-center py-12">
             <User className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Perfil No Encontrado</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('profile.client.profile_not_found')}</h3>
             <p className="text-muted-foreground">
-              No se encontró información del cliente.
+              {t('profile.client.profile_not_found_desc')}
             </p>
           </CardContent>
         </Card>
@@ -171,16 +173,16 @@ export default function ClientProfile() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Perfil del Cliente</h1>
-          <p className="text-muted-foreground">Gestiona tu información de contacto y configuración</p>
+          <h1 className="text-3xl font-bold">{t('profile.client.title')}</h1>
+          <p className="text-muted-foreground">{t('profile.client.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Badge variant={profile.is_verified ? 'default' : 'secondary'}>
-            {profile.is_verified ? 'Verificado' : 'No Verificado'}
+            {profile.is_verified ? t('profile.client.verified') : t('profile.client.not_verified')}
           </Badge>
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)}>
-              Editar Perfil
+              {t('profile.client.edit_profile')}
             </Button>
           ) : (
             <div className="flex gap-2">
@@ -202,10 +204,10 @@ export default function ClientProfile() {
                   });
                 }
               }}>
-                Cancelar
+                {t('profile.client.cancel')}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
-                {saving ? 'Guardando...' : 'Guardar'}
+                {saving ? t('profile.client.saving') : t('profile.client.save')}
               </Button>
             </div>
           )}
@@ -218,15 +220,15 @@ export default function ClientProfile() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building className="h-5 w-5 text-muted-foreground" />
-              Información de la Empresa
+              {t('profile.client.company_info')}
             </CardTitle>
             <CardDescription>
-              Datos generales de tu empresa
+              {t('profile.client.company_info_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="company_name">Nombre de la Empresa</Label>
+              <Label htmlFor="company_name">{t('profile.client.company_name')}</Label>
               <Input
                 id="company_name"
                 value={formData.company_name || ''}
@@ -235,7 +237,7 @@ export default function ClientProfile() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="first_name">Nombre</Label>
+              <Label htmlFor="first_name">{t('profile.client.first_name')}</Label>
               <Input
                 id="first_name"
                 value={formData.first_name || ''}
@@ -244,7 +246,7 @@ export default function ClientProfile() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="last_name">Apellido</Label>
+              <Label htmlFor="last_name">{t('profile.client.last_name')}</Label>
               <Input
                 id="last_name"
                 value={formData.last_name || ''}
@@ -253,7 +255,7 @@ export default function ClientProfile() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
+              <Label htmlFor="phone">{t('profile.client.phone')}</Label>
               <Input
                 id="phone"
                 value={formData.phone || ''}
@@ -269,39 +271,39 @@ export default function ClientProfile() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5 text-muted-foreground" />
-              Información del Servicio
+              {t('profile.client.service_info')}
             </CardTitle>
             <CardDescription>
-              Detalles de tu plan y servicios
+              {t('profile.client.service_info_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="website">URL del Sitio Web</Label>
+              <Label htmlFor="website">{t('profile.client.website')}</Label>
               <Input
                 id="website"
                 value={formData.website || ''}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                 disabled={!isEditing}
-                placeholder="https://example.com"
+                placeholder={t('profile.client.website_placeholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="bio">Biografía</Label>
+              <Label htmlFor="bio">{t('profile.client.bio')}</Label>
               <Textarea
                 id="bio"
                 value={formData.bio || ''}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 disabled={!isEditing}
-                placeholder="Escribe una breve biografía..."
+                placeholder={t('profile.client.bio_placeholder')}
                 rows={4}
               />
             </div>
             <div className="space-y-2">
-              <Label>Estado de Verificación</Label>
+              <Label>{t('profile.client.verification_status')}</Label>
               <div className="flex items-center gap-2">
                 <Badge variant={profile.is_verified ? 'default' : 'secondary'}>
-                  {profile.is_verified ? 'Verificado' : 'No Verificado'}
+                  {profile.is_verified ? t('profile.client.verified') : t('profile.client.not_verified')}
                 </Badge>
               </div>
             </div>
@@ -314,15 +316,15 @@ export default function ClientProfile() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-muted-foreground" />
-            Información de Dirección
+            {t('profile.client.address_info')}
           </CardTitle>
           <CardDescription>
-            Dirección de contacto
+            {t('profile.client.address_info_desc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="address_line1">Dirección</Label>
+            <Label htmlFor="address_line1">{t('profile.client.address')}</Label>
             <Input
               id="address_line1"
               value={formData.address_line1 || ''}
@@ -331,7 +333,7 @@ export default function ClientProfile() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="city">Ciudad</Label>
+            <Label htmlFor="city">{t('profile.client.city')}</Label>
             <Input
               id="city"
               value={formData.city || ''}
@@ -340,7 +342,7 @@ export default function ClientProfile() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="country">País</Label>
+            <Label htmlFor="country">{t('profile.client.country')}</Label>
             <Input
               id="country"
               value={formData.country || ''}
@@ -349,7 +351,7 @@ export default function ClientProfile() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="postal_code">Código Postal</Label>
+            <Label htmlFor="postal_code">{t('profile.client.postal_code')}</Label>
             <Input
               id="postal_code"
               value={formData.postal_code || ''}
