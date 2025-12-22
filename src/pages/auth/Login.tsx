@@ -87,7 +87,12 @@ export default function Login() {
     setError(null);
 
     try {
-      const { error, user: signedInUser } = await signIn(data.email, data.password);
+      const signInResult = await signIn(data.email, data.password);
+      const { error, user: signedInUser, profileCompletion } = signInResult as {
+        error: { message: string } | null;
+        user: any;
+        profileCompletion?: { completion_percentage: number; is_complete: boolean; missing_fields: string[] } | null;
+      };
 
       if (error) {
         // Error message is already extracted and formatted by useAuth hook
@@ -100,7 +105,16 @@ export default function Login() {
         description: t('auth.login_page.login_success'),
       });
 
-      // Redirect immediately based on role from API response
+      // Check profile completion first
+      const completionPercentage = profileCompletion?.completion_percentage ?? 100;
+
+      // If profile is not complete (less than 100%), redirect to profile setup
+      if (completionPercentage < 100) {
+        navigate('/client/profile-setup', { replace: true });
+        return;
+      }
+
+      // Profile is complete, redirect based on role from API response
       if (signedInUser && signedInUser.roles && signedInUser.roles.length > 0) {
         // Handle both formats: array of strings ["admin"] or array of objects [{name: "admin"}]
         const roles = signedInUser.roles;

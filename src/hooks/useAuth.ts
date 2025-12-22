@@ -7,6 +7,7 @@ import {
   useGetCurrentUserQuery,
   authApi
 } from '@/store/api/authApi';
+import { profileApi } from '@/store/api/profileApi';
 import { extractErrorMessage } from '@/lib/errorHandler';
 
 /**
@@ -46,7 +47,24 @@ export const useAuth = () => {
           token: loginResult.access_token,
           refreshToken: loginResult.refresh_token, // Store refresh token from login response
         }));
-        return { error: null, user: userResult };
+
+        // Fetch profile completion status
+        let profileCompletion = null;
+        try {
+          const completionResult = await dispatch(
+            profileApi.endpoints.getProfileCompletion.initiate(undefined)
+          ).unwrap();
+          profileCompletion = completionResult;
+        } catch (completionError) {
+          // If profile completion API fails, continue without it
+          console.warn('Failed to fetch profile completion:', completionError);
+        }
+
+        return {
+          error: null,
+          user: userResult,
+          profileCompletion
+        };
       }
 
       return { error: { message: 'Failed to fetch user data' }, user: null };

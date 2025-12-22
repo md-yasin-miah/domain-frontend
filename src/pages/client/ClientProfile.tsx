@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,76 +6,56 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { User, Building, Globe, Phone, Mail, Calendar } from "lucide-react";
-import { mockData, mockAuth } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
-
-interface ClientProfile {
-  id: string;
-  company_name: string;
-  contact_person: string;
-  contact_email: string;
-  contact_phone?: string;
-  website_url?: string;
-  hosting_plan: string;
-  domain_status: string;
-  services: string[];
-  monthly_fee: number;
-  contract_start_date: string;
-  contract_end_date?: string;
-  status: string;
-  notes?: string;
-  metadata: any;
-}
+import { useAuth } from "@/hooks/useAuth";
+import { useAppDispatch } from "@/store/hooks";
+import { profileApi } from "@/store/api/profileApi";
+import type { UserProfile } from "@/store/api/types";
 
 export default function ClientProfile() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<ClientProfile | null>(null);
+  const dispatch = useAppDispatch();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    contact_person: '',
-    contact_email: '',
-    contact_phone: '',
-    website_url: '',
-    notes: ''
+    first_name: '',
+    last_name: '',
+    phone: '',
+    bio: '',
+    avatar_url: '',
+    address_line1: '',
+    city: '',
+    country: '',
+    postal_code: '',
+    company_name: '',
+    website: '',
   });
 
-  useEffect(() => {
-    fetchClientProfile();
-  }, []);
-
-  const fetchClientProfile = async () => {
+  const fetchClientProfile = useCallback(async () => {
     if (!user) return;
     try {
-      const profileData = await mockData.getClientProfile(user.id);
-      
+      const profileData = await dispatch(
+        profileApi.endpoints.getMyProfile.initiate(undefined)
+      ).unwrap();
+
       if (profileData) {
-        const mockProfile: ClientProfile = {
-          id: profileData.id,
-          company_name: profileData.company_name || '',
-          contact_person: profileData.full_name || '',
-          contact_email: user.email || '',
-          contact_phone: profileData.phone_number || '',
-          website_url: '',
-          hosting_plan: 'Standard',
-          domain_status: 'Active',
-          services: [],
-          monthly_fee: 0,
-          contract_start_date: new Date().toISOString(),
-          status: 'Active',
-          notes: '',
-          metadata: {},
-        };
-        setProfile(mockProfile);
+        setProfile(profileData);
         setFormData({
-          contact_person: mockProfile.contact_person,
-          contact_email: mockProfile.contact_email,
-          contact_phone: mockProfile.contact_phone || '',
-          website_url: mockProfile.website_url || '',
-          notes: mockProfile.notes || ''
+          first_name: profileData.first_name || '',
+          last_name: profileData.last_name || '',
+          phone: profileData.phone || '',
+          bio: profileData.bio || '',
+          avatar_url: profileData.avatar_url || '',
+          address_line1: profileData.address_line1 || '',
+          city: profileData.city || '',
+          country: profileData.country || '',
+          postal_code: profileData.postal_code || '',
+          company_name: profileData.company_name || '',
+          website: profileData.website || '',
         });
       }
     } catch (error: any) {
@@ -88,17 +68,32 @@ export default function ClientProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, dispatch, toast]);
+
+  useEffect(() => {
+    fetchClientProfile();
+  }, [fetchClientProfile]);
 
   const handleSave = async () => {
     if (!profile || !user) return;
 
     setSaving(true);
     try {
-      await mockData.updateClientProfile(user.id, {
-        full_name: formData.contact_person,
-        phone_number: formData.contact_phone,
-      });
+      await dispatch(
+        profileApi.endpoints.updateProfile.initiate({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          phone: formData.phone,
+          bio: formData.bio,
+          avatar_url: formData.avatar_url,
+          address_line1: formData.address_line1,
+          city: formData.city,
+          country: formData.country,
+          postal_code: formData.postal_code,
+          company_name: formData.company_name,
+          website: formData.website,
+        })
+      ).unwrap();
 
       toast({
         title: "Éxito",
@@ -110,7 +105,7 @@ export default function ClientProfile() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: `Error al actualizar el perfil: ${error.message}`,
+        description: `Error al actualizar el perfil: ${error.message || 'Error desconocido'}`,
         variant: "destructive"
       });
     } finally {
@@ -180,8 +175,8 @@ export default function ClientProfile() {
           <p className="text-muted-foreground">Gestiona tu información de contacto y configuración</p>
         </div>
         <div className="flex gap-2">
-          <Badge variant={getStatusColor(profile.status)}>
-            {profile.status === 'active' ? 'Activo' : profile.status}
+          <Badge variant={profile.is_verified ? 'default' : 'secondary'}>
+            {profile.is_verified ? 'Verificado' : 'No Verificado'}
           </Badge>
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)}>
@@ -191,13 +186,21 @@ export default function ClientProfile() {
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => {
                 setIsEditing(false);
-                setFormData({
-                  contact_person: profile.contact_person || '',
-                  contact_email: profile.contact_email || '',
-                  contact_phone: profile.contact_phone || '',
-                  website_url: profile.website_url || '',
-                  notes: profile.notes || ''
-                });
+                if (profile) {
+                  setFormData({
+                    first_name: profile.first_name || '',
+                    last_name: profile.last_name || '',
+                    phone: profile.phone || '',
+                    bio: profile.bio || '',
+                    avatar_url: profile.avatar_url || '',
+                    address_line1: profile.address_line1 || '',
+                    city: profile.city || '',
+                    country: profile.country || '',
+                    postal_code: profile.postal_code || '',
+                    company_name: profile.company_name || '',
+                    website: profile.website || '',
+                  });
+                }
               }}>
                 Cancelar
               </Button>
@@ -223,34 +226,38 @@ export default function ClientProfile() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Nombre de la Empresa</Label>
-              <Input value={profile.company_name} disabled />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="contact_person">Persona de Contacto</Label>
+              <Label htmlFor="company_name">Nombre de la Empresa</Label>
               <Input
-                id="contact_person"
-                value={formData.contact_person}
-                onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
+                id="company_name"
+                value={formData.company_name || ''}
+                onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                 disabled={!isEditing}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="contact_email">Email de Contacto</Label>
+              <Label htmlFor="first_name">Nombre</Label>
               <Input
-                id="contact_email"
-                type="email"
-                value={formData.contact_email}
-                onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
+                id="first_name"
+                value={formData.first_name || ''}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                 disabled={!isEditing}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="contact_phone">Teléfono</Label>
+              <Label htmlFor="last_name">Apellido</Label>
               <Input
-                id="contact_phone"
-                value={formData.contact_phone}
-                onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
+                id="last_name"
+                value={formData.last_name || ''}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                disabled={!isEditing}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Teléfono</Label>
+              <Input
+                id="phone"
+                value={formData.phone || ''}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 disabled={!isEditing}
               />
             </div>
@@ -270,84 +277,86 @@ export default function ClientProfile() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="website_url">URL del Sitio Web</Label>
+              <Label htmlFor="website">URL del Sitio Web</Label>
               <Input
-                id="website_url"
-                value={formData.website_url}
-                onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
+                id="website"
+                value={formData.website || ''}
+                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                 disabled={!isEditing}
                 placeholder="https://example.com"
               />
             </div>
             <div className="space-y-2">
-              <Label>Plan de Hosting</Label>
-              <Input value={getPlanName(profile.hosting_plan)} disabled />
+              <Label htmlFor="bio">Biografía</Label>
+              <Textarea
+                id="bio"
+                value={formData.bio || ''}
+                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                disabled={!isEditing}
+                placeholder="Escribe una breve biografía..."
+                rows={4}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Estado del Dominio</Label>
+              <Label>Estado de Verificación</Label>
               <div className="flex items-center gap-2">
-                <Badge variant={getStatusColor(profile.domain_status)}>
-                  {profile.domain_status === 'active' ? 'Activo' : 
-                   profile.domain_status === 'pending' ? 'Pendiente' : profile.domain_status}
+                <Badge variant={profile.is_verified ? 'default' : 'secondary'}>
+                  {profile.is_verified ? 'Verificado' : 'No Verificado'}
                 </Badge>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Tarifa Mensual</Label>
-              <Input value={`$${profile.monthly_fee}`} disabled />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Contract Information */}
+      {/* Address Information */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-muted-foreground" />
-            Información del Contrato
+            Información de Dirección
           </CardTitle>
           <CardDescription>
-            Fechas y términos del contrato
+            Dirección de contacto
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Fecha de Inicio</Label>
-            <Input 
-              value={new Date(profile.contract_start_date).toLocaleDateString('es-ES')} 
-              disabled 
+            <Label htmlFor="address_line1">Dirección</Label>
+            <Input
+              id="address_line1"
+              value={formData.address_line1 || ''}
+              onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
+              disabled={!isEditing}
             />
           </div>
           <div className="space-y-2">
-            <Label>Fecha de Fin</Label>
-            <Input 
-              value={profile.contract_end_date ? 
-                new Date(profile.contract_end_date).toLocaleDateString('es-ES') : 
-                'Sin fecha de fin'
-              } 
-              disabled 
+            <Label htmlFor="city">Ciudad</Label>
+            <Input
+              id="city"
+              value={formData.city || ''}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              disabled={!isEditing}
             />
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Additional Notes */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Notas Adicionales</CardTitle>
-          <CardDescription>
-            Información adicional o comentarios
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            disabled={!isEditing}
-            placeholder="Agregar notas o comentarios..."
-            rows={4}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="country">País</Label>
+            <Input
+              id="country"
+              value={formData.country || ''}
+              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="postal_code">Código Postal</Label>
+            <Input
+              id="postal_code"
+              value={formData.postal_code || ''}
+              onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+              disabled={!isEditing}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
