@@ -1,36 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mockData, mockAuth } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Users, 
-  Shield, 
-  Search, 
-  Loader2, 
-  UserPlus, 
-  Edit, 
-  Trash2, 
-  X,
+import {
+  Users,
+  Shield,
+  Search,
+  Loader2,
+  UserPlus,
+  Edit,
+  Trash2,
   Mail,
   Phone,
   MapPin,
   Building
 } from 'lucide-react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogFooter
 } from '@/components/ui/dialog';
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -42,8 +40,20 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DataTable, type ColumnDef } from '@/components/ui/data-table';
+import {
+  useGetUsersQuery,
+  useGetRolesQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  useAssignRoleMutation,
+  useRemoveRoleMutation,
+  useUpdateClientProfileMutation,
+} from '@/store/api/userApi';
+import type { UserResponse, Role as RoleType } from '@/store/api/types';
 
+// Local User interface matching the component's needs
 interface User {
   id: string;
   email: string;
@@ -61,15 +71,10 @@ interface User {
   };
 }
 
-interface Role {
-  id: string;
-  name: string;
-  description: string;
-}
-
 interface UserFormData {
   email: string;
   password: string;
+  username: string;
   full_name: string;
   phone_number: string;
   address: string;
@@ -81,9 +86,19 @@ interface UserFormData {
 
 export default function UserManagement() {
   const { t } = useTranslation();
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  // RTK Query hooks
+  const { data: usersData, isLoading: isLoadingUsers, refetch: refetchUsers } = useGetUsersQuery({});
+  const { data: rolesData, isLoading: isLoadingRoles } = useGetRolesQuery();
+  const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
+  const [updateUser] = useUpdateUserMutation();
+  const [updateClientProfile] = useUpdateClientProfileMutation();
+  const [deleteUser, { isLoading: isDeletingUser }] = useDeleteUserMutation();
+  const [assignRole] = useAssignRoleMutation();
+  const [removeRole] = useRemoveRoleMutation();
+
+  // Local state
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<string>('');
@@ -95,6 +110,7 @@ export default function UserManagement() {
   const [formData, setFormData] = useState<UserFormData>({
     email: '',
     password: '',
+    username: '',
     full_name: '',
     phone_number: '',
     address: '',
@@ -103,148 +119,57 @@ export default function UserManagement() {
     company_details: '',
     role_id: '',
   });
-  const [formLoading, setFormLoading] = useState(false);
-  const { toast } = useToast();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // Transform API response to local User format
+  const users: User[] = useMemo(() => {
+    if (!usersData) return [];
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch all roles
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('roles')
-        .select('*')
-        .order('name');
+    const items = Array.isArray(usersData) ? usersData : usersData.items || [];
 
-      if (rolesError) {
-        console.error('Error fetching roles:', rolesError);
-        throw rolesError;
-      }
-      setRoles(rolesData || []);
+    return items.map((user: UserResponse) => {
+      const profile = user.profile;
+      const fullName = profile
+        ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || null
+        : null;
 
-      // Try to use the Edge Function first (recommended - more secure)
-      try {
-        const { data: edgeFunctionData, error: edgeFunctionError } = await supabase.functions.invoke('get-all-users', {
-          method: 'GET',
-        });
-
-        if (!edgeFunctionError && edgeFunctionData?.users) {
-          // Use the edge function result
-          const usersList: User[] = edgeFunctionData.users.map((user: any) => ({
-            id: user.id,
-            email: user.email || 'No email',
-            created_at: user.created_at || new Date().toISOString(),
-            roles: (user.roles || []).map((r: any) => ({
-              id: r.id,
-              name: r.name,
-              description: r.description,
-            })),
-            profile: user.profile ? {
-              id: user.profile.id,
-              full_name: user.profile.full_name,
-              phone_number: user.profile.phone_number,
-              address: user.profile.address,
-              company_name: user.profile.company_name || undefined,
-              company_address: user.profile.company_address || undefined,
-              company_details: user.profile.company_details || undefined,
-              profile_completed: user.profile.profile_completed || false,
-            } : undefined,
-          }));
-          setUsers(usersList);
-          return;
-        }
-        
-        if (edgeFunctionError) {
-          console.warn('Error calling get-all-users edge function:', edgeFunctionError);
-        }
-      } catch (edgeError: any) {
-        // Edge function not available - use fallback
-        console.log('get-all-users edge function not available, using fallback method');
-      }
-
-      // Fallback: Fetch users with their roles and profiles manually
-      console.log('Using fallback method to fetch users');
-      
-      // Use regular client - RLS policies will handle permissions
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('client_profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        // Don't throw, continue with empty profiles
-      }
-
-      // Get all user_roles using regular client - RLS policies will handle permissions
-      const { data: userRolesData, error: userRolesError } = await supabase
-        .from('user_roles')
-        .select(`
-          user_id,
-          role:roles (
-            id,
-            name,
-            description
-          )
-        `);
-
-      if (userRolesError) {
-        console.error('Error fetching user roles:', userRolesError);
-        // Don't throw, continue with empty roles
-      }
-
-      // Combine data: create a map of user_id -> roles
-      const userRolesMap = new Map<string, Array<{ id: string; name: string; description: string }>>();
-      
-      if (userRolesData) {
-        userRolesData.forEach((ur: any) => {
-          if (ur.user_id && ur.role) {
-            if (!userRolesMap.has(ur.user_id)) {
-              userRolesMap.set(ur.user_id, []);
-            }
-            userRolesMap.get(ur.user_id)!.push(ur.role);
-          }
-        });
-      }
-
-      // Build users array from profiles
-      const usersList: User[] = (profilesData || []).map((profile: any) => ({
-        id: profile.user_id,
-        email: profile.email,
-        created_at: profile.created_at || new Date().toISOString(),
-        roles: userRolesMap.get(profile.user_id) || [],
-        profile: {
-          id: profile.id,
-          full_name: profile.full_name,
-          phone_number: profile.phone_number,
-          address: profile.address,
+      return {
+        id: String(user.id),
+        email: user.email,
+        created_at: user.created_at,
+        roles: (user.roles || []).map((role) => ({
+          id: String(role.id),
+          name: role.name,
+          description: role.description || '',
+        })),
+        profile: profile && fullName ? {
+          id: String(profile.id),
+          full_name: fullName,
+          phone_number: profile.phone || '',
+          address: profile.address_line1 || '',
           company_name: profile.company_name || undefined,
-          company_address: profile.company_address || undefined,
-          company_details: profile.company_details || undefined,
-          profile_completed: profile.profile_completed || false,
-        },
-      }));
+          company_address: undefined, // Not in UserProfile
+          company_details: profile.bio || undefined,
+          profile_completed: user.is_profile_complete || false,
+        } : undefined,
+      };
+    });
+  }, [usersData]);
 
-      console.log('Fetched users:', usersList.length);
-      setUsers(usersList);
-    } catch (error: any) {
-      console.error('Error fetching data:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load users. Check console for details.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Transform roles
+  const roles: Array<{ id: string; name: string; description: string }> = useMemo(() => {
+    if (!rolesData) return [];
+    return rolesData.map((role: RoleType) => ({
+      id: String(role.id),
+      name: role.name,
+      description: role.description || '',
+    }));
+  }, [rolesData]);
+
+  const loading = isLoadingUsers || isLoadingRoles;
+  const formLoading = isCreatingUser || isDeletingUser;
 
   const handleCreateUser = async () => {
-    if (!formData.email || !formData.password || !formData.full_name || !formData.phone_number || !formData.address) {
+    if (!formData.email || !formData.password || !formData.username || !formData.full_name || !formData.phone_number || !formData.address) {
       toast({
         title: 'Error',
         description: t('admin.user_management.create_dialog.required_fields'),
@@ -254,27 +179,36 @@ export default function UserManagement() {
     }
 
     try {
-      setFormLoading(true);
+      // Create user
+      const userResult = await createUser({
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        is_active: true,
+      }).unwrap();
 
-      // Use Edge Function to create user (checks Admin role from user_roles table)
-      const { data, error } = await supabase.functions.invoke('create-user', {
-        body: {
-          email: formData.email,
-          password: formData.password,
-          full_name: formData.full_name,
-          phone_number: formData.phone_number,
-          address: formData.address,
-          company_name: formData.company_name || null,
-          company_address: formData.company_address || null,
-          company_details: formData.company_details || null,
-          role_id: formData.role_id || null,
-        },
-      });
+      // Create profile if profile data is provided
+      if (formData.full_name || formData.phone_number || formData.address) {
+        const nameParts = formData.full_name.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
 
-      if (error) throw error;
+        await updateClientProfile({
+          first_name: firstName,
+          last_name: lastName,
+          phone: formData.phone_number,
+          address_line1: formData.address,
+          company_name: formData.company_name || undefined,
+          bio: formData.company_details || undefined,
+        }).unwrap();
+      }
 
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Failed to create user');
+      // Assign role if selected
+      if (formData.role_id) {
+        await assignRole({
+          id: userResult.id,
+          roleId: Number(formData.role_id),
+        }).unwrap();
       }
 
       toast({
@@ -284,16 +218,14 @@ export default function UserManagement() {
 
       setShowCreateDialog(false);
       resetForm();
-      fetchData();
+      refetchUsers();
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
         title: 'Error',
-        description: error.message || t('admin.user_management.messages.create_error'),
+        description: error?.data?.detail || error?.message || t('admin.user_management.messages.create_error'),
         variant: 'destructive',
       });
-    } finally {
-      setFormLoading(false);
     }
   };
 
@@ -308,65 +240,32 @@ export default function UserManagement() {
     }
 
     try {
-      setFormLoading(true);
+      const userId = Number(selectedUser.id);
 
-      console.log('Updating profile for user_id:', selectedUser.id);
-      console.log('Update data:', {
-        full_name: formData.full_name,
-        phone_number: formData.phone_number,
-        address: formData.address,
-        company_name: formData.company_name,
-        email: formData.email,
-      });
-
-      // Use Edge Function for secure update (bypasses RLS)
-      try {
-        const { data: edgeFunctionData, error: edgeFunctionError } = await supabase.functions.invoke('update-user-profile', {
-          method: 'POST',
-          body: {
-            user_id: selectedUser.id,
-            email: formData.email,
-            profile_data: {
-              full_name: formData.full_name,
-              phone_number: formData.phone_number,
-              address: formData.address,
-              company_name: formData.company_name || null,
-              company_address: formData.company_address || null,
-              company_details: formData.company_details || null,
-            }
-          }
-        });
-
-        if (!edgeFunctionError && edgeFunctionData?.success) {
-          console.log('Profile updated via Edge Function:', edgeFunctionData.profile);
-          // Skip to email update and success message
-        } else if (edgeFunctionError) {
-          console.warn('Edge Function error, falling back to direct update:', edgeFunctionError);
-          throw edgeFunctionError;
-        }
-      } catch (edgeError: any) {
-        // Edge Function failed - show error
-        console.error('Edge Function error:', edgeError);
-        throw new Error(edgeError.message || 'Failed to update user profile. Please try again.');
+      // Update user email/username if changed
+      if (formData.email !== selectedUser.email || formData.username) {
+        await updateUser({
+          id: userId,
+          data: {
+            email: formData.email !== selectedUser.email ? formData.email : undefined,
+            username: formData.username || undefined,
+          },
+        }).unwrap();
       }
 
-      // Verify the update actually happened
-      const { data: updatedProfile, error: verifyError } = await supabase
-        .from('client_profiles')
-        .select('*')
-        .eq('user_id', selectedUser.id)
-        .single();
+      // Update profile
+      const nameParts = formData.full_name.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
 
-      if (verifyError) {
-        console.warn('Could not verify update:', verifyError);
-      } else {
-        console.log('Profile updated successfully:', updatedProfile);
-      }
-
-      // Email update is handled by the Edge Function
-      if (formData.email !== selectedUser.email) {
-        console.log('Email update handled by Edge Function');
-      }
+      await updateClientProfile({
+        first_name: firstName,
+        last_name: lastName,
+        phone: formData.phone_number,
+        address_line1: formData.address,
+        company_name: formData.company_name || undefined,
+        bio: formData.company_details || undefined,
+      }).unwrap();
 
       toast({
         title: 'Success',
@@ -375,17 +274,14 @@ export default function UserManagement() {
 
       setShowEditDialog(false);
       resetForm();
-      // Refresh data to show updated values
-      await fetchData();
+      refetchUsers();
     } catch (error: any) {
       console.error('Error updating user:', error);
       toast({
         title: 'Error',
-        description: error.message || t('admin.user_management.messages.update_error'),
+        description: error?.data?.detail || error?.message || t('admin.user_management.messages.update_error'),
         variant: 'destructive',
       });
-    } finally {
-      setFormLoading(false);
     }
   };
 
@@ -393,20 +289,7 @@ export default function UserManagement() {
     if (!userToDelete) return;
 
     try {
-      setFormLoading(true);
-
-      // Use Edge Function to delete user (checks Admin role from user_roles table)
-      const { data, error } = await supabase.functions.invoke('delete-user', {
-        body: {
-          user_id: userToDelete.id,
-        },
-      });
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Failed to delete user');
-      }
+      await deleteUser(Number(userToDelete.id)).unwrap();
 
       toast({
         title: 'Success',
@@ -415,20 +298,18 @@ export default function UserManagement() {
 
       setShowDeleteDialog(false);
       setUserToDelete(null);
-      fetchData();
+      refetchUsers();
     } catch (error: any) {
       console.error('Error deleting user:', error);
       toast({
         title: 'Error',
-        description: error.message || t('admin.user_management.messages.delete_error'),
+        description: error?.data?.detail || error?.message || t('admin.user_management.messages.delete_error'),
         variant: 'destructive',
       });
-    } finally {
-      setFormLoading(false);
     }
   };
 
-  const assignRole = async () => {
+  const handleAssignRole = async () => {
     if (!selectedUser || !selectedRoleId) {
       toast({
         title: 'Error',
@@ -450,14 +331,10 @@ export default function UserManagement() {
         return;
       }
 
-      const { error } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: selectedUser.id,
-          role_id: selectedRoleId,
-        });
-
-      if (error) throw error;
+      await assignRole({
+        id: Number(selectedUser.id),
+        roleId: Number(selectedRoleId),
+      }).unwrap();
 
       toast({
         title: 'Role Assigned',
@@ -467,40 +344,37 @@ export default function UserManagement() {
       setShowAssignDialog(false);
       setSelectedUser(null);
       setSelectedRoleId('');
-      fetchData();
+      refetchUsers();
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error?.data?.detail || error?.message || t('admin.user_management.messages.role_assigned_error'),
         variant: 'destructive',
       });
     }
   };
 
-  const removeRole = async (userId: string, roleId: string) => {
+  const handleRemoveRole = async (userId: string, roleId: string) => {
     if (!confirm(t('admin.user_management.messages.remove_role_confirm'))) {
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId)
-        .eq('role_id', roleId);
-
-      if (error) throw error;
+      await removeRole({
+        id: Number(userId),
+        roleId: Number(roleId),
+      }).unwrap();
 
       toast({
         title: 'Role Removed',
         description: t('admin.user_management.messages.role_removed'),
       });
 
-      fetchData();
+      refetchUsers();
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error?.data?.detail || error?.message || t('admin.user_management.messages.role_removed_error'),
         variant: 'destructive',
       });
     }
@@ -508,15 +382,17 @@ export default function UserManagement() {
 
   const openEditDialog = (user: User) => {
     setSelectedUser(user);
+    const profile = user.profile;
     setFormData({
       email: user.email,
       password: '',
-      full_name: user.profile?.full_name || '',
-      phone_number: user.profile?.phone_number || '',
-      address: user.profile?.address || '',
-      company_name: user.profile?.company_name || '',
-      company_address: user.profile?.company_address || '',
-      company_details: user.profile?.company_details || '',
+      username: '', // Not available in current User interface
+      full_name: profile?.full_name || '',
+      phone_number: profile?.phone_number || '',
+      address: profile?.address || '',
+      company_name: profile?.company_name || '',
+      company_address: profile?.company_address || '',
+      company_details: profile?.company_details || '',
       role_id: user.roles[0]?.id || '',
     });
     setShowEditDialog(true);
@@ -526,6 +402,7 @@ export default function UserManagement() {
     setFormData({
       email: '',
       password: '',
+      username: '',
       full_name: '',
       phone_number: '',
       address: '',
@@ -553,6 +430,205 @@ export default function UserManagement() {
         return 'bg-gray-500/10 text-gray-500 hover:bg-gray-500/20';
     }
   };
+
+  // Define columns for DataTable
+  const columns: ColumnDef<User>[] = [
+    {
+      id: 'user',
+      header: t('admin.user_management.user'),
+      accessorKey: 'email',
+      cell: ({ row }) => (
+        <div>
+          <div className="font-medium">
+            {row.profile?.full_name || t('admin.user_management.no_name')}
+          </div>
+          <div className="text-sm text-muted-foreground flex items-center gap-1">
+            <Mail className="h-3 w-3" />
+            {row.email}
+          </div>
+        </div>
+      ),
+      enableSorting: true,
+    },
+    {
+      id: 'contact',
+      header: t('admin.user_management.contact'),
+      cell: ({ row }) => (
+        <div className="space-y-1 text-sm">
+          {row.profile?.phone_number && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Phone className="h-3 w-3" />
+              {row.profile.phone_number}
+            </div>
+          )}
+          {row.profile?.address && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              <span className="truncate max-w-[200px]">{row.profile.address}</span>
+            </div>
+          )}
+          {row.profile?.company_name && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Building className="h-3 w-3" />
+              {row.profile.company_name}
+            </div>
+          )}
+        </div>
+      ),
+      enableSorting: false,
+    },
+    {
+      id: 'roles',
+      header: t('admin.user_management.roles'),
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-2">
+          {row.roles.length === 0 ? (
+            <Badge variant="outline" className="text-muted-foreground">
+              {t('admin.user_management.no_roles')}
+            </Badge>
+          ) : (
+            row.roles.map((role) => (
+              <Badge
+                key={role.id}
+                className={getRoleBadgeColor(role.name)}
+                variant="secondary"
+              >
+                <Shield className="h-3 w-3 mr-1" />
+                {role.name}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveRole(row.id, role.id);
+                  }}
+                  className="ml-2 hover:text-destructive"
+                  title="Remove role"
+                >
+                  ×
+                </button>
+              </Badge>
+            ))
+          )}
+        </div>
+      ),
+      enableSorting: false,
+    },
+    {
+      id: 'created',
+      header: t('admin.user_management.created'),
+      accessorKey: 'created_at',
+      cell: ({ getValue }) => {
+        const date = getValue() as string;
+        return new Date(date).toLocaleDateString();
+      },
+      enableSorting: true,
+    },
+  ];
+
+  // Render actions for each row
+  const renderUserActions = (user: User) => (
+    <div className="flex justify-end gap-2">
+      <Dialog
+        open={showAssignDialog && selectedUser?.id === user.id}
+        onOpenChange={(open) => {
+          setShowAssignDialog(open);
+          if (open) {
+            setSelectedUser(user);
+          } else {
+            setSelectedUser(null);
+            setSelectedRoleId('');
+          }
+        }}
+      >
+        <DialogTrigger asChild>
+          <Button size="sm" variant="outline">
+            <UserPlus className="h-4 w-4 mr-2" />
+            {t('admin.user_management.assign_role')}
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('admin.user_management.assign_role_dialog.title')}</DialogTitle>
+            <DialogDescription>
+              {t('admin.user_management.assign_role_dialog.description')} {user.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                {t('admin.user_management.assign_role_dialog.current_roles')}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {user.roles.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    {t('admin.user_management.assign_role_dialog.no_roles_assigned')}
+                  </p>
+                ) : (
+                  user.roles.map((role) => (
+                    <Badge
+                      key={role.id}
+                      className={getRoleBadgeColor(role.name)}
+                    >
+                      {role.name}
+                    </Badge>
+                  ))
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                {t('admin.user_management.assign_role_dialog.select_role')}
+              </label>
+              <Select
+                value={selectedRoleId}
+                onValueChange={setSelectedRoleId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('admin.user_management.assign_role_dialog.choose_role')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        <div>
+                          <div className="font-medium">{role.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {role.description}
+                          </div>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={handleAssignRole} className="w-full">
+              {t('admin.user_management.assign_role_dialog.assign')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => openEditDialog(user)}
+      >
+        <Edit className="h-4 w-4 mr-2" />
+        {t('admin.user_management.edit_user')}
+      </Button>
+      <Button
+        size="sm"
+        variant="destructive"
+        onClick={() => {
+          setUserToDelete(user);
+          setShowDeleteDialog(true);
+        }}
+      >
+        <Trash2 className="h-4 w-4 mr-2" />
+        {t('admin.user_management.delete_user')}
+      </Button>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -605,6 +681,17 @@ export default function UserManagement() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="create-username">{t('admin.user_management.create_dialog.username')} *</Label>
+                    <Input
+                      id="create-username"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      placeholder="username"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label htmlFor="create-password">{t('admin.user_management.create_dialog.password')} *</Label>
                     <Input
                       id="create-password"
@@ -613,6 +700,24 @@ export default function UserManagement() {
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="••••••••"
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="create-role">{t('admin.user_management.create_dialog.initial_role')}</Label>
+                    <Select
+                      value={formData.role_id}
+                      onValueChange={(value) => setFormData({ ...formData, role_id: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('admin.user_management.create_dialog.select_role')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roles.map((role) => (
+                          <SelectItem key={role.id} value={role.id}>
+                            {role.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -633,24 +738,6 @@ export default function UserManagement() {
                       onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                       placeholder="+1234567890"
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="create-role">{t('admin.user_management.create_dialog.initial_role')}</Label>
-                    <Select
-                      value={formData.role_id}
-                      onValueChange={(value) => setFormData({ ...formData, role_id: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('admin.user_management.create_dialog.select_role')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role.id} value={role.id}>
-                            {role.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -713,7 +800,7 @@ export default function UserManagement() {
             <div>
               <CardTitle>{t('admin.user_management.all_users')}</CardTitle>
               <CardDescription>
-                {filteredUsers.length} {filteredUsers.length === 1 
+                {filteredUsers.length} {filteredUsers.length === 1
                   ? t('admin.user_management.users_found')
                   : t('admin.user_management.users_found_plural')}
               </CardDescription>
@@ -730,198 +817,17 @@ export default function UserManagement() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('admin.user_management.user')}</TableHead>
-                  <TableHead>{t('admin.user_management.contact')}</TableHead>
-                  <TableHead>{t('admin.user_management.roles')}</TableHead>
-                  <TableHead>{t('admin.user_management.created')}</TableHead>
-                  <TableHead className="text-right">{t('admin.user_management.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      {t('admin.user_management.no_users')}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{user.profile?.full_name || t('admin.user_management.no_name')}</div>
-                          <div className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Mail className="h-3 w-3" />
-                            {user.email}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1 text-sm">
-                          {user.profile?.phone_number && (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <Phone className="h-3 w-3" />
-                              {user.profile.phone_number}
-                            </div>
-                          )}
-                          {user.profile?.address && (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <MapPin className="h-3 w-3" />
-                              <span className="truncate max-w-[200px]">{user.profile.address}</span>
-                            </div>
-                          )}
-                          {user.profile?.company_name && (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <Building className="h-3 w-3" />
-                              {user.profile.company_name}
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-2">
-                          {user.roles.length === 0 ? (
-                            <Badge variant="outline" className="text-muted-foreground">
-                              {t('admin.user_management.no_roles')}
-                            </Badge>
-                          ) : (
-                            user.roles.map((role) => (
-                              <Badge
-                                key={role.id}
-                                className={getRoleBadgeColor(role.name)}
-                                variant="secondary"
-                              >
-                                <Shield className="h-3 w-3 mr-1" />
-                                {role.name}
-                                <button
-                                  onClick={() => removeRole(user.id, role.id)}
-                                  className="ml-2 hover:text-destructive"
-                                  title="Remove role"
-                                >
-                                  ×
-                                </button>
-                              </Badge>
-                            ))
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(user.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Dialog
-                            open={showAssignDialog && selectedUser?.id === user.id}
-                            onOpenChange={(open) => {
-                              setShowAssignDialog(open);
-                              if (open) {
-                                setSelectedUser(user);
-                              } else {
-                                setSelectedUser(null);
-                                setSelectedRoleId('');
-                              }
-                            }}
-                          >
-                            <DialogTrigger asChild>
-                              <Button size="sm" variant="outline">
-                                <UserPlus className="h-4 w-4 mr-2" />
-                                {t('admin.user_management.assign_role')}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>{t('admin.user_management.assign_role_dialog.title')}</DialogTitle>
-                                <DialogDescription>
-                                  {t('admin.user_management.assign_role_dialog.description')} {user.email}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div>
-                                  <label className="text-sm font-medium mb-2 block">
-                                    {t('admin.user_management.assign_role_dialog.current_roles')}
-                                  </label>
-                                  <div className="flex flex-wrap gap-2">
-                                    {user.roles.length === 0 ? (
-                                      <p className="text-sm text-muted-foreground">
-                                        {t('admin.user_management.assign_role_dialog.no_roles_assigned')}
-                                      </p>
-                                    ) : (
-                                      user.roles.map((role) => (
-                                        <Badge
-                                          key={role.id}
-                                          className={getRoleBadgeColor(role.name)}
-                                        >
-                                          {role.name}
-                                        </Badge>
-                                      ))
-                                    )}
-                                  </div>
-                                </div>
-                                <div>
-                                  <label className="text-sm font-medium mb-2 block">
-                                    {t('admin.user_management.assign_role_dialog.select_role')}
-                                  </label>
-                                  <Select
-                                    value={selectedRoleId}
-                                    onValueChange={setSelectedRoleId}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder={t('admin.user_management.assign_role_dialog.choose_role')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {roles.map((role) => (
-                                        <SelectItem key={role.id} value={role.id}>
-                                          <div className="flex items-center gap-2">
-                                            <Shield className="h-4 w-4" />
-                                            <div>
-                                              <div className="font-medium">{role.name}</div>
-                                              <div className="text-xs text-muted-foreground">
-                                                {role.description}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <Button onClick={assignRole} className="w-full">
-                                  {t('admin.user_management.assign_role_dialog.assign')}
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => openEditDialog(user)}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            {t('admin.user_management.edit_user')}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              setUserToDelete(user);
-                              setShowDeleteDialog(true);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            {t('admin.user_management.delete_user')}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <DataTable
+            data={filteredUsers}
+            columns={columns}
+            isLoading={loading}
+            emptyMessage={t('admin.user_management.no_users')}
+            getRowId={(row) => row.id}
+            renderActions={renderUserActions}
+            actionsColumnHeader={t('admin.user_management.actions')}
+            actionsColumnClassName="text-right"
+            enableSorting={true}
+          />
         </CardContent>
       </Card>
 

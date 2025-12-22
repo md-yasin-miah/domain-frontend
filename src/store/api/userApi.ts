@@ -6,6 +6,7 @@ import type {
   PasswordUpdateRequest,
   PasswordResetRequest,
   UserStats,
+  Role,
   PaginatedResponse,
   PaginationParams,
 } from './types';
@@ -99,6 +100,13 @@ export const userApi = apiSlice.injectEndpoints({
         method: 'GET',
       }),
       providesTags: (result, error, id) => [{ type: 'User', id }],
+    }),
+    getRoles: builder.query<Role[], void>({
+      query: () => ({
+        url: '/roles',
+        method: 'GET',
+      }),
+      providesTags: ['Role'],
     }),
     // Client-specific convenience queries
     getClientProfile: builder.query<any, string | number>({
@@ -204,6 +212,7 @@ export const {
   useDeactivateUserMutation,
   useDeleteUserMutation,
   useGetUserStatsQuery,
+  useGetRolesQuery,
   useGetClientProfileQuery,
   useGetClientDomainsQuery,
   useGetClientInvoicesQuery,

@@ -28,16 +28,7 @@ export interface RefreshTokenResponse {
   token_type: string;
 }
 
-export interface UserResponse {
-  id: number;
-  email: string;
-  username: string;
-  is_active: boolean;
-  is_profile_complete: boolean;
-  profile: UserProfile | null;
-  roles: Role[];
-  created_at: string;
-}
+
 
 // ============ Profile Types ============
 export interface UserProfile {
@@ -121,7 +112,7 @@ export interface ListingCreateRequest {
   status?: 'draft' | 'active';
 }
 
-export interface ListingUpdateRequest extends Partial<ListingCreateRequest> {}
+export type ListingUpdateRequest = Partial<ListingCreateRequest>;
 
 // ============ Order Types ============
 export interface Order {
@@ -442,6 +433,17 @@ export interface BuyerDashboard {
 }
 
 // ============ User Management Types ============
+export interface UserResponse {
+  id: number;
+  username: string;
+  email: string;
+  is_active: boolean;
+  is_profile_complete?: boolean;
+  profile: UserProfile | null;
+  roles: Role[];
+  created_at: string;
+}
+
 export interface UserCreateRequest {
   email: string;
   username: string;
@@ -487,6 +489,7 @@ export interface PaginationParams {
   page?: number;
   size?: number;
 }
+
 
 // ============ Filter Types ============
 export interface ListingFilters extends PaginationParams {
