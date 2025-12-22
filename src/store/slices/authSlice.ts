@@ -56,10 +56,7 @@ const authSlice = createSlice({
       state.user = user;
       state.token = token;
       state.refreshToken = refreshToken || null;
-      state.isAuthenticated = true;
-      // Handle both formats: array of strings ["admin"] or array of objects [{name: "admin"}]
-      // API may return roles as strings, but type definition expects Role objects
-      state.isAdmin = user.roles?.some((r: unknown) => {
+      state.isAuthenticated = true; state.isAdmin = user.roles?.some((r: unknown) => {
         if (typeof r === 'string') {
           return r.toLowerCase() === 'admin';
         }
