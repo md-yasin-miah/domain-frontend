@@ -3,7 +3,7 @@ import type { RootState } from '../index';
 
 // Base query for API calls
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api',
+  baseUrl: import.meta.env.VITE_API_BASE_URL,
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as RootState;
     const token = state.auth.token;
