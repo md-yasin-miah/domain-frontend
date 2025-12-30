@@ -4,7 +4,6 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
-import Dashboard from "./pages/Dashboard";
 import DominiosPage from "./pages/marketplace/Dominios";
 import SitiosPage from "./pages/marketplace/Sitios";
 import NotFound from "./pages/NotFound";
@@ -299,25 +298,6 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "dashboard",
-        element: <Dashboard />,
-      },
-      // User protected routes - Nested
-      {
-        path: "user",
-        children: [
-          {
-            path: "dominios",
-            element: <MisDominios />,
-          },
-          {
-            path: "facturas",
-            element: <Facturas />,
-          },
-        ],
-      },
-      // Client routes - Nested
-      {
         path: "client",
         children: [
           {
@@ -331,6 +311,14 @@ export const router = createBrowserRouter([
           {
             path: "profile-setup",
             element: <ProfileSetup />,
+          },
+          {
+            path: "dominios",
+            element: <MisDominios />,
+          },
+          {
+            path: "facturas",
+            element: <Facturas />,
           },
           {
             path: "faq",
@@ -436,17 +424,6 @@ export const router = createBrowserRouter([
         element: <FAQManager />,
       },
     ],
-  },
-  // Secure Super Admin Route - No indexing (separate route)
-  {
-    path: "/_admin-roc-9b3a2f",
-    element: (
-      <ProtectedRoute requireAdmin={true}>
-        <AdminLayout>
-          <SuperAdminPanel />
-        </AdminLayout>
-      </ProtectedRoute>
-    ),
   },
   // Catch all
   {

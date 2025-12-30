@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Globe, CreditCard, FileText, MessageCircle, AlertCircle, HelpCircle, ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -51,6 +51,7 @@ export default function ClientDashboard() {
   const { data: profile, isLoading: profileLoading } = useGetClientProfileQuery(user?.id || '', {
     skip: !user?.id,
   });
+  console.log({ profile });
   const { data: domains = [], isLoading: domainsLoading } = useGetClientDomainsQuery(user?.id || '', {
     skip: !user?.id,
   });
@@ -63,11 +64,11 @@ export default function ClientDashboard() {
 
   const loading = profileLoading || domainsLoading || invoicesLoading || ticketsLoading;
 
-  useEffect(() => {
-    if (user && profile && !profile.profile_completed) {
-      navigate('/client/profile-setup');
-    }
-  }, [user, profile, navigate]);
+  // useEffect(() => {
+  //   if (user && profile && !profile.profile_completed) {
+  //     navigate('/client/profile-setup');
+  //   }
+  // }, [user, profile, navigate]);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
