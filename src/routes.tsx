@@ -1,6 +1,7 @@
 import { createBrowserRouter, Outlet } from "react-router-dom";
-import AppLayout from "./components/AppLayout";
-import { AdminLayout } from "./components/admin/AdminLayout";
+import AppLayout from "./components/layout/AppLayout";
+import { AdminLayout } from "./components/layout/AdminLayout";
+import { ClientLayout } from "./components/layout/ClientLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
@@ -286,7 +287,44 @@ export const router = createBrowserRouter([
       </>
     ),
   },
-  // Protected routes with AppLayout
+  // Client routes with ClientLayout
+  {
+    path: "/client",
+    element: (
+      <ProtectedRoute>
+        <ClientLayout>
+          <Outlet />
+        </ClientLayout>
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: "dashboard",
+        element: <ClientDashboard />,
+      },
+      {
+        path: "profile",
+        element: <ClientProfile />,
+      },
+      {
+        path: "profile-setup",
+        element: <ProfileSetup />,
+      },
+      {
+        path: "dominios",
+        element: <MisDominios />,
+      },
+      {
+        path: "facturas",
+        element: <Facturas />,
+      },
+      {
+        path: "faq",
+        element: <FAQ />,
+      },
+    ],
+  },
+  // Protected routes with AppLayout (for other protected routes)
   {
     path: "/",
     element: (
@@ -297,35 +335,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      {
-        path: "client",
-        children: [
-          {
-            path: "dashboard",
-            element: <ClientDashboard />,
-          },
-          {
-            path: "profile",
-            element: <ClientProfile />,
-          },
-          {
-            path: "profile-setup",
-            element: <ProfileSetup />,
-          },
-          {
-            path: "dominios",
-            element: <MisDominios />,
-          },
-          {
-            path: "facturas",
-            element: <Facturas />,
-          },
-          {
-            path: "faq",
-            element: <FAQ />,
-          },
-        ],
-      },
+      // Other protected routes can go here
     ],
   },
   // Admin routes - Nested under /admin
