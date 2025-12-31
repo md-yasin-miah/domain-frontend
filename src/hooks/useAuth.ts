@@ -1,4 +1,5 @@
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { store } from '@/store';
 import { logout, setCredentials, setToken, setError } from '@/store/slices/authSlice';
 import {
   useLoginMutation,
@@ -33,12 +34,25 @@ export const useAuth = () => {
         password
       }).unwrap();
 
-      // Store token first
+      // Store token first - Redux updates are synchronous
       dispatch(setToken(loginResult.access_token));
 
-      // Fetch user data using the API directly (since query is skipped initially)
+      // Verify token is in store (should be immediate since Redux updates are synchronous)
+      // Use a microtask to ensure any pending state updates are processed
+      await Promise.resolve();
+
+      // Double-check token is in store before making the request
+      const token = store.getState().auth.token;
+      if (!token) {
+        console.error('Token not found in store after setToken dispatch');
+        throw new Error('Token was not set in store after login');
+      }
+
+      // Fetch user data using the API directly with the token
       const userResult = await dispatch(
-        authApi.endpoints.getCurrentUser.initiate(undefined)
+        authApi.endpoints.getCurrentUser.initiate(undefined, {
+          forceRefetch: true,
+        })
       ).unwrap();
 
       if (userResult) {
@@ -83,9 +97,6 @@ export const useAuth = () => {
         password,
         username: username || email.split('@')[0]
       }).unwrap();
-
-      // After registration, user is returned but no token
-      // User needs to login separately
       return { error: null, user: result };
     } catch (error: unknown) {
       const errorMessage = extractErrorMessage(error);
