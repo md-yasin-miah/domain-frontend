@@ -109,7 +109,7 @@ export const userApi = apiSlice.injectEndpoints({
       providesTags: ['Role'],
     }),
     // Client-specific convenience queries
-    getClientProfile: builder.query<any, string | number>({
+    getClientProfile: builder.query<ClientProfile, string | number>({
       query: (userId) => ({
         url: `/profile/${userId}`,
         method: 'GET',
