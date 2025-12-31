@@ -256,7 +256,7 @@ export default function ClientProfile() {
                 type="url"
                 value={formData.avatar_url || ''}
                 onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder={t('profile.client.avatar_url_placeholder')}
               />
               {formData.avatar_url && (
@@ -278,7 +278,7 @@ export default function ClientProfile() {
                 id="company_name"
                 value={formData.company_name || ''}
                 onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
               />
             </div>
             <div className="space-y-2">
@@ -287,7 +287,7 @@ export default function ClientProfile() {
                 id="first_name"
                 value={formData.first_name || ''}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
               />
             </div>
             <div className="space-y-2">
@@ -296,7 +296,7 @@ export default function ClientProfile() {
                 id="last_name"
                 value={formData.last_name || ''}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
               />
             </div>
             <div className="space-y-2">
@@ -306,7 +306,7 @@ export default function ClientProfile() {
                 type="tel"
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
               />
             </div>
           </CardContent>
@@ -330,7 +330,7 @@ export default function ClientProfile() {
                 id="website"
                 value={formData.website || ''}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder={t('profile.client.website_placeholder')}
               />
             </div>
@@ -340,7 +340,7 @@ export default function ClientProfile() {
                 id="bio"
                 value={formData.bio || ''}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder={t('profile.client.bio_placeholder')}
                 rows={4}
               />
@@ -375,7 +375,7 @@ export default function ClientProfile() {
               id="address_line1"
               value={formData.address_line1 || ''}
               onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
-              disabled={!isEditing}
+              readOnly={!isEditing}
               placeholder={t('profile.client.address_placeholder')}
             />
           </div>
@@ -385,7 +385,7 @@ export default function ClientProfile() {
               id="address_line2"
               value={formData.address_line2 || ''}
               onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
-              disabled={!isEditing}
+              readOnly={!isEditing}
               placeholder={t('profile.client.address_line2_placeholder')}
             />
           </div>
@@ -395,7 +395,7 @@ export default function ClientProfile() {
               id="city"
               value={formData.city || ''}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              disabled={!isEditing}
+              readOnly={!isEditing}
             />
           </div>
           <div className="space-y-2">
@@ -404,7 +404,7 @@ export default function ClientProfile() {
               id="state"
               value={formData.state || ''}
               onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              disabled={!isEditing}
+              readOnly={!isEditing}
             />
           </div>
           <div className="space-y-2">
@@ -413,7 +413,7 @@ export default function ClientProfile() {
               id="country"
               value={formData.country || ''}
               onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              disabled={!isEditing}
+              readOnly={!isEditing}
             />
           </div>
           <div className="space-y-2">
@@ -422,7 +422,7 @@ export default function ClientProfile() {
               id="postal_code"
               value={formData.postal_code || ''}
               onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-              disabled={!isEditing}
+              readOnly={!isEditing}
             />
           </div>
         </CardContent>
@@ -451,7 +451,7 @@ export default function ClientProfile() {
                   ...formData,
                   social_links: { ...formData.social_links, facebook: e.target.value }
                 })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder="https://facebook.com/username"
               />
             </div>
@@ -465,7 +465,7 @@ export default function ClientProfile() {
                   ...formData,
                   social_links: { ...formData.social_links, twitter: e.target.value }
                 })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder="https://twitter.com/username"
               />
             </div>
@@ -479,7 +479,7 @@ export default function ClientProfile() {
                   ...formData,
                   social_links: { ...formData.social_links, linkedin: e.target.value }
                 })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder="https://linkedin.com/in/username"
               />
             </div>
@@ -493,7 +493,7 @@ export default function ClientProfile() {
                   ...formData,
                   social_links: { ...formData.social_links, instagram: e.target.value }
                 })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder="https://instagram.com/username"
               />
             </div>
@@ -507,7 +507,7 @@ export default function ClientProfile() {
                   ...formData,
                   social_links: { ...formData.social_links, github: e.target.value }
                 })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder="https://github.com/username"
               />
             </div>
@@ -521,7 +521,7 @@ export default function ClientProfile() {
                   ...formData,
                   social_links: { ...formData.social_links, youtube: e.target.value }
                 })}
-                disabled={!isEditing}
+                readOnly={!isEditing}
                 placeholder="https://youtube.com/@username"
               />
             </div>

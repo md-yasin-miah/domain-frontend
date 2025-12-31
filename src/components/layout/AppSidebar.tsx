@@ -131,16 +131,6 @@ export function AppSidebar({
       return (
         <SidebarFooter className="border-t border-sidebar-border/50 bg-sidebar-background/50 backdrop-blur-sm">
           <div className="flex flex-col gap-2 p-2">
-            <div className="flex items-center gap-2 px-2 py-1.5">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.profile?.avatar_url || undefined} alt={userName} />
-                <AvatarFallback>{userInitials}</AvatarFallback>
-              </Avatar>
-              <div className={cn('flex flex-col min-w-0 flex-1', isCollapsed && 'hidden')}>
-                <p className="text-sm font-medium truncate">{userName}</p>
-                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-              </div>
-            </div>
             <Button
               variant="ghost"
               size="sm"
