@@ -57,35 +57,6 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
   const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Extract subitems from menuItems for dropdowns
-  const categoriesItem = menuItems.find((item) => item.title === 'Categories' || item.title === 'Categorías');
-  const servicesItem = menuItems.find((item) => item.title === 'Services' || item.title === 'Servicios');
-  const resourcesItem = menuItems.find((item) => item.title === 'Resources' || item.title === 'Recursos');
-
-  const effectiveCategoriesItems =
-    categoriesItem?.subItems?.map((sub) => ({
-      title: sub.title,
-      url: sub.url,
-      icon: sub.icon || Grid3X3,
-      description: sub.description,
-    })) || [];
-
-  const effectiveServicesItems =
-    servicesItem?.subItems?.map((sub) => ({
-      title: sub.title,
-      url: sub.url,
-      icon: sub.icon || Settings,
-      description: sub.description,
-    })) || [];
-
-  const effectiveResourcesItems =
-    resourcesItem?.subItems?.map((sub) => ({
-      title: sub.title,
-      url: sub.url,
-      icon: sub.icon || BookOpen,
-      description: sub.description,
-    })) || [];
-
   return (
     <>
       {/* Enhanced Header with Professional Design */}
@@ -128,9 +99,9 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="center"
-                        className={`${categoriesItem ? 'w-96' : 'w-80'} bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50`}
+                        className={`${item.subItems.length > 5 ? 'w-96' : 'w-80'} bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50`}
                       >
-                        <div className={categoriesItem ? 'grid grid-cols-2 gap-1' : 'space-y-1'}>
+                        <div className={item.subItems.length > 5 ? 'grid grid-cols-2 gap-1' : 'space-y-1'}>
                           {item.subItems?.map((subItem) => (
                             <DropdownMenuItem key={subItem.title} asChild>
                               <Link
