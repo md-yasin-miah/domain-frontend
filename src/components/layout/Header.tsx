@@ -56,6 +56,7 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedMenuItems, setExpandedMenuItems] = useState<Record<string, boolean>>({});
 
   return (
     <>
@@ -195,7 +196,7 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                       </DropdownMenuItem>
                     )}
 
-                    {userServices.map((item) => (
+                    {userServices?.map((item) => (
                       <DropdownMenuItem key={item.title} asChild>
                         <Link
                           to={item.url}
@@ -267,92 +268,76 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
         <div className="lg:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-xl z-40 animate-fade-in">
           <div className="flex flex-col h-full overflow-y-auto">
             <div className="flex-1 px-4 py-6 space-y-6">
-              {/* Main Navigation - Mobile */}
-              <div className="space-y-3">
-                <h3 className="text-xs font-semibold text-primary uppercase tracking-wider px-2">
-                  Navegación Principal
-                </h3>
-                <div className="space-y-1">
+              {/* Dynamic Menu Items - Mobile */}
+              {menuItems.map((item) => {
+                // If item has subItems, render as expandable section
+                if (item.subItems && item.subItems.length > 0) {
+                  const isExpanded = expandedMenuItems[item.title] || false;
+                  const isGridLayout = item.subItems.length > 5;
+
+                  return (
+                    <div key={item.title} className="space-y-3">
+                      <button
+                        onClick={() => setExpandedMenuItems(prev => ({ ...prev, [item.title]: !prev[item.title] }))}
+                        className="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-primary uppercase tracking-wider hover:bg-muted/30 rounded-lg transition-all"
+                      >
+                        <span>{item.title}</span>
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                        />
+                      </button>
+                      {isExpanded && (
+                        <div className={isGridLayout ? 'grid grid-cols-2 gap-2' : 'space-y-1'}>
+                          {item.subItems.map((subItem) => (
+                            <Link
+                              key={subItem.title}
+                              to={subItem.url}
+                              className={`flex ${isGridLayout ? 'flex-col items-center space-y-2 text-center' : 'items-center space-x-3'} p-4 bg-muted/30 hover:bg-muted/60 rounded-xl transition-all`}
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <div className={`p-2 rounded-lg bg-primary/10 ${isGridLayout ? '' : 'shrink-0'}`}>
+                                <subItem.icon className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className={isGridLayout ? 'mt-1' : 'flex-1'}>
+                                <span className={`${isGridLayout ? 'text-xs' : 'text-sm'} font-medium`}>
+                                  {subItem.title}
+                                </span>
+                                {!isGridLayout && subItem.description && (
+                                  <div className="text-xs text-muted-foreground mt-1 leading-tight">
+                                    {subItem.description}
+                                  </div>
+                                )}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                // Otherwise, render as simple link
+                return (
                   <Link
-                    to="/"
+                    key={item.title}
+                    to={item.url}
                     className="flex items-center space-x-3 px-4 py-3 text-sm bg-muted/30 hover:bg-muted/60 rounded-xl transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Home className="w-4 h-4 text-primary" />
-                    <span className="font-medium">Inicio</span>
+                    <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                      <item.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="font-medium">{item.title}</span>
                   </Link>
-
-                  <Link
-                    to="/marketplace"
-                    className="flex items-center space-x-3 px-4 py-3 text-sm bg-muted/30 hover:bg-muted/60 rounded-xl transition-all"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <ShoppingCart className="w-4 h-4 text-primary" />
-                    <span className="font-medium">Marketplace</span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Categories - Mobile */}
-              <div className="space-y-3">
-                <h3 className="text-xs font-semibold text-primary uppercase tracking-wider px-2">Categorías</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {effectiveCategoriesItems.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.url}
-                      className="flex flex-col items-center space-y-2 p-4 bg-muted/30 hover:bg-muted/60 rounded-xl transition-all text-center"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <item.icon className="w-4 h-4 text-primary" />
-                      </div>
-                      <span className="text-xs font-medium">{item.title}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Services - Mobile */}
-              <div className="space-y-3">
-                <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider px-2">Servicios</h3>
-                <div className="space-y-1">
-                  {effectiveServicesItems.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.url}
-                      className="flex items-center space-x-3 px-4 py-3 text-sm bg-secondary/5 hover:bg-secondary/10 border border-secondary/20 rounded-xl transition-all"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <item.icon className="w-4 h-4 text-secondary" />
-                      <span className="font-medium">{item.title}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Resources - Mobile */}
-              <div className="space-y-3">
-                <h3 className="text-xs font-semibold text-accent-foreground uppercase tracking-wider px-2">Recursos</h3>
-                <div className="space-y-1">
-                  {effectiveResourcesItems.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.url}
-                      className="flex items-center space-x-3 px-4 py-3 text-sm bg-accent/30 hover:bg-accent/50 rounded-xl transition-all"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <item.icon className="w-4 h-4 text-accent-foreground" />
-                      <span className="font-medium">{item.title}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
+                );
+              })}
 
               {/* User Services - If Logged In */}
-              {user && userServices.length > 0 && (
+              {user && userServices && userServices.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider px-2">Mis Servicios</h3>
+                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider px-2">
+                    {t('nav.profile') || 'Mis Servicios'}
+                  </h3>
                   <div className="space-y-1">
                     {userServices.map((item) => (
                       <Link
@@ -361,7 +346,9 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                         className="flex items-center space-x-3 px-4 py-3 text-sm bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-xl transition-all"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <item.icon className="w-4 h-4 text-primary" />
+                        <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                          <item.icon className="w-4 h-4 text-primary" />
+                        </div>
                         <span className="font-medium">{item.title}</span>
                       </Link>
                     ))}
