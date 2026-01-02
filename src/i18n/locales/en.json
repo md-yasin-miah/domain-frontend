@@ -9,7 +9,21 @@
     "login": "Login",
     "register": "Register",
     "seller": "Seller",
-    "buyer": "Buyer"
+    "buyer": "Buyer",
+    "marketplaceListing": "Marketplace Listing",
+    "offers": "Offers",
+    "actions": "Actions",
+    "savedSearch": "Saved Search",
+    "orders": "Orders",
+    "allOrders": "All Orders",
+    "invoice": "Invoice",
+    "payment": "Payment",
+    "escrows": "Escrows",
+    "profile": "Profile",
+    "settings": "Settings",
+    "support": "Support",
+    "reviews": "Reviews",
+    "faq": "FAQ"
   },
   "hero": {
     "title": "The future of digital commerce",

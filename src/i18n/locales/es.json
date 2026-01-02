@@ -9,7 +9,21 @@
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "seller": "Vendedor",
-    "buyer": "Comprador"
+    "buyer": "Comprador",
+    "marketplaceListing": "Listado del Marketplace",
+    "offers": "Ofertas",
+    "actions": "Acciones",
+    "savedSearch": "Búsqueda Guardada",
+    "orders": "Pedidos",
+    "allOrders": "Todos los Pedidos",
+    "invoice": "Factura",
+    "payment": "Pago",
+    "escrows": "Escrows",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "support": "Soporte",
+    "reviews": "Reseñas",
+    "faq": "Preguntas Frecuentes"
   },
   "hero": {
     "title": "El futuro del comercio digital",
@@ -170,7 +184,8 @@
   "common": {
     "from": "Desde",
     "premium": "Premium",
-    "digital_commerce_future": "El futuro del comercio digital"
+    "digital_commerce_future": "El futuro del comercio digital",
+    "error": "Error"
   },
   "dashboard": {
     "welcome": "Panel de Control",
@@ -243,8 +258,5 @@
       "error_update": "Error",
       "error_update_desc": "Error al actualizar el perfil"
     }
-  },
-  "common": {
-    "error": "Error"
   }
 }

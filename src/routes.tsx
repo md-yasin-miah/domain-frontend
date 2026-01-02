@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import { AdminLayout } from "./components/layout/AdminLayout";
 import { ClientLayout } from "./components/layout/ClientLayout";
@@ -298,6 +298,10 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
+      {
+        index: true,
+        element: <Navigate to="/client/dashboard" replace />,
+      },
       {
         path: "dashboard",
         element: <ClientDashboard />,

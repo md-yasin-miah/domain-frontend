@@ -4,23 +4,20 @@ import { Header, MenuItem } from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import {
+  LayoutDashboard,
   ShoppingCart,
-  MessageSquare,
-  Globe,
-  Smartphone,
-  Code,
-  Database,
-  Play,
-  Gem,
-  TrendingUp,
-  Award,
-  Users,
+  Handshake,
+  Gavel,
+  Bookmark,
+  Package,
   FileText,
+  CreditCard,
+  Lock,
+  MessageSquare,
+  HelpCircle,
+  Star,
   User,
   Settings,
-  Home,
-  Grid3X3,
-  BookOpen,
 } from 'lucide-react';
 
 interface ClientLayoutProps {
@@ -34,129 +31,54 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   // Full menu structure with subitems
   const menuItems: MenuItem[] = [
     {
-      title: t('nav.home'),
-      url: '/',
-      icon: Home,
+      title: t('nav.dashboard') || 'Dashboard',
+      url: '/client/dashboard',
+      icon: LayoutDashboard,
     },
     {
-      title: t('nav.marketplace'),
-      url: '/marketplace',
+      title: t('nav.marketplaceListing'),
+      url: '/client/marketplace-listing',
       icon: ShoppingCart,
     },
     {
-      title: 'Categorías',
-      url: '#',
-      icon: Grid3X3,
-      subItems: [
-        {
-          title: t('categories.domains'),
-          url: '/marketplace/dominios',
-          icon: Globe,
-          description: t('categories.domains_desc'),
-        },
-        {
-          title: t('categories.websites'),
-          url: '/marketplace/sitios',
-          icon: Globe,
-          description: t('categories.websites_desc'),
-        },
-        {
-          title: t('categories.fba_stores'),
-          url: '/marketplace/fba',
-          icon: ShoppingCart,
-          description: t('categories.fba_stores_desc'),
-        },
-        {
-          title: t('categories.mobile_apps'),
-          url: '/marketplace/apps',
-          icon: Smartphone,
-          description: t('categories.mobile_apps_desc'),
-        },
-        {
-          title: t('categories.ecommerce'),
-          url: '/categories/ecommerce',
-          icon: ShoppingCart,
-          description: t('categories.ecommerce_desc'),
-        },
-        {
-          title: t('categories.software_saas'),
-          url: '/categories/software-saas',
-          icon: Code,
-          description: t('categories.software_saas_desc'),
-        },
-        {
-          title: t('categories.databases'),
-          url: '/categories/databases',
-          icon: Database,
-          description: t('categories.databases_desc'),
-        },
-        {
-          title: t('categories.digital_channels'),
-          url: '/categories/digital-channels',
-          icon: Play,
-          description: t('categories.digital_channels_desc'),
-        },
-        {
-          title: t('categories.nfts'),
-          url: '/categories/nfts',
-          icon: Gem,
-          description: t('categories.nfts_desc'),
-        },
-      ],
+      title: t('nav.offers'),
+      url: '/client/offers',
+      icon: Handshake,
     },
     {
-      title: 'Servicios',
-      url: '#',
-      icon: Settings,
-      subItems: [
-        {
-          title: t('services.valuations'),
-          url: '/services/valuations',
-          icon: TrendingUp,
-          description: t('services.valuations_desc'),
-        },
-        {
-          title: t('services.market_trends'),
-          url: '/services/trends',
-          icon: Award,
-          description: t('services.market_trends_desc'),
-        },
-        {
-          title: t('services.brokers_network'),
-          url: '/services/brokers',
-          icon: Users,
-          description: t('services.brokers_network_desc'),
-        },
-        {
-          title: t('services.referral_program'),
-          url: '/services/referrals',
-          icon: Award,
-          description: t('services.referral_program_desc'),
-        },
-      ],
+      title: t('nav.actions'),
+      url: '/client/auctions',
+      icon: Gavel,
     },
     {
-      title: 'Recursos',
+      title: t('nav.savedSearch'),
+      url: '/client/saved-search',
+      icon: Bookmark,
+    },
+    {
+      title: t('nav.orders'),
       url: '#',
-      icon: BookOpen,
+      icon: Package,
       subItems: [
         {
-          title: t('resources.guides'),
-          url: '/resources/guides',
-          icon: FileText,
-          description: t('resources.guides_desc'),
+          title: t('nav.allOrders'),
+          url: '/client/orders',
+          icon: Package,
         },
         {
-          title: t('resources.help_center'),
-          url: '/resources/help',
-          icon: MessageSquare,
-          description: t('resources.help_center_desc'),
+          title: t('nav.invoice'),
+          url: '/client/invoices',
+          icon: FileText,
         },
         {
-          title: t('resources.blog'),
-          url: '/resources/blog',
-          icon: FileText,
-          description: t('resources.blog_desc'),
+          title: t('nav.payment'),
+          url: '/client/payments',
+          icon: CreditCard,
+        },
+        {
+          title: t('nav.escrows'),
+          url: '/client/escrows',
+          icon: Lock,
         },
       ],
     },
@@ -165,8 +87,11 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   // User services (when logged in) - Profile and Settings for client layout
   const userServices = user
     ? [
-      { title: t('client.profile') || 'Profile', url: '/client/profile', icon: User },
-      { title: t('client.settings') || 'Settings', url: '/client/profile', icon: Settings },
+      { title: t('nav.profile'), url: '/client/profile', icon: User },
+      { title: t('nav.settings'), url: '/client/profile', icon: Settings },
+      { title: t('nav.support'), url: '/client/support', icon: MessageSquare },
+      { title: t('nav.reviews'), url: '/client/reviews', icon: Star },
+      { title: t('nav.faq'), url: '/client/faq', icon: HelpCircle },
     ]
     : [];
 

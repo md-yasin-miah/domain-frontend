@@ -14,8 +14,8 @@ interface ProtectedRouteProps {
   requireRole?: string;
 }
 
-export default function ProtectedRoute({ 
-  children, 
+export default function ProtectedRoute({
+  children,
   requireAdmin = false,
   requirePermission,
   requireRole
@@ -30,7 +30,7 @@ export default function ProtectedRoute({
   });
 
   // Check profile completion from user object or profile completion query
-  const profileCompleted = user?.is_profile_complete ?? profileCompletion?.is_complete ?? null;
+  const profileCompleted = user?.is_profile_complete ?? null;
 
   if (loading || roleLoading || permissionLoading || (profileLoading && !requireAdmin && location.pathname !== '/client/profile-setup')) {
     return (
@@ -64,7 +64,7 @@ export default function ProtectedRoute({
           <p className="text-muted-foreground">
             {t('auth.admin_required')}
           </p>
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="text-primary hover:underline"
           >
@@ -87,7 +87,7 @@ export default function ProtectedRoute({
           <p className="text-muted-foreground">
             {t('auth.role_required')} {requireRole} {t('auth.to_access')}
           </p>
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="text-primary hover:underline"
           >
@@ -110,7 +110,7 @@ export default function ProtectedRoute({
           <p className="text-muted-foreground">
             {t('auth.permission_needed')}
           </p>
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="text-primary hover:underline"
           >

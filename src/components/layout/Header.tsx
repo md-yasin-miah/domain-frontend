@@ -113,19 +113,6 @@ export function Header({ menuItems, userServices = [], showDashboard = true }: H
               {menuItems.map((item) => {
                 // If item has subItems, render as dropdown
                 if (item.subItems && item.subItems.length > 0) {
-                  const categoriesItem = item.title === 'Categories' || item.title === 'Categorías';
-                  const servicesItem = item.title === 'Services' || item.title === 'Servicios';
-                  const resourcesItem = item.title === 'Resources' || item.title === 'Recursos';
-
-                  let effectiveSubItems: typeof item.subItems = [];
-                  if (categoriesItem) {
-                    effectiveSubItems = effectiveCategoriesItems;
-                  } else if (servicesItem) {
-                    effectiveSubItems = effectiveServicesItems;
-                  } else if (resourcesItem) {
-                    effectiveSubItems = effectiveResourcesItems;
-                  }
-
                   return (
                     <DropdownMenu key={item.title}>
                       <DropdownMenuTrigger asChild>
@@ -144,7 +131,7 @@ export function Header({ menuItems, userServices = [], showDashboard = true }: H
                         className={`${categoriesItem ? 'w-96' : 'w-80'} bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50`}
                       >
                         <div className={categoriesItem ? 'grid grid-cols-2 gap-1' : 'space-y-1'}>
-                          {effectiveSubItems.map((subItem) => (
+                          {item.subItems?.map((subItem) => (
                             <DropdownMenuItem key={subItem.title} asChild>
                               <Link
                                 to={subItem.url}

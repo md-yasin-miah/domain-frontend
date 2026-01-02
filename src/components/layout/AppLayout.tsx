@@ -41,7 +41,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
       icon: ShoppingCart,
     },
     {
-      title: 'Categorías',
+      title: t('nav.categories'),
       url: '#',
       icon: Grid3X3,
       subItems: [
