@@ -34,7 +34,7 @@ import {
 export interface MenuSubItem {
   title: string;
   url: string;
-  icon?: LucideIcon;
+  icon: LucideIcon;
   description?: string;
 }
 
@@ -52,7 +52,7 @@ interface HeaderProps {
   showDashboard?: boolean;
 }
 
-export function Header({ menuItems, userServices = [], showDashboard = true }: HeaderProps) {
+export function Header({ menuItems, userServices, showDashboard = true }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
