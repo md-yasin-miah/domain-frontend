@@ -1,128 +1,187 @@
-import { Link } from 'react-router-dom';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { ClientSidebar } from './ClientSidebar';
-import { useAuth } from '@/hooks/useAuth';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { User, Settings, LogOut } from 'lucide-react';
+import LiveChat from '@/components/LiveChat';
+import { Footer } from '@/components/layout/Footer';
+import { Header, MenuItem } from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  ShoppingCart,
+  MessageSquare,
+  Globe,
+  Smartphone,
+  Code,
+  Database,
+  Play,
+  Gem,
+  TrendingUp,
+  Award,
+  Users,
+  FileText,
+  User,
+  Settings,
+  Home,
+  Grid3X3,
+  BookOpen,
+} from 'lucide-react';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
 }
 
 export function ClientLayout({ children }: ClientLayoutProps) {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: t('auth.logout_success') || 'Logged out',
-        description: t('auth.logout_success_desc') || 'You have been logged out successfully',
-      });
-      navigate('/');
-    } catch (error) {
-      toast({
-        title: t('auth.logout_error') || 'Error',
-        description: t('auth.logout_error_desc') || 'Failed to log out',
-        variant: 'destructive',
-      });
-    }
-  };
+  // Full menu structure with subitems
+  const menuItems: MenuItem[] = [
+    {
+      title: t('nav.home'),
+      url: '/',
+      icon: Home,
+    },
+    {
+      title: t('nav.marketplace'),
+      url: '/marketplace',
+      icon: ShoppingCart,
+    },
+    {
+      title: 'Categorías',
+      url: '#',
+      icon: Grid3X3,
+      subItems: [
+        {
+          title: t('categories.domains'),
+          url: '/marketplace/dominios',
+          icon: Globe,
+          description: t('categories.domains_desc'),
+        },
+        {
+          title: t('categories.websites'),
+          url: '/marketplace/sitios',
+          icon: Globe,
+          description: t('categories.websites_desc'),
+        },
+        {
+          title: t('categories.fba_stores'),
+          url: '/marketplace/fba',
+          icon: ShoppingCart,
+          description: t('categories.fba_stores_desc'),
+        },
+        {
+          title: t('categories.mobile_apps'),
+          url: '/marketplace/apps',
+          icon: Smartphone,
+          description: t('categories.mobile_apps_desc'),
+        },
+        {
+          title: t('categories.ecommerce'),
+          url: '/categories/ecommerce',
+          icon: ShoppingCart,
+          description: t('categories.ecommerce_desc'),
+        },
+        {
+          title: t('categories.software_saas'),
+          url: '/categories/software-saas',
+          icon: Code,
+          description: t('categories.software_saas_desc'),
+        },
+        {
+          title: t('categories.databases'),
+          url: '/categories/databases',
+          icon: Database,
+          description: t('categories.databases_desc'),
+        },
+        {
+          title: t('categories.digital_channels'),
+          url: '/categories/digital-channels',
+          icon: Play,
+          description: t('categories.digital_channels_desc'),
+        },
+        {
+          title: t('categories.nfts'),
+          url: '/categories/nfts',
+          icon: Gem,
+          description: t('categories.nfts_desc'),
+        },
+      ],
+    },
+    {
+      title: 'Servicios',
+      url: '#',
+      icon: Settings,
+      subItems: [
+        {
+          title: t('services.valuations'),
+          url: '/services/valuations',
+          icon: TrendingUp,
+          description: t('services.valuations_desc'),
+        },
+        {
+          title: t('services.market_trends'),
+          url: '/services/trends',
+          icon: Award,
+          description: t('services.market_trends_desc'),
+        },
+        {
+          title: t('services.brokers_network'),
+          url: '/services/brokers',
+          icon: Users,
+          description: t('services.brokers_network_desc'),
+        },
+        {
+          title: t('services.referral_program'),
+          url: '/services/referrals',
+          icon: Award,
+          description: t('services.referral_program_desc'),
+        },
+      ],
+    },
+    {
+      title: 'Recursos',
+      url: '#',
+      icon: BookOpen,
+      subItems: [
+        {
+          title: t('resources.guides'),
+          url: '/resources/guides',
+          icon: FileText,
+          description: t('resources.guides_desc'),
+        },
+        {
+          title: t('resources.help_center'),
+          url: '/resources/help',
+          icon: MessageSquare,
+          description: t('resources.help_center_desc'),
+        },
+        {
+          title: t('resources.blog'),
+          url: '/resources/blog',
+          icon: FileText,
+          description: t('resources.blog_desc'),
+        },
+      ],
+    },
+  ];
 
-  const userInitials = user?.email
-    ? user.email
-      .split('@')[0]
-      .substring(0, 2)
-      .toUpperCase()
-    : 'U';
-
-  const userName =
-    user?.profile?.first_name && user?.profile?.last_name
-      ? `${user.profile.first_name} ${user.profile.last_name}`
-      : user?.email || 'User';
+  // User services (when logged in) - Profile and Settings for client layout
+  const userServices = user
+    ? [
+      { title: t('client.profile') || 'Profile', url: '/client/profile', icon: User },
+      { title: t('client.settings') || 'Settings', url: '/client/profile', icon: Settings },
+    ]
+    : [];
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/20">
-        <ClientSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b border-border/40 bg-background/80 backdrop-blur-xl px-6 shadow-sm">
-            <SidebarTrigger className="transition-all duration-200 hover:bg-accent hover:text-accent-foreground hover:scale-105" />
-            <div className="flex-1" />
-            <div className="flex items-center gap-2">
-              <LanguageSwitcher />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-muted/60">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.profile?.avatar_url || undefined} alt={userName} />
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
-                        {userInitials}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-64 bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50"
-                  align="end"
-                  forceMount
-                >
-                  <div className="px-3 py-2 border-b border-border/40">
-                    <p className="text-sm font-medium text-foreground truncate">{userName}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                  </div>
-                  <div className="py-2">
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to="/client/profile"
-                        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer"
-                      >
-                        <User className="w-4 h-4 text-primary" />
-                        <span className="font-medium">{t('client.profile') || 'Profile'}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to="/client/profile"
-                        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer"
-                      >
-                        <Settings className="w-4 h-4 text-muted-foreground" />
-                        <span>{t('client.settings') || 'Settings'}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleSignOut}
-                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>{t('auth.logout') || 'Logout'}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto custom-scrollbar p-6 lg:p-8">
-            <div className="mx-auto max-w-7xl">{children}</div>
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+      <Header menuItems={menuItems} userServices={userServices} showDashboard={false} />
+
+      {/* Main Content - Fixed Padding */}
+      <main className="min-h-screen">{children}</main>
+
+      {/* Footer Component */}
+      <Footer />
+
+      {/* Live Chat Component */}
+      <LiveChat />
+    </div>
   );
 }

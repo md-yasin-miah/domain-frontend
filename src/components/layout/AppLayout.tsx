@@ -1,8 +1,8 @@
-import LiveChat from "@/components/LiveChat";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
-import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth";
+import LiveChat from '@/components/LiveChat';
+import { Footer } from '@/components/layout/Footer';
+import { Header, MenuItem } from '@/components/layout/Header';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
 import {
   ShoppingCart,
   Server,
@@ -18,122 +18,143 @@ import {
   Award,
   Users,
   FileText,
-} from "lucide-react";
+  Grid3X3,
+  Settings,
+  BookOpen,
+  Home,
+} from 'lucide-react';
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
 
-  // Categories menu items
-  const categoriesItems = [
+  // Full menu structure with subitems
+  const menuItems: MenuItem[] = [
     {
-      title: t("categories.domains"),
-      url: "/marketplace/dominios",
-      icon: Globe,
-      description: t("categories.domains_desc"),
+      title: t('nav.home'),
+      url: '/',
+      icon: Home,
     },
     {
-      title: t("categories.websites"),
-      url: "/marketplace/sitios",
-      icon: Globe,
-      description: t("categories.websites_desc"),
-    },
-    {
-      title: t("categories.fba_stores"),
-      url: "/marketplace/fba",
+      title: t('nav.marketplace'),
+      url: '/marketplace',
       icon: ShoppingCart,
-      description: t("categories.fba_stores_desc"),
     },
     {
-      title: t("categories.mobile_apps"),
-      url: "/marketplace/apps",
-      icon: Smartphone,
-      description: t("categories.mobile_apps_desc"),
+      title: 'Categorías',
+      url: '#',
+      icon: Grid3X3,
+      subItems: [
+        {
+          title: t('categories.domains'),
+          url: '/marketplace/dominios',
+          description: t('categories.domains_desc'),
+        },
+        {
+          title: t('categories.websites'),
+          url: '/marketplace/sitios',
+          description: t('categories.websites_desc'),
+        },
+        {
+          title: t('categories.fba_stores'),
+          url: '/marketplace/fba',
+          description: t('categories.fba_stores_desc'),
+        },
+        {
+          title: t('categories.mobile_apps'),
+          url: '/marketplace/apps',
+          description: t('categories.mobile_apps_desc'),
+        },
+        {
+          title: t('categories.ecommerce'),
+          url: '/categories/ecommerce',
+          description: t('categories.ecommerce_desc'),
+        },
+        {
+          title: t('categories.software_saas'),
+          url: '/categories/software-saas',
+          description: t('categories.software_saas_desc'),
+        },
+        {
+          title: t('categories.databases'),
+          url: '/categories/databases',
+          description: t('categories.databases_desc'),
+        },
+        {
+          title: t('categories.digital_channels'),
+          url: '/categories/digital-channels',
+          description: t('categories.digital_channels_desc'),
+        },
+        {
+          title: t('categories.nfts'),
+          url: '/categories/nfts',
+          description: t('categories.nfts_desc'),
+        },
+      ],
     },
     {
-      title: t("categories.ecommerce"),
-      url: "/categories/ecommerce",
-      icon: ShoppingCart,
-      description: t("categories.ecommerce_desc"),
+      title: 'Servicios',
+      url: '#',
+      icon: Settings,
+      subItems: [
+        {
+          title: t('services.valuations'),
+          url: '/services/valuations',
+          description: t('services.valuations_desc'),
+        },
+        {
+          title: t('services.market_trends'),
+          url: '/services/trends',
+          description: t('services.market_trends_desc'),
+        },
+        {
+          title: t('services.brokers_network'),
+          url: '/services/brokers',
+          description: t('services.brokers_network_desc'),
+        },
+        {
+          title: t('services.referral_program'),
+          url: '/services/referrals',
+          description: t('services.referral_program_desc'),
+        },
+      ],
     },
     {
-      title: t("categories.software_saas"),
-      url: "/categories/software-saas",
-      icon: Code,
-      description: t("categories.software_saas_desc"),
+      title: 'Recursos',
+      url: '#',
+      icon: BookOpen,
+      subItems: [
+        {
+          title: t('resources.guides'),
+          url: '/resources/guides',
+          description: t('resources.guides_desc'),
+        },
+        {
+          title: t('resources.help_center'),
+          url: '/resources/help',
+          description: t('resources.help_center_desc'),
+        },
+        {
+          title: t('resources.blog'),
+          url: '/resources/blog',
+          description: t('resources.blog_desc'),
+        },
+      ],
     },
-    {
-      title: t("categories.databases"),
-      url: "/categories/databases",
-      icon: Database,
-      description: t("categories.databases_desc"),
-    },
-    {
-      title: t("categories.digital_channels"),
-      url: "/categories/digital-channels",
-      icon: Play,
-      description: t("categories.digital_channels_desc"),
-    },
-    { title: t("categories.nfts"), url: "/categories/nfts", icon: Gem, description: t("categories.nfts_desc") },
   ];
 
-  // Services menu items
-  const servicesItems = [
-    {
-      title: t("services.valuations"),
-      url: "/services/valuations",
-      icon: TrendingUp,
-      description: t("services.valuations_desc"),
-    },
-    {
-      title: t("services.market_trends"),
-      url: "/services/trends",
-      icon: Award,
-      description: t("services.market_trends_desc"),
-    },
-    {
-      title: t("services.brokers_network"),
-      url: "/services/brokers",
-      icon: Users,
-      description: t("services.brokers_network_desc"),
-    },
-    {
-      title: t("services.referral_program"),
-      url: "/services/referrals",
-      icon: Award,
-      description: t("services.referral_program_desc"),
-    },
-  ];
-
-  // User services (when logged in)
+  // User services (when logged in) - for backward compatibility
   const userServices = user
     ? [
-      { title: t("user.my_domains"), url: "/user/dominios", icon: Server },
-      { title: t("user.invoices"), url: "/user/facturas", icon: CreditCard },
-      { title: t("user.support"), url: "/user/soporte", icon: MessageSquare },
+      { title: t('user.my_domains'), url: '/user/dominios', icon: Server },
+      { title: t('user.invoices'), url: '/user/facturas', icon: CreditCard },
+      { title: t('user.support'), url: '/user/soporte', icon: MessageSquare },
     ]
     : [];
 
-  // Resources menu items
-  const resourcesItems = [
-    { title: t("resources.guides"), url: "/resources/guides", icon: FileText, description: t("resources.guides_desc") },
-    {
-      title: t("resources.help_center"),
-      url: "/resources/help",
-      icon: MessageSquare,
-      description: t("resources.help_center_desc"),
-    },
-    { title: t("resources.blog"), url: "/resources/blog", icon: FileText, description: t("resources.blog_desc") },
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Header
-        categoriesItems={categoriesItems}
-        servicesItems={servicesItems}
-        resourcesItems={resourcesItems}
-        userServices={userServices}
-      />
+      <Header menuItems={menuItems} userServices={userServices} />
 
       {/* Main Content - Fixed Padding */}
       <main className="min-h-screen">{children}</main>

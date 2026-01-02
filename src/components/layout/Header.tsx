@@ -31,24 +31,60 @@ import {
   LucideIcon,
 } from 'lucide-react';
 
-interface MenuItem {
+export interface MenuSubItem {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  description?: string;
+}
+
+export interface MenuItem {
   title: string;
   url: string;
   icon: LucideIcon;
   description?: string;
+  subItems?: MenuSubItem[];
 }
 
 interface HeaderProps {
-  categoriesItems: MenuItem[];
-  servicesItems: MenuItem[];
-  resourcesItems: MenuItem[];
-  userServices: MenuItem[];
+  menuItems: MenuItem[];
+  userServices?: MenuItem[];
+  showDashboard?: boolean;
 }
 
-export function Header({ categoriesItems, servicesItems, resourcesItems, userServices }: HeaderProps) {
+export function Header({ menuItems, userServices = [], showDashboard = true }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Extract subitems from menuItems for dropdowns
+  const categoriesItem = menuItems.find((item) => item.title === 'Categories' || item.title === 'Categorías');
+  const servicesItem = menuItems.find((item) => item.title === 'Services' || item.title === 'Servicios');
+  const resourcesItem = menuItems.find((item) => item.title === 'Resources' || item.title === 'Recursos');
+
+  const effectiveCategoriesItems =
+    categoriesItem?.subItems?.map((sub) => ({
+      title: sub.title,
+      url: sub.url,
+      icon: sub.icon || Grid3X3,
+      description: sub.description,
+    })) || [];
+
+  const effectiveServicesItems =
+    servicesItem?.subItems?.map((sub) => ({
+      title: sub.title,
+      url: sub.url,
+      icon: sub.icon || Settings,
+      description: sub.description,
+    })) || [];
+
+  const effectiveResourcesItems =
+    resourcesItem?.subItems?.map((sub) => ({
+      title: sub.title,
+      url: sub.url,
+      icon: sub.icon || BookOpen,
+      description: sub.description,
+    })) || [];
 
   return (
     <>
@@ -73,154 +109,85 @@ export function Header({ categoriesItems, servicesItems, resourcesItems, userSer
           {/* Desktop Navigation - Completely Redesigned */}
           <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center max-w-4xl">
             <div className="flex items-center space-x-1">
-              {/* Core Navigation Links */}
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary/10 text-primary border border-primary/20'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-                  }`
+              {/* Render menu items - simple links and dropdowns */}
+              {menuItems.map((item) => {
+                // If item has subItems, render as dropdown
+                if (item.subItems && item.subItems.length > 0) {
+                  const categoriesItem = item.title === 'Categories' || item.title === 'Categorías';
+                  const servicesItem = item.title === 'Services' || item.title === 'Servicios';
+                  const resourcesItem = item.title === 'Resources' || item.title === 'Recursos';
+
+                  let effectiveSubItems: typeof item.subItems = [];
+                  if (categoriesItem) {
+                    effectiveSubItems = effectiveCategoriesItems;
+                  } else if (servicesItem) {
+                    effectiveSubItems = effectiveServicesItems;
+                  } else if (resourcesItem) {
+                    effectiveSubItems = effectiveResourcesItems;
+                  }
+
+                  return (
+                    <DropdownMenu key={item.title}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[state=open]:bg-muted/80 data-[state=open]:text-foreground"
+                        >
+                          <item.icon className="w-4 h-4" />
+                          <span>{item.title}</span>
+                          <ChevronDown className="w-3 h-3 transition-transform data-[state=open]:rotate-180" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="center"
+                        className={`${categoriesItem ? 'w-96' : 'w-80'} bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50`}
+                      >
+                        <div className={categoriesItem ? 'grid grid-cols-2 gap-1' : 'space-y-1'}>
+                          {effectiveSubItems.map((subItem) => (
+                            <DropdownMenuItem key={subItem.title} asChild>
+                              <Link
+                                to={subItem.url}
+                                className="flex items-start space-x-3 p-4 rounded-lg hover:bg-muted/80 transition-all group"
+                              >
+                                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                                  <subItem.icon className="w-4 h-4 text-primary" />
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm text-foreground group-hover:text-accent-foreground transition-colors">
+                                    {subItem.title}
+                                  </div>
+                                  {subItem.description && (
+                                    <div className="text-xs text-muted-foreground mt-1 leading-tight">{subItem.description}</div>
+                                  )}
+                                </div>
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </div>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
                 }
-              >
-                <Home className="w-4 h-4" />
-                <span>{t('nav.home')}</span>
-              </NavLink>
 
-              <NavLink
-                to="/marketplace"
-                className={({ isActive }) =>
-                  `flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary/10 text-primary border border-primary/20'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-                  }`
-                }
-              >
-                <ShoppingCart className="w-4 h-4" />
-                <span>{t('nav.marketplace')}</span>
-              </NavLink>
-
-              {/* Enhanced Categories Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[state=open]:bg-muted/80 data-[state=open]:text-foreground"
+                // Otherwise, render as simple NavLink
+                return (
+                  <NavLink
+                    key={item.title}
+                    to={item.url}
+                    className={({ isActive }) =>
+                      `flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                        ? 'bg-primary/10 text-primary border border-primary/20'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                      }`
+                    }
                   >
-                    <Grid3X3 className="w-4 h-4" />
-                    <span>Categorías</span>
-                    <ChevronDown className="w-3 h-3 transition-transform data-[state=open]:rotate-180" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="center"
-                  className="w-96 bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50"
-                >
-                  <div className="grid grid-cols-2 gap-1">
-                    {categoriesItems.map((item) => (
-                      <DropdownMenuItem key={item.title} asChild>
-                        <Link
-                          to={item.url}
-                          className="flex items-start space-x-3 p-4 rounded-lg hover:bg-muted/80 transition-all group"
-                        >
-                          <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                            <item.icon className="w-4 h-4 text-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
-                              {item.title}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1 leading-tight">{item.description}</div>
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.title}</span>
+                  </NavLink>
+                );
+              })}
 
-              {/* Enhanced Services Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[state=open]:bg-muted/80 data-[state=open]:text-foreground"
-                  >
-                    <Settings className="w-4 h-4" />
-                    <span>Servicios</span>
-                    <ChevronDown className="w-3 h-3 transition-transform data-[state=open]:rotate-180" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="center"
-                  className="w-80 bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50"
-                >
-                  <div className="space-y-1">
-                    {servicesItems.map((item) => (
-                      <DropdownMenuItem key={item.title} asChild>
-                        <Link
-                          to={item.url}
-                          className="flex items-start space-x-3 p-4 rounded-lg hover:bg-muted/80 transition-all group"
-                        >
-                          <div className="p-2 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
-                            <item.icon className="w-4 h-4 text-secondary" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-sm text-foreground group-hover:text-secondary transition-colors">
-                              {item.title}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1 leading-tight">{item.description}</div>
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Enhanced Resources Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[state=open]:bg-muted/80 data-[state=open]:text-foreground"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    <span>Recursos</span>
-                    <ChevronDown className="w-3 h-3 transition-transform data-[state=open]:rotate-180" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="center"
-                  className="w-80 bg-background/98 backdrop-blur-xl border shadow-xl rounded-xl p-2 z-50"
-                >
-                  <div className="space-y-1">
-                    {resourcesItems.map((item) => (
-                      <DropdownMenuItem key={item.title} asChild>
-                        <Link
-                          to={item.url}
-                          className="flex items-start space-x-3 p-4 rounded-lg hover:bg-muted/80 transition-all group"
-                        >
-                          <div className="p-2 rounded-lg bg-accent/50 group-hover:bg-accent transition-colors">
-                            <item.icon className="w-4 h-4 text-accent-foreground" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-sm text-foreground group-hover:text-accent-foreground transition-colors">
-                              {item.title}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1 leading-tight">{item.description}</div>
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </nav>
 
@@ -258,15 +225,17 @@ export function Header({ categoriesItems, servicesItems, resourcesItems, userSer
                   </div>
 
                   <div className="py-2">
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to="/client/dashboard"
-                        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-muted/60 transition-colors"
-                      >
-                        <LayoutDashboard className="w-4 h-4 text-primary" />
-                        <span className="font-medium">Dashboard</span>
-                      </Link>
-                    </DropdownMenuItem>
+                    {showDashboard && (
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to="/client/dashboard"
+                          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-muted/60 transition-colors"
+                        >
+                          <LayoutDashboard className="w-4 h-4 text-primary" />
+                          <span className="font-medium">Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
 
                     {userServices.map((item) => (
                       <DropdownMenuItem key={item.title} asChild>
@@ -370,7 +339,7 @@ export function Header({ categoriesItems, servicesItems, resourcesItems, userSer
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider px-2">Categorías</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {categoriesItems.map((item) => (
+                  {effectiveCategoriesItems.map((item) => (
                     <Link
                       key={item.title}
                       to={item.url}
@@ -390,7 +359,7 @@ export function Header({ categoriesItems, servicesItems, resourcesItems, userSer
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider px-2">Servicios</h3>
                 <div className="space-y-1">
-                  {servicesItems.map((item) => (
+                  {effectiveServicesItems.map((item) => (
                     <Link
                       key={item.title}
                       to={item.url}
@@ -408,7 +377,7 @@ export function Header({ categoriesItems, servicesItems, resourcesItems, userSer
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold text-accent-foreground uppercase tracking-wider px-2">Recursos</h3>
                 <div className="space-y-1">
-                  {resourcesItems.map((item) => (
+                  {effectiveResourcesItems.map((item) => (
                     <Link
                       key={item.title}
                       to={item.url}
