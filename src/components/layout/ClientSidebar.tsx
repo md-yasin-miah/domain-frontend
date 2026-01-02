@@ -1,9 +1,16 @@
 import {
   LayoutDashboard,
-  User,
+  ShoppingCart,
+  Handshake,
+  Gavel,
+  Search,
+  Package,
   FileText,
-  Globe,
+  CreditCard,
+  Shield,
   HelpCircle,
+  Star,
+  MessageSquare,
 } from 'lucide-react';
 import { AppSidebar, MenuItem } from './AppSidebar';
 
@@ -14,24 +21,50 @@ const clientMenuItems: MenuItem[] = [
     url: '/client/dashboard',
   },
   {
-    title: 'Profile',
-    icon: User,
-    url: '/client/profile',
+    title: 'Marketplace Listing',
+    icon: ShoppingCart,
+    url: '/client/marketplace-listing',
   },
   {
-    title: 'My Domains',
-    icon: Globe,
-    url: '/client/dominios',
+    title: 'Offers',
+    icon: Handshake,
+    url: '/client/offers',
   },
   {
-    title: 'Invoices',
-    icon: FileText,
-    url: '/client/facturas',
+    title: 'Auctions',
+    icon: Gavel,
+    url: '/client/auctions',
   },
   {
-    title: 'FAQ',
+    title: 'Saved Search',
+    icon: Search,
+    url: '/client/saved-search',
+  },
+  {
+    title: 'Orders',
+    icon: Package,
+    url: '/client/orders',
+    subItems: [
+      { title: 'Orders', url: '/client/orders' },
+      { title: 'Invoice', url: '/client/invoice' },
+      { title: 'Payment', url: '/client/payment' },
+      { title: 'Escrows', url: '/client/escrows' },
+    ],
+  },
+  {
+    title: 'Support',
+    icon: MessageSquare,
+    url: '/client/support',
+  },
+  {
+    title: 'FAQs',
     icon: HelpCircle,
     url: '/client/faq',
+  },
+  {
+    title: 'Reviews',
+    icon: Star,
+    url: '/client/reviews',
   },
 ];
 
