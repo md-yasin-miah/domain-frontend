@@ -780,7 +780,8 @@
     "filter": "Filter",
     "all": "All",
     "required": "Required",
-    "optional": "Optional"
+    "optional": "Optional",
+    "no_results": "No results found"
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -881,6 +882,52 @@
       "expired": {
         "title": "Expired Domains",
         "description": "Domains that have expired and need renewal"
+      }
+    }
+  },
+  "websites": {
+    "title": "My Websites",
+    "subtitle": "Manage all your websites from one place",
+    "register_website": "Register Website",
+    "search_placeholder": "Search websites...",
+    "tabs": {
+      "all": "All",
+      "active": "Active"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending"
+    },
+    "configure": "Configure",
+    "registered_by": "Registered by",
+    "sections": {
+      "website_info": "WEBSITE INFORMATION",
+      "traffic_stats": "TRAFFIC & STATISTICS",
+      "quick_actions": "QUICK ACTIONS"
+    },
+    "labels": {
+      "status": "Status:",
+      "url": "URL:",
+      "traffic_monthly": "Monthly Traffic:",
+      "revenue_monthly": "Monthly Revenue:",
+      "profit_monthly": "Monthly Profit:",
+      "technology": "Technology:",
+      "last_update": "Last update:"
+    },
+    "actions": {
+      "view_website": "View Website",
+      "analytics": "View Analytics",
+      "configure": "Configure"
+    },
+    "empty_states": {
+      "active": {
+        "title": "Active Websites",
+        "description": "All your active websites will appear here"
+      },
+      "all": {
+        "title": "No Websites",
+        "description": "You don't have any websites yet"
       }
     }
   }

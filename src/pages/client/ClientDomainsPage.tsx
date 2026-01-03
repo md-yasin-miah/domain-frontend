@@ -9,33 +9,12 @@ import { useGetMarketplaceListingsQuery } from '@/store/api/marketplaceApi';
 import { useTranslation } from 'react-i18next';
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from '@/lib/utils';
+import { getStatusColor, getStatusLabel } from '@/lib/helperfun';
 
 const ClientDomainsPage = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const { data: domainsData, isLoading } = useGetMarketplaceListingsQuery({ listing_type_id: 1 });
-
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-      case 'Activo': return 'bg-green-500';
-      case 'expired':
-      case 'Expirado': return 'bg-red-500';
-      case 'pending':
-      case 'Pendiente': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, string> = {
-      'active': t('domains.status.active'),
-      'expired': t('domains.status.expired'),
-      'pending': t('domains.status.pending'),
-    };
-    return statusMap[status] || status;
-  };
 
   const getDaysUntilExpiration = (expirationDate: string) => {
     const today = new Date();
@@ -132,7 +111,7 @@ const ClientDomainsPage = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>{t('domains.labels.status')}</span>
-                  <span className="font-medium">{getStatusLabel(domain.status)}</span>
+                  <span className="font-medium">{getStatusLabel(domain.status, t)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t('domains.labels.expires')}</span>

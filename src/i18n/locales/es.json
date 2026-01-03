@@ -185,7 +185,8 @@
     "from": "Desde",
     "premium": "Premium",
     "digital_commerce_future": "El futuro del comercio digital",
-    "error": "Error"
+    "error": "Error",
+    "no_results": "No se encontraron resultados"
   },
   "dashboard": {
     "welcome": "Panel de Control",
@@ -313,6 +314,52 @@
       "expired": {
         "title": "Dominios Expirados",
         "description": "Dominios que han expirado y necesitan renovación"
+      }
+    }
+  },
+  "websites": {
+    "title": "Mis Sitios Web",
+    "subtitle": "Gestiona todos tus sitios web desde un solo lugar",
+    "register_website": "Registrar Sitio Web",
+    "search_placeholder": "Buscar sitios web...",
+    "tabs": {
+      "all": "Todos",
+      "active": "Activos"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "pending": "Pendiente"
+    },
+    "configure": "Configurar",
+    "registered_by": "Registrado por",
+    "sections": {
+      "website_info": "INFORMACIÓN DEL SITIO WEB",
+      "traffic_stats": "TRÁFICO Y ESTADÍSTICAS",
+      "quick_actions": "ACCIONES RÁPIDAS"
+    },
+    "labels": {
+      "status": "Estado:",
+      "url": "URL:",
+      "traffic_monthly": "Tráfico Mensual:",
+      "revenue_monthly": "Ingresos Mensuales:",
+      "profit_monthly": "Beneficio Mensual:",
+      "technology": "Tecnología:",
+      "last_update": "Última actualización:"
+    },
+    "actions": {
+      "view_website": "Ver Sitio Web",
+      "analytics": "Ver Analíticas",
+      "configure": "Configurar"
+    },
+    "empty_states": {
+      "active": {
+        "title": "Sitios Web Activos",
+        "description": "Todos tus sitios web activos aparecerán aquí"
+      },
+      "all": {
+        "title": "Sin Sitios Web",
+        "description": "Aún no tienes sitios web"
       }
     }
   }
