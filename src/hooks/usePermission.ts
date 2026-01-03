@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/store/hooks/useAuth';
 import { useUserRole } from './useUserRole';
 
 export const usePermission = (permissionName?: string) => {
@@ -46,10 +46,10 @@ export const usePermissions = () => {
     }
 
     // Mock permissions based on role
-    const mockPermissions = isAdmin 
+    const mockPermissions = isAdmin
       ? ['read', 'write', 'delete', 'admin', 'view', 'edit']
       : ['read', 'view'];
-    
+
     setPermissions(mockPermissions);
     setLoading(false);
   }, [user, isAdmin]);

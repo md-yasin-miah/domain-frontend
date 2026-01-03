@@ -21,9 +21,9 @@ import BuyerDashboard from "./pages/admin/BuyerDashboard";
 import SuperAdminDashboard from "./pages/admin/SuperAdminDashboard";
 import Apps from "./pages/marketplace/Apps";
 import FBA from "./pages/marketplace/FBA";
-import MisDominios from "./pages/user/MisDominios";
-import Facturas from "./pages/user/Facturas";
-import Soporte from "./pages/user/Soporte";
+import ClientDomainsPage from "./pages/client/ClientDomainsPage";
+import Facturas from "./pages/client/Facturas";
+import Soporte from "./pages/client/Soporte";
 import GestionListados from "./pages/admin/GestionListados";
 import AdminConfig from "./pages/admin/AdminConfig";
 import AdminUsuarios from "./pages/admin/AdminUsuarios";
@@ -61,6 +61,8 @@ import BlogSEOManagement from "./pages/admin/BlogSEOManagement";
 import FAQManager from "./pages/admin/FAQManager";
 import RolesPermissions from "./pages/admin/RolesPermissions";
 import UserManagement from "./pages/admin/UserManagement";
+import ClientAppsPage from "./pages/client/ClientAppsPage";
+import ClientWebsitesPage from "./pages/client/ClientWebsitesPage";
 
 export const router = createBrowserRouter([
   // Root route
@@ -315,8 +317,16 @@ export const router = createBrowserRouter([
         element: <ProfileSetup />,
       },
       {
-        path: "dominios",
-        element: <MisDominios />,
+        path: "domains",
+        element: <ClientDomainsPage />,
+      },
+      {
+        path: "apps",
+        element: <ClientAppsPage />,
+      },
+      {
+        path: "websites",
+        element: <ClientWebsitesPage />,
       },
       {
         path: "facturas",

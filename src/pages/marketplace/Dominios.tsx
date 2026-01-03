@@ -3,88 +3,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Filter, Globe, Eye, Calendar, ArrowRight, TrendingUp, Award, CheckCircle } from "lucide-react"
-import { useMarketplaceDomains, useMarketplaceStats, useIncrementViews } from "@/hooks/useMarketplace"
+import { useMarketplaceDomains, useMarketplaceStats, useIncrementViews } from "@/store/hooks/useMarketplace"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const DominiosPage = () => {
   const { data: domains, isLoading: domainsLoading } = useMarketplaceDomains();
   const { data: stats } = useMarketplaceStats();
   const incrementViews = useIncrementViews();
-
-  const featuredDomains = [
-    {
-      id: 1,
-      domain: "tecnologia.com",
-      price: "$2,500",
-      views: "1,234",
-      category: "Tecnología",
-      extension: ".com",
-      length: 10,
-      registrar: "GoDaddy",
-      expires: "2025-12-15",
-      premium: true
-    },
-    {
-      id: 2,
-      domain: "marketing-online.com",
-      price: "$4,800",
-      views: "856",
-      category: "Marketing",
-      extension: ".com",
-      length: 16,
-      registrar: "Namecheap",
-      expires: "2026-03-22",
-      premium: true
-    },
-    {
-      id: 3,
-      domain: "consultoria.io",
-      price: "$1,200",
-      views: "432",
-      category: "Servicios",
-      extension: ".io",
-      length: 11,
-      registrar: "1&1",
-      expires: "2025-08-10",
-      premium: false
-    },
-    {
-      id: 4,
-      domain: "ecommerce-shop.net",
-      price: "$3,200",
-      views: "678",
-      category: "Comercio",
-      extension: ".net",
-      length: 14,
-      registrar: "GoDaddy",
-      expires: "2026-01-05",
-      premium: false
-    },
-    {
-      id: 5,
-      domain: "inversiones.com",
-      price: "$15,000",
-      views: "2,145",
-      category: "Finanzas",
-      extension: ".com",
-      length: 11,
-      registrar: "Namecheap",
-      expires: "2027-06-30",
-      premium: true
-    },
-    {
-      id: 6,
-      domain: "salud-digital.org",
-      price: "$2,800",
-      views: "543",
-      category: "Salud",
-      extension: ".org",
-      length: 13,
-      registrar: "Register.com",
-      expires: "2025-11-18",
-      premium: false
-    }
-  ]
 
   const categories = [
     { name: "Tecnología", count: 47, color: "bg-primary" },
@@ -104,7 +29,7 @@ const DominiosPage = () => {
             Dominios Premium en Español
           </h1>
           <p className="text-xl text-muted-foreground mb-6">
-            Descubre dominios .com, .io y otras extensiones premium para tu negocio. 
+            Descubre dominios .com, .io y otras extensiones premium para tu negocio.
             Amplia selección de dominios verificados con precios competitivos en el mercado global.
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -129,8 +54,8 @@ const DominiosPage = () => {
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Buscar dominios... ej: tecnologia, marketing, finanzas" 
+            <Input
+              placeholder="Buscar dominios... ej: tecnologia, marketing, finanzas"
               className="pl-10 h-12"
             />
           </div>
@@ -142,7 +67,7 @@ const DominiosPage = () => {
             <Button className="h-12 px-8">Buscar</Button>
           </div>
         </div>
-        
+
         {/* Quick Filters */}
         <div className="flex flex-wrap gap-2 mt-4">
           <Badge variant="secondary" className="cursor-pointer hover:bg-primary hover:text-primary-foreground">
@@ -190,7 +115,7 @@ const DominiosPage = () => {
             <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
-        
+
         {domainsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -231,8 +156,8 @@ const DominiosPage = () => {
               const length = displayDomain.length;
 
               return (
-                <Card 
-                  key={domain.id} 
+                <Card
+                  key={domain.id}
                   className="hover:shadow-lg transition-all duration-300 group border-2 hover:border-primary/20 cursor-pointer"
                   onClick={() => incrementViews(domain.id)}
                 >
@@ -256,7 +181,7 @@ const DominiosPage = () => {
                       </div>
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-2xl font-bold text-primary">
@@ -267,7 +192,7 @@ const DominiosPage = () => {
                         {domain.views_count}
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground">Longitud:</span>
@@ -278,12 +203,12 @@ const DominiosPage = () => {
                         <p className="font-medium">{registrar}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
                       Expira: {expires}
                     </div>
-                    
+
                     <div className="flex gap-2 pt-2">
                       <Button className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground">
                         Ver Detalles

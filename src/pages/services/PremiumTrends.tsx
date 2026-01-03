@@ -3,18 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  TrendingUp, 
-  Download, 
-  Crown, 
-  CheckCircle, 
-  BarChart3, 
+import {
+  TrendingUp,
+  Download,
+  Crown,
+  CheckCircle,
+  BarChart3,
   Calendar,
   Globe,
   Star,
   Lock
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/store/hooks/useAuth';
 import { mockData, mockAuth } from '@/lib/mockData';
 import { useToast } from '@/hooks/use-toast';
 
@@ -360,8 +360,8 @@ Subscribe to Premium Market Trends for complete reports.
                   </p>
                   <div className="space-y-4">
                     <div className="text-3xl font-bold text-primary">$29<span className="text-lg text-muted-foreground">/month</span></div>
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="w-full btn-primary"
                       onClick={handleSubscribe}
                       disabled={isLoading}

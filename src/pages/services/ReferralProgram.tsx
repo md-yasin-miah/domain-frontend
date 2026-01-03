@@ -5,20 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ReferralDashboard from '@/components/ReferralDashboard';
-import { 
-  Users, 
-  DollarSign, 
-  Gift, 
-  TrendingUp, 
-  Share2, 
-  CheckCircle, 
+import {
+  Users,
+  DollarSign,
+  Gift,
+  TrendingUp,
+  Share2,
+  CheckCircle,
   Copy,
   Trophy,
   Star,
   Crown,
   Zap
 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/store/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const ReferralProgram = () => {
@@ -36,7 +36,7 @@ const ReferralProgram = () => {
       color: "text-orange-600"
     },
     {
-      tier: "Silver", 
+      tier: "Silver",
       icon: Star,
       referrals: "11-25",
       commission: "5%",
@@ -76,7 +76,7 @@ const ReferralProgram = () => {
       linkedin: `https://linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://adominioz.com')}&summary=${encodeURIComponent(message)}`,
       whatsapp: `https://wa.me/?text=${encodeURIComponent(message)}`
     };
-    
+
     window.open(urls[platform as keyof typeof urls], '_blank');
   };
 
@@ -122,7 +122,7 @@ const ReferralProgram = () => {
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               <div className="flex gap-2 justify-center">
                 <Button variant="outline" size="sm" onClick={() => shareOnSocial('twitter')}>
                   Compartir en Twitter
@@ -194,7 +194,7 @@ const ReferralProgram = () => {
               <h3 className="text-xl font-bold mb-2">1. Regístrate</h3>
               <p className="text-muted-foreground">Crea tu cuenta y obtén tu código único de referido</p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                 <Share2 className="w-8 h-8 text-white" />
@@ -202,7 +202,7 @@ const ReferralProgram = () => {
               <h3 className="text-xl font-bold mb-2">2. Comparte</h3>
               <p className="text-muted-foreground">Comparte tu código en redes sociales o con contactos</p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-8 h-8 text-white" />
@@ -210,7 +210,7 @@ const ReferralProgram = () => {
               <h3 className="text-xl font-bold mb-2">3. Gana</h3>
               <p className="text-muted-foreground">Recibe comisión por cada venta que generes</p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                 <DollarSign className="w-8 h-8 text-white" />

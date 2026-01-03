@@ -2,7 +2,7 @@ import LiveChat from '@/components/LiveChat';
 import { Footer } from '@/components/layout/Footer';
 import { Header, MenuItem } from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/store/hooks/useAuth';
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -18,6 +18,9 @@ import {
   Star,
   User,
   Settings,
+  Globe,
+  Server,
+  Smartphone,
 } from 'lucide-react';
 
 interface ClientLayoutProps {
@@ -37,8 +40,25 @@ export function ClientLayout({ children }: ClientLayoutProps) {
     },
     {
       title: t('nav.marketplaceListing'),
-      url: '/client/marketplace-listing',
+      url: '#',
       icon: ShoppingCart,
+      subItems: [
+        {
+          title: t('nav.apps'),
+          url: '/client/apps',
+          icon: Smartphone,
+        },
+        {
+          title: t('nav.domains'),
+          url: '/client/domains',
+          icon: Server,
+        },
+        {
+          title: t('nav.websites'),
+          url: '/client/websites',
+          icon: Globe,
+        },
+      ],
     },
     {
       title: t('nav.offers'),

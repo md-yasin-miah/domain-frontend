@@ -1,30 +1,23 @@
 import { apiSlice } from './apiSlice';
-import type {
-  Listing,
-  ListingCreateRequest,
-  ListingUpdateRequest,
-  ListingFilters,
-  PaginatedResponse,
-} from './types';
 
 export const marketplaceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getListings: builder.query<PaginatedResponse<Listing> | Listing[], ListingFilters>({
+    getMarketplaceListings: builder.query<PaginatedResponse<MarketplaceListing>, ListingFilters>({
       query: (params) => ({
         url: '/marketplace/listings',
         method: 'GET',
         params,
       }),
-      providesTags: ['Domain'],
+      providesTags: ['MarketplaceListing'],
     }),
-    getListing: builder.query<Listing, number>({
+    getMarketplaceListing: builder.query<MarketplaceListing, number>({
       query: (id) => ({
         url: `/marketplace/listings/${id}`,
         method: 'GET',
       }),
       providesTags: (result, error, id) => [{ type: 'Domain', id }],
     }),
-    createListing: builder.mutation<Listing, ListingCreateRequest>({
+    createMarketplaceListing: builder.mutation<MarketplaceListing, ListingCreateRequest>({
       query: (data) => ({
         url: '/marketplace/listings',
         method: 'POST',
@@ -32,7 +25,7 @@ export const marketplaceApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Domain'],
     }),
-    updateListing: builder.mutation<Listing, { id: number; data: ListingUpdateRequest }>({
+    updateMarketplaceListing: builder.mutation<MarketplaceListing, { id: number; data: ListingUpdateRequest }>({
       query: ({ id, data }) => ({
         url: `/marketplace/listings/${id}`,
         method: 'PUT',
@@ -40,42 +33,42 @@ export const marketplaceApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
     }),
-    deleteListing: builder.mutation<void, number>({
+    deleteMarketplaceListing: builder.mutation<void, number>({
       query: (id) => ({
         url: `/marketplace/listings/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Domain'],
     }),
-    getListingBySlug: builder.query<Listing, string>({
+    getMarketplaceListingBySlug: builder.query<MarketplaceListing, string>({
       query: (slug) => ({
         url: `/marketplace/listings/slug/${slug}`,
         method: 'GET',
       }),
       providesTags: (result, error, slug) => [{ type: 'Domain', id: result?.id }],
     }),
-    incrementViewCount: builder.mutation<void, number>({
+    incrementMarketplaceViewCount: builder.mutation<void, number>({
       query: (id) => ({
         url: `/marketplace/listings/${id}/view`,
         method: 'POST',
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Domain', id }],
     }),
-    featureListing: builder.mutation<Listing, number>({
+    featureMarketplaceListing: builder.mutation<MarketplaceListing, number>({
       query: (id) => ({
         url: `/marketplace/listings/${id}/feature`,
         method: 'POST',
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Domain', id }, 'Domain'],
     }),
-    getListingTypes: builder.query<any[], void>({
+    getMarketplaceListingTypes: builder.query<any[], void>({
       query: () => ({
         url: '/marketplace/listing-types',
         method: 'GET',
       }),
       providesTags: ['Domain'],
     }),
-    createListingType: builder.mutation<any, any>({
+    createMarketplaceListingType: builder.mutation<any, any>({
       query: (data) => ({
         url: '/marketplace/listing-types',
         method: 'POST',
@@ -87,14 +80,14 @@ export const marketplaceApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetListingsQuery,
-  useGetListingQuery,
-  useGetListingBySlugQuery,
-  useCreateListingMutation,
-  useUpdateListingMutation,
-  useDeleteListingMutation,
-  useIncrementViewCountMutation,
-  useFeatureListingMutation,
-  useGetListingTypesQuery,
-  useCreateListingTypeMutation,
+  useGetMarketplaceListingsQuery,
+  useGetMarketplaceListingQuery,
+  useGetMarketplaceListingBySlugQuery,
+  useCreateMarketplaceListingMutation,
+  useUpdateMarketplaceListingMutation,
+  useDeleteMarketplaceListingMutation,
+  useIncrementMarketplaceViewCountMutation,
+  useFeatureMarketplaceListingMutation,
+  useGetMarketplaceListingTypesQuery,
+  useCreateMarketplaceListingTypeMutation,
 } = marketplaceApi;

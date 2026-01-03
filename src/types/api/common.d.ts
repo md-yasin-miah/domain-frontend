@@ -2,10 +2,14 @@
 // ============ Pagination Types ============
 interface PaginatedResponse<T> {
   items: T[];
-  total: number;
-  page: number;
-  size: number;
-  pages: number;
+  pagination: {
+    total: number,
+    page: number,
+    page_size: number,
+    total_pages: number,
+    has_next: boolean,
+    has_previous: boolean
+  }
 }
 
 interface PaginationParams {

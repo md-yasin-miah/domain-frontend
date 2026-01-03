@@ -4,50 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Globe, Search, Calendar, Settings, RefreshCw, ExternalLink, AlertTriangle } from "lucide-react";
+import { Globe, Search, Calendar, Settings, RefreshCw, ExternalLink, AlertTriangle, Server } from "lucide-react";
+import { useGetMarketplaceListingsQuery } from '@/store/api/marketplaceApi';
 
-const MisDominios = () => {
+const ClientDomainsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { data: domainsData } = useGetMarketplaceListingsQuery({ status: 'active', listing_type_id: 1 });
 
-  // Sample domains data
-  const domains = [
-    {
-      id: 1,
-      name: "mitiendaonline.com",
-      status: "Activo",
-      expirationDate: "2025-03-15",
-      registrar: "GoDaddy",
-      autoRenewal: true,
-      dnsRecords: 12,
-      lastUpdate: "2024-01-15",
-      type: "Premium"
-    },
-    {
-      id: 2,
-      name: "blogpersonal.net",
-      status: "Activo",
-      expirationDate: "2024-12-20",
-      registrar: "Namecheap",
-      autoRenewal: false,
-      dnsRecords: 8,
-      lastUpdate: "2024-01-10",
-      type: "Estándar"
-    },
-    {
-      id: 3,
-      name: "proyectoweb.org",
-      status: "Expirado",
-      expirationDate: "2024-01-05",
-      registrar: "Domain.com",
-      autoRenewal: false,
-      dnsRecords: 5,
-      lastUpdate: "2023-12-30",
-      type: "Estándar"
-    }
-  ];
-
-  const filteredDomains = domains.filter(domain =>
-    domain.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDomains = domainsData?.items?.filter(domain =>
+    domain.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -73,7 +38,7 @@ const MisDominios = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Globe className="w-8 h-8 text-primary" />
+            <Server className="w-8 h-8 text-primary" />
             Mis Dominios
           </h1>
           <p className="text-muted-foreground mt-2">
@@ -81,7 +46,7 @@ const MisDominios = () => {
           </p>
         </div>
         <Button className="bg-primary hover:bg-primary/90">
-          <Globe className="w-4 h-4 mr-2" />
+          <Server className="w-4 h-4 mr-2" />
           Registrar Dominio
         </Button>
       </div>
@@ -100,17 +65,17 @@ const MisDominios = () => {
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all">Todos ({domains.length})</TabsTrigger>
-          <TabsTrigger value="active">Activos ({domains.filter(d => d.status === 'Activo').length})</TabsTrigger>
+          <TabsTrigger value="all">Todos ({domainsData?.pagination.total})</TabsTrigger>
+          <TabsTrigger value="active">Activos ({domainsData?.items.filter(d => d.status === 'active').length})</TabsTrigger>
           <TabsTrigger value="expiring">Próximos a Expirar</TabsTrigger>
           <TabsTrigger value="expired">Expirados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-6">
           <div className="grid gap-6">
-            {filteredDomains.map((domain) => {
-              const daysUntilExpiration = getDaysUntilExpiration(domain.expirationDate);
-              
+            {filteredDomains?.map((domain) => {
+              const daysUntilExpiration = getDaysUntilExpiration(domain.expires_at);
+
               return (
                 <Card key={domain.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
@@ -118,11 +83,11 @@ const MisDominios = () => {
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${getStatusColor(domain.status)}`} />
                         <div>
-                          <CardTitle className="text-xl">{domain.name}</CardTitle>
+                          <CardTitle className="text-xl">{domain.title}</CardTitle>
                           <CardDescription className="flex items-center gap-4 mt-1">
-                            <span>Registrado con {domain.registrar}</span>
-                            <Badge variant={domain.type === 'Premium' ? 'default' : 'secondary'}>
-                              {domain.type}
+                            <span>Registered by {domain.seller.username}</span>
+                            <Badge variant={domain.listing_type.name === 'Premium' ? 'default' : 'secondary'}>
+                              {domain.listing_type.name}
                             </Badge>
                           </CardDescription>
                         </div>
@@ -141,7 +106,7 @@ const MisDominios = () => {
                       </div>
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent>
                     <div className="grid md:grid-cols-3 gap-6">
                       {/* Domain Info */}
@@ -154,12 +119,12 @@ const MisDominios = () => {
                           </div>
                           <div className="flex justify-between">
                             <span>Expira:</span>
-                            <span className="font-medium">{domain.expirationDate}</span>
+                            <span className="font-medium">{domain.expires_at}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Auto-renovación:</span>
-                            <Badge variant={domain.autoRenewal ? 'default' : 'secondary'} className="text-xs">
-                              {domain.autoRenewal ? 'Activada' : 'Desactivada'}
+                            <Badge variant={domain?.is_auto_renew ? 'default' : 'secondary'} className="text-xs">
+                              {domain?.is_auto_renew ? 'Activada' : 'Desactivada'}
                             </Badge>
                           </div>
                         </div>
@@ -171,11 +136,11 @@ const MisDominios = () => {
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span>Registros DNS:</span>
-                            <span className="font-medium">{domain.dnsRecords}</span>
+                            <span className="font-medium">{domain?.dns_records}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Última actualización:</span>
-                            <span className="font-medium">{domain.lastUpdate}</span>
+                            <span className="font-medium">{domain.updated_at}</span>
                           </div>
                         </div>
                         <Button variant="outline" size="sm" className="w-full">
@@ -244,4 +209,4 @@ const MisDominios = () => {
   );
 };
 
-export default MisDominios;
+export default ClientDomainsPage;

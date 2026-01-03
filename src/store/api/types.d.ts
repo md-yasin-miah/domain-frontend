@@ -1,37 +1,6 @@
-// API Response Types - Based on Backend Models
-
-// ============ Authentication Types ============
-export interface LoginRequest {
-  username: string; // Can be username or email
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  username: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-}
-
-export interface RefreshTokenRequest {
-  refresh_token: string;
-}
-
-export interface RefreshTokenResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-}
-
-
 
 // ============ Profile Types ============
-export interface UserProfile {
+interface UserProfile {
   id: number;
   user_id: number;
   first_name: string | null;
@@ -50,7 +19,7 @@ export interface UserProfile {
   updated_at: string;
 }
 
-export interface ProfileCreateRequest {
+interface ProfileCreateRequest {
   first_name?: string;
   last_name?: string;
   phone?: string;
@@ -69,39 +38,23 @@ export interface ProfileCreateRequest {
   } | null;
 }
 
-export interface ProfileCompletionResponse {
+interface ProfileCompletionResponse {
   is_complete: boolean;
   completion_percentage: number;
   missing_fields: string[];
 }
 
 // ============ Role Types ============
-export interface Role {
+interface Role {
   id: number;
   name: string;
   description: string | null;
 }
 
 // ============ Marketplace Types ============
-export interface Listing {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  listing_type_id: number;
-  price: number;
-  currency: string;
-  status: 'draft' | 'active' | 'sold' | 'expired' | 'suspended';
-  domain_name?: string | null;
-  website_url?: string | null;
-  seller_id: number;
-  view_count: number;
-  favorite_count: number;
-  created_at: string;
-  updated_at: string;
-}
 
-export interface ListingCreateRequest {
+
+interface ListingCreateRequest {
   title: string;
   description: string;
   listing_type_id: number;
@@ -112,10 +65,10 @@ export interface ListingCreateRequest {
   status?: 'draft' | 'active';
 }
 
-export type ListingUpdateRequest = Partial<ListingCreateRequest>;
+type ListingUpdateRequest = Partial<ListingCreateRequest>;
 
 // ============ Order Types ============
-export interface Order {
+interface Order {
   id: number;
   order_number: string;
   listing_id: number;
@@ -130,25 +83,25 @@ export interface Order {
   updated_at: string;
 }
 
-export interface OrderCreateRequest {
+interface OrderCreateRequest {
   listing_id: number;
   final_price?: number;
   currency?: string;
   offer_id?: number;
 }
 
-export interface PaymentIntentResponse {
+interface PaymentIntentResponse {
   client_secret: string;
   payment_intent_id: string;
 }
 
-export interface PaymentIntentStatus {
+interface PaymentIntentStatus {
   status: string;
   payment_intent_id: string | null;
 }
 
 // ============ Payment Types ============
-export interface Payment {
+interface Payment {
   id: number;
   payment_number: string;
   order_id: number;
@@ -161,7 +114,7 @@ export interface Payment {
   created_at: string;
 }
 
-export interface PaymentCreateRequest {
+interface PaymentCreateRequest {
   order_id: number;
   amount: number;
   currency: string;
@@ -169,7 +122,7 @@ export interface PaymentCreateRequest {
 }
 
 // ============ Escrow Types ============
-export interface Escrow {
+interface Escrow {
   id: number;
   escrow_number: string;
   order_id: number;
@@ -185,16 +138,16 @@ export interface Escrow {
   created_at: string;
 }
 
-export interface EscrowReleaseRequest {
+interface EscrowReleaseRequest {
   release_reason?: string;
 }
 
-export interface EscrowRefundRequest {
+interface EscrowRefundRequest {
   refund_reason?: string;
 }
 
 // ============ Offer Types ============
-export interface Offer {
+interface Offer {
   id: number;
   listing_id: number;
   buyer_id: number;
@@ -208,20 +161,20 @@ export interface Offer {
   updated_at: string;
 }
 
-export interface OfferCreateRequest {
+interface OfferCreateRequest {
   listing_id: number;
   amount: number;
   currency: string;
   message?: string;
 }
 
-export interface OfferCounterRequest {
+interface OfferCounterRequest {
   amount: number;
   message?: string;
 }
 
 // ============ Auction Types ============
-export interface Auction {
+interface Auction {
   id: number;
   listing_id: number;
   starting_bid: number;
@@ -232,7 +185,7 @@ export interface Auction {
   created_at: string;
 }
 
-export interface Bid {
+interface Bid {
   id: number;
   auction_id: number;
   buyer_id: number;
@@ -240,18 +193,18 @@ export interface Bid {
   created_at: string;
 }
 
-export interface BidCreateRequest {
+interface BidCreateRequest {
   amount: number;
 }
 
-export interface AuctionCreateRequest {
+interface AuctionCreateRequest {
   listing_id: number;
   starting_bid: number;
   reserve_price?: number;
   end_date: string;
 }
 
-export interface AuctionUpdateRequest {
+interface AuctionUpdateRequest {
   starting_bid?: number;
   reserve_price?: number;
   end_date?: string;
@@ -259,7 +212,7 @@ export interface AuctionUpdateRequest {
 }
 
 // ============ Message Types ============
-export interface Conversation {
+interface Conversation {
   id: number;
   listing_id: number | null;
   participant1_id: number;
@@ -269,7 +222,7 @@ export interface Conversation {
   created_at: string;
 }
 
-export interface Message {
+interface Message {
   id: number;
   conversation_id: number;
   sender_id: number;
@@ -278,17 +231,17 @@ export interface Message {
   created_at: string;
 }
 
-export interface MessageCreateRequest {
+interface MessageCreateRequest {
   content: string;
 }
 
-export interface ConversationCreateRequest {
+interface ConversationCreateRequest {
   listing_id?: number;
   recipient_id: number;
 }
 
 // ============ Review Types ============
-export interface Review {
+interface Review {
   id: number;
   listing_id: number;
   order_id: number;
@@ -299,7 +252,7 @@ export interface Review {
   updated_at: string;
 }
 
-export interface ReviewCreateRequest {
+interface ReviewCreateRequest {
   listing_id: number;
   order_id: number;
   rating: number;
@@ -307,7 +260,7 @@ export interface ReviewCreateRequest {
 }
 
 // ============ Support Types ============
-export interface SupportTicket {
+interface SupportTicket {
   id: number;
   user_id: number;
   subject: string;
@@ -318,14 +271,14 @@ export interface SupportTicket {
   updated_at: string;
 }
 
-export interface TicketCreateRequest {
+interface TicketCreateRequest {
   subject: string;
   description: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
 // ============ FAQ Types ============
-export interface FAQ {
+interface FAQ {
   id: number;
   question: string;
   answer: string;
@@ -335,7 +288,7 @@ export interface FAQ {
   created_at: string;
 }
 
-export interface FAQCreateRequest {
+interface FAQCreateRequest {
   question: string;
   answer: string;
   category?: string;
@@ -344,7 +297,7 @@ export interface FAQCreateRequest {
 }
 
 // ============ Blog Types ============
-export interface BlogPost {
+interface BlogPost {
   id: number;
   title: string;
   slug: string;
@@ -361,7 +314,7 @@ export interface BlogPost {
   updated_at: string;
 }
 
-export interface BlogPostCreateRequest {
+interface BlogPostCreateRequest {
   title: string;
   content: string;
   excerpt?: string;
@@ -372,7 +325,7 @@ export interface BlogPostCreateRequest {
 }
 
 // ============ Dispute Types ============
-export interface Dispute {
+interface Dispute {
   id: number;
   order_id: number;
   buyer_id: number;
@@ -385,13 +338,13 @@ export interface Dispute {
   updated_at: string;
 }
 
-export interface DisputeCreateRequest {
+interface DisputeCreateRequest {
   order_id: number;
   reason: string;
   description: string;
 }
 
-export interface DisputeComment {
+interface DisputeComment {
   id: number;
   dispute_id: number;
   user_id: number;
@@ -400,7 +353,7 @@ export interface DisputeComment {
 }
 
 // ============ Dashboard Types ============
-export interface AdminDashboard {
+interface AdminDashboard {
   total_users: number;
   active_listings: number;
   total_orders: number;
@@ -411,7 +364,7 @@ export interface AdminDashboard {
   recent_users: UserResponse[];
 }
 
-export interface SellerDashboard {
+interface SellerDashboard {
   total_listings: number;
   active_listings: number;
   total_sales: number;
@@ -422,7 +375,7 @@ export interface SellerDashboard {
   recent_listings: Listing[];
 }
 
-export interface BuyerDashboard {
+interface BuyerDashboard {
   total_orders: number;
   active_orders: number;
   total_spent: number;
@@ -433,7 +386,7 @@ export interface BuyerDashboard {
 }
 
 // ============ User Management Types ============
-export interface UserResponse {
+interface UserResponse {
   id: number;
   username: string;
   email: string;
@@ -444,29 +397,29 @@ export interface UserResponse {
   created_at: string;
 }
 
-export interface UserCreateRequest {
+interface UserCreateRequest {
   email: string;
   username: string;
   password: string;
   is_active?: boolean;
 }
 
-export interface UserUpdateRequest {
+interface UserUpdateRequest {
   email?: string;
   username?: string;
   is_active?: boolean;
 }
 
-export interface PasswordUpdateRequest {
+interface PasswordUpdateRequest {
   current_password: string;
   new_password: string;
 }
 
-export interface PasswordResetRequest {
+interface PasswordResetRequest {
   new_password: string;
 }
 
-export interface UserStats {
+interface UserStats {
   total_listings: number;
   total_orders: number;
   total_revenue: number;
@@ -474,25 +427,9 @@ export interface UserStats {
   average_rating: number | null;
 }
 
-// ============ Pagination Types ============
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  size: number;
-  pages: number;
-}
-
-export interface PaginationParams {
-  skip?: number;
-  limit?: number;
-  page?: number;
-  size?: number;
-}
-
 
 // ============ Filter Types ============
-export interface ListingFilters extends PaginationParams {
+interface ListingFilters extends PaginationParams {
   status?: 'draft' | 'active' | 'sold' | 'expired' | 'suspended';
   listing_type_id?: number;
   seller_id?: number;
@@ -501,22 +438,9 @@ export interface ListingFilters extends PaginationParams {
   search?: string;
 }
 
-export interface OrderFilters extends PaginationParams {
+interface OrderFilters extends PaginationParams {
   buyer_id?: number;
   seller_id?: number;
   status?: string;
-}
-
-// ============ Error Types ============
-export interface ApiError {
-  detail: string | Array<{
-    type: string;
-    loc: (string | number)[];
-    msg: string;
-    input: any;
-  }>;
-  message?: string;
-  errors?: Record<string, string[]>;
-  status?: number;
 }
 

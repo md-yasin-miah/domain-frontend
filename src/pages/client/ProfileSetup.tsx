@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/store/hooks/useAuth";
 import { useUpdateClientProfileMutation } from "@/store/api/userApi";
 
 export default function ProfileSetup() {
@@ -79,7 +79,7 @@ export default function ProfileSetup() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">{t('profile.setup.personal_info')}</h3>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="full_name">{t('profile.setup.full_name')} *</Label>
                 <Input
@@ -129,7 +129,7 @@ export default function ProfileSetup() {
 
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">{t('profile.setup.company_info')}</h3>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="company_name">{t('profile.setup.company_name')}</Label>
                 <Input

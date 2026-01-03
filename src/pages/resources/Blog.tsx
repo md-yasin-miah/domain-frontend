@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/store/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useGetBlogPostsQuery } from "@/store/api/blogApi";
 import { useGetBlogCategoriesQuery } from "@/store/api/categoryApi";

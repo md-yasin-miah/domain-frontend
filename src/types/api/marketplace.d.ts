@@ -1,23 +1,61 @@
-/**
- * Marketplace API Types
- */
-// ============ Listing Types ============
-interface Listing {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  listing_type_id: number;
-  price: number;
-  currency: string;
-  status: 'draft' | 'active' | 'sold' | 'expired' | 'suspended';
-  domain_name?: string | null;
-  website_url?: string | null;
-  seller_id: number;
-  view_count: number;
-  favorite_count: number;
-  created_at: string;
-  updated_at: string;
+interface MarketplaceListingType {
+  id: number,
+  name: string,
+  slug: string,
+  icon: string,
+  description: string,
+  is_active: boolean,
+  created_at: string,
+  updated_at: string
+}
+interface MarketplaceListing {
+  id: number,
+  title: string,
+  slug: string,
+  description: string,
+  short_description: string,
+  listing_type_id: number,
+  price: number | string,
+  currency: 'USD' | string,
+  is_price_negotiable: boolean,
+  domain_name: string | null,
+  domain_extension: string | null,
+  domain_age_years: number | null,
+  domain_authority: number | null,
+  domain_backlinks: number | null,
+  website_url: string,
+  website_traffic_monthly: number,
+  website_revenue_monthly: number | string,
+  website_profit_monthly: number | string,
+  website_technology: string,
+  status: 'draft' | 'active' | 'sold' | 'expired' | 'suspended',
+  is_featured: boolean,
+  primary_image_url: string,
+  image_urls: string[] | null,
+  meta_title: string | null,
+  meta_description: string | null,
+  additional_metadata: object | null,
+  expires_at: string | null,
+  seller_id: number,
+  view_count: number,
+  favorite_count: number,
+  sold_at: string | null,
+  sold_to_user_id: number | null,
+  sold_price: number | null,
+  created_at: string,
+  updated_at: string,
+  seller: {
+    id: number,
+    username: string,
+    email: string
+  },
+  listing_type: MarketplaceListingType,
+  is_favorited: boolean
+
+
+  // self added asper UI design
+  is_auto_renew: boolean,
+  dns_records: string,
 }
 
 interface ListingCreateRequest {

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Upload, Shield, CheckCircle } from "lucide-react";
 import { mockData, mockAuth } from "@/lib/mockData";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/store/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const RegisterBroker = () => {

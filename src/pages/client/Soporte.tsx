@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Search, Plus, Clock, CheckCircle, AlertCircle, MessageCircle } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/store/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 
 const Soporte = () => {
@@ -126,14 +126,14 @@ const Soporte = () => {
       });
       return;
     }
-    
+
     // Handle ticket creation
     console.log('Creating ticket:', newTicket);
     toast({
       title: "✅ Ticket creado",
       description: "Tu ticket de soporte ha sido creado exitosamente. Te contactaremos pronto.",
     });
-    
+
     // Reset form
     setNewTicket({ subject: '', category: '', priority: '', message: '', clientName: '', websiteUrl: '', email: '', name: '' });
   };
@@ -145,7 +145,7 @@ const Soporte = () => {
       title: "✅ Mensaje enviado",
       description: "Hemos recibido tu mensaje. Te responderemos pronto.",
     });
-    
+
     // Reset form
     setContactForm({ name: '', email: '', phone: '', subject: '', message: '' });
   };
@@ -196,83 +196,83 @@ const Soporte = () => {
             </Card>
           ) : (
             <>
-          {/* Search */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Buscar tickets por asunto o número..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+              {/* Search */}
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Buscar tickets por asunto o número..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
 
-          {/* Tickets List */}
-          <div className="space-y-4">
-            {filteredTickets.map((ticket) => (
-              <Card key={ticket.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    {/* Ticket Info */}
-                    <div className="flex items-center gap-4">
-                      <div className={`w-3 h-3 rounded-full ${getStatusColor(ticket.status)}`} />
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-lg">{ticket.subject}</h3>
-                          <Badge variant={getStatusBadge(ticket.status)}>
-                            {ticket.status}
-                          </Badge>
-                          <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
-                            {ticket.priority}
-                          </Badge>
+              {/* Tickets List */}
+              <div className="space-y-4">
+                {filteredTickets.map((ticket) => (
+                  <Card key={ticket.id} className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        {/* Ticket Info */}
+                        <div className="flex items-center gap-4">
+                          <div className={`w-3 h-3 rounded-full ${getStatusColor(ticket.status)}`} />
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-semibold text-lg">{ticket.subject}</h3>
+                              <Badge variant={getStatusBadge(ticket.status)}>
+                                {ticket.status}
+                              </Badge>
+                              <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
+                                {ticket.priority}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                              <span>#{ticket.id}</span>
+                              <span>Categoría: {ticket.category}</span>
+                              <span className="flex items-center gap-1">
+                                <MessageCircle className="w-3 h-3" />
+                                {ticket.messages} mensajes
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              <span>Creado: {ticket.created}</span>
+                              <span>Actualizado: {ticket.updated}</span>
+                              {ticket.agent && <span>Agente: {ticket.agent}</span>}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                          <span>#{ticket.id}</span>
-                          <span>Categoría: {ticket.category}</span>
-                          <span className="flex items-center gap-1">
-                            <MessageCircle className="w-3 h-3" />
-                            {ticket.messages} mensajes
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span>Creado: {ticket.created}</span>
-                          <span>Actualizado: {ticket.updated}</span>
-                          {ticket.agent && <span>Agente: {ticket.agent}</span>}
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm">
+                            Ver detalles
+                          </Button>
+                          {ticket.status !== 'Cerrado' && (
+                            <Button size="sm" className="bg-primary hover:bg-primary/90">
+                              Responder
+                            </Button>
+                          )}
                         </div>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        Ver detalles
-                      </Button>
-                      {ticket.status !== 'Cerrado' && (
-                        <Button size="sm" className="bg-primary hover:bg-primary/90">
-                          Responder
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {filteredTickets.length === 0 && (
-            <div className="text-center py-12">
-              <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No tienes tickets</h3>
-              <p className="text-muted-foreground mb-4">
-                ¿Necesitas ayuda? Crea tu primer ticket de soporte
-              </p>
-              <Button onClick={() => setTab('create')}>
-                <Plus className="w-4 h-4 mr-2" />
-                Crear Ticket
-              </Button>
-            </div>
-          )}
-          </>
+              {filteredTickets.length === 0 && (
+                <div className="text-center py-12">
+                  <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">No tienes tickets</h3>
+                  <p className="text-muted-foreground mb-4">
+                    ¿Necesitas ayuda? Crea tu primer ticket de soporte
+                  </p>
+                  <Button onClick={() => setTab('create')}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Crear Ticket
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </TabsContent>
 
@@ -293,7 +293,7 @@ const Soporte = () => {
                   </p>
                 </div>
               )}
-              
+
               {!user && (
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -301,7 +301,7 @@ const Soporte = () => {
                     <Input
                       placeholder="Tu nombre completo"
                       value={newTicket.name}
-                      onChange={(e) => setNewTicket({...newTicket, name: e.target.value})}
+                      onChange={(e) => setNewTicket({ ...newTicket, name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
@@ -310,24 +310,24 @@ const Soporte = () => {
                       type="email"
                       placeholder="tu@email.com"
                       value={newTicket.email}
-                      onChange={(e) => setNewTicket({...newTicket, email: e.target.value})}
+                      onChange={(e) => setNewTicket({ ...newTicket, email: e.target.value })}
                     />
                   </div>
                 </div>
               )}
-              
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Asunto *</label>
                   <Input
                     placeholder="Describe brevemente tu problema"
                     value={newTicket.subject}
-                    onChange={(e) => setNewTicket({...newTicket, subject: e.target.value})}
+                    onChange={(e) => setNewTicket({ ...newTicket, subject: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Categoría *</label>
-                  <Select value={newTicket.category} onValueChange={(value) => setNewTicket({...newTicket, category: value})}>
+                  <Select value={newTicket.category} onValueChange={(value) => setNewTicket({ ...newTicket, category: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona una categoría" />
                     </SelectTrigger>
@@ -344,7 +344,7 @@ const Soporte = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Prioridad</label>
-                  <Select value={newTicket.priority} onValueChange={(value) => setNewTicket({...newTicket, priority: value})}>
+                  <Select value={newTicket.priority} onValueChange={(value) => setNewTicket({ ...newTicket, priority: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona prioridad" />
                     </SelectTrigger>
@@ -360,7 +360,7 @@ const Soporte = () => {
                   <Input
                     placeholder="Nombre del cliente o empresa"
                     value={newTicket.clientName}
-                    onChange={(e) => setNewTicket({...newTicket, clientName: e.target.value})}
+                    onChange={(e) => setNewTicket({ ...newTicket, clientName: e.target.value })}
                   />
                 </div>
               </div>
@@ -370,7 +370,7 @@ const Soporte = () => {
                 <Input
                   placeholder="https://ejemplo.com"
                   value={newTicket.websiteUrl}
-                  onChange={(e) => setNewTicket({...newTicket, websiteUrl: e.target.value})}
+                  onChange={(e) => setNewTicket({ ...newTicket, websiteUrl: e.target.value })}
                 />
               </div>
 
@@ -380,16 +380,16 @@ const Soporte = () => {
                   placeholder="Describe tu problema con el mayor detalle posible..."
                   rows={6}
                   value={newTicket.message}
-                  onChange={(e) => setNewTicket({...newTicket, message: e.target.value})}
+                  onChange={(e) => setNewTicket({ ...newTicket, message: e.target.value })}
                 />
               </div>
 
-              <Button 
+              <Button
                 onClick={handleCreateTicket}
                 className="bg-primary hover:bg-primary/90"
                 disabled={
-                  !newTicket.subject || 
-                  !newTicket.category || 
+                  !newTicket.subject ||
+                  !newTicket.category ||
                   !newTicket.message ||
                   (!user && (!newTicket.email || !newTicket.name))
                 }
@@ -397,7 +397,7 @@ const Soporte = () => {
                 <Plus className="w-4 h-4 mr-2" />
                 Crear Ticket
               </Button>
-              
+
               {!user && (
                 <p className="text-xs text-muted-foreground">
                   * Campos requeridos. Recibirás una copia del ticket en tu email.
@@ -423,7 +423,7 @@ const Soporte = () => {
                   <Input
                     placeholder="Tu nombre"
                     value={contactForm.name}
-                    onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -432,7 +432,7 @@ const Soporte = () => {
                     type="email"
                     placeholder="tu@email.com"
                     value={contactForm.email}
-                    onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
                   />
                 </div>
               </div>
@@ -443,7 +443,7 @@ const Soporte = () => {
                   type="tel"
                   placeholder="+1 (555) 123-4567"
                   value={contactForm.phone}
-                  onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
+                  onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
                 />
               </div>
 
@@ -452,7 +452,7 @@ const Soporte = () => {
                 <Input
                   placeholder="¿En qué podemos ayudarte?"
                   value={contactForm.subject}
-                  onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
+                  onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
                 />
               </div>
 
@@ -462,11 +462,11 @@ const Soporte = () => {
                   placeholder="Escribe tu mensaje aquí..."
                   rows={6}
                   value={contactForm.message}
-                  onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                 />
               </div>
 
-              <Button 
+              <Button
                 onClick={handleContactSubmit}
                 className="bg-primary hover:bg-primary/90"
                 disabled={!contactForm.name || !contactForm.email || !contactForm.subject || !contactForm.message}

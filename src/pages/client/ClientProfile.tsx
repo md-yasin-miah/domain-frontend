@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { User, Building, Globe, Phone, Mail, Calendar, Image, MapPin, Link2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/store/hooks/useAuth";
 import { useGetMyProfileQuery, useUpdateProfileMutation, type ClientProfile } from "@/store/api/profileApi";
 
 export default function ClientProfile() {

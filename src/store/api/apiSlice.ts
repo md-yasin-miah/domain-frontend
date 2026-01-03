@@ -55,6 +55,7 @@ export const apiSlice = createApi({
     'Auth',
     'User',
     'Domain',
+    'MarketplaceListing',
     'Blog',
     'FAQ',
     'Role',

@@ -2,7 +2,7 @@ import LiveChat from '@/components/LiveChat';
 import { Footer } from '@/components/layout/Footer';
 import { Header, MenuItem } from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/store/hooks/useAuth';
 import {
   ShoppingCart,
   Server,

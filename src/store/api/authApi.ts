@@ -1,5 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type { LoginRequest, RegisterRequest, LoginResponse, UserResponse, RefreshTokenRequest, RefreshTokenResponse } from './types';
 
 const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
