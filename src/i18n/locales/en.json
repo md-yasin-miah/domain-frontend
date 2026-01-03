@@ -826,5 +826,62 @@
       "reply": "Reply",
       "replies": "replies"
     }
+  },
+  "domains": {
+    "title": "My Domains",
+    "subtitle": "Manage all your domains from one place",
+    "register_domain": "Register Domain",
+    "search_placeholder": "Search domains...",
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "expiring": "Expiring Soon",
+      "expired": "Expired"
+    },
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "pending": "Pending"
+    },
+    "expires_in": "Expires in",
+    "days": "days",
+    "configure": "Configure",
+    "registered_by": "Registered by",
+    "sections": {
+      "domain_info": "DOMAIN INFORMATION",
+      "dns_config": "DNS AND CONFIGURATION",
+      "quick_actions": "QUICK ACTIONS"
+    },
+    "labels": {
+      "status": "Status:",
+      "expires": "Expires:",
+      "auto_renewal": "Auto-renewal:",
+      "dns_records": "DNS Records:",
+      "last_update": "Last update:"
+    },
+    "auto_renewal": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "actions": {
+      "update_dns": "Update DNS",
+      "view_at_registrar": "View at registrar",
+      "renew_domain": "Renew domain",
+      "configure": "Configure"
+    },
+    "empty_states": {
+      "active": {
+        "title": "Active Domains",
+        "description": "All your active domains will appear here"
+      },
+      "expiring": {
+        "title": "Expiring Soon",
+        "description": "Domains expiring in the next 30 days"
+      },
+      "expired": {
+        "title": "Expired Domains",
+        "description": "Domains that have expired and need renewal"
+      }
+    }
   }
 }

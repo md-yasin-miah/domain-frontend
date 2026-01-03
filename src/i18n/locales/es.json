@@ -258,5 +258,62 @@
       "error_update": "Error",
       "error_update_desc": "Error al actualizar el perfil"
     }
+  },
+  "domains": {
+    "title": "Mis Dominios",
+    "subtitle": "Gestiona todos tus dominios desde un solo lugar",
+    "register_domain": "Registrar Dominio",
+    "search_placeholder": "Buscar dominios...",
+    "tabs": {
+      "all": "Todos",
+      "active": "Activos",
+      "expiring": "Próximos a Expirar",
+      "expired": "Expirados"
+    },
+    "status": {
+      "active": "Activo",
+      "expired": "Expirado",
+      "pending": "Pendiente"
+    },
+    "expires_in": "Expira en",
+    "days": "días",
+    "configure": "Configurar",
+    "registered_by": "Registrado por",
+    "sections": {
+      "domain_info": "INFORMACIÓN DEL DOMINIO",
+      "dns_config": "DNS Y CONFIGURACIÓN",
+      "quick_actions": "ACCIONES RÁPIDAS"
+    },
+    "labels": {
+      "status": "Estado:",
+      "expires": "Expira:",
+      "auto_renewal": "Auto-renovación:",
+      "dns_records": "Registros DNS:",
+      "last_update": "Última actualización:"
+    },
+    "auto_renewal": {
+      "enabled": "Activada",
+      "disabled": "Desactivada"
+    },
+    "actions": {
+      "update_dns": "Actualizar DNS",
+      "view_at_registrar": "Ver en registrar",
+      "renew_domain": "Renovar dominio",
+      "configure": "Configurar"
+    },
+    "empty_states": {
+      "active": {
+        "title": "Dominios Activos",
+        "description": "Todos tus dominios activos aparecerán aquí"
+      },
+      "expiring": {
+        "title": "Próximos a Expirar",
+        "description": "Dominios que expiran en los próximos 30 días"
+      },
+      "expired": {
+        "title": "Dominios Expirados",
+        "description": "Dominios que han expirado y necesitan renovación"
+      }
+    }
   }
 }
