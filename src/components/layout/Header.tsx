@@ -107,8 +107,8 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                           variant="ghost"
                           size="sm"
                           className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-all duration-200 ${isActive
-                              ? 'bg-primary/10 text-primary border border-primary/20'
-                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                            ? 'bg-primary/10 text-primary border border-primary/20'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
                             } data-[state=open]:bg-muted/80 data-[state=open]:text-foreground`}
                         >
                           <item.icon className="w-4 h-4" />
@@ -128,20 +128,20 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                                 <Link
                                   to={subItem.url}
                                   className={`flex items-start space-x-3 p-4 rounded-lg transition-all group ${isSubItemActive
-                                      ? 'bg-primary/10 hover:bg-primary/20'
-                                      : 'hover:bg-muted/80'
+                                    ? 'bg-primary/10 hover:bg-primary/20'
+                                    : 'hover:bg-muted/80'
                                     }`}
                                 >
                                   <div className={`p-2 rounded-lg transition-colors ${isSubItemActive
-                                      ? 'bg-primary/20 group-hover:bg-primary/30'
-                                      : 'bg-primary/10 group-hover:bg-primary/20'
+                                    ? 'bg-primary/20 group-hover:bg-primary/30'
+                                    : 'bg-primary/10 group-hover:bg-primary/20'
                                     }`}>
                                     <subItem.icon className={`w-4 h-4 ${isSubItemActive ? 'text-primary' : 'text-primary'}`} />
                                   </div>
                                   <div className="flex-1">
                                     <div className={`font-medium text-sm transition-colors ${isSubItemActive
-                                        ? 'text-primary group-hover:text-primary'
-                                        : 'text-foreground group-hover:text-accent-foreground'
+                                      ? 'text-primary group-hover:text-primary'
+                                      : 'text-foreground group-hover:text-accent-foreground'
                                       }`}>
                                       {subItem.title}
                                     </div>
@@ -311,8 +311,8 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                       <button
                         onClick={() => setExpandedMenuItems(prev => ({ ...prev, [item.title]: !prev[item.title] }))}
                         className={`w-full flex items-center justify-between px-2 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all ${isActive
-                            ? 'text-primary bg-primary/10'
-                            : 'text-primary hover:bg-muted/30'
+                          ? 'text-primary bg-primary/10'
+                          : 'text-primary hover:bg-muted/30'
                           }`}
                       >
                         <span>{item.title}</span>
@@ -329,8 +329,8 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                                 key={subItem.title}
                                 to={subItem.url}
                                 className={`flex ${isGridLayout ? 'flex-col items-center space-y-2 text-center' : 'items-center space-x-3'} p-4 rounded-xl transition-all ${isSubItemActive
-                                    ? 'bg-primary/10 hover:bg-primary/20 border border-primary/20'
-                                    : 'bg-muted/30 hover:bg-muted/60'
+                                  ? 'bg-primary/10 hover:bg-primary/20 border border-primary/20'
+                                  : 'bg-muted/30 hover:bg-muted/60'
                                   }`}
                                 onClick={() => setMobileMenuOpen(false)}
                               >
@@ -364,8 +364,8 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                     key={item.title}
                     to={item.url}
                     className={`flex items-center space-x-3 px-4 py-3 text-sm rounded-xl transition-all ${isActive
-                        ? 'bg-primary/10 text-primary border border-primary/20'
-                        : 'bg-muted/30 hover:bg-muted/60'
+                      ? 'bg-primary/10 text-primary border border-primary/20'
+                      : 'bg-muted/30 hover:bg-muted/60'
                       }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
