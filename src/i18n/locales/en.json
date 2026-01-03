@@ -930,5 +930,53 @@
         "description": "You don't have any websites yet"
       }
     }
+  },
+  "apps": {
+    "title": "My Apps",
+    "subtitle": "Manage all your apps from one place",
+    "register_app": "Register App",
+    "search_placeholder": "Search apps...",
+    "tabs": {
+      "all": "All",
+      "active": "Active"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending"
+    },
+    "configure": "Configure",
+    "registered_by": "Registered by",
+    "sections": {
+      "app_info": "APP INFORMATION",
+      "stats": "STATISTICS & METRICS",
+      "quick_actions": "QUICK ACTIONS"
+    },
+    "labels": {
+      "status": "Status:",
+      "url": "URL:",
+      "platform": "Platform:",
+      "downloads": "Downloads:",
+      "active_users": "Active Users:",
+      "revenue_monthly": "Monthly Revenue:",
+      "profit_monthly": "Monthly Profit:",
+      "technology": "Technology:",
+      "last_update": "Last update:"
+    },
+    "actions": {
+      "view_app": "View App",
+      "analytics": "View Analytics",
+      "configure": "Configure"
+    },
+    "empty_states": {
+      "active": {
+        "title": "Active Apps",
+        "description": "All your active apps will appear here"
+      },
+      "all": {
+        "title": "No Apps",
+        "description": "You don't have any apps yet"
+      }
+    }
   }
 }

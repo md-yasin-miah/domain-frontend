@@ -362,5 +362,53 @@
         "description": "Aún no tienes sitios web"
       }
     }
+  },
+  "apps": {
+    "title": "Mis Apps",
+    "subtitle": "Gestiona todas tus aplicaciones desde un solo lugar",
+    "register_app": "Registrar App",
+    "search_placeholder": "Buscar apps...",
+    "tabs": {
+      "all": "Todos",
+      "active": "Activos"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "pending": "Pendiente"
+    },
+    "configure": "Configurar",
+    "registered_by": "Registrado por",
+    "sections": {
+      "app_info": "INFORMACIÓN DE LA APP",
+      "stats": "ESTADÍSTICAS Y MÉTRICAS",
+      "quick_actions": "ACCIONES RÁPIDAS"
+    },
+    "labels": {
+      "status": "Estado:",
+      "url": "URL:",
+      "platform": "Plataforma:",
+      "downloads": "Descargas:",
+      "active_users": "Usuarios Activos:",
+      "revenue_monthly": "Ingresos Mensuales:",
+      "profit_monthly": "Beneficio Mensual:",
+      "technology": "Tecnología:",
+      "last_update": "Última actualización:"
+    },
+    "actions": {
+      "view_app": "Ver App",
+      "analytics": "Ver Analíticas",
+      "configure": "Configurar"
+    },
+    "empty_states": {
+      "active": {
+        "title": "Apps Activas",
+        "description": "Todas tus apps activas aparecerán aquí"
+      },
+      "all": {
+        "title": "Sin Apps",
+        "description": "Aún no tienes apps"
+      }
+    }
   }
 }

@@ -73,7 +73,7 @@ const ClientWebsitesPage = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>{t('websites.labels.status')}</span>
-                  <span className="font-medium">{getStatusLabel(website.status, t)}</span>
+                  <span className="font-medium">{getStatusLabel(website.status, t, 'websites')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t('websites.labels.url')}</span>

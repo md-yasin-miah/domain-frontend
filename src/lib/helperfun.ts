@@ -24,6 +24,8 @@ export const getStatusColor = (status: string) => {
   switch (status) {
     case 'active':
     case 'Activo': return 'bg-green-500';
+    case 'inactive':
+    case 'Inactivo': return 'bg-red-500';
     case 'expired':
     case 'Expirado': return 'bg-red-500';
     case 'pending':
@@ -31,12 +33,12 @@ export const getStatusColor = (status: string) => {
     default: return 'bg-gray-500';
   }
 };
-export const getStatusLabel = (status: string, t: TFunction) => {
+export const getStatusLabel = (status: string, t: TFunction, type: 'domains' | 'websites' | 'apps' = 'domains') => {
   const statusMap: Record<string, string> = {
-    'active': t('domains.status.active'),
-    'inactive': t('websites.status.inactive'),
+    'active': type === 'domains' ? t('domains.status.active') : type === 'websites' ? t('websites.status.active') : t('apps.status.active'),
+    'inactive': type === 'websites' ? t('websites.status.inactive') : t('apps.status.inactive'),
     'expired': t('domains.status.expired'),
-    'pending': t('domains.status.pending')
+    'pending': type === 'domains' ? t('domains.status.pending') : type === 'websites' ? t('websites.status.pending') : t('apps.status.pending')
   };
   return statusMap[status] || status;
 };

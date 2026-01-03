@@ -111,7 +111,7 @@ const ClientDomainsPage = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>{t('domains.labels.status')}</span>
-                  <span className="font-medium">{getStatusLabel(domain.status, t)}</span>
+                  <span className="font-medium">{getStatusLabel(domain.status, t, 'domains')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t('domains.labels.expires')}</span>
