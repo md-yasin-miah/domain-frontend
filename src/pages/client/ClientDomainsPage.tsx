@@ -7,11 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Globe, Search, Calendar, Settings, RefreshCw, ExternalLink, AlertTriangle, Server } from "lucide-react";
 import { useGetMarketplaceListingsQuery } from '@/store/api/marketplaceApi';
 import { useTranslation } from 'react-i18next';
+import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 
 const ClientDomainsPage = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: domainsData } = useGetMarketplaceListingsQuery({ status: 'active', listing_type_id: 1 });
+  const { data: domainsData, isLoading } = useGetMarketplaceListingsQuery({ status: 'active', listing_type_id: 1 });
 
   const filteredDomains = domainsData?.items?.filter(domain =>
     domain.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -45,6 +46,11 @@ const ClientDomainsPage = () => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return <DomainsPageSkeleton />;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
