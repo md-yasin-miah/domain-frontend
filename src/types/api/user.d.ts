@@ -1,6 +1,8 @@
-/**
- * User API Types
- */
+interface UserMini {
+  id: number;
+  username: string;
+  email: string;
+}
 interface UserResponse {
   id: number;
   username: string;

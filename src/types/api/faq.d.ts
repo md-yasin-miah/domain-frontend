@@ -24,3 +24,11 @@ interface FAQ {
     updated_at: string;
   }
 }
+
+interface FAQCreateRequest {
+  question: string;
+  answer: string;
+  category?: string;
+  order?: number;
+  is_active?: boolean;
+}

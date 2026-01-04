@@ -1,3 +1,11 @@
+interface MarketplaceListingFilters extends PaginationParams {
+  status?: 'draft' | 'active' | 'sold' | 'expired' | 'suspended';
+  listing_type_id?: number;
+  seller_id?: number;
+  min_price?: number;
+  max_price?: number;
+  search?: string;
+}
 interface MarketplaceListingType {
   id: number,
   name: string,

@@ -260,22 +260,6 @@ interface ReviewCreateRequest {
 }
 
 // ============ Support Types ============
-interface SupportTicket {
-  id: number;
-  user_id: number;
-  subject: string;
-  description: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  created_at: string;
-  updated_at: string;
-}
-
-interface TicketCreateRequest {
-  subject: string;
-  description: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-}
 
 // ============ FAQ Types ============
 interface FAQCreateRequest {
@@ -419,14 +403,6 @@ interface UserStats {
 
 
 // ============ Filter Types ============
-interface ListingFilters extends PaginationParams {
-  status?: 'draft' | 'active' | 'sold' | 'expired' | 'suspended';
-  listing_type_id?: number;
-  seller_id?: number;
-  min_price?: number;
-  max_price?: number;
-  search?: string;
-}
 
 interface OrderFilters extends PaginationParams {
   buyer_id?: number;

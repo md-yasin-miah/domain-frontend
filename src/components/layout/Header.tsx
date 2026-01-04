@@ -72,6 +72,19 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
     return false;
   };
 
+  // Helper function to check if any user menu item is active
+  const isUserMenuActive = (): boolean => {
+    // Check if dashboard is active
+    if (showDashboard && location.pathname === '/client/dashboard') return true;
+
+    // Check if any userService item is active
+    if (userServices) {
+      return userServices.some((item) => location.pathname === item.url);
+    }
+
+    return false;
+  };
+
   return (
     <>
       {/* Enhanced Header with Professional Design */}
@@ -106,9 +119,9 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                         <Button
                           variant="ghost"
                           size="sm"
-                          className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-all duration-200 ${isActive
-                            ? 'bg-primary/10 text-primary border border-primary/20'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                          className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-all border duration-200 ${isActive
+                            ? 'bg-primary/10 text-primary border-primary/20'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60 border-transparent'
                             } data-[state=open]:bg-muted/80 data-[state=open]:text-foreground`}
                         >
                           <item.icon className="w-4 h-4" />
@@ -165,9 +178,9 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                     key={item.title}
                     to={item.url}
                     className={({ isActive }) =>
-                      `flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
-                        ? 'bg-primary/10 text-primary border border-primary/20'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                      `flex items-center space-x-2 px-4 border py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                        ? 'bg-primary/10 text-primary border-primary/20'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/60 border-transparent'
                       }`
                     }
                   >
@@ -194,7 +207,11 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex items-center space-x-2 px-3 py-2 hover:bg-muted/60 data-[state=open]:bg-muted/80"
+                    className={`flex items-center space-x-2 px-3 py-2 border transition-all ${
+                      isUserMenuActive()
+                        ? 'bg-primary/10 text-primary border-primary/20'
+                        : 'hover:bg-muted/60 border-transparent'
+                    }`}
                   >
                     <Avatar className="w-7 h-7">
                       <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
@@ -218,25 +235,42 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                       <DropdownMenuItem asChild>
                         <Link
                           to="/client/dashboard"
-                          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-muted/60 transition-colors"
+                          className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                            location.pathname === '/client/dashboard'
+                              ? 'bg-primary/10 hover:bg-primary/20 text-primary'
+                              : 'hover:bg-muted/60'
+                          }`}
                         >
-                          <LayoutDashboard className="w-4 h-4 text-primary" />
-                          <span className="font-medium">Dashboard</span>
+                          <LayoutDashboard className={`w-4 h-4 ${
+                            location.pathname === '/client/dashboard' ? 'text-primary' : 'text-muted-foreground'
+                          }`} />
+                          <span className={`font-medium ${
+                            location.pathname === '/client/dashboard' ? 'text-primary' : ''
+                          }`}>Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
 
-                    {userServices?.map((item) => (
-                      <DropdownMenuItem key={item.title} asChild>
-                        <Link
-                          to={item.url}
-                          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-muted/60 transition-colors"
-                        >
-                          <item.icon className="w-4 h-4 text-muted-foreground" />
-                          <span>{item.title}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
+                    {userServices?.map((item) => {
+                      const isActive = location.pathname === item.url;
+                      return (
+                        <DropdownMenuItem key={item.title} asChild>
+                          <Link
+                            to={item.url}
+                            className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                              isActive
+                                ? 'bg-primary/10 hover:bg-primary/20 text-primary'
+                                : 'hover:bg-muted/60'
+                            }`}
+                          >
+                            <item.icon className={`w-4 h-4 ${
+                              isActive ? 'text-primary' : 'text-muted-foreground'
+                            }`} />
+                            <span className={isActive ? 'text-primary font-medium' : ''}>{item.title}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
                   </div>
 
                   <DropdownMenuSeparator />
@@ -384,19 +418,30 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                     {t('nav.profile') || 'Mis Servicios'}
                   </h3>
                   <div className="space-y-1">
-                    {userServices.map((item) => (
-                      <Link
-                        key={item.title}
-                        to={item.url}
-                        className="flex items-center space-x-3 px-4 py-3 text-sm bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-xl transition-all"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                          <item.icon className="w-4 h-4 text-primary" />
-                        </div>
-                        <span className="font-medium">{item.title}</span>
-                      </Link>
-                    ))}
+                    {userServices.map((item) => {
+                      const isActive = location.pathname === item.url;
+                      return (
+                        <Link
+                          key={item.title}
+                          to={item.url}
+                          className={`flex items-center space-x-3 px-4 py-3 text-sm rounded-xl transition-all ${
+                            isActive
+                              ? 'bg-primary/10 text-primary border border-primary/20'
+                              : 'bg-primary/5 hover:bg-primary/10 border border-primary/20'
+                          }`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <div className={`p-2 rounded-lg shrink-0 ${
+                            isActive ? 'bg-primary/20' : 'bg-primary/10'
+                          }`}>
+                            <item.icon className="w-4 h-4 text-primary" />
+                          </div>
+                          <span className={`font-medium ${
+                            isActive ? 'text-primary' : ''
+                          }`}>{item.title}</span>
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               )}

@@ -116,69 +116,6 @@ export const userApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, userId) => [{ type: 'User', id: Number(userId) }],
     }),
-    getClientDomains: builder.query<any[], string | number>({
-      query: (userId) => ({
-        url: '/marketplace/listings',
-        method: 'GET',
-        params: { seller_id: Number(userId), listing_type_id: 1 }, // Assuming type 1 is domains
-      }),
-      transformResponse: (response: any) => {
-        // Transform marketplace listings to domain format
-        if (Array.isArray(response)) {
-          return response.map((listing: any) => ({
-            id: String(listing.id),
-            domain_name: listing.domain_name || listing.title,
-            status: listing.status,
-            expiry_date: listing.expires_at,
-            auto_renew: false,
-          }));
-        }
-        return [];
-      },
-      providesTags: (result, error, userId) => [{ type: 'User', id: Number(userId) }],
-    }),
-    getClientInvoices: builder.query<any[], string | number>({
-      query: (userId) => ({
-        url: '/invoices',
-        method: 'GET',
-        params: { buyer_id: Number(userId) },
-      }),
-      transformResponse: (response: any) => {
-        if (Array.isArray(response)) {
-          return response.map((inv: any) => ({
-            id: String(inv.id),
-            invoice_number: inv.invoice_number,
-            amount: Number(inv.total_amount),
-            status: inv.status,
-            due_date: inv.issued_at || inv.created_at,
-            description: null,
-          }));
-        }
-        return [];
-      },
-      providesTags: (result, error, userId) => [{ type: 'User', id: Number(userId) }],
-    }),
-    getSupportTickets: builder.query<any[], string | number>({
-      query: (userId) => ({
-        url: '/support/tickets',
-        method: 'GET',
-        params: { created_by_id: Number(userId) },
-      }),
-      transformResponse: (response: any) => {
-        if (Array.isArray(response)) {
-          return response.map((ticket: any) => ({
-            id: String(ticket.id),
-            ticket_number: `TKT-${ticket.id}`,
-            subject: ticket.title,
-            status: ticket.status,
-            priority: 'medium',
-            created_at: ticket.created_at,
-          }));
-        }
-        return [];
-      },
-      providesTags: (result, error, userId) => [{ type: 'User', id: Number(userId) }],
-    }),
     // Client profile mutations
     updateClientProfile: builder.mutation<any, any>({
       query: (data) => ({
@@ -214,9 +151,6 @@ export const {
   useGetUserStatsQuery,
   useGetRolesQuery,
   useGetClientProfileQuery,
-  useGetClientDomainsQuery,
-  useGetClientInvoicesQuery,
-  useGetSupportTicketsQuery,
   useUpdateClientProfileMutation,
   useCreateClientProfileMutation,
 } = userApi;

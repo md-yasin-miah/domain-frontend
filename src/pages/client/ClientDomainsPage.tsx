@@ -9,7 +9,7 @@ import { useGetMarketplaceListingsQuery } from '@/store/api/marketplaceApi';
 import { useTranslation } from 'react-i18next';
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from '@/lib/utils';
-import { getStatusColor, getStatusLabel } from '@/lib/helperfun';
+import { getStatusColor, getStatusLabel, timeFormat } from '@/lib/helperfun';
 
 const ClientDomainsPage = () => {
   const { t } = useTranslation();
@@ -136,7 +136,7 @@ const ClientDomainsPage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>{t('domains.labels.last_update')}</span>
-                  <span className="font-medium">{domain.updated_at}</span>
+                  <span className="font-medium">{timeFormat(domain.updated_at, 'lll')}</span>
                 </div>
               </div>
               <Button variant="outline" size="sm" className="w-full">

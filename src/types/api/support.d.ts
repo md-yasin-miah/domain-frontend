@@ -1,16 +1,16 @@
-/**
- * Support & FAQ API Types
- */
-
-interface SupportTicket {
-  id: number;
-  user_id: number;
-  subject: string;
+interface SupportTicket{
+  title: string;
   description: string;
+  category_id: number;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  created_at: string;
-  updated_at: string;
+  id: number,
+  created_by_id: number,
+  assigned_to_id: number | null,
+  created_at: string,
+  updated_at: string,
+  created_by: UserMini,
+  assigned_to: UserMini | null,
+  category: Category,
 }
 
 interface TicketCreateRequest {
@@ -19,12 +19,4 @@ interface TicketCreateRequest {
   priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
-
-interface FAQCreateRequest {
-  question: string;
-  answer: string;
-  category?: string;
-  order?: number;
-  is_active?: boolean;
-}
 

@@ -1,33 +1,9 @@
 import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
-
-export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description: string | null;
-  type: 'support' | 'faq' | 'blog';
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CategoryCreateRequest {
-  name: string;
-  slug?: string;
-  description?: string;
-  type: 'support' | 'faq' | 'blog';
-}
-
-export interface CategoryUpdateRequest {
-  name?: string;
-  slug?: string;
-  description?: string;
-}
 
 export const categoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Support Categories
-    getSupportCategories: builder.query<PaginatedResponse<Category> | Category[], PaginationParams>({
+    getSupportCategories: builder.query<PaginatedResponse<Category>, PaginationParams>({
       query: (params) => ({
         url: '/categories/support',
         method: 'GET',

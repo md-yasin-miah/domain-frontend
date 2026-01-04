@@ -9,12 +9,9 @@ import {
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/store/hooks/useAuth";
-import {
-  useGetClientProfileQuery,
-  useGetClientDomainsQuery,
-  useGetClientInvoicesQuery,
-  useGetSupportTicketsQuery,
-} from "@/store/api/userApi";
+import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
+import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
+import { useGetTicketsQuery } from "@/store/api/supportApi";
 
 interface ClientDomain {
   id: string;
@@ -47,22 +44,19 @@ export default function ClientDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Use RTK Query hooks
-  const { data: profile, isLoading: profileLoading } = useGetClientProfileQuery(user?.id || '', {
-    skip: !user?.id,
+  const { data: invoices, isLoading: invoicesLoading } = useGetInvoicesQuery({
+    skip: 0,
   });
-  console.log({ profile });
-  const { data: domains = [], isLoading: domainsLoading } = useGetClientDomainsQuery(user?.id || '', {
-    skip: !user?.id,
+  const { data: domains, isLoading: domainsLoading } = useGetMarketplaceListingsQuery({
+    listing_type_id: 1,
+    skip: 0,
   });
-  const { data: invoices = [], isLoading: invoicesLoading } = useGetClientInvoicesQuery(user?.id || '', {
-    skip: !user?.id,
+  const { data: tickets, isLoading: ticketsLoading } = useGetTicketsQuery({
+    skip: 0,
   });
-  const { data: tickets = [], isLoading: ticketsLoading } = useGetSupportTicketsQuery(user?.id || '', {
-    skip: !user?.id,
-  });
+  console.log({domains})
 
-  const loading = profileLoading || domainsLoading || invoicesLoading || ticketsLoading;
+  const loading = domainsLoading || invoicesLoading || ticketsLoading ;
 
   // useEffect(() => {
   //   if (user && profile && !profile.profile_completed) {
@@ -88,7 +82,7 @@ export default function ClientDashboard() {
   };
 
   const totalDuePayment = invoices
-    .filter(inv => inv.status === 'pending')
+    ?.items?.filter((inv: Invoice) => inv.status === 'issued')
     .reduce((sum, inv) => sum + Number(inv.amount), 0);
 
   if (loading) {
@@ -126,7 +120,7 @@ export default function ClientDashboard() {
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{domains.length}</div>
+            <div className="text-2xl font-bold">{domains?.pagination?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
               Active domains
             </p>
@@ -139,7 +133,7 @@ export default function ClientDashboard() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{invoices.length}</div>
+            <div className="text-2xl font-bold">{domains?.pagination?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
               All time invoices
             </p>
@@ -165,7 +159,7 @@ export default function ClientDashboard() {
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tickets.length}</div>
+            <div className="text-2xl font-bold">{domains?.pagination?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
               Total tickets
             </p>
@@ -186,18 +180,18 @@ export default function ClientDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {domains.length === 0 ? (
+            {domains?.items?.length === 0 ? (
               <p className="text-center text-muted-foreground py-4">
                 No domains found
               </p>
             ) : (
               <div className="space-y-3">
-                {domains.map((domain) => (
+                {domains?.items?.map((domain) => (
                   <div key={domain.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
                       <h4 className="font-medium">{domain.domain_name}</h4>
                       <p className="text-xs text-muted-foreground">
-                        {domain.expiry_date ? `Expires: ${new Date(domain.expiry_date).toLocaleDateString()}` : 'No expiry date'}
+                        {domain.expires_at ? `Expires: ${new Date(domain.expires_at).toLocaleDateString()}` : 'No expiry date'}
                       </p>
                     </div>
                     <Badge variant={getStatusBadgeVariant(domain.status)}>
@@ -224,21 +218,60 @@ export default function ClientDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {tickets.length === 0 ? (
+              {tickets?.items?.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
                   No tickets found
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {tickets.slice(0, 3).map((ticket) => (
+                  {tickets?.items?.slice(0, 3).map((ticket) => (
                     <div key={ticket.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
-                        <h4 className="font-medium text-sm">{ticket.subject}</h4>
-                        <p className="text-xs text-muted-foreground">#{ticket.ticket_number}</p>
+                        <h4 className="font-medium text-sm">{ticket?.title}</h4>
+                        <p className="text-xs text-muted-foreground">#{ticket?.id}</p>
                       </div>
                       <Badge variant={getStatusBadgeVariant(ticket.status)} className="text-xs">
                         {ticket.status}
                       </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Invoices */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-muted-foreground" />
+                Recent Invoices
+              </CardTitle>
+              <CardDescription>
+                Your latest billing information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {invoices?.items?.length === 0 ? (
+                <p className="text-center text-muted-foreground py-4">
+                  No invoices found
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {invoices?.items?.slice(0, 3).map((invoice) => (
+                    <div key={invoice.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-sm">{invoice?.invoice_number}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Due: {new Date(invoice?.due_date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-sm">${invoice?.amount}</p>
+                        <Badge variant={getStatusBadgeVariant(invoice.status)} className="text-xs">
+                          {invoice.status}
+                        </Badge>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -267,44 +300,6 @@ export default function ClientDashboard() {
             </CardContent>
           </Card>
 
-          {/* Recent Invoices */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-muted-foreground" />
-                Recent Invoices
-              </CardTitle>
-              <CardDescription>
-                Your latest billing information
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {invoices.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">
-                  No invoices found
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {invoices.slice(0, 3).map((invoice) => (
-                    <div key={invoice.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-sm">{invoice.invoice_number}</h4>
-                        <p className="text-xs text-muted-foreground">
-                          Due: {new Date(invoice.due_date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-sm">${invoice.amount}</p>
-                        <Badge variant={getStatusBadgeVariant(invoice.status)} className="text-xs">
-                          {invoice.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
       </div>
 

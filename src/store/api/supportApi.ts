@@ -1,14 +1,8 @@
 import { apiSlice } from './apiSlice';
-import type {
-  SupportTicket,
-  TicketCreateRequest,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export const supportApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getTickets: builder.query<PaginatedResponse<SupportTicket> | SupportTicket[], PaginationParams>({
+    getTickets: builder.query<PaginatedResponse<SupportTicket>, PaginationParams>({
       query: (params) => ({
         url: '/support/tickets',
         method: 'GET',

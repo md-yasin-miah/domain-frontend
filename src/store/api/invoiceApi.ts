@@ -1,39 +1,7 @@
 import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
-
-export interface Invoice {
-  id: number;
-  invoice_number: string;
-  order_id: number;
-  user_id: number;
-  amount: number;
-  currency: string;
-  status: 'draft' | 'issued' | 'paid' | 'overdue' | 'cancelled';
-  issue_date: string | null;
-  due_date: string | null;
-  paid_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface InvoiceCreateRequest {
-  order_id: number;
-  amount: number;
-  currency?: string;
-  due_date?: string;
-}
-
-export interface InvoiceUpdateRequest {
-  amount?: number;
-  currency?: string;
-  status?: 'draft' | 'issued' | 'paid' | 'overdue' | 'cancelled';
-  issue_date?: string;
-  due_date?: string;
-}
-
 export const invoiceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getInvoices: builder.query<PaginatedResponse<Invoice> | Invoice[], PaginationParams>({
+    getInvoices: builder.query<PaginatedResponse<Invoice>, PaginationParams>({
       query: (params) => ({
         url: '/invoices',
         method: 'GET',

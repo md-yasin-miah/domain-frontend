@@ -2,7 +2,7 @@ import { apiSlice } from './apiSlice';
 
 export const marketplaceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getMarketplaceListings: builder.query<PaginatedResponse<MarketplaceListing>, ListingFilters>({
+    getMarketplaceListings: builder.query<PaginatedResponse<MarketplaceListing>, MarketplaceListingFilters>({
       query: (params) => ({
         url: '/marketplace/listings',
         method: 'GET',
