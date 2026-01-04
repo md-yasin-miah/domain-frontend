@@ -806,6 +806,8 @@
     }
   },
   "common": {
+    "name": "Name",
+    "email": "Email",
     "from": "From",
     "premium": "Premium",
     "digital_commerce_future": "The future of digital commerce",

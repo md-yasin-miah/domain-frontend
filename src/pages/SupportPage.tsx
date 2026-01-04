@@ -20,6 +20,7 @@ import { getStatusColor, timeFormat } from "@/lib/helperFun";
 import { ticketCreateSchema, contactFormSchema, type TicketCreateFormData, type ContactFormData } from "@/schemas/support";
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/constant';
+import SupportTicketDetailsModal from "@/pages/component/SupportTicketDetailsModal";
 
 const SupportPage = () => {
   const { t } = useTranslation();
@@ -27,6 +28,8 @@ const SupportPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved' | 'closed'>('all');
   const [tab, setTab] = useState(user ? 'tickets' : 'create');
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Ticket creation form
   const ticketForm = useForm<TicketCreateFormData>({
@@ -326,7 +329,14 @@ const SupportPage = () => {
 
                             {/* Actions */}
                             <div className="flex items-center gap-2 ml-4">
-                              <Button variant="outline" size="sm">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedTicket(ticket);
+                                  setIsModalOpen(true);
+                                }}
+                              >
                                 {t('support.tickets.view_details')}
                               </Button>
                               {ticket.status !== 'closed' && (
@@ -655,6 +665,13 @@ const SupportPage = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Ticket Details Modal */}
+      <SupportTicketDetailsModal
+        ticket={selectedTicket}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
     </div>
   );
 };

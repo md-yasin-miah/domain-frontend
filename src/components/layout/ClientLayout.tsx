@@ -35,7 +35,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   // Full menu structure with subitems
   const menuItems: MenuItem[] = [
     {
-      title: t('nav.dashboard') || 'Dashboard',
+      title: t('nav.dashboard'),
       url: ROUTES.CLIENT.DASHBOARD,
       icon: LayoutDashboard,
     },
