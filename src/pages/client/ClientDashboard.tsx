@@ -14,6 +14,7 @@ import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
 import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
 import { useGetTicketsQuery } from "@/store/api/supportApi";
 import { getStatusColor } from "@/lib/helperFun";
+import { ROUTES } from "@/lib/constant";
 
 interface ClientDomain {
   id: string;
@@ -183,23 +184,27 @@ export default function ClientDashboard() {
               </p>
             ) : (
               <div className="space-y-3">
-                {domains?.items?.map((domain) => (
-                  <div key={domain.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">{domain.domain_name}</h4>
-                      <p className="text-xs text-muted-foreground">
-                        {domain.expires_at
-                          ? `${t('client_dashboard.recent_domains.expires')}: ${new Date(domain.expires_at).toLocaleDateString()}`
-                          : t('client_dashboard.recent_domains.no_expiry')
-                        }
-                      </p>
-                    </div>
-                    <Badge
-                      variant={getStatusBadgeVariant(domain.status)}
-                      className={`text-xs ${getStatusColor(domain.status)} text-white capitalize`}
-                    >
-                      {domain.status?.replace(/_|-/g, ' ')}
-                    </Badge>
+                {domains?.items?.map((domain, index) => (
+                  <div key={index}>
+                    <Link to={ROUTES.CLIENT.DOMAINS} >
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <h4 className="font-medium">{domain.domain_name}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            {domain.expires_at
+                              ? `${t('client_dashboard.recent_domains.expires')}: ${new Date(domain.expires_at).toLocaleDateString()}`
+                              : t('client_dashboard.recent_domains.no_expiry')
+                            }
+                          </p>
+                        </div>
+                        <Badge
+                          variant={getStatusBadgeVariant(domain.status)}
+                          className={`text-xs ${getStatusColor(domain.status)} text-white capitalize`}
+                        >
+                          {domain.status?.replace(/_|-/g, ' ')}
+                        </Badge>
+                      </div>
+                    </Link>
                   </div>
                 ))}
               </div>
@@ -227,18 +232,22 @@ export default function ClientDashboard() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {tickets?.items?.slice(0, 3).map((ticket) => (
-                    <div key={ticket.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-sm">{ticket?.title}</h4>
-                        <p className="text-xs text-muted-foreground">#{ticket?.id}</p>
-                      </div>
-                      <Badge
-                        variant={getStatusBadgeVariant(ticket.status)}
-                        className={`text-xs ${getStatusColor(ticket.status)} text-white capitalize`}
-                      >
-                        {ticket.status?.replace(/_|-/g, ' ')}
-                      </Badge>
+                  {tickets?.items?.slice(0, 3).map((ticket, index) => (
+                    <div key={index}>
+                      <Link to={ROUTES.CLIENT.SUPPORT} >
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <h4 className="font-medium text-sm">{ticket?.title}</h4>
+                            <p className="text-xs text-muted-foreground">#{ticket?.id}</p>
+                          </div>
+                          <Badge
+                            variant={getStatusBadgeVariant(ticket.status)}
+                            className={`text-xs ${getStatusColor(ticket.status)} text-white capitalize`}
+                          >
+                            {ticket.status?.replace(/_|-/g, ' ')}
+                          </Badge>
+                        </div>
+                      </Link>
                     </div>
                   ))}
                 </div>
