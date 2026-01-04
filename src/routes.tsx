@@ -453,9 +453,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: (
-      <AppLayout>
         <NotFound />
-      </AppLayout>
     ),
   },
 ]);

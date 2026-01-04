@@ -19,15 +19,6 @@ interface TicketCreateRequest {
   priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
-interface FAQ {
-  id: number;
-  question: string;
-  answer: string;
-  category: string | null;
-  order: number;
-  is_active: boolean;
-  created_at: string;
-}
 
 interface FAQCreateRequest {
   question: string;

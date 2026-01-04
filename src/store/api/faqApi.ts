@@ -1,14 +1,8 @@
 import { apiSlice } from './apiSlice';
-import type {
-  FAQ,
-  FAQCreateRequest,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export const faqApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getFAQs: builder.query<PaginatedResponse<FAQ> | FAQ[], PaginationParams>({
+    getFAQs: builder.query<PaginatedResponse<FAQ> , PaginationParams>({
       query: (params) => ({
         url: '/faq',
         method: 'GET',
