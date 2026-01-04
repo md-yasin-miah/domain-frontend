@@ -22,6 +22,7 @@ import {
   Server,
   Smartphone,
 } from 'lucide-react';
+import { ROUTES } from '@/lib/constant';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   const menuItems: MenuItem[] = [
     {
       title: t('nav.dashboard') || 'Dashboard',
-      url: '/client/dashboard',
+      url: ROUTES.CLIENT.DASHBOARD,
       icon: LayoutDashboard,
     },
     {
@@ -45,34 +46,34 @@ export function ClientLayout({ children }: ClientLayoutProps) {
       subItems: [
         {
           title: t('nav.apps'),
-          url: '/client/apps',
+          url: ROUTES.CLIENT.APPS,
           icon: Smartphone,
         },
         {
           title: t('nav.domains'),
-          url: '/client/domains',
+          url: ROUTES.CLIENT.DOMAINS,
           icon: Server,
         },
         {
           title: t('nav.websites'),
-          url: '/client/websites',
+          url: ROUTES.CLIENT.WEBSITES,
           icon: Globe,
         },
       ],
     },
     {
       title: t('nav.offers'),
-      url: '/client/offers',
+      url: ROUTES.CLIENT.OFFERS,
       icon: Handshake,
     },
     {
       title: t('nav.actions'),
-      url: '/client/auctions',
+      url: ROUTES.CLIENT.AUCTIONS,
       icon: Gavel,
     },
     {
       title: t('nav.savedSearch'),
-      url: '/client/saved-search',
+      url: ROUTES.CLIENT.SAVED_SEARCH,
       icon: Bookmark,
     },
     {
@@ -82,22 +83,22 @@ export function ClientLayout({ children }: ClientLayoutProps) {
       subItems: [
         {
           title: t('nav.allOrders'),
-          url: '/client/orders',
+          url: ROUTES.CLIENT.ORDERS,
           icon: Package,
         },
         {
           title: t('nav.invoice'),
-          url: '/client/invoices',
+          url: ROUTES.CLIENT.INVOICES,
           icon: FileText,
         },
         {
           title: t('nav.payment'),
-          url: '/client/payments',
+          url: ROUTES.CLIENT.PAYMENTS,
           icon: CreditCard,
         },
         {
           title: t('nav.escrows'),
-          url: '/client/escrows',
+          url: ROUTES.CLIENT.ESCROWS,
           icon: Lock,
         },
       ],
@@ -107,11 +108,11 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   // User services (when logged in) - Profile and Settings for client layout
   const userServices = user
     ? [
-      { title: t('nav.profile'), url: '/client/profile', icon: User },
-      { title: t('nav.settings'), url: '/client/profile', icon: Settings },
-      { title: t('nav.support'), url: '/client/support', icon: MessageSquare },
-      { title: t('nav.reviews'), url: '/client/reviews', icon: Star },
-      { title: t('nav.faq'), url: '/client/faq', icon: HelpCircle },
+      { title: t('nav.profile'), url: ROUTES.CLIENT.PROFILE, icon: User },
+      { title: t('nav.settings'), url: ROUTES.CLIENT.PROFILE, icon: Settings },
+      { title: t('nav.support'), url: ROUTES.CLIENT.SUPPORT, icon: MessageSquare },
+      { title: t('nav.reviews'), url: ROUTES.CLIENT.REVIEWS, icon: Star },
+      { title: t('nav.faq'), url: ROUTES.CLIENT.FAQ, icon: HelpCircle },
     ]
     : [];
 

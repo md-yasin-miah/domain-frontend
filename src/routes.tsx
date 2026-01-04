@@ -1,3 +1,4 @@
+import { ROUTES } from "./lib/constant";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import { AdminLayout } from "./components/layout/AdminLayout";
@@ -291,7 +292,7 @@ export const router = createBrowserRouter([
   },
   // Client routes with ClientLayout
   {
-    path: "/client",
+    path: ROUTES.CLIENT.ROOT,
     element: (
       <ProtectedRoute>
         <ClientLayout>
@@ -302,7 +303,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/client/dashboard" replace />,
+        element: <Navigate to={ROUTES.CLIENT.DASHBOARD} replace />,
       },
       {
         path: "dashboard",

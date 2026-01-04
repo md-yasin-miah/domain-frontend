@@ -18,6 +18,8 @@ import { useGetTicketsQuery, useCreateTicketMutation } from "@/store/api/support
 import { useGetSupportCategoriesQuery } from "@/store/api/categoryApi";
 import { getStatusColor, timeFormat } from "@/lib/helperFun";
 import { ticketCreateSchema, contactFormSchema, type TicketCreateFormData, type ContactFormData } from "@/schemas/support";
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/lib/constant';
 
 const SupportPage = () => {
   const { t } = useTranslation();
@@ -599,17 +601,19 @@ const SupportPage = () => {
         <TabsContent value="knowledge" className="mt-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* FAQ Categories */}
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <MessageSquare className="w-6 h-6 text-blue-600" />
-                </div>
-                <CardTitle>{t('support.knowledge.faq.title')}</CardTitle>
-                <CardDescription>
-                  {t('support.knowledge.faq.description')}
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            <Link to={ROUTES.CLIENT.FAQ}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <MessageSquare className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <CardTitle>{t('support.knowledge.faq.title')}</CardTitle>
+                  <CardDescription>
+                    {t('support.knowledge.faq.description')}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
 
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader>

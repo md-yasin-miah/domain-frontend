@@ -1,0 +1,21 @@
+export const ROUTES = {
+  CLIENT: {
+    ROOT: '/client',
+    APPS: '/client/apps',
+    AUCTIONS: '/client/auctions',
+    DASHBOARD: '/client/dashboard',
+    DOMAINS: '/client/domains',
+    ESCROWS: '/client/escrows',
+    FAQ: '/client/faq',
+    ORDERS: '/client/orders',
+    OFFERS: '/client/offers',
+    PROFILE: '/client/profile',
+    PAYMENTS: '/client/payments',
+    PROFILE_SETUP: '/client/profile-setup',
+    SAVED_SEARCH: '/client/saved-search',
+    SUPPORT: '/client/support',
+    INVOICES: '/client/invoices',
+    REVIEWS: '/client/reviews',
+    WEBSITES: '/client/websites',
+  },
+};
