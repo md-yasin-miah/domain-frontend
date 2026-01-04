@@ -18,3 +18,6 @@ export * from './blog';
 // Common schemas
 export * from './common';
 
+// Support schemas
+export * from './support';
+

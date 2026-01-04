@@ -17,7 +17,7 @@ interface TicketCreateRequest {
   subject: string;
   description: string;
   category_id: number;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
 

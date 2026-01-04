@@ -13,7 +13,7 @@ import { useAuth } from "@/store/hooks/useAuth";
 import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
 import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
 import { useGetTicketsQuery } from "@/store/api/supportApi";
-import { getStatusColor } from "@/lib/helperfun";
+import { getStatusColor } from "@/lib/helperFun";
 
 interface ClientDomain {
   id: string;
@@ -57,9 +57,9 @@ export default function ClientDashboard() {
   const { data: tickets, isLoading: ticketsLoading } = useGetTicketsQuery({
     skip: 0,
   });
-  console.log({domains})
+  console.log({ domains })
 
-  const loading = domainsLoading || invoicesLoading || ticketsLoading ;
+  const loading = domainsLoading || invoicesLoading || ticketsLoading;
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -188,14 +188,14 @@ export default function ClientDashboard() {
                     <div>
                       <h4 className="font-medium">{domain.domain_name}</h4>
                       <p className="text-xs text-muted-foreground">
-                        {domain.expires_at 
-                          ? `${t('client_dashboard.recent_domains.expires')}: ${new Date(domain.expires_at).toLocaleDateString()}` 
+                        {domain.expires_at
+                          ? `${t('client_dashboard.recent_domains.expires')}: ${new Date(domain.expires_at).toLocaleDateString()}`
                           : t('client_dashboard.recent_domains.no_expiry')
                         }
                       </p>
                     </div>
-                    <Badge 
-                    variant={getStatusBadgeVariant(domain.status)}
+                    <Badge
+                      variant={getStatusBadgeVariant(domain.status)}
                       className={`text-xs ${getStatusColor(domain.status)} text-white capitalize`}
                     >
                       {domain.status?.replace(/_|-/g, ' ')}
@@ -233,8 +233,8 @@ export default function ClientDashboard() {
                         <h4 className="font-medium text-sm">{ticket?.title}</h4>
                         <p className="text-xs text-muted-foreground">#{ticket?.id}</p>
                       </div>
-                      <Badge 
-                        variant={getStatusBadgeVariant(ticket.status)} 
+                      <Badge
+                        variant={getStatusBadgeVariant(ticket.status)}
                         className={`text-xs ${getStatusColor(ticket.status)} text-white capitalize`}
                       >
                         {ticket.status?.replace(/_|-/g, ' ')}

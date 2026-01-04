@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,35 +10,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { MessageSquare, Search, Plus, CheckCircle, AlertCircle, MessageCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/store/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { useGetTicketsQuery, useCreateTicketMutation } from "@/store/api/supportApi";
 import { useGetSupportCategoriesQuery } from "@/store/api/categoryApi";
-import { getStatusColor, timeFormat } from "@/lib/helperfun";
+import { getStatusColor, timeFormat } from "@/lib/helperFun";
+import { ticketCreateSchema, contactFormSchema, type TicketCreateFormData, type ContactFormData } from "@/schemas/support";
 
 const SupportPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved' | 'closed'>('all');
-  const [newTicket, setNewTicket] = useState({
-    subject: '',
-    description: '',
-    category_id: '',
-    priority: '' as 'low' | 'medium' | 'high' | 'urgent' | '',
-  });
-
   const [tab, setTab] = useState(user ? 'tickets' : 'create');
 
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
-    category_id: '',
-    priority: '' as 'low' | 'medium' | 'high' | 'urgent' | '',
+  // Ticket creation form
+  const ticketForm = useForm<TicketCreateFormData>({
+    resolver: zodResolver(ticketCreateSchema),
+    defaultValues: {
+      subject: '',
+      description: '',
+      category_id: '',
+    },
+  });
+
+  // Contact form
+  const contactForm = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      subject: '',
+      message: '',
+      category_id: '',
+    },
   });
 
   // Fetch tickets
@@ -100,58 +107,14 @@ const SupportPage = () => {
   const getStatusLabel = (status: string) => {
     return t(`support.status.${status}`) || status;
   };
-
-  const getPriorityColor = (priority?: string) => {
-    if (!priority) return 'text-gray-600 bg-gray-50 border-gray-200';
-    switch (priority.toLowerCase()) {
-      case 'urgent':
-      case 'high': return 'text-red-600 bg-red-50 border-red-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'low': return 'text-green-600 bg-green-50 border-green-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
-    }
-  };
-
-  const getPriorityLabel = (priority?: string) => {
-    if (!priority) return '';
-    return t(`support.priority.${priority.toLowerCase()}`) || priority;
-  };
-
-  const handleCreateTicket = async () => {
-    // Validate required fields
-    if (!newTicket.subject || !newTicket.description) {
-      toast({
-        title: t('support.create.error.title'),
-        description: t('support.create.error.description'),
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!newTicket.category_id) {
-      toast({
-        title: t('support.create.error.title'),
-        description: t('support.create.error.description'),
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!newTicket.priority) {
-      toast({
-        title: t('support.create.error.title'),
-        description: t('support.create.error.description'),
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleCreateTicket = async (data: TicketCreateFormData) => {
     try {
+      // Validate and parse the form data (schema matches TicketCreateRequest exactly)
+      const validatedData = ticketCreateSchema.parse(data);
       const ticketData: TicketCreateRequest = {
-        subject: newTicket.subject,
-        description: newTicket.description,
-        category_id: parseInt(newTicket.category_id),
-        priority: newTicket.priority as 'low' | 'medium' | 'high' | 'urgent',
+        subject: validatedData.subject,
+        description: validatedData.description,
+        category_id: parseInt(validatedData.category_id),
       };
       await createTicket(ticketData).unwrap();
 
@@ -161,18 +124,14 @@ const SupportPage = () => {
       });
 
       // Reset form
-      setNewTicket({
-        subject: '',
-        category_id: '',
-        priority: '',
-        description: '',
-      });
+      ticketForm.reset();
 
       // Switch to tickets tab if user is logged in
       if (user) {
         setTab('tickets');
       }
     } catch (error: unknown) {
+      console.error({ error });
       const errorMessage = error && typeof error === 'object' && 'data' in error && typeof error.data === 'object' && error.data !== null && 'message' in error.data
         ? String(error.data.message)
         : t('support.create.error.server');
@@ -184,41 +143,13 @@ const SupportPage = () => {
     }
   };
 
-  const handleContactSubmit = async () => {
-    // Contact form can also create a ticket
-    if (!contactForm.subject || !contactForm.message || !contactForm.email || !contactForm.name) {
-      toast({
-        title: t('support.create.error.title'),
-        description: t('support.create.error.description'),
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!contactForm.category_id) {
-      toast({
-        title: t('support.create.error.title'),
-        description: t('support.create.error.description'),
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!contactForm.priority) {
-      toast({
-        title: t('support.create.error.title'),
-        description: t('support.create.error.description'),
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleContactSubmit = async (data: ContactFormData) => {
     try {
+      // Map message to description for API (schema matches TicketCreateRequest structure)
       const ticketData: TicketCreateRequest = {
-        subject: contactForm.subject,
-        description: contactForm.message,
-        category_id: parseInt(contactForm.category_id),
-        priority: contactForm.priority as 'low' | 'medium' | 'high' | 'urgent',
+        subject: data.subject,
+        description: data.message,
+        category_id: parseInt(data.category_id),
       };
       await createTicket(ticketData).unwrap();
 
@@ -228,7 +159,7 @@ const SupportPage = () => {
       });
 
       // Reset form
-      setContactForm({ name: '', email: '', phone: '', subject: '', message: '', category_id: '', priority: '' });
+      contactForm.reset();
     } catch (error: unknown) {
       const errorMessage = error && typeof error === 'object' && 'data' in error && typeof error.data === 'object' && error.data !== null && 'message' in error.data
         ? String(error.data.message)
@@ -366,7 +297,10 @@ const SupportPage = () => {
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2 flex-wrap">
                                   <h3 className="font-semibold text-lg">{ticket.title || ticket.id}</h3>
-                                  <Badge variant={getStatusBadge(ticket.status)}>
+                                  <Badge
+                                    variant={getStatusBadge(ticket.status)}
+                                    className={getStatusColor(ticket.status)}
+                                  >
                                     {getStatusLabel(ticket.status)}
                                   </Badge>
                                 </div>
@@ -436,107 +370,110 @@ const SupportPage = () => {
                 {t('support.create.description')}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {!user && (
-                <div className="bg-muted p-4 rounded-lg mb-4">
-                  <p className="text-sm">
-                    <strong>{t('support.form.tip')}</strong> {t('support.form.tip_text')}
-                  </p>
-                </div>
-              )}
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('support.create.subject')} *</label>
-                  <Input
-                    placeholder={t('support.create.subject_placeholder')}
-                    value={newTicket.subject}
-                    onChange={(e) => setNewTicket({ ...newTicket, subject: e.target.value })}
-                  />
-                </div>
-                {categories.length > 0 && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t('support.form.category_label')} *</label>
-                    <Select
-                      value={newTicket.category_id}
-                      onValueChange={(value) => setNewTicket({ ...newTicket, category_id: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('support.form.category_placeholder')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {isLoadingCategories ? (
-                          <SelectItem value="loading" disabled>{t('common.loading')}</SelectItem>
-                        ) : (
-                          categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id.toString()}>
-                              {category.name}
-                            </SelectItem>
-                          ))
+            <CardContent>
+              <Form {...ticketForm}>
+                <form onSubmit={ticketForm.handleSubmit(handleCreateTicket)} className="space-y-6">
+                  {!user && (
+                    <div className="bg-muted p-4 rounded-lg mb-4">
+                      <p className="text-sm">
+                        <strong>{t('support.form.tip')}</strong> {t('support.form.tip_text')}
+                      </p>
+                    </div>
+                  )}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={ticketForm.control}
+                      name="subject"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('support.create.subject')} *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={t('support.create.subject_placeholder')}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {categories.length > 0 && (
+                      <FormField
+                        control={ticketForm.control}
+                        name="category_id"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('support.form.category_label')} *</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value.toString()}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder={t('support.form.category_placeholder')} />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {isLoadingCategories ? (
+                                  <SelectItem value="loading" disabled>{t('common.loading')}</SelectItem>
+                                ) : (
+                                  categories.map((category) => (
+                                    <SelectItem key={category.id} value={category.id.toString()}>
+                                      {category.name}
+                                    </SelectItem>
+                                  ))
+                                )}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                      </SelectContent>
-                    </Select>
+                      />
+                    )}
                   </div>
-                )}
-              </div>
+                  <FormField
+                    control={ticketForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('support.create.description_label')} *</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder={t('support.create.description_placeholder')}
+                            rows={6}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('support.create.priority')} *</label>
-                  <Select
-                    value={newTicket.priority}
-                    onValueChange={(value) => setNewTicket({ ...newTicket, priority: value as typeof newTicket.priority })}
+                  <Button
+                    type="submit"
+                    className="bg-primary hover:bg-primary/90"
+                    disabled={isCreatingTicket}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('support.form.priority_placeholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">{t('support.form.low')}</SelectItem>
-                      <SelectItem value="medium">{t('support.form.medium')}</SelectItem>
-                      <SelectItem value="high">{t('support.form.high')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                    {isCreatingTicket ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {t('support.create.creating')}
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t('support.create.submit')}
+                      </>
+                    )}
+                  </Button>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('support.create.description_label')} *</label>
-                <Textarea
-                  placeholder={t('support.create.description_placeholder')}
-                  rows={6}
-                  value={newTicket.description}
-                  onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
-                />
-              </div>
-
-              <Button
-                onClick={handleCreateTicket}
-                className="bg-primary hover:bg-primary/90"
-                disabled={
-                  isCreatingTicket ||
-                  !newTicket.subject ||
-                  !newTicket.description ||
-                  !newTicket.category_id ||
-                  !newTicket.priority
-                }
-              >
-                {isCreatingTicket ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('support.create.creating')}
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    {t('support.create.submit')}
-                  </>
-                )}
-              </Button>
-
-              {!user && (
-                <p className="text-xs text-muted-foreground">
-                  {t('support.form.required_fields_note')}
-                </p>
-              )}
+                  {!user && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('support.form.required_fields_note')}
+                    </p>
+                  )}
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </TabsContent>
@@ -550,113 +487,86 @@ const SupportPage = () => {
                 {t('support.contact.description')}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('support.contact.full_name')} *</label>
-                  <Input
-                    placeholder={t('support.contact.full_name_placeholder')}
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+            <CardContent>
+              <Form {...contactForm}>
+                <form onSubmit={contactForm.handleSubmit(handleContactSubmit)} className="space-y-6">
+                  <FormField
+                    control={contactForm.control}
+                    name="subject"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('support.contact.subject')} *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('support.contact.subject_placeholder')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('support.contact.email')} *</label>
-                  <Input
-                    type="email"
-                    placeholder={t('support.contact.email_placeholder')}
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                  />
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('support.contact.phone')}</label>
-                <Input
-                  type="tel"
-                  placeholder={t('support.contact.phone_placeholder')}
-                  value={contactForm.phone}
-                  onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('support.contact.subject')} *</label>
-                <Input
-                  placeholder={t('support.contact.subject_placeholder')}
-                  value={contactForm.subject}
-                  onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                />
-              </div>
-
-              {categories.length > 0 && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('support.form.category_label')} *</label>
-                  <Select
-                    value={contactForm.category_id}
-                    onValueChange={(value) => setContactForm({ ...contactForm, category_id: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('support.form.category_placeholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {isLoadingCategories ? (
-                        <SelectItem value="loading" disabled>{t('common.loading')}</SelectItem>
-                      ) : (
-                        categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id.toString()}>
-                            {category.name}
-                          </SelectItem>
-                        ))
+                  {categories.length > 0 && (
+                    <FormField
+                      control={contactForm.control}
+                      name="category_id"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('support.form.category_label')} *</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value?.toString() || ''}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t('support.form.category_placeholder')} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {isLoadingCategories ? (
+                                <SelectItem value="loading" disabled>{t('common.loading')}</SelectItem>
+                              ) : (
+                                categories.map((category) => (
+                                  <SelectItem key={category.id} value={category.id.toString()}>
+                                    {category.name}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+                    />
+                  )}
+                  <FormField
+                    control={contactForm.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('support.contact.message')} *</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder={t('support.contact.message_placeholder')}
+                            rows={6}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('support.create.priority')} *</label>
-                <Select
-                  value={contactForm.priority}
-                  onValueChange={(value) => setContactForm({ ...contactForm, priority: value as typeof contactForm.priority })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('support.form.priority_placeholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">{t('support.form.low')}</SelectItem>
-                    <SelectItem value="medium">{t('support.form.medium')}</SelectItem>
-                    <SelectItem value="high">{t('support.form.high')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('support.contact.message')} *</label>
-                <Textarea
-                  placeholder={t('support.contact.message_placeholder')}
-                  rows={6}
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                />
-              </div>
-
-              <Button
-                onClick={handleContactSubmit}
-                className="bg-primary hover:bg-primary/90"
-                disabled={
-                  !contactForm.name ||
-                  !contactForm.email ||
-                  !contactForm.subject ||
-                  !contactForm.message ||
-                  !contactForm.category_id ||
-                  !contactForm.priority
-                }
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                {t('support.contact.send_message')}
-              </Button>
+                  <Button
+                    type="submit"
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    {t('support.contact.send_message')}
+                  </Button>
+                </form>
+              </Form>
 
               <div className="pt-6 border-t">
                 <h4 className="font-semibold mb-4">{t('support.contact.other_channels')}</h4>

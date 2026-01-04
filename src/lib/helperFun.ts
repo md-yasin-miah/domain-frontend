@@ -38,7 +38,7 @@ export const getStatusColor = (status: string) => {
     default: return 'bg-gray-500';
   }
 };
-export const getStatusLabel = (status: string, t: TFunction, type: 'domains' | 'websites' | 'apps' = 'domains') => {
+export const getMarketStatusLabel = (status: string, t: TFunction, type: 'domains' | 'websites' | 'apps' = 'domains') => {
   const statusMap: Record<string, string> = {
     'active': type === 'domains' ? t('domains.status.active') : type === 'websites' ? t('websites.status.active') : t('apps.status.active'),
     'inactive': type === 'websites' ? t('websites.status.inactive') : t('apps.status.inactive'),

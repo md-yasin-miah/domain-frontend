@@ -9,7 +9,7 @@ import { useGetMarketplaceListingsQuery } from '@/store/api/marketplaceApi';
 import { useTranslation } from 'react-i18next';
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from '@/lib/utils';
-import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat } from '@/lib/helperfun';
+import { formatCurrency, formatNumber, getStatusColor, getMarketStatusLabel, timeFormat } from '@/lib/helperFun';
 
 const ClientAppsPage = () => {
   const { t } = useTranslation();
@@ -73,7 +73,7 @@ const ClientAppsPage = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>{t('apps.labels.status')}</span>
-                  <span className="font-medium">{getStatusLabel(app.status, t, 'apps')}</span>
+                  <span className="font-medium">{getMarketStatusLabel(app.status, t, 'apps')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t('apps.labels.url')}</span>
