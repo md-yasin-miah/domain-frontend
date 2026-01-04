@@ -22,11 +22,9 @@ const SupportPage = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved' | 'closed'>('all');
   const [newTicket, setNewTicket] = useState({
     subject: '',
+    description: '',
     category_id: '',
     priority: '' as 'low' | 'medium' | 'high' | 'urgent' | '',
-    description: '',
-    email: '',
-    name: ''
   });
 
   const [tab, setTab] = useState(user ? 'tickets' : 'create');
@@ -36,7 +34,9 @@ const SupportPage = () => {
     email: '',
     phone: '',
     subject: '',
-    message: ''
+    message: '',
+    category_id: '',
+    priority: '' as 'low' | 'medium' | 'high' | 'urgent' | '',
   });
 
   // Fetch tickets
@@ -128,7 +128,16 @@ const SupportPage = () => {
       return;
     }
 
-    if (!user && (!newTicket.email || !newTicket.name)) {
+    if (!newTicket.category_id) {
+      toast({
+        title: t('support.create.error.title'),
+        description: t('support.create.error.description'),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!newTicket.priority) {
       toast({
         title: t('support.create.error.title'),
         description: t('support.create.error.description'),
@@ -141,13 +150,9 @@ const SupportPage = () => {
       const ticketData: TicketCreateRequest = {
         subject: newTicket.subject,
         description: newTicket.description,
+        category_id: parseInt(newTicket.category_id),
+        priority: newTicket.priority as 'low' | 'medium' | 'high' | 'urgent',
       };
-      if (newTicket.priority) {
-        ticketData.priority = newTicket.priority;
-      }
-      if (newTicket.category_id) {
-        ticketData.category_id = parseInt(newTicket.category_id);
-      }
       await createTicket(ticketData).unwrap();
 
       toast({
@@ -161,8 +166,6 @@ const SupportPage = () => {
         category_id: '',
         priority: '',
         description: '',
-        email: '',
-        name: ''
       });
 
       // Switch to tickets tab if user is logged in
@@ -192,10 +195,30 @@ const SupportPage = () => {
       return;
     }
 
+    if (!contactForm.category_id) {
+      toast({
+        title: t('support.create.error.title'),
+        description: t('support.create.error.description'),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!contactForm.priority) {
+      toast({
+        title: t('support.create.error.title'),
+        description: t('support.create.error.description'),
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const ticketData: TicketCreateRequest = {
         subject: contactForm.subject,
         description: contactForm.message,
+        category_id: parseInt(contactForm.category_id),
+        priority: contactForm.priority as 'low' | 'medium' | 'high' | 'urgent',
       };
       await createTicket(ticketData).unwrap();
 
@@ -205,7 +228,7 @@ const SupportPage = () => {
       });
 
       // Reset form
-      setContactForm({ name: '', email: '', phone: '', subject: '', message: '' });
+      setContactForm({ name: '', email: '', phone: '', subject: '', message: '', category_id: '', priority: '' });
     } catch (error: unknown) {
       const errorMessage = error && typeof error === 'object' && 'data' in error && typeof error.data === 'object' && error.data !== null && 'message' in error.data
         ? String(error.data.message)
@@ -421,29 +444,6 @@ const SupportPage = () => {
                   </p>
                 </div>
               )}
-
-              {!user && (
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t('support.form.name')} *</label>
-                    <Input
-                      placeholder={t('support.form.name_placeholder')}
-                      value={newTicket.name}
-                      onChange={(e) => setNewTicket({ ...newTicket, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t('support.form.email_required')} *</label>
-                    <Input
-                      type="email"
-                      placeholder={t('support.form.email_placeholder_form')}
-                      value={newTicket.email}
-                      onChange={(e) => setNewTicket({ ...newTicket, email: e.target.value })}
-                    />
-                  </div>
-                </div>
-              )}
-
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t('support.create.subject')} *</label>
@@ -455,7 +455,7 @@ const SupportPage = () => {
                 </div>
                 {categories.length > 0 && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">{t('support.form.category_label')}</label>
+                    <label className="text-sm font-medium">{t('support.form.category_label')} *</label>
                     <Select
                       value={newTicket.category_id}
                       onValueChange={(value) => setNewTicket({ ...newTicket, category_id: value })}
@@ -481,7 +481,7 @@ const SupportPage = () => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('support.create.priority')}</label>
+                  <label className="text-sm font-medium">{t('support.create.priority')} *</label>
                   <Select
                     value={newTicket.priority}
                     onValueChange={(value) => setNewTicket({ ...newTicket, priority: value as typeof newTicket.priority })}
@@ -515,7 +515,8 @@ const SupportPage = () => {
                   isCreatingTicket ||
                   !newTicket.subject ||
                   !newTicket.description ||
-                  (!user && (!newTicket.email || !newTicket.name))
+                  !newTicket.category_id ||
+                  !newTicket.priority
                 }
               >
                 {isCreatingTicket ? (
@@ -589,6 +590,48 @@ const SupportPage = () => {
                 />
               </div>
 
+              {categories.length > 0 && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('support.form.category_label')} *</label>
+                  <Select
+                    value={contactForm.category_id}
+                    onValueChange={(value) => setContactForm({ ...contactForm, category_id: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('support.form.category_placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {isLoadingCategories ? (
+                        <SelectItem value="loading" disabled>{t('common.loading')}</SelectItem>
+                      ) : (
+                        categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('support.create.priority')} *</label>
+                <Select
+                  value={contactForm.priority}
+                  onValueChange={(value) => setContactForm({ ...contactForm, priority: value as typeof contactForm.priority })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('support.form.priority_placeholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">{t('support.form.low')}</SelectItem>
+                    <SelectItem value="medium">{t('support.form.medium')}</SelectItem>
+                    <SelectItem value="high">{t('support.form.high')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t('support.contact.message')} *</label>
                 <Textarea
@@ -602,7 +645,14 @@ const SupportPage = () => {
               <Button
                 onClick={handleContactSubmit}
                 className="bg-primary hover:bg-primary/90"
-                disabled={!contactForm.name || !contactForm.email || !contactForm.subject || !contactForm.message}
+                disabled={
+                  !contactForm.name ||
+                  !contactForm.email ||
+                  !contactForm.subject ||
+                  !contactForm.message ||
+                  !contactForm.category_id ||
+                  !contactForm.priority
+                }
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
                 {t('support.contact.send_message')}

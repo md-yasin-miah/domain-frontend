@@ -16,8 +16,8 @@ interface SupportTicket {
 interface TicketCreateRequest {
   subject: string;
   description: string;
-  category_id?: number;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  category_id: number;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
 }
 
 
