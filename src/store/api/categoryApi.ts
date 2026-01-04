@@ -3,7 +3,7 @@ import { apiSlice } from './apiSlice';
 export const categoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Support Categories
-    getSupportCategories: builder.query<PaginatedResponse<Category>, PaginationParams>({
+    getSupportCategories: builder.query<Category[], { is_active: boolean }>({
       query: (params) => ({
         url: '/categories/support',
         method: 'GET',

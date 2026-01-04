@@ -1,4 +1,4 @@
-interface SupportTicket{
+interface SupportTicket {
   title: string;
   description: string;
   category_id: number;
@@ -16,6 +16,7 @@ interface SupportTicket{
 interface TicketCreateRequest {
   subject: string;
   description: string;
+  category_id?: number;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 

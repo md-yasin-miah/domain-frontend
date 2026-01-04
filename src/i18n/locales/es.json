@@ -540,6 +540,87 @@
       "updated": "Actualizado",
       "assigned_to": "Asignado A"
     },
-    "no_category": "Sin Categoría"
+    "no_category": "Sin Categoría",
+    "tickets": {
+      "title": "Mis Tickets",
+      "no_tickets_title": "Tus tickets",
+      "no_tickets_description": "Para ver el historial de tus tickets, inicia sesión. También puedes crear un ticket sin registrarte.",
+      "create_without_account": "Crear ticket sin cuenta",
+      "new_ticket": "Nuevo Ticket",
+      "search_placeholder": "Buscar tickets por asunto o número...",
+      "view_details": "Ver detalles",
+      "respond": "Responder",
+      "no_tickets_found": "No tienes tickets",
+      "no_tickets_description_2": "¿Necesitas ayuda? Crea tu primer ticket de soporte",
+      "create_ticket": "Crear Ticket",
+      "ticket_id": "Ticket #",
+      "category_label": "Categoría:",
+      "messages": "mensajes",
+      "created_label": "Creado:",
+      "updated_label": "Actualizado:",
+      "agent": "Agente:"
+    },
+    "contact": {
+      "title": "Contacto Directo",
+      "description": "¿Prefieres contactarnos directamente? Completa el formulario y te responderemos pronto",
+      "full_name": "Nombre completo",
+      "full_name_placeholder": "Tu nombre",
+      "email": "Email",
+      "email_placeholder": "tu@email.com",
+      "phone": "Teléfono",
+      "phone_placeholder": "+1 (555) 123-4567",
+      "subject": "Asunto",
+      "subject_placeholder": "¿En qué podemos ayudarte?",
+      "message": "Mensaje",
+      "message_placeholder": "Escribe tu mensaje aquí...",
+      "send_message": "Enviar Mensaje",
+      "other_channels": "Otros canales de contacto",
+      "email_label": "Email",
+      "phone_label": "Teléfono",
+      "hours": "Horario",
+      "hours_value": "Lun - Vie: 9:00 AM - 6:00 PM",
+      "live_chat": "Chat en vivo",
+      "live_chat_value": "Disponible 24/7"
+    },
+    "knowledge": {
+      "title": "Base de Conocimientos",
+      "faq": {
+        "title": "Preguntas Frecuentes",
+        "description": "Respuestas a las preguntas más comunes"
+      },
+      "guides": {
+        "title": "Guías de Configuración",
+        "description": "Tutoriales paso a paso para configurar tus servicios"
+      },
+      "troubleshooting": {
+        "title": "Solución de Problemas",
+        "description": "Resuelve problemas comunes por ti mismo"
+      },
+      "popular_articles": "Artículos Populares"
+    },
+    "form": {
+      "tip": "💡 Consejo:",
+      "tip_text": "No necesitas iniciar sesión para crear un ticket. Solo completa el formulario con tu información de contacto.",
+      "name": "Nombre",
+      "name_placeholder": "Tu nombre completo",
+      "email_required": "Email",
+      "email_placeholder_form": "tu@email.com",
+      "subject_label": "Asunto",
+      "subject_placeholder_form": "Describe brevemente tu problema",
+      "category_label": "Categoría",
+      "category_placeholder": "Selecciona una categoría",
+      "priority_label": "Prioridad",
+      "priority_placeholder": "Selecciona prioridad",
+      "client_company": "Cliente / Empresa",
+      "client_company_placeholder": "Nombre del cliente o empresa",
+      "website_url": "Sitio Web (URL)",
+      "website_url_placeholder": "https://ejemplo.com",
+      "problem_description": "Descripción del problema",
+      "problem_description_placeholder": "Describe tu problema con el mayor detalle posible...",
+      "required_fields_note": "* Campos requeridos. Recibirás una copia del ticket en tu email.",
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta"
+    }
   }
 }

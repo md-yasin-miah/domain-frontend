@@ -23,7 +23,7 @@ import Apps from "./pages/marketplace/Apps";
 import FBA from "./pages/marketplace/FBA";
 import ClientDomainsPage from "./pages/client/ClientDomainsPage";
 import Facturas from "./pages/client/Facturas";
-import Soporte from "./pages/client/Soporte";
+import SupportPage from "./pages/SupportPage";
 import GestionListados from "./pages/admin/GestionListados";
 import AdminConfig from "./pages/admin/AdminConfig";
 import AdminUsuarios from "./pages/admin/AdminUsuarios";
@@ -63,7 +63,6 @@ import RolesPermissions from "./pages/admin/RolesPermissions";
 import UserManagement from "./pages/admin/UserManagement";
 import ClientAppsPage from "./pages/client/ClientAppsPage";
 import ClientWebsitesPage from "./pages/client/ClientWebsitesPage";
-import ClientSupportPage from "./pages/client/ClientSupportPage";
 
 export const router = createBrowserRouter([
   // Root route
@@ -244,13 +243,13 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "soporte",
-            element: <Soporte />,
+            element: <SupportPage />,
           },
         ],
       },
       {
         path: "soporte",
-        element: <Soporte />,
+        element: <SupportPage />,
       },
       // Categories routes - Nested
       {
@@ -335,7 +334,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "support",
-        element: <ClientSupportPage />,
+        element: <SupportPage />,
       },
       {
         path: "faq",
@@ -458,7 +457,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: (
-        <NotFound />
+      <NotFound />
     ),
   },
 ]);
