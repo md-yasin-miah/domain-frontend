@@ -30,7 +30,7 @@ const SupportPage = () => {
   const ticketForm = useForm<TicketCreateFormData>({
     resolver: zodResolver(ticketCreateSchema),
     defaultValues: {
-      subject: '',
+      title: '',
       description: '',
       category_id: '',
     },
@@ -40,7 +40,7 @@ const SupportPage = () => {
   const contactForm = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
-      subject: '',
+      title: '',
       message: '',
       category_id: '',
     },
@@ -112,8 +112,9 @@ const SupportPage = () => {
       // Validate and parse the form data (schema matches TicketCreateRequest exactly)
       const validatedData = ticketCreateSchema.parse(data);
       const ticketData: TicketCreateRequest = {
-        subject: validatedData.subject,
+        title: validatedData.title,
         description: validatedData.description,
+        msg: validatedData.description,
         category_id: parseInt(validatedData.category_id),
       };
       await createTicket(ticketData).unwrap();
@@ -147,8 +148,9 @@ const SupportPage = () => {
     try {
       // Map message to description for API (schema matches TicketCreateRequest structure)
       const ticketData: TicketCreateRequest = {
-        subject: data.subject,
+        title: data.title,
         description: data.message,
+        msg: data.message,
         category_id: parseInt(data.category_id),
       };
       await createTicket(ticketData).unwrap();
@@ -383,13 +385,13 @@ const SupportPage = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <FormField
                       control={ticketForm.control}
-                      name="subject"
+                      name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('support.create.subject')} *</FormLabel>
+                          <FormLabel>{t('support.create.title_label')} *</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={t('support.create.subject_placeholder')}
+                              placeholder={t('support.create.title_placeholder')}
                               {...field}
                             />
                           </FormControl>
@@ -492,13 +494,13 @@ const SupportPage = () => {
                 <form onSubmit={contactForm.handleSubmit(handleContactSubmit)} className="space-y-6">
                   <FormField
                     control={contactForm.control}
-                    name="subject"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('support.contact.subject')} *</FormLabel>
+                        <FormLabel>{t('support.contact.title')} *</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder={t('support.contact.subject_placeholder')}
+                            placeholder={t('support.contact.title_placeholder')}
                             {...field}
                           />
                         </FormControl>
