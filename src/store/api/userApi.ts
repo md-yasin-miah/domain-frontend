@@ -1,15 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type {
-  UserResponse,
-  UserCreateRequest,
-  UserUpdateRequest,
-  PasswordUpdateRequest,
-  PasswordResetRequest,
-  UserStats,
-  Role,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

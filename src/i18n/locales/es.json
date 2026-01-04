@@ -185,8 +185,25 @@
     "from": "Desde",
     "premium": "Premium",
     "digital_commerce_future": "El futuro del comercio digital",
+    "loading": "Cargando...",
     "error": "Error",
-    "no_results": "No se encontraron resultados"
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "required": "Requerido",
+    "optional": "Opcional",
+    "no_results": "No se encontraron resultados",
+    "retry": "Reintentar",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "close": "Cerrar"
   },
   "dashboard": {
     "welcome": "Panel de Control",
@@ -452,5 +469,77 @@
         "description": "Aún no tienes apps"
       }
     }
+  },
+  "support": {
+    "title": "Tickets de Soporte",
+    "subtitle": "Gestiona y rastrea tus solicitudes de soporte",
+    "search_placeholder": "Buscar tickets...",
+    "filter_status": "Filtrar por estado",
+    "filter": {
+      "all": "Todos los Estados"
+    },
+    "status": {
+      "open": "Abierto",
+      "in_progress": "En Progreso",
+      "resolved": "Resuelto",
+      "closed": "Cerrado"
+    },
+    "priority": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    },
+    "tabs": {
+      "all": "Todos",
+      "open": "Abiertos",
+      "in_progress": "En Progreso",
+      "resolved": "Resueltos",
+      "closed": "Cerrados"
+    },
+    "create": {
+      "button": "Crear Ticket",
+      "title": "Crear Nuevo Ticket de Soporte",
+      "description": "Envía una nueva solicitud de soporte. Nuestro equipo te responderá lo antes posible.",
+      "subject": "Asunto",
+      "subject_placeholder": "Ingresa el asunto del ticket...",
+      "priority": "Prioridad",
+      "description_label": "Descripción",
+      "description_placeholder": "Describe tu problema o pregunta en detalle...",
+      "submit": "Crear Ticket",
+      "creating": "Creando...",
+      "success": {
+        "title": "Ticket Creado",
+        "description": "Tu ticket de soporte ha sido creado exitosamente."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Por favor completa todos los campos requeridos.",
+        "server": "Error al crear el ticket. Por favor intenta de nuevo."
+      }
+    },
+    "empty": {
+      "title": "No se Encontraron Tickets",
+      "description": "Aún no has creado ningún ticket de soporte. Crea tu primer ticket para comenzar.",
+      "search": "No hay tickets que coincidan con tu búsqueda",
+      "search_description": "Intenta ajustar tus términos de búsqueda o filtros."
+    },
+    "error": {
+      "title": "Error al Cargar Tickets",
+      "description": "Error al cargar los tickets de soporte. Por favor intenta de nuevo."
+    },
+    "pagination": {
+      "showing": "Mostrando {{from}} a {{to}} de {{total}} tickets"
+    },
+    "detail": {
+      "description": "Detalles e información del ticket",
+      "status": "Estado",
+      "description_label": "Descripción",
+      "category": "Categoría",
+      "created": "Creado",
+      "updated": "Actualizado",
+      "assigned_to": "Asignado A"
+    },
+    "no_category": "Sin Categoría"
   }
 }

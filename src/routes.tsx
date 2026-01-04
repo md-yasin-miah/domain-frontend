@@ -63,6 +63,7 @@ import RolesPermissions from "./pages/admin/RolesPermissions";
 import UserManagement from "./pages/admin/UserManagement";
 import ClientAppsPage from "./pages/client/ClientAppsPage";
 import ClientWebsitesPage from "./pages/client/ClientWebsitesPage";
+import ClientSupportPage from "./pages/client/ClientSupportPage";
 
 export const router = createBrowserRouter([
   // Root route
@@ -331,6 +332,10 @@ export const router = createBrowserRouter([
       {
         path: "facturas",
         element: <Facturas />,
+      },
+      {
+        path: "support",
+        element: <ClientSupportPage />,
       },
       {
         path: "faq",
