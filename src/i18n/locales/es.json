@@ -201,6 +201,48 @@
     "login_desc": "Inicia sesión para acceder a tu panel personalizado",
     "guest_explore": "Explorar como Invitado"
   },
+  "client_dashboard": {
+    "title": "Panel del Cliente",
+    "subtitle": "Gestiona tus dominios, facturas y tickets de soporte",
+    "cards": {
+      "total_domains": "Total de Dominios",
+      "active_domains": "Dominios activos",
+      "total_invoices": "Total de Facturas",
+      "all_time_invoices": "Facturas de todos los tiempos",
+      "due_payment": "Pago Pendiente",
+      "pending_payments": "Pagos pendientes",
+      "support_tickets": "Tickets de Soporte",
+      "total_tickets": "Total de tickets"
+    },
+    "recent_domains": {
+      "title": "Dominios Recientes",
+      "description": "Tus últimas registraciones de dominios",
+      "no_domains": "No se encontraron dominios",
+      "expires": "Expira",
+      "no_expiry": "Sin fecha de expiración"
+    },
+    "recent_tickets": {
+      "title": "Tickets Recientes",
+      "description": "Tus últimos tickets de soporte",
+      "no_tickets": "No se encontraron tickets"
+    },
+    "recent_invoices": {
+      "title": "Facturas Recientes",
+      "description": "Tu última información de facturación",
+      "no_invoices": "No se encontraron facturas",
+      "due": "Vence"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "description": "Encuentra respuestas a preguntas comunes",
+      "view_faqs": "Ver Preguntas Frecuentes"
+    },
+    "actions": {
+      "create_ticket": "Crear Ticket",
+      "view_all_invoices": "Ver Todas las Facturas",
+      "manage_domains": "Gestionar Dominios"
+    }
+  },
   "marketplace": {
     "explore_collection": "Explora nuestra colección curada de activos digitales rentables, desde NFTs hasta ecommerce completo",
     "all_categories": "Todas las Categorías",

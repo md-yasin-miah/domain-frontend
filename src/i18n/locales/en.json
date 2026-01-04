@@ -763,6 +763,48 @@
     "increase_this_week": "increase this week",
     "new_today": "new today"
   },
+  "client_dashboard": {
+    "title": "Client Dashboard",
+    "subtitle": "Manage your domains, invoices, and support tickets",
+    "cards": {
+      "total_domains": "Total Domains",
+      "active_domains": "Active domains",
+      "total_invoices": "Total Invoices",
+      "all_time_invoices": "All time invoices",
+      "due_payment": "Due Payment",
+      "pending_payments": "Pending payments",
+      "support_tickets": "Support Tickets",
+      "total_tickets": "Total tickets"
+    },
+    "recent_domains": {
+      "title": "Recent Domains",
+      "description": "Your latest domain registrations",
+      "no_domains": "No domains found",
+      "expires": "Expires",
+      "no_expiry": "No expiry date"
+    },
+    "recent_tickets": {
+      "title": "Recent Tickets",
+      "description": "Your latest support tickets",
+      "no_tickets": "No tickets found"
+    },
+    "recent_invoices": {
+      "title": "Recent Invoices",
+      "description": "Your latest billing information",
+      "no_invoices": "No invoices found",
+      "due": "Due"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to common questions",
+      "view_faqs": "View FAQs"
+    },
+    "actions": {
+      "create_ticket": "Create Ticket",
+      "view_all_invoices": "View All Invoices",
+      "manage_domains": "Manage Domains"
+    }
+  },
   "common": {
     "from": "From",
     "premium": "Premium",

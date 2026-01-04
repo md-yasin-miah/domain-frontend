@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { useAuth } from "@/store/hooks/useAuth";
 import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
 import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
 import { useGetTicketsQuery } from "@/store/api/supportApi";
+import { getStatusColor } from "@/lib/helperfun";
 
 interface ClientDomain {
   id: string;
@@ -40,6 +42,7 @@ interface SupportTicket {
 }
 
 export default function ClientDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -58,12 +61,6 @@ export default function ClientDashboard() {
 
   const loading = domainsLoading || invoicesLoading || ticketsLoading ;
 
-  // useEffect(() => {
-  //   if (user && profile && !profile.profile_completed) {
-  //     navigate('/client/profile-setup');
-  //   }
-  // }, [user, profile, navigate]);
-
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'active':
@@ -81,8 +78,8 @@ export default function ClientDashboard() {
     }
   };
 
-  const totalDuePayment = invoices
-    ?.items?.filter((inv: Invoice) => inv.status === 'issued')
+  const totalDuePayment = (invoices?.items || [])
+    .filter((inv: Invoice) => inv.status === 'issued')
     .reduce((sum, inv) => sum + Number(inv.amount), 0);
 
   if (loading) {
@@ -108,60 +105,60 @@ export default function ClientDashboard() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Client Dashboard</h1>
-        <p className="text-muted-foreground">Manage your domains, invoices, and support tickets</p>
+        <h1 className="text-3xl font-bold">{t('client_dashboard.title')}</h1>
+        <p className="text-muted-foreground">{t('client_dashboard.subtitle')}</p>
       </div>
 
       {/* Overview Cards */}
       <div className="grid gap-6 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Domains</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('client_dashboard.cards.total_domains')}</CardTitle>
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{domains?.pagination?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Active domains
+              {t('client_dashboard.cards.active_domains')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('client_dashboard.cards.total_invoices')}</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{domains?.pagination?.total || 0}</div>
+            <div className="text-2xl font-bold">{invoices?.pagination?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
-              All time invoices
+              {t('client_dashboard.cards.all_time_invoices')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Due Payment</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('client_dashboard.cards.due_payment')}</CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalDuePayment.toFixed(2)}</div>
+            <div className="text-2xl font-bold">${(totalDuePayment || 0).toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Pending payments
+              {t('client_dashboard.cards.pending_payments')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Support Tickets</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('client_dashboard.cards.support_tickets')}</CardTitle>
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{domains?.pagination?.total || 0}</div>
+            <div className="text-2xl font-bold">{tickets?.pagination?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Total tickets
+              {t('client_dashboard.cards.total_tickets')}
             </p>
           </CardContent>
         </Card>
@@ -173,16 +170,16 @@ export default function ClientDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5 text-muted-foreground" />
-              Recent Domains
+              {t('client_dashboard.recent_domains.title')}
             </CardTitle>
             <CardDescription>
-              Your latest domain registrations
+              {t('client_dashboard.recent_domains.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {domains?.items?.length === 0 ? (
               <p className="text-center text-muted-foreground py-4">
-                No domains found
+                {t('client_dashboard.recent_domains.no_domains')}
               </p>
             ) : (
               <div className="space-y-3">
@@ -191,11 +188,17 @@ export default function ClientDashboard() {
                     <div>
                       <h4 className="font-medium">{domain.domain_name}</h4>
                       <p className="text-xs text-muted-foreground">
-                        {domain.expires_at ? `Expires: ${new Date(domain.expires_at).toLocaleDateString()}` : 'No expiry date'}
+                        {domain.expires_at 
+                          ? `${t('client_dashboard.recent_domains.expires')}: ${new Date(domain.expires_at).toLocaleDateString()}` 
+                          : t('client_dashboard.recent_domains.no_expiry')
+                        }
                       </p>
                     </div>
-                    <Badge variant={getStatusBadgeVariant(domain.status)}>
-                      {domain.status}
+                    <Badge 
+                    variant={getStatusBadgeVariant(domain.status)}
+                      className={`text-xs ${getStatusColor(domain.status)} text-white capitalize`}
+                    >
+                      {domain.status?.replace(/_|-/g, ' ')}
                     </Badge>
                   </div>
                 ))}
@@ -211,16 +214,16 @@ export default function ClientDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                Recent Tickets
+                {t('client_dashboard.recent_tickets.title')}
               </CardTitle>
               <CardDescription>
-                Your latest support tickets
+                {t('client_dashboard.recent_tickets.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {tickets?.items?.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  No tickets found
+                  {t('client_dashboard.recent_tickets.no_tickets')}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -230,8 +233,11 @@ export default function ClientDashboard() {
                         <h4 className="font-medium text-sm">{ticket?.title}</h4>
                         <p className="text-xs text-muted-foreground">#{ticket?.id}</p>
                       </div>
-                      <Badge variant={getStatusBadgeVariant(ticket.status)} className="text-xs">
-                        {ticket.status}
+                      <Badge 
+                        variant={getStatusBadgeVariant(ticket.status)} 
+                        className={`text-xs ${getStatusColor(ticket.status)} text-white capitalize`}
+                      >
+                        {ticket.status?.replace(/_|-/g, ' ')}
                       </Badge>
                     </div>
                   ))}
@@ -245,16 +251,16 @@ export default function ClientDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-muted-foreground" />
-                Recent Invoices
+                {t('client_dashboard.recent_invoices.title')}
               </CardTitle>
               <CardDescription>
-                Your latest billing information
+                {t('client_dashboard.recent_invoices.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {invoices?.items?.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  No invoices found
+                  {t('client_dashboard.recent_invoices.no_invoices')}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -263,7 +269,7 @@ export default function ClientDashboard() {
                       <div>
                         <h4 className="font-medium text-sm">{invoice?.invoice_number}</h4>
                         <p className="text-xs text-muted-foreground">
-                          Due: {new Date(invoice?.due_date).toLocaleDateString()}
+                          {t('client_dashboard.recent_invoices.due')}: {new Date(invoice?.due_date).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="text-right">
@@ -284,16 +290,16 @@ export default function ClientDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <HelpCircle className="h-5 w-5 text-muted-foreground" />
-                Frequently Asked Questions
+                {t('client_dashboard.faq.title')}
               </CardTitle>
               <CardDescription>
-                Find answers to common questions
+                {t('client_dashboard.faq.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link to="/client/faq">
                 <Button variant="outline" className="w-full justify-between">
-                  View FAQs
+                  {t('client_dashboard.faq.view_faqs')}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -307,15 +313,15 @@ export default function ClientDashboard() {
       <div className="flex gap-4 flex-wrap">
         <Button onClick={() => navigate('/user/soporte')}>
           <MessageCircle className="h-4 w-4 mr-2" />
-          Create Ticket
+          {t('client_dashboard.actions.create_ticket')}
         </Button>
         <Button variant="outline" onClick={() => navigate('/user/facturas')}>
           <FileText className="h-4 w-4 mr-2" />
-          View All Invoices
+          {t('client_dashboard.actions.view_all_invoices')}
         </Button>
         <Button variant="outline" onClick={() => navigate('/user/mis-dominios')}>
           <Globe className="h-4 w-4 mr-2" />
-          Manage Domains
+          {t('client_dashboard.actions.manage_domains')}
         </Button>
       </div>
     </div>

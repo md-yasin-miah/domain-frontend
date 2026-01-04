@@ -30,6 +30,11 @@ export const getStatusColor = (status: string) => {
     case 'Expirado': return 'bg-red-500';
     case 'pending':
     case 'Pendiente': return 'bg-yellow-500';
+    // Support ticket statuses
+    case 'open': return 'bg-blue-500';
+    case 'in_progress': return 'bg-yellow-500';
+    case 'resolved': return 'bg-green-500';
+    case 'closed': return 'bg-gray-500';
     default: return 'bg-gray-500';
   }
 };
