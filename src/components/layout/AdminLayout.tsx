@@ -6,7 +6,7 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-export function AdminLayout({ children }: AdminLayoutProps) {
+const AdminLayout = ({ children }: AdminLayoutProps) => {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/20">
@@ -31,3 +31,4 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     </SidebarProvider>
   );
 }
+export default AdminLayout;

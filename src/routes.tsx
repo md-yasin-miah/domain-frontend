@@ -1,8 +1,8 @@
 import { ROUTES } from "./lib/constant";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
-import { AdminLayout } from "./components/layout/AdminLayout";
-import { ClientLayout } from "./components/layout/ClientLayout";
+import AdminLayout from "./components/layout/AdminLayout";
+import ClientLayout from "./components/layout/ClientLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
@@ -325,7 +325,7 @@ export const router = createBrowserRouter([
             element: <ClientInvoicePage />,
           },
           {
-            path: "payment",
+            path: "payments",
             element: <ClientPaymentPage />,
           },
           {

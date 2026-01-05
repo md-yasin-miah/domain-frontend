@@ -1,16 +1,8 @@
 import { apiSlice } from './apiSlice';
-import type {
-  Order,
-  OrderCreateRequest,
-  PaymentIntentResponse,
-  PaymentIntentStatus,
-  PaginatedResponse,
-  OrderFilters,
-} from './types';
 
 export const ordersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getOrders: builder.query<PaginatedResponse<Order> | Order[], OrderFilters>({
+    getOrders: builder.query<PaginatedResponse<Order>, OrderFilters>({
       query: (params) => ({
         url: '/orders',
         method: 'GET',

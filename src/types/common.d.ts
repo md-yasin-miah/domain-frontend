@@ -20,3 +20,18 @@ interface OrderFilters extends PaginationParams {
   seller_id?: number;
   status?: string;
 }
+
+interface MenuSubItem {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  description?: string;
+}
+
+interface MenuItem {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  description?: string;
+  subItems?: MenuSubItem[];
+}

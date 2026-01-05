@@ -68,27 +68,8 @@ interface ListingCreateRequest {
 type ListingUpdateRequest = Partial<ListingCreateRequest>;
 
 // ============ Order Types ============
-interface Order {
-  id: number;
-  order_number: string;
-  listing_id: number;
-  buyer_id: number;
-  seller_id: number;
-  final_price: number;
-  platform_fee: number;
-  seller_amount: number;
-  status: string;
-  payment_method: string | null;
-  created_at: string;
-  updated_at: string;
-}
 
-interface OrderCreateRequest {
-  listing_id: number;
-  final_price?: number;
-  currency?: string;
-  offer_id?: number;
-}
+
 
 interface PaymentIntentResponse {
   client_secret: string;
@@ -404,9 +385,5 @@ interface UserStats {
 
 // ============ Filter Types ============
 
-interface OrderFilters extends PaginationParams {
-  buyer_id?: number;
-  seller_id?: number;
-  status?: string;
-}
+
 
