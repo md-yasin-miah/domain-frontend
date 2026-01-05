@@ -1,6 +1,6 @@
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { store } from '@/store';
-import { logout, setCredentials, setToken, setError } from '@/store/slices/authSlice';
+import { logout, setCredentials, setToken, setRefreshToken, setError } from '@/store/slices/authSlice';
 import {
   useLoginMutation,
   useRegisterMutation,
@@ -34,18 +34,28 @@ export const useAuth = () => {
         password
       }).unwrap();
 
-      // Store token first - Redux updates are synchronous
+      // Store both tokens immediately - Redux updates are synchronous
       dispatch(setToken(loginResult.access_token));
+      if (loginResult.refresh_token) {
+        dispatch(setRefreshToken(loginResult.refresh_token));
+      }
 
-      // Verify token is in store (should be immediate since Redux updates are synchronous)
-      // Use a microtask to ensure any pending state updates are processed
+      // Verify tokens are in store and localStorage
       await Promise.resolve();
 
-      // Double-check token is in store before making the request
       const token = store.getState().auth.token;
-      if (!token) {
-        console.error('Token not found in store after setToken dispatch');
+      const storedToken = localStorage.getItem('auth_token');
+      const storedRefreshToken = localStorage.getItem('refresh_token');
+
+      if (!token || !storedToken) {
+        console.error('Token not found in store or localStorage after setToken dispatch');
+        console.error('Store token:', token ? 'exists' : 'missing');
+        console.error('localStorage token:', storedToken ? 'exists' : 'missing');
         throw new Error('Token was not set in store after login');
+      }
+
+      if (loginResult.refresh_token && !storedRefreshToken) {
+        console.warn('Refresh token not stored in localStorage');
       }
 
       // Fetch user data using the API directly with the token

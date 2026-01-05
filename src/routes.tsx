@@ -64,6 +64,10 @@ import RolesPermissions from "./pages/admin/RolesPermissions";
 import UserManagement from "./pages/admin/UserManagement";
 import ClientAppsPage from "./pages/client/ClientAppsPage";
 import ClientWebsitesPage from "./pages/client/ClientWebsitesPage";
+import ClientAllOrderPage from "./pages/client/orders/ClientAllOrderPage";
+import ClientInvoicePage from "./pages/client/orders/ClientInvoicePage";
+import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
+import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 
 export const router = createBrowserRouter([
   // Root route
@@ -308,6 +312,27 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <ClientDashboard />,
+      },
+      {
+        path: "orders",
+        children: [
+          {
+            index: true,
+            element: <ClientAllOrderPage />,
+          },
+          {
+            path: "invoices",
+            element: <ClientInvoicePage />,
+          },
+          {
+            path: "payment",
+            element: <ClientPaymentPage />,
+          },
+          {
+            path: "escrows",
+            element: <ClientEscrowsPage />,
+          },
+        ],
       },
       {
         path: "profile",

@@ -101,11 +101,23 @@ const authSlice = createSlice({
     },
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
-      localStorage.setItem('auth_token', action.payload);
+      try {
+        localStorage.setItem('auth_token', action.payload);
+      } catch (error) {
+        console.error('Failed to store token in localStorage:', error);
+      }
+    },
+    setRefreshToken: (state, action: PayloadAction<string>) => {
+      state.refreshToken = action.payload;
+      try {
+        localStorage.setItem('refresh_token', action.payload);
+      } catch (error) {
+        console.error('Failed to store refresh token in localStorage:', error);
+      }
     },
   },
 });
 
-export const { setCredentials, logout, setLoading, setError, updateUser, setToken } = authSlice.actions;
+export const { setCredentials, logout, setLoading, setError, updateUser, setToken, setRefreshToken } = authSlice.actions;
 export default authSlice.reducer;
 

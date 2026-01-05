@@ -78,27 +78,27 @@ export function ClientLayout({ children }: ClientLayoutProps) {
     },
     {
       title: t('nav.orders'),
-      url: '#',
+      url: ROUTES.CLIENT.ORDERS.INDEX,
       icon: Package,
       subItems: [
         {
           title: t('nav.allOrders'),
-          url: ROUTES.CLIENT.ORDERS,
+          url: ROUTES.CLIENT.ORDERS.INDEX,
           icon: Package,
         },
         {
           title: t('nav.invoice'),
-          url: ROUTES.CLIENT.INVOICES,
+          url: ROUTES.CLIENT.ORDERS.INVOICES,
           icon: FileText,
         },
         {
           title: t('nav.payment'),
-          url: ROUTES.CLIENT.PAYMENTS,
+          url: ROUTES.CLIENT.ORDERS.PAYMENTS,
           icon: CreditCard,
         },
         {
           title: t('nav.escrows'),
-          url: ROUTES.CLIENT.ESCROWS,
+          url: ROUTES.CLIENT.ORDERS.ESCROWS,
           icon: Lock,
         },
       ],
