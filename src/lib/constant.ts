@@ -8,6 +8,7 @@ export const ROUTES = {
     FAQ: '/client/faq',
     ORDERS: {
       INDEX: '/client/orders',
+      ORDER_DETAILS: (id: number) => `/client/orders/${id}`,
       INVOICES: '/client/orders/invoices',
       PAYMENTS: '/client/orders/payments',
       ESCROWS: '/client/orders/escrows',

@@ -85,7 +85,7 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto">
         <div className="grid gap-6 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
@@ -103,7 +103,7 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">{t('client_dashboard.title')}</h1>

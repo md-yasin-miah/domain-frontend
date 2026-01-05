@@ -51,3 +51,13 @@ export const timeFormat = (date: string, format: string = 'MM/DD/YYYY') => {
   if (!date) return '---';
   return moment(date).format(format);
 };
+export const getStatusBadgeVariant = (status: string) => {
+  switch (status) {
+    case 'completed': return 'default';
+    case 'processing': return 'secondary';
+    case 'pending': return 'outline';
+    case 'cancelled': return 'destructive';
+    case 'refunded': return 'destructive';
+    default: return 'outline';
+  }
+};

@@ -26,10 +26,10 @@ export default function FAQ() {
 
   // Filter FAQs based on search term
   const faqs = searchTerm.trim()
-    ? allFaqs.filter(faq => 
-        faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? allFaqs.filter(faq =>
+      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : allFaqs;
 
   const categories = Array.from(new Set(faqs.map(faq => faq.category?.name).filter(Boolean))) as string[];
@@ -43,7 +43,7 @@ export default function FAQ() {
   const uncategorizedFAQs = faqs.filter(faq => !faq.category);
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto max-w-4xl">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-3xl">

@@ -14,7 +14,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Header menuItems={getClientMenuItems(t)} userServices={getClientServices(t)} showDashboard={false} />
-      <main className="min-h-screen">{children}</main>
+      <main className="min-h-screen md:p-6 lg:p-8 p-4">{children}</main>
       <Footer />
       <LiveChat />
     </div>

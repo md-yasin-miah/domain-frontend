@@ -58,12 +58,12 @@ const Facturas = () => {
 
   const filteredInvoices = invoices.filter(invoice => {
     const matchesSearch = invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         invoice.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      invoice.description.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStatus = filterStatus === 'all' || invoice.status.toLowerCase() === filterStatus.toLowerCase();
-    
+
     const matchesYear = invoice.date.startsWith(filterYear);
-    
+
     return matchesSearch && matchesStatus && matchesYear;
   });
 
@@ -90,7 +90,7 @@ const Facturas = () => {
   const pendingAmount = filteredInvoices.filter(inv => inv.status === 'Pendiente').reduce((sum, invoice) => sum + invoice.amount, 0);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>

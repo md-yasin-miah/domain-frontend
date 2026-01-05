@@ -68,6 +68,7 @@ import ClientAllOrderPage from "./pages/client/orders/ClientAllOrderPage";
 import ClientInvoicePage from "./pages/client/orders/ClientInvoicePage";
 import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
+import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
 
 export const router = createBrowserRouter([
   // Root route
@@ -319,6 +320,10 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <ClientAllOrderPage />,
+          },
+          {
+            path: ":id",
+            element: <ClientOrderDetailsPage />,
           },
           {
             path: "invoices",

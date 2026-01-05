@@ -626,5 +626,103 @@
       "medium": "Media",
       "high": "Alta"
     }
+  },
+  "orders": {
+    "all_orders": "Todas las Órdenes",
+    "description": "Ver y gestionar todas tus órdenes",
+    "search_placeholder": "Buscar por número de orden, listado...",
+    "filter_by_status": "Filtrar por estado",
+    "status": {
+      "all": "Todas",
+      "pending": "Pendiente",
+      "processing": "En Proceso",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "refunded": "Reembolsada"
+    },
+    "table": {
+      "title": "Órdenes",
+      "order_number": "Número de Orden",
+      "listing": "Listado",
+      "listing_id": "ID de Listado",
+      "buyer": "Comprador",
+      "seller": "Vendedor",
+      "price": "Precio",
+      "status": "Estado",
+      "created_at": "Fecha de Creación",
+      "actions": "Acciones",
+      "total_orders": "órdenes en total"
+    },
+    "actions": {
+      "view": "Ver"
+    },
+    "pagination": {
+      "showing": "Mostrando",
+      "of": "de",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "empty": {
+      "no_orders": "No se encontraron órdenes"
+    },
+    "error": {
+      "title": "Error al cargar órdenes",
+      "description": "Hubo un error al cargar tus órdenes. Por favor, intenta de nuevo más tarde."
+    },
+    "details": {
+      "title": "Detalles de la Orden",
+      "back_to_orders": "Volver a Órdenes",
+      "order_information": "Información de la Orden",
+      "listing_information": "Información del Listado",
+      "parties_information": "Información de las Partes",
+      "pricing_summary": "Resumen de Precios",
+      "payment_information": "Información de Pago",
+      "actions": "Acciones",
+      "order_id": "ID de Orden",
+      "order_number": "Número de Orden",
+      "created_at": "Fecha de Creación",
+      "updated_at": "Última Actualización",
+      "paid_at": "Fecha de Pago",
+      "completed_at": "Fecha de Completado",
+      "cancelled_at": "Fecha de Cancelación",
+      "cancellation_reason": "Razón de Cancelación",
+      "listing_title": "Título del Listado",
+      "listing_id": "ID del Listado",
+      "listing_price": "Precio del Listado",
+      "buyer": "Comprador",
+      "seller": "Vendedor",
+      "platform_fee": "Tarifa de Plataforma",
+      "final_price": "Precio Final",
+      "seller_amount": "Monto del Vendedor",
+      "payment_method": "Método de Pago",
+      "transaction_id": "ID de Transacción",
+      "cancel_order": "Cancelar Orden",
+      "complete_order": "Completar Orden",
+      "request_refund": "Solicitar Reembolso",
+      "cancel_success": "Orden Cancelada",
+      "cancel_success_desc": "La orden ha sido cancelada exitosamente.",
+      "cancel_error": "Error al Cancelar",
+      "cancel_error_desc": "No se pudo cancelar la orden. Por favor, intenta de nuevo.",
+      "complete_success": "Orden Completada",
+      "complete_success_desc": "La orden ha sido marcada como completada.",
+      "complete_error": "Error al Completar",
+      "complete_error_desc": "No se pudo completar la orden. Por favor, intenta de nuevo.",
+      "refund_success": "Reembolso Solicitado",
+      "refund_success_desc": "Tu solicitud de reembolso ha sido enviada exitosamente.",
+      "refund_error": "Error al Solicitar Reembolso",
+      "refund_error_desc": "No se pudo solicitar el reembolso. Por favor, intenta de nuevo.",
+      "cancel_dialog": {
+        "title": "Cancelar Orden",
+        "description": "¿Estás seguro de que deseas cancelar esta orden? Esta acción no se puede deshacer."
+      },
+      "refund_dialog": {
+        "title": "Solicitar Reembolso",
+        "description": "¿Estás seguro de que deseas solicitar un reembolso para esta orden?"
+      },
+      "error": {
+        "title": "Orden No Encontrada",
+        "description": "La orden que buscas no existe o no tienes permiso para verla."
+      }
+    }
   }
 }

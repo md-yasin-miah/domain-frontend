@@ -1183,5 +1183,103 @@
       "medium": "Medium",
       "high": "High"
     }
+  },
+  "orders": {
+    "all_orders": "All Orders",
+    "description": "View and manage all your orders",
+    "search_placeholder": "Search by order number, listing...",
+    "filter_by_status": "Filter by status",
+    "status": {
+      "all": "All",
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "table": {
+      "title": "Orders",
+      "order_number": "Order Number",
+      "listing": "Listing",
+      "listing_id": "Listing ID",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "price": "Price",
+      "status": "Status",
+      "created_at": "Created At",
+      "actions": "Actions",
+      "total_orders": "total orders"
+    },
+    "actions": {
+      "view": "View"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "empty": {
+      "no_orders": "No orders found"
+    },
+    "error": {
+      "title": "Error loading orders",
+      "description": "There was an error loading your orders. Please try again later."
+    },
+    "details": {
+      "title": "Order Details",
+      "back_to_orders": "Back to Orders",
+      "order_information": "Order Information",
+      "listing_information": "Listing Information",
+      "parties_information": "Parties Information",
+      "pricing_summary": "Pricing Summary",
+      "payment_information": "Payment Information",
+      "actions": "Actions",
+      "order_id": "Order ID",
+      "order_number": "Order Number",
+      "created_at": "Created At",
+      "updated_at": "Updated At",
+      "paid_at": "Paid At",
+      "completed_at": "Completed At",
+      "cancelled_at": "Cancelled At",
+      "cancellation_reason": "Cancellation Reason",
+      "listing_title": "Listing Title",
+      "listing_id": "Listing ID",
+      "listing_price": "Listing Price",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "platform_fee": "Platform Fee",
+      "final_price": "Final Price",
+      "seller_amount": "Seller Amount",
+      "payment_method": "Payment Method",
+      "transaction_id": "Transaction ID",
+      "cancel_order": "Cancel Order",
+      "complete_order": "Complete Order",
+      "request_refund": "Request Refund",
+      "cancel_success": "Order Cancelled",
+      "cancel_success_desc": "The order has been cancelled successfully.",
+      "cancel_error": "Cancellation Failed",
+      "cancel_error_desc": "Failed to cancel the order. Please try again.",
+      "complete_success": "Order Completed",
+      "complete_success_desc": "The order has been marked as completed.",
+      "complete_error": "Completion Failed",
+      "complete_error_desc": "Failed to complete the order. Please try again.",
+      "refund_success": "Refund Requested",
+      "refund_success_desc": "Your refund request has been submitted successfully.",
+      "refund_error": "Refund Request Failed",
+      "refund_error_desc": "Failed to request refund. Please try again.",
+      "cancel_dialog": {
+        "title": "Cancel Order",
+        "description": "Are you sure you want to cancel this order? This action cannot be undone."
+      },
+      "refund_dialog": {
+        "title": "Request Refund",
+        "description": "Are you sure you want to request a refund for this order?"
+      },
+      "error": {
+        "title": "Order Not Found",
+        "description": "The order you're looking for doesn't exist or you don't have permission to view it."
+      }
+    }
   }
 }
