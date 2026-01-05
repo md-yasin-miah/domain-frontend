@@ -48,9 +48,6 @@ export const useAuth = () => {
       const storedRefreshToken = localStorage.getItem('refresh_token');
 
       if (!token || !storedToken) {
-        console.error('Token not found in store or localStorage after setToken dispatch');
-        console.error('Store token:', token ? 'exists' : 'missing');
-        console.error('localStorage token:', storedToken ? 'exists' : 'missing');
         throw new Error('Token was not set in store after login');
       }
 
