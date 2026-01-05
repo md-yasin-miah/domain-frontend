@@ -832,7 +832,13 @@
     "retry": "Retry",
     "previous": "Previous",
     "next": "Next",
-    "close": "Close"
+    "close": "Close",
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next"
+    }
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -1216,6 +1222,7 @@
     "pagination": {
       "showing": "Showing",
       "of": "of",
+      "per_page": "Per page",
       "previous": "Previous",
       "next": "Next"
     },

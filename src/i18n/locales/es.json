@@ -206,7 +206,13 @@
     "retry": "Reintentar",
     "previous": "Anterior",
     "next": "Siguiente",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "pagination": {
+      "showing": "Mostrando",
+      "of": "de",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    }
   },
   "dashboard": {
     "welcome": "Panel de Control",
@@ -659,6 +665,7 @@
     "pagination": {
       "showing": "Mostrando",
       "of": "de",
+      "per_page": "Por página",
       "previous": "Anterior",
       "next": "Siguiente"
     },

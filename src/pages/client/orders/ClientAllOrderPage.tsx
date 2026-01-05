@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { Search, Package, Loader2, Eye, FileText } from "lucide-react";
 import { useGetOrdersQuery } from '@/store/api/ordersApi';
 import { useAuth } from '@/store/hooks/useAuth';
@@ -14,6 +14,7 @@ import { formatCurrency, timeFormat, getStatusColor, getStatusBadgeVariant } fro
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/constant';
+import { usePagination } from '@/hooks/usePagination';
 
 type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
 
@@ -22,24 +23,14 @@ const ClientAllOrderPage = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({ initialPage: 1, initialPageSize: 10 });
 
   // Build query params
   const queryParams = useMemo(() => {
     const params: OrderFilters = {
       page,
-      size: pageSize,
+      size,
     };
-
-    // Filter by current user (as buyer or seller)
-    if (user?.id) {
-      // You might want to filter by buyer_id or seller_id based on your needs
-      // For now, let's show all orders where user is buyer or seller
-      // params.buyer_id = user.id; // Uncomment if you want only buyer orders
-      // params.seller_id = user.id; // Uncomment if you want only seller orders
-    }
-
     if (statusFilter !== 'all') {
       params.status = statusFilter;
     }
@@ -49,7 +40,7 @@ const ClientAllOrderPage = () => {
     }
 
     return params;
-  }, [page, pageSize, statusFilter, searchTerm, user?.id]);
+  }, [page, size, statusFilter, searchTerm]);
 
   const { data: ordersData, isLoading, error } = useGetOrdersQuery(queryParams);
   // Define table columns
@@ -157,76 +148,60 @@ const ClientAllOrderPage = () => {
     </Button>
   );
 
-  // Handle pagination
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const totalPages = ordersData?.pagination?.total_pages || 1;
-  const currentPage = ordersData?.pagination?.page || page;
-
   return (
     <div className="space-y-6 container mx-auto">
-      {/* Header */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
-        <div className="col-span-12 md:col-span-5">
-          <h1 className="text-3xl font-bold">{t('orders.all_orders')}</h1>
-          <p className="text-muted-foreground mt-2">
-            {t('orders.description')}
-          </p>
-        </div>
-        {/* Filters and Search */}
-        <div className="col-span-12 md:col-span-7">
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-            <div className="flex-1 w-full md:w-auto">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t('orders.search_placeholder')}
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setPage(1); // Reset to first page on search
-                  }}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Select
-                value={statusFilter}
-                onValueChange={(value) => {
-                  setStatusFilter(value as OrderStatus | 'all');
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={t('orders.filter_by_status')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('orders.status.all')}</SelectItem>
-                  <SelectItem value="pending">{t('orders.status.pending')}</SelectItem>
-                  <SelectItem value="processing">{t('orders.status.processing')}</SelectItem>
-                  <SelectItem value="completed">{t('orders.status.completed')}</SelectItem>
-                  <SelectItem value="cancelled">{t('orders.status.cancelled')}</SelectItem>
-                  <SelectItem value="refunded">{t('orders.status.refunded')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Orders Table */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>{t('orders.table.title')}</CardTitle>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="col-span-12 md:col-span-6 flex flex-col gap-2">
+              <CardTitle>{t('orders.all_orders')}</CardTitle>
               <CardDescription>
-                {ordersData?.pagination?.total || 0} {t('orders.table.total_orders')}
+                {t('orders.description')}{' '}
+                <span className="text-xs  bg-primary/10 px-2 py-1 rounded-md">
+                  {ordersData?.pagination?.total || 0} {t('orders.table.total_orders')}
+                </span>
               </CardDescription>
+            </div>
+            {/* Filters and Search */}
+            <div className="col-span-12 md:col-span-6">
+              <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+                <div className="flex-1 w-full md:w-auto">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={t('orders.search_placeholder')}
+                      value={searchTerm}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        handlePageChange(1); // Reset to first page on search
+                      }}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(value) => {
+                      setStatusFilter(value as OrderStatus | 'all');
+                      handlePageChange(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder={t('orders.filter_by_status')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('orders.status.all')}</SelectItem>
+                      <SelectItem value="pending">{t('orders.status.pending')}</SelectItem>
+                      <SelectItem value="processing">{t('orders.status.processing')}</SelectItem>
+                      <SelectItem value="completed">{t('orders.status.completed')}</SelectItem>
+                      <SelectItem value="cancelled">{t('orders.status.cancelled')}</SelectItem>
+                      <SelectItem value="refunded">{t('orders.status.refunded')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -263,55 +238,15 @@ const ClientAllOrderPage = () => {
               />
 
               {/* Pagination */}
-              {ordersData && ordersData.pagination && ordersData.pagination.total_pages > 1 && (
-                <div className="flex items-center justify-between mt-6">
-                  <div className="text-sm text-muted-foreground">
-                    {t('orders.pagination.showing')} {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, ordersData.pagination.total)} {t('orders.pagination.of')} {ordersData.pagination.total}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={!ordersData.pagination.has_previous || isLoading}
-                    >
-                      {t('orders.pagination.previous')}
-                    </Button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNum: number;
-                        if (totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (currentPage >= totalPages - 2) {
-                          pageNum = totalPages - 4 + i;
-                        } else {
-                          pageNum = currentPage - 2 + i;
-                        }
-                        return (
-                          <Button
-                            key={pageNum}
-                            variant={currentPage === pageNum ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handlePageChange(pageNum)}
-                            disabled={isLoading}
-                          >
-                            {pageNum}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={!ordersData.pagination.has_next || isLoading}
-                    >
-                      {t('orders.pagination.next')}
-                    </Button>
-                  </div>
-                </div>
+              {ordersData && ordersData.pagination && (
+                <TablePagination
+                  pagination={ordersData.pagination}
+                  pageSize={size}
+                  isLoading={isLoading}
+                  onPageChange={handlePageChange}
+                  onPageSizeChange={handlePageSizeChange}
+                  translationKey="orders.pagination"
+                />
               )}
             </>
           )}
