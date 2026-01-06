@@ -32,3 +32,5 @@ interface ApiError {
   errors?: Record<string, string[]>;
   status?: number;
 }
+
+type Currency = 'USD'

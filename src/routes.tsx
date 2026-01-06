@@ -69,6 +69,7 @@ import ClientInvoicePage from "./pages/client/orders/ClientInvoicePage";
 import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
+import ClientOffersPage from "./pages/client/ClientOffersPage";
 
 export const router = createBrowserRouter([
   // Root route
@@ -338,6 +339,10 @@ export const router = createBrowserRouter([
             element: <ClientEscrowsPage />,
           },
         ],
+      },
+      {
+        path: "offers",
+        element: <ClientOffersPage />,
       },
       {
         path: "profile",

@@ -729,7 +729,96 @@
       "error": {
         "title": "Orden No Encontrada",
         "description": "La orden que buscas no existe o no tienes permiso para verla."
-      }
-    }
-  }
-}
+       }
+     }
+   },
+   "offers": {
+     "all_offers": "Todas las Ofertas",
+     "description": "Ver y gestionar todas tus ofertas",
+     "search_placeholder": "Buscar por ID de oferta, listado...",
+     "filter_by_status": "Filtrar por estado",
+     "status": {
+       "all": "Todas",
+       "pending": "Pendiente",
+       "accepted": "Aceptada",
+       "rejected": "Rechazada",
+       "countered": "Contraoferta",
+       "withdrawn": "Retirada"
+     },
+     "table": {
+       "title": "Ofertas",
+       "offer_id": "ID de Oferta",
+       "listing": "Listado",
+       "listing_id": "ID de Listado",
+       "buyer": "Comprador",
+       "amount": "Monto",
+       "listing_price": "Precio del Listado",
+       "status": "Estado",
+       "expires_at": "Expira",
+       "created_at": "Fecha de Creación",
+       "actions": "Acciones",
+       "total_offers": "ofertas en total",
+       "no_expiry": "Sin expiración"
+     },
+     "actions": {
+       "accept": "Aceptar",
+       "reject": "Rechazar",
+       "counter": "Contraoferta",
+       "withdraw": "Retirar",
+       "view": "Ver",
+       "accept_success": "Oferta Aceptada",
+       "accept_success_desc": "La oferta ha sido aceptada exitosamente.",
+       "accept_error": "Error al Aceptar",
+       "accept_error_desc": "No se pudo aceptar la oferta. Por favor, intenta de nuevo.",
+       "reject_success": "Oferta Rechazada",
+       "reject_success_desc": "La oferta ha sido rechazada.",
+       "reject_error": "Error al Rechazar",
+       "reject_error_desc": "No se pudo rechazar la oferta. Por favor, intenta de nuevo.",
+       "counter_success": "Contraoferta Enviada",
+       "counter_success_desc": "Tu contraoferta ha sido enviada exitosamente.",
+       "counter_error": "Error en Contraoferta",
+       "counter_error_desc": "Por favor ingresa un monto válido.",
+       "countering": "Enviando...",
+       "counter_submit": "Enviar Contraoferta",
+       "withdraw_success": "Oferta Retirada",
+       "withdraw_success_desc": "La oferta ha sido retirada exitosamente.",
+       "withdraw_error": "Error al Retirar",
+       "withdraw_error_desc": "No se pudo retirar la oferta. Por favor, intenta de nuevo.",
+       "counter_dialog": {
+         "title": "Contraoferta",
+         "description": "Haz una contraoferta con un monto diferente",
+         "amount": "Monto de Contraoferta",
+         "amount_placeholder": "Ingresa el monto de contraoferta",
+         "message": "Mensaje (Opcional)",
+         "message_placeholder": "Agrega un mensaje a tu contraoferta..."
+       }
+     },
+     "pagination": {
+       "showing": "Mostrando",
+       "of": "de",
+       "per_page": "Por página",
+       "previous": "Anterior",
+       "next": "Siguiente"
+     },
+     "empty": {
+       "no_offers": "No se encontraron ofertas"
+     },
+     "error": {
+       "title": "Error al cargar ofertas",
+       "description": "Hubo un error al cargar tus ofertas. Por favor, intenta de nuevo más tarde."
+     },
+     "details": {
+       "title": "Detalles de la Oferta",
+       "description": "Ver información detallada sobre esta oferta",
+       "listing": "Listado",
+       "buyer": "Comprador",
+       "amount": "Monto",
+       "listing_price": "Precio del Listado",
+       "status": "Estado",
+       "expires_at": "Expira",
+       "created_at": "Fecha de Creación",
+       "updated_at": "Última Actualización",
+       "message": "Mensaje"
+     }
+   }
+ }

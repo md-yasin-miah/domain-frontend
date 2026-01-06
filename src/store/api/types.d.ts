@@ -128,31 +128,6 @@ interface EscrowRefundRequest {
 }
 
 // ============ Offer Types ============
-interface Offer {
-  id: number;
-  listing_id: number;
-  buyer_id: number;
-  seller_id: number;
-  amount: number;
-  currency: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'countered' | 'withdrawn';
-  message: string | null;
-  counter_amount: number | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface OfferCreateRequest {
-  listing_id: number;
-  amount: number;
-  currency: string;
-  message?: string;
-}
-
-interface OfferCounterRequest {
-  amount: number;
-  message?: string;
-}
 
 // ============ Auction Types ============
 interface Auction {

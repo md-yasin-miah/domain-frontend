@@ -320,15 +320,15 @@ export default function ClientDashboard() {
 
       {/* Actions */}
       <div className="flex gap-4 flex-wrap">
-        <Button onClick={() => navigate('/user/soporte')}>
+        <Button onClick={() => navigate(ROUTES.CLIENT.SUPPORT)}>
           <MessageCircle className="h-4 w-4 mr-2" />
           {t('client_dashboard.actions.create_ticket')}
         </Button>
-        <Button variant="outline" onClick={() => navigate('/user/facturas')}>
+        <Button variant="outline" onClick={() => navigate(ROUTES.CLIENT.ORDERS.INVOICES)}>
           <FileText className="h-4 w-4 mr-2" />
           {t('client_dashboard.actions.view_all_invoices')}
         </Button>
-        <Button variant="outline" onClick={() => navigate('/user/mis-dominios')}>
+        <Button variant="outline" onClick={() => navigate(ROUTES.CLIENT.DOMAINS)}>
           <Globe className="h-4 w-4 mr-2" />
           {t('client_dashboard.actions.manage_domains')}
         </Button>
