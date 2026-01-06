@@ -10,7 +10,7 @@ interface UserResponse {
   is_active: boolean;
   is_profile_complete?: boolean;
   profile: UserProfile | null;
-  roles: Role[];
+  roles: string[];
   created_at: string;
 }
 

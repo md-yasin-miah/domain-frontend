@@ -44,13 +44,6 @@ interface ProfileCompletionResponse {
   missing_fields: string[];
 }
 
-// ============ Role Types ============
-interface Role {
-  id: number;
-  name: string;
-  description: string | null;
-}
-
 // ============ Marketplace Types ============
 
 
@@ -313,31 +306,6 @@ interface BuyerDashboard {
   pending_offers: number;
   recent_orders: Order[];
   favorite_listings_data: Listing[];
-}
-
-// ============ User Management Types ============
-interface UserResponse {
-  id: number;
-  username: string;
-  email: string;
-  is_active: boolean;
-  is_profile_complete?: boolean;
-  profile: UserProfile | null;
-  roles: Role[];
-  created_at: string;
-}
-
-interface UserCreateRequest {
-  email: string;
-  username: string;
-  password: string;
-  is_active?: boolean;
-}
-
-interface UserUpdateRequest {
-  email?: string;
-  username?: string;
-  is_active?: boolean;
 }
 
 interface PasswordUpdateRequest {

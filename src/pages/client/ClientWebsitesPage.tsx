@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatNumber, getStatusColor, getMarketStatusLabel, timeFormat } from '@/lib/helperFun';
+import { Link } from 'react-router-dom';
 
 const ClientWebsitesPage = () => {
   const { t } = useTranslation();
@@ -119,10 +120,12 @@ const ClientWebsitesPage = () => {
             <div className="space-y-3">
               <h4 className="font-semibold text-sm text-muted-foreground">{t('websites.sections.quick_actions')}</h4>
               <div className="space-y-2">
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  {t('websites.actions.view_website')}
-                </Button>
+                <Link to={website.website_url} target="_blank">
+                  <Button variant="outline" size="sm" className="w-full justify-start">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    {t('websites.actions.view_website')}
+                  </Button>
+                </Link>
                 <Button variant="outline" size="sm" className="w-full justify-start">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   {t('websites.actions.analytics')}

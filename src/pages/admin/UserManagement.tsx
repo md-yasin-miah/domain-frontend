@@ -51,14 +51,14 @@ import {
   useRemoveRoleMutation,
   useUpdateClientProfileMutation,
 } from '@/store/api/userApi';
-import type { UserResponse, Role as RoleType } from '@/store/api/types';
+import CustomTooltip from '@/components/common/CustomTooltip';
 
 // Local User interface matching the component's needs
 interface User {
   id: string;
   email: string;
   created_at: string;
-  roles: Array<{ id: string; name: string; description: string }>;
+  roles: Role[];
   profile?: {
     id: string;
     full_name: string;
@@ -131,16 +131,12 @@ export default function UserManagement() {
       const fullName = profile
         ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || null
         : null;
-
+      const roles = user.roles.map((role: string) => rolesData?.find((r: Role) => r.name === role));
       return {
         id: String(user.id),
         email: user.email,
         created_at: user.created_at,
-        roles: (user.roles || []).map((role) => ({
-          id: String(role.id),
-          name: role.name,
-          description: role.description || '',
-        })),
+        roles,
         profile: profile && fullName ? {
           id: String(profile.id),
           full_name: fullName,
@@ -153,17 +149,7 @@ export default function UserManagement() {
         } : undefined,
       };
     });
-  }, [usersData]);
-
-  // Transform roles
-  const roles: Array<{ id: string; name: string; description: string }> = useMemo(() => {
-    if (!rolesData) return [];
-    return rolesData.map((role: RoleType) => ({
-      id: String(role.id),
-      name: role.name,
-      description: role.description || '',
-    }));
-  }, [rolesData]);
+  }, [usersData, rolesData]);
 
   const loading = isLoadingUsers || isLoadingRoles;
   const formLoading = isCreatingUser || isDeletingUser;
@@ -321,7 +307,7 @@ export default function UserManagement() {
 
     try {
       // Check if user already has this role
-      const hasRole = selectedUser.roles.some(r => r.id === selectedRoleId);
+      const hasRole = selectedUser.roles.some(r => r.id?.toString() === selectedRoleId);
       if (hasRole) {
         toast({
           title: 'Already Assigned',
@@ -393,7 +379,7 @@ export default function UserManagement() {
       company_name: profile?.company_name || '',
       company_address: profile?.company_address || '',
       company_details: profile?.company_details || '',
-      role_id: user.roles[0]?.id || '',
+      role_id: user.roles[0]?.id?.toString() || '',
     });
     setShowEditDialog(true);
   };
@@ -480,8 +466,8 @@ export default function UserManagement() {
     {
       id: 'roles',
       header: t('admin.user_management.roles'),
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-2">
+      cell: ({ row }) => {
+        return <div className="flex flex-wrap gap-2">
           {row.roles.length === 0 ? (
             <Badge variant="outline" className="text-muted-foreground">
               {t('admin.user_management.no_roles')}
@@ -493,12 +479,11 @@ export default function UserManagement() {
                 className={getRoleBadgeColor(role.name)}
                 variant="secondary"
               >
-                <Shield className="h-3 w-3 mr-1" />
                 {role.name}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRemoveRole(row.id, role.id);
+                    handleRemoveRole(row.id, role.id.toString());
                   }}
                   className="ml-2 hover:text-destructive"
                   title="Remove role"
@@ -509,7 +494,7 @@ export default function UserManagement() {
             ))
           )}
         </div>
-      ),
+      },
       enableSorting: false,
     },
     {
@@ -540,10 +525,11 @@ export default function UserManagement() {
         }}
       >
         <DialogTrigger asChild>
-          <Button size="sm" variant="outline">
-            <UserPlus className="h-4 w-4 mr-2" />
-            {t('admin.user_management.assign_role')}
-          </Button>
+          <CustomTooltip content={t('admin.user_management.assign_role')}>
+            <Button size="sm" variant="outline">
+              <UserPlus className="h-4 w-4" />
+            </Button>
+          </CustomTooltip>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -586,8 +572,8 @@ export default function UserManagement() {
                   <SelectValue placeholder={t('admin.user_management.assign_role_dialog.choose_role')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {roles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
+                  {rolesData.map((role: Role) => (
+                    <SelectItem key={role.id} value={role.id.toString()}>
                       <div className="flex items-center gap-2">
                         <Shield className="h-4 w-4" />
                         <div>
@@ -613,8 +599,8 @@ export default function UserManagement() {
         variant="outline"
         onClick={() => openEditDialog(user)}
       >
-        <Edit className="h-4 w-4 mr-2" />
-        {t('admin.user_management.edit_user')}
+        <Edit className="h-4 w-4" />
+        {/* {t('admin.user_management.edit_user')} */}
       </Button>
       <Button
         size="sm"
@@ -624,8 +610,8 @@ export default function UserManagement() {
           setShowDeleteDialog(true);
         }}
       >
-        <Trash2 className="h-4 w-4 mr-2" />
-        {t('admin.user_management.delete_user')}
+        <Trash2 className="h-4 w-4" />
+        {/* {t('admin.user_management.delete_user')} */}
       </Button>
     </div>
   );
@@ -711,8 +697,8 @@ export default function UserManagement() {
                         <SelectValue placeholder={t('admin.user_management.create_dialog.select_role')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role.id} value={role.id}>
+                        {rolesData.map((role: Role) => (
+                          <SelectItem key={role.id} value={role.id.toString()}>
                             {role.name}
                           </SelectItem>
                         ))}
