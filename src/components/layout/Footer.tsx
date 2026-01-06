@@ -11,7 +11,7 @@ export function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <img
-              src="/lovable-uploads/c4e923e1-17e4-42b9-90b4-d79eed7fcc19.png"
+              src="/uploads/logo-full.png"
               alt="ADOMINIOZ"
               className="h-8 w-auto"
             />

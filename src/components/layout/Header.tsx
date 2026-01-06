@@ -79,7 +79,7 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
           <div className="flex items-center shrink-0">
             <Link to="/" className="flex flex-col items-start hover:opacity-80 transition-opacity group">
               <img
-                src="/lovable-uploads/c4e923e1-17e4-42b9-90b4-d79eed7fcc19.png"
+                src="/uploads/logo-full.png"
                 alt="ADOMINIOZ"
                 className="h-10 w-auto transition-transform group-hover:scale-105"
               />

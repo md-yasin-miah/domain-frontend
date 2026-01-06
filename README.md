@@ -1,73 +1,322 @@
-# Welcome to your Lovable project
+# ADOMINIOZ - Digital Asset Marketplace Platform
 
-## Project info
+A comprehensive digital asset trading platform built with React, TypeScript, and modern web technologies. ADOMINIOZ provides a secure marketplace for buying and selling digital assets including domains, websites, mobile apps, NFTs, e-commerce stores, and more.
 
-**URL**: https://lovable.dev/projects/42c6da84-231b-4295-a562-1d97a1732a52
+## 🚀 Features
 
-## How can I edit this code?
+### Core Functionality
 
-There are several ways of editing your application.
+- **Digital Asset Marketplace**: Browse and trade premium digital assets
 
-**Use Lovable**
+  - Domains
+  - Websites
+  - Mobile Apps
+  - E-commerce Stores
+  - Software/SaaS
+  - NFTs
+  - Databases
+  - Digital Channels (YouTube, TikTok, Social Media)
+  - FBA Stores
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/42c6da84-231b-4295-a562-1d97a1732a52) and start prompting.
+- **User Management**
 
-Changes made via Lovable will be committed automatically to this repo.
+  - Role-based access control (Admin, Seller, Buyer, Broker)
+  - User authentication and authorization
+  - Profile management
+  - Verification system
 
-**Use your preferred IDE**
+- **Trading Features**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+  - Offers management (create, accept, reject, counter)
+  - Order processing
+  - Escrow services
+  - Payment management
+  - Invoice generation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Client Dashboard**
 
-Follow these steps:
+  - Domain management
+  - Order tracking
+  - Invoice management
+  - Support tickets
+  - Offers overview
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Admin Panel**
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+  - User management
+  - Content management (Blog, FAQ)
+  - Marketplace administration
+  - Role and permissions management
+  - Analytics and reporting
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Support System**
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+  - Ticket creation and management
+  - Category-based support
+  - Priority levels
+  - Agent assignment
+
+- **Internationalization**
+  - Multi-language support (English, Spanish)
+  - Dynamic language switching
+
+## 🛠️ Technology Stack
+
+### Frontend
+
+- **React 18.3** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **React Router DOM** - Routing
+- **Redux Toolkit** - State management
+- **React Query (RTK Query)** - Data fetching and caching
+
+### UI Components
+
+- **Radix UI** - Accessible component primitives
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Component library
+- **Lucide React** - Icon library
+- **Framer Motion** - Animation library
+
+### Forms & Validation
+
+- **React Hook Form** - Form management
+- **Zod** - Schema validation
+- **@hookform/resolvers** - Form validation integration
+
+### Rich Text Editing
+
+- **TipTap** - Rich text editor
+- **TipTap Extensions** - Image, link, placeholder support
+
+### Internationalization
+
+- **i18next** - Internationalization framework
+- **react-i18next** - React integration
+
+### Additional Libraries
+
+- **Moment.js** - Date formatting
+- **Recharts** - Data visualization
+- **Sonner** - Toast notifications
+
+## 📋 Prerequisites
+
+- **Node.js** >= 18.x
+- **npm** >= 9.x or **yarn** >= 1.22.x
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+
+## 🔧 Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd domain-frontend
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Environment Setup**
+   Create a `.env` file in the root directory with the following variables:
+
+   ```env
+   VITE_API_BASE_URL=your_api_base_url
+   VITE_APP_NAME=ADOMINIOZ
+   ```
+
+4. **Start development server**
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+   The application will be available at `http://localhost:8080`
+
+## 📜 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build for development
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## 📁 Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── admin/         # Admin-specific components
+│   ├── auth/          # Authentication components
+│   ├── layout/        # Layout components (Header, Footer, Sidebar)
+│   └── ui/            # Base UI components (shadcn/ui)
+├── pages/             # Page components
+│   ├── admin/         # Admin pages
+│   ├── auth/          # Authentication pages
+│   ├── client/        # Client dashboard pages
+│   ├── marketplace/   # Marketplace pages
+│   └── resources/     # Blog, guides, etc.
+├── store/             # Redux store
+│   ├── api/           # RTK Query API slices
+│   ├── hooks/         # Redux hooks
+│   └── slices/        # Redux slices
+├── types/             # TypeScript type definitions
+│   └── api/           # API type definitions
+├── hooks/             # Custom React hooks
+├── lib/               # Utility functions
+├── i18n/              # Internationalization
+│   └── locales/       # Translation files
+├── routes.tsx         # Route configuration
+└── App.tsx           # Main application component
 ```
 
-**Edit a file directly in GitHub**
+## 🔐 Authentication & Authorization
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The application uses role-based access control (RBAC) with the following roles:
 
-**Use GitHub Codespaces**
+- **Super Admin** - Full system access
+- **Admin** - Administrative access
+- **Seller** - Can list and sell assets
+- **Buyer** - Can purchase assets
+- **Broker** - Can facilitate transactions
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Protected routes are handled by the `ProtectedRoute` component.
 
-## What technologies are used for this project?
+## 🌐 Internationalization
 
-This project is built with:
+The application supports multiple languages:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- English (en)
+- Spanish (es)
 
-## How can I deploy this project?
+Translation files are located in `src/i18n/locales/`. To add a new language:
 
-Simply open [Lovable](https://lovable.dev/projects/42c6da84-231b-4295-a562-1d97a1732a52) and click on Share -> Publish.
+1. Create a new JSON file in `src/i18n/locales/`
+2. Add the language to `src/i18n/config.ts`
 
-## Can I connect a custom domain to my Lovable project?
+## 🎨 Styling
 
-Yes, you can!
+The project uses Tailwind CSS with custom configuration. Component styles follow the shadcn/ui pattern with:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- CSS variables for theming
+- Dark mode support (via next-themes)
+- Responsive design utilities
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📡 API Integration
+
+API integration is handled through RTK Query with the following main API slices:
+
+- `authApi` - Authentication
+- `marketplaceApi` - Marketplace listings
+- `offersApi` - Offer management
+- `ordersApi` - Order processing
+- `supportApi` - Support tickets
+- `userApi` - User management
+- `blogApi` - Blog/CMS
+- And more...
+
+## 🚦 Routing
+
+Routes are configured in `src/routes.tsx` using React Router v6. The application has three main route groups:
+
+1. **Public routes** - Home, marketplace, legal pages
+2. **Client routes** - Protected client dashboard (`/client/*`)
+3. **Admin routes** - Protected admin panel (`/admin/*`)
+
+## 🧪 Development Guidelines
+
+### Code Style
+
+- Use TypeScript for all new files
+- Follow React best practices (functional components, hooks)
+- Use ESLint for code quality
+- Follow the existing component structure
+
+### Component Structure
+
+```typescript
+// Component example
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
+const MyComponent = () => {
+  const { t } = useTranslation();
+  const [state, setState] = useState();
+
+  return <div>{/* Component JSX */}</div>;
+};
+
+export default MyComponent;
+```
+
+### Adding New Features
+
+1. Create components in appropriate directories
+2. Add routes in `src/routes.tsx`
+3. Add API endpoints in `src/store/api/`
+4. Add TypeScript types in `src/types/`
+5. Add translations in `src/i18n/locales/`
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Port already in use**
+
+```bash
+# Change port in vite.config.ts or use:
+npm run dev -- --port 3000
+```
+
+**Build errors**
+
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Type errors**
+
+```bash
+# Regenerate TypeScript definitions
+npm run build
+```
+
+## 📝 License
+
+[Add your license information here]
+
+## 👥 Contributors
+
+[Add contributor information here]
+
+## 📞 Support
+
+For support, please:
+
+- Create a support ticket in the application
+- Contact the development team
+- Check the FAQ section
+
+## 🔄 Version History
+
+- **v0.0.0** - Initial release
+  - Core marketplace functionality
+  - User authentication
+  - Admin panel
+  - Support system
+  - Multi-language support
+
+---
+
+Built with ❤️ by the ADOMINIOZ team

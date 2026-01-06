@@ -18,7 +18,7 @@ const Index = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src="/lovable-uploads/9851ebbe-e0c7-4f47-85b7-5a275776e711.png"
+            src="/uploads/hero-bg.png"
             alt="El futuro del comercio digital"
             className="w-full h-full object-cover"
           />
@@ -478,7 +478,7 @@ const Index = () => {
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
                 <img
-                  src="/lovable-uploads/c4e923e1-17e4-42b9-90b4-d79eed7fcc19.png"
+                  src="/uploads/logo-full.png"
                   alt="ADOMINIOZ"
                   className="h-12 w-auto"
                 />
