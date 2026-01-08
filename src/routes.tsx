@@ -1,4 +1,4 @@
-import { ROUTES } from "./lib/constant";
+import { ROUTES } from "./lib/routes";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import AdminLayout from "./components/layout/AdminLayout";
@@ -6,8 +6,8 @@ import ClientLayout from "./components/layout/ClientLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
-import DominiosPage from "./pages/marketplace/Dominios";
-import SitiosPage from "./pages/marketplace/Sitios";
+import DomainsPage from "./pages/marketplace/Domains";
+import WebsitesPage from "./pages/marketplace/WebsitesPage";
 import NotFound from "./pages/NotFound";
 import Terminos from "./pages/legal/Terminos";
 import Privacidad from "./pages/legal/Privacidad";
@@ -97,19 +97,19 @@ export const router = createBrowserRouter([
             element: <Marketplace />,
           },
           {
-            path: "dominios",
-            element: <DominiosPage />,
+            path: "domains",
+            element: <DomainsPage />,
           },
           {
-            path: "sitios",
-            element: <SitiosPage />,
+            path: "websites",
+            element: <WebsitesPage />,
           },
           {
             path: "apps",
             element: <Apps />,
           },
           {
-            path: "fba",
+            path: "fba-stores",
             element: <FBA />,
           },
           {
@@ -492,9 +492,6 @@ export const router = createBrowserRouter([
   // Catch all
   {
     path: "*",
-    element: (
-      <NotFound />
-    ),
+    element: <NotFound />,
   },
 ]);
-

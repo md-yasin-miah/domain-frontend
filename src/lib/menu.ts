@@ -25,19 +25,19 @@ import {
   BookOpen,
   Home,
 } from 'lucide-react';
-import { ROUTES } from "./constant";
+import { ROUTES } from "./routes";
 import { TFunction } from "i18next";
 
 const getAppMenuItems = (t: TFunction): MenuItem[] => {
   return [
     {
       title: t('nav.home'),
-      url: '/',
+      url: ROUTES.ROOT,
       icon: Home,
     },
     {
       title: t('nav.marketplace'),
-      url: '/marketplace',
+      url: ROUTES.APP.MARKETPLACE,
       icon: ShoppingCart,
     },
     {
@@ -47,55 +47,55 @@ const getAppMenuItems = (t: TFunction): MenuItem[] => {
       subItems: [
         {
           title: t('categories.domains'),
-          url: '/marketplace/dominios',
+          url: ROUTES.APP.CATEGORIES.DOMAINS,
           icon: Server,
           description: t('categories.domains_desc'),
         },
         {
           title: t('categories.websites'),
-          url: '/marketplace/sitios',
+          url: ROUTES.APP.CATEGORIES.WEBSITES,
           icon: Globe,
           description: t('categories.websites_desc'),
         },
         {
           title: t('categories.fba_stores'),
-          url: '/marketplace/fba',
+          url: ROUTES.APP.CATEGORIES.FBA_STORES,
           icon: Smartphone,
           description: t('categories.fba_stores_desc'),
         },
         {
           title: t('categories.mobile_apps'),
-          url: '/marketplace/apps',
+          url: ROUTES.APP.CATEGORIES.APPS,
           icon: Code,
           description: t('categories.mobile_apps_desc'),
         },
         {
           title: t('categories.ecommerce'),
-          url: '/categories/ecommerce',
+          url: ROUTES.APP.CATEGORIES.E_COMMERCE,
           icon: ShoppingCart,
           description: t('categories.ecommerce_desc'),
         },
         {
           title: t('categories.software_saas'),
-          url: '/categories/software-saas',
+          url: ROUTES.APP.CATEGORIES.SOFTWARE_SAAS,
           icon: Code,
           description: t('categories.software_saas_desc'),
         },
         {
           title: t('categories.databases'),
-          url: '/categories/databases',
+          url: ROUTES.APP.CATEGORIES.DATABASES,
           icon: Database,
           description: t('categories.databases_desc'),
         },
         {
           title: t('categories.digital_channels'),
-          url: '/categories/digital-channels',
+          url: ROUTES.APP.CATEGORIES.DIGITAL_CHANNELS,
           icon: Globe,
           description: t('categories.digital_channels_desc'),
         },
         {
           title: t('categories.nfts'),
-          url: '/categories/nfts',
+          url: ROUTES.APP.CATEGORIES.NFTs,
           icon: Gem,
           description: t('categories.nfts_desc'),
         },
@@ -173,18 +173,23 @@ const getClientMenuItems = (t: TFunction): MenuItem[] => {
       icon: ShoppingCart,
       subItems: [
         {
+          title: t('nav.myListings'),
+          url: ROUTES.CLIENT.MARKETPLACE.ROOT,
+          icon: ShoppingCart,
+        },
+        {
           title: t('nav.apps'),
-          url: ROUTES.CLIENT.APPS,
+          url: ROUTES.CLIENT.MARKETPLACE.APPS,
           icon: Smartphone,
         },
         {
           title: t('nav.domains'),
-          url: ROUTES.CLIENT.DOMAINS,
+          url: ROUTES.CLIENT.MARKETPLACE.DOMAINS,
           icon: Server,
         },
         {
           title: t('nav.websites'),
-          url: ROUTES.CLIENT.WEBSITES,
+          url: ROUTES.CLIENT.MARKETPLACE.WEBSITES,
           icon: Globe,
         },
       ],

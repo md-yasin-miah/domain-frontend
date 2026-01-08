@@ -1,0 +1,42 @@
+export const ROUTES = {
+  ROOT: '/',
+  APP:{
+    MARKETPLACE: '/marketplace',
+    CATEGORIES:{
+      DOMAINS: '/marketplace/domains',
+      WEBSITES: '/marketplace/websites',
+      APPS: '/marketplace/apps',
+      FBA_STORES: '/marketplace/fba-stores',
+      E_COMMERCE: '/categories/e-commerce',
+      SOFTWARE_SAAS: '/categories/software-saas',
+      DATABASES: '/categories/databases',
+      DIGITAL_CHANNELS: '/categories/digital-channels',
+      NFTs: '/categories/nfts',
+    },
+  },
+  CLIENT: {
+    ROOT: '/client',
+    AUCTIONS: '/client/auctions',
+    DASHBOARD: '/client/dashboard',
+    FAQ: '/client/faq',
+    ORDERS: {
+      INDEX: '/client/orders',
+      ORDER_DETAILS: (id: number) => `/client/orders/${id}`,
+      INVOICES: '/client/orders/invoices',
+      PAYMENTS: '/client/orders/payments',
+      ESCROWS: '/client/orders/escrows',
+    },
+    MARKETPLACE:{
+      ROOT: '/client/marketplace/my-listings',
+      APPS: '/client/marketplace/apps',
+      DOMAINS: '/client/marketplace/domains',
+      WEBSITES: '/client/marketplace/websites',
+    },
+    OFFERS: '/client/offers',
+    PROFILE: '/client/profile',
+    PROFILE_SETUP: '/client/profile-setup',
+    SAVED_SEARCH: '/client/saved-search',
+    SUPPORT: '/client/support',
+    REVIEWS: '/client/reviews',
+  },
+};

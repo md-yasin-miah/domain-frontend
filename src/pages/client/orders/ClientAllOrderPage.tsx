@@ -1,29 +1,54 @@
-import { useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { TablePagination } from "@/components/ui/table-pagination";
 import { Search, Package, Loader2, Eye, FileText } from "lucide-react";
-import { useGetOrdersQuery } from '@/store/api/ordersApi';
-import { useAuth } from '@/store/hooks/useAuth';
-import { formatCurrency, timeFormat, getStatusColor, getStatusBadgeVariant } from '@/lib/helperFun';
-import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '@/lib/constant';
-import { usePagination } from '@/hooks/usePagination';
+import { useGetOrdersQuery } from "@/store/api/ordersApi";
+import { useAuth } from "@/store/hooks/useAuth";
+import {
+  formatCurrency,
+  timeFormat,
+  getStatusColor,
+  getStatusBadgeVariant,
+} from "@/lib/helperFun";
+import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+import { ROUTES } from "@/lib/routes";
+import { usePagination } from "@/hooks/usePagination";
 
-type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
+type OrderStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "cancelled"
+  | "refunded";
 
 const ClientAllOrderPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
-  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({ initialPage: 1, initialPageSize: 10 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
+  });
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -31,7 +56,7 @@ const ClientAllOrderPage = () => {
       page,
       size,
     };
-    if (statusFilter !== 'all') {
+    if (statusFilter !== "all") {
       params.status = statusFilter;
     }
 
@@ -52,9 +77,9 @@ const ClientAllOrderPage = () => {
 
     return [
       {
-        id: 'order_number',
-        accessorKey: 'order_number',
-        header: t('orders.table.order_number'),
+        id: "order_number",
+        accessorKey: "order_number",
+        header: t("orders.table.order_number"),
         cell: ({ row }) => (
           <div className="font-medium">
             <Link
@@ -67,42 +92,46 @@ const ClientAllOrderPage = () => {
         ),
       },
       {
-        id: 'listing',
-        accessorKey: (row) => row.listing?.title || '',
-        header: t('orders.table.listing'),
+        id: "listing",
+        accessorKey: (row) => row.listing?.title || "",
+        header: t("orders.table.listing"),
         cell: ({ row }) => (
           <div>
-            <div className="font-medium">{row.listing?.title || 'N/A'}</div>
+            <div className="font-medium">{row.listing?.title || "N/A"}</div>
             <div className="text-sm text-muted-foreground">
-              {t('orders.table.listing_id')}: {row.listing_id}
+              {t("orders.table.listing_id")}: {row.listing_id}
             </div>
           </div>
         ),
       },
       {
-        id: 'buyer',
-        accessorKey: (row) => row.buyer?.username || row.buyer?.email || '',
-        header: t('orders.table.buyer'),
+        id: "buyer",
+        accessorKey: (row) => row.buyer?.username || row.buyer?.email || "",
+        header: t("orders.table.buyer"),
         cell: ({ row }) => (
           <div>
-            <div className="font-medium">{row.buyer?.username || row.buyer?.email || 'N/A'}</div>
+            <div className="font-medium">
+              {row.buyer?.username || row.buyer?.email || "N/A"}
+            </div>
           </div>
         ),
       },
       {
-        id: 'seller',
-        accessorKey: (row) => row.seller?.username || row.seller?.email || '',
-        header: t('orders.table.seller'),
+        id: "seller",
+        accessorKey: (row) => row.seller?.username || row.seller?.email || "",
+        header: t("orders.table.seller"),
         cell: ({ row }) => (
           <div>
-            <div className="font-medium">{row.seller?.username || row.seller?.email || 'N/A'}</div>
+            <div className="font-medium">
+              {row.seller?.username || row.seller?.email || "N/A"}
+            </div>
           </div>
         ),
       },
       {
-        id: 'final_price',
-        accessorKey: 'final_price',
-        header: t('orders.table.price'),
+        id: "final_price",
+        accessorKey: "final_price",
+        header: t("orders.table.price"),
         cell: ({ row }) => (
           <div className="font-medium">
             {formatCurrency(row.final_price)} {row.currency}
@@ -110,25 +139,25 @@ const ClientAllOrderPage = () => {
         ),
       },
       {
-        id: 'status',
-        accessorKey: 'status',
-        header: t('orders.table.status'),
+        id: "status",
+        accessorKey: "status",
+        header: t("orders.table.status"),
         cell: ({ row }) => (
           <Badge
             variant={getStatusBadgeVariant(row.status)}
-            className={cn('capitalize', getStatusColor(row.status))}
+            className={cn("capitalize", getStatusColor(row.status))}
           >
             {getStatusLabel(row.status)}
           </Badge>
         ),
       },
       {
-        id: 'created_at',
-        accessorKey: 'created_at',
-        header: t('orders.table.created_at'),
+        id: "created_at",
+        accessorKey: "created_at",
+        header: t("orders.table.created_at"),
         cell: ({ row }) => (
           <div className="text-sm">
-            {timeFormat(row.created_at, 'MM/DD/YYYY')}
+            {timeFormat(row.created_at, "MM/DD/YYYY")}
           </div>
         ),
       },
@@ -137,11 +166,7 @@ const ClientAllOrderPage = () => {
 
   // Render actions for each row
   const renderActions = (order: Order) => (
-    <Button
-      variant="ghost"
-      size="sm"
-      asChild
-    >
+    <Button variant="ghost" size="sm" asChild>
       <Link to={ROUTES.CLIENT.ORDERS.ORDER_DETAILS(order.id)}>
         <Eye className="w-4 h-4" />
       </Link>
@@ -155,11 +180,12 @@ const ClientAllOrderPage = () => {
         <CardHeader>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div className="col-span-12 md:col-span-6 flex flex-col gap-2">
-              <CardTitle>{t('orders.all_orders')}</CardTitle>
+              <CardTitle>{t("orders.all_orders")}</CardTitle>
               <CardDescription>
-                {t('orders.description')}{' '}
+                {t("orders.description")}{" "}
                 <span className="text-xs  bg-primary/10 px-2 py-1 rounded-md">
-                  {ordersData?.pagination?.total || 0} {t('orders.table.total_orders')}
+                  {ordersData?.pagination?.total || 0}{" "}
+                  {t("orders.table.total_orders")}
                 </span>
               </CardDescription>
             </div>
@@ -170,7 +196,7 @@ const ClientAllOrderPage = () => {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder={t('orders.search_placeholder')}
+                      placeholder={t("orders.search_placeholder")}
                       value={searchTerm}
                       onChange={(e) => {
                         setSearchTerm(e.target.value);
@@ -184,20 +210,32 @@ const ClientAllOrderPage = () => {
                   <Select
                     value={statusFilter}
                     onValueChange={(value) => {
-                      setStatusFilter(value as OrderStatus | 'all');
+                      setStatusFilter(value as OrderStatus | "all");
                       handlePageChange(1);
                     }}
                   >
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder={t('orders.filter_by_status')} />
+                      <SelectValue placeholder={t("orders.filter_by_status")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t('orders.status.all')}</SelectItem>
-                      <SelectItem value="pending">{t('orders.status.pending')}</SelectItem>
-                      <SelectItem value="processing">{t('orders.status.processing')}</SelectItem>
-                      <SelectItem value="completed">{t('orders.status.completed')}</SelectItem>
-                      <SelectItem value="cancelled">{t('orders.status.cancelled')}</SelectItem>
-                      <SelectItem value="refunded">{t('orders.status.refunded')}</SelectItem>
+                      <SelectItem value="all">
+                        {t("orders.status.all")}
+                      </SelectItem>
+                      <SelectItem value="pending">
+                        {t("orders.status.pending")}
+                      </SelectItem>
+                      <SelectItem value="processing">
+                        {t("orders.status.processing")}
+                      </SelectItem>
+                      <SelectItem value="completed">
+                        {t("orders.status.completed")}
+                      </SelectItem>
+                      <SelectItem value="cancelled">
+                        {t("orders.status.cancelled")}
+                      </SelectItem>
+                      <SelectItem value="refunded">
+                        {t("orders.status.refunded")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -210,7 +248,9 @@ const ClientAllOrderPage = () => {
             <div className="flex items-center justify-center py-12">
               <div className="flex flex-col items-center gap-4">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("common.loading")}
+                </p>
               </div>
             </div>
           ) : error ? (
@@ -218,8 +258,12 @@ const ClientAllOrderPage = () => {
               <div className="flex flex-col items-center gap-4 text-center">
                 <Package className="w-16 h-16 text-muted-foreground" />
                 <div>
-                  <h3 className="text-lg font-semibold">{t('orders.error.title')}</h3>
-                  <p className="text-muted-foreground">{t('orders.error.description')}</p>
+                  <h3 className="text-lg font-semibold">
+                    {t("orders.error.title")}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {t("orders.error.description")}
+                  </p>
                 </div>
               </div>
             </div>
@@ -229,11 +273,13 @@ const ClientAllOrderPage = () => {
                 data={ordersData?.items || []}
                 columns={columns}
                 isLoading={false}
-                emptyMessage={t('orders.empty.no_orders')}
-                emptyIcon={<Package className="w-16 h-16 text-muted-foreground" />}
+                emptyMessage={t("orders.empty.no_orders")}
+                emptyIcon={
+                  <Package className="w-16 h-16 text-muted-foreground" />
+                }
                 getRowId={(row) => String(row.id)}
                 renderActions={renderActions}
-                actionsColumnHeader={t('orders.table.actions')}
+                actionsColumnHeader={t("orders.table.actions")}
                 enableSorting={true}
               />
 

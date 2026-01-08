@@ -1,12 +1,21 @@
 import { useState } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Globe, Users, TrendingUp, DollarSign, Eye, Award } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Globe,
+  Users,
+  TrendingUp,
+  DollarSign,
+  Eye,
+  Award,
+} from "lucide-react";
 
-const Sitios = () => {
+const WebsitesPage = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -21,7 +30,7 @@ const Sitios = () => {
       price: "$45,000",
       rating: 4.9,
       age: "5 años",
-      description: "Blog de tecnología con audiencia técnica especializada"
+      description: "Blog de tecnología con audiencia técnica especializada",
     },
     {
       id: 2,
@@ -33,8 +42,9 @@ const Sitios = () => {
       price: "$120,000",
       rating: 4.8,
       age: "3 años",
-      description: "Tienda de moda online con inventario y proveedores establecidos"
-    }
+      description:
+        "Tienda de moda online con inventario y proveedores establecidos",
+    },
   ];
 
   return (
@@ -62,7 +72,9 @@ const Sitios = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">{site.description}</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                {site.description}
+              </p>
               <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                 <div>
                   <span className="text-muted-foreground">Visitantes:</span>
@@ -82,4 +94,4 @@ const Sitios = () => {
   );
 };
 
-export default Sitios;
+export default WebsitesPage;
