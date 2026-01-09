@@ -1,8 +1,8 @@
 export const ROUTES = {
   ROOT: '/',
-  APP:{
+  APP: {
     MARKETPLACE: '/marketplace',
-    CATEGORIES:{
+    CATEGORIES: {
       DOMAINS: '/marketplace/domains',
       WEBSITES: '/marketplace/websites',
       APPS: '/marketplace/apps',
@@ -26,8 +26,9 @@ export const ROUTES = {
       PAYMENTS: '/client/orders/payments',
       ESCROWS: '/client/orders/escrows',
     },
-    MARKETPLACE:{
-      ROOT: '/client/marketplace/my-listings',
+    MARKETPLACE: {
+      ROOT: '/client/marketplace',
+      MY_LISTINGS: '/client/marketplace/my-listings',
       APPS: '/client/marketplace/apps',
       DOMAINS: '/client/marketplace/domains',
       WEBSITES: '/client/marketplace/websites',

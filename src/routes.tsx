@@ -70,6 +70,7 @@ import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
 import ClientOffersPage from "./pages/client/ClientOffersPage";
+import ClientMyListingsPage from "./pages/client/ClientMyListingsPage";
 
 export const router = createBrowserRouter([
   // Root route
@@ -341,6 +342,31 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "marketplace",
+        children: [
+          {
+            index: true,
+            element: <Navigate to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS} replace />,
+          },
+          {
+            path: "my-listings",
+            element: <ClientMyListingsPage />,
+          },
+          {
+            path: "apps",
+            element: <ClientAppsPage />,
+          },
+          {
+            path: "domains",
+            element: <ClientDomainsPage />,
+          },
+          {
+            path: "websites",
+            element: <ClientWebsitesPage />,
+          },
+        ],
+      },
+      {
         path: "offers",
         element: <ClientOffersPage />,
       },
@@ -353,18 +379,6 @@ export const router = createBrowserRouter([
         element: <ProfileSetup />,
       },
       {
-        path: "domains",
-        element: <ClientDomainsPage />,
-      },
-      {
-        path: "apps",
-        element: <ClientAppsPage />,
-      },
-      {
-        path: "websites",
-        element: <ClientWebsitesPage />,
-      },
-      {
         path: "facturas",
         element: <Facturas />,
       },
@@ -375,6 +389,10 @@ export const router = createBrowserRouter([
       {
         path: "faq",
         element: <FAQ />,
+      },
+      {
+        path: "my-listings",
+        element: <ClientMyListingsPage />,
       },
     ],
   },
