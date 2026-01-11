@@ -829,10 +829,25 @@
       "created_at": "Fecha de Creación",
       "updated_at": "Última Actualización",
       "expires_at": "Fecha de Expiración",
-      "verified_at": "Fecha de Verificación",
-      "attempts": "Intentos de Verificación",
-      "verify_product": "Verificar Producto"
-    },
+       "verified_at": "Fecha de Verificación",
+       "attempts": "Intentos de Verificación",
+       "verify_product": "Verificar Producto"
+     },
+     "verify": {
+       "verifying": "Verificando...",
+       "success": {
+         "title": "Verificación Exitosa",
+         "description": "¡Tu producto ha sido verificado exitosamente!"
+       },
+       "failed": {
+         "title": "Verificación Fallida",
+         "description": "La verificación falló. Por favor, verifica tu registro DNS o la carga del archivo."
+       },
+       "error": {
+         "title": "Error",
+         "description": "Error al verificar el producto. Por favor, inténtalo de nuevo más tarde."
+       }
+     },
     "create": {
       "title": "Crear Verificación de Producto",
       "description": "Crea una nueva verificación de producto para listar tu dominio o sitio web",

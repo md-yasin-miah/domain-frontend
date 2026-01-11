@@ -42,6 +42,7 @@ import {
 import {
   useGetProductVerificationsQuery,
   useCreateProductVerificationMutation,
+  useVerifyProductVerificationMutation,
 } from "@/store/api/productVerification";
 import {
   useGetMarketplaceListingTypesQuery,
@@ -94,6 +95,8 @@ const ClientMyListingsPage = () => {
     useGetMarketplaceListingTypesQuery();
   const [createVerification, { isLoading: isCreating }] =
     useCreateProductVerificationMutation();
+  const [verifyVerification, { isLoading: isVerifying }] =
+    useVerifyProductVerificationMutation();
 
   // Filter verifications
   const filteredVerifications = useMemo(() => {
@@ -160,6 +163,61 @@ const ClientMyListingsPage = () => {
   const handleViewDetails = (verification: ProductVerification) => {
     setSelectedVerification(verification);
     setDetailDialogOpen(true);
+  };
+
+  const handleVerifyProduct = async () => {
+    if (!selectedVerification) return;
+
+    try {
+      const response = await verifyVerification(
+        selectedVerification.id
+      ).unwrap();
+
+      // Update the selected verification with the response
+      setSelectedVerification({
+        ...selectedVerification,
+        status: response.status,
+        verified_at: response.verified_at,
+        verification_attempts: response.verification_attempts,
+        last_verification_check: response.last_verification_check,
+      });
+
+      if (response.is_verified) {
+        toast({
+          title:
+            t("my_listings.verify.success.title") || "Verification Successful",
+          description:
+            t("my_listings.verify.success.description") ||
+            "Your product has been successfully verified!",
+        });
+      } else {
+        toast({
+          title: t("my_listings.verify.failed.title") || "Verification Failed",
+          description:
+            response.message ||
+            t("my_listings.verify.failed.description") ||
+            "Verification failed. Please check your DNS record or file upload.",
+          variant: "destructive",
+        });
+      }
+
+      // Refetch the list to update all verifications
+      refetch();
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "data" in error
+          ? (error as { data?: { message?: string } }).data?.message
+          : undefined;
+
+      toast({
+        title: t("my_listings.verify.error.title") || "Error",
+        description:
+          errorMessage ||
+          t("my_listings.verify.error.description") ||
+          "Failed to verify product. Please try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCreateClick = () => {
@@ -537,7 +595,7 @@ const ClientMyListingsPage = () => {
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.status") || "Status"}
+                      {t("common.status.status") || "Status"}
                     </label>
                     <div className="mt-1">
                       <Badge
@@ -854,13 +912,28 @@ const ClientMyListingsPage = () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button className="bg-green-500 text-white">
-                  {t("my_listings.details.verify_product") || "Verify Product"}
-                  <CheckCircle className="w-4 h-4" />
+                <Button
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                  onClick={handleVerifyProduct}
+                  disabled={isVerifying}
+                >
+                  {isVerifying ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {t("my_listings.verify.verifying") || "Verifying..."}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      {t("my_listings.details.verify_product") ||
+                        "Verify Product"}
+                    </>
+                  )}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setDetailDialogOpen(false)}
+                  disabled={isVerifying}
                 >
                   {t("common.close") || "Close"}
                 </Button>

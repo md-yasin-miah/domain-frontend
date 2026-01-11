@@ -26,12 +26,37 @@ export const productVerificationApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['ProductVerification'],
     }),
+    verifyProductVerification: builder.mutation<ProductVerificationVerifyResponse, number>({
+      query: (verificationId) => ({
+        url: `/product-verification/${verificationId}/verify`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, verificationId) => [
+        { type: 'ProductVerification', id: verificationId },
+        'ProductVerification',
+      ],
+    }),
   }),
 }); 
+
+export interface ProductVerificationVerifyResponse {
+  id: number;
+  status: 'pending' | 'verified' | 'rejected' | 'expired' | 'failed';
+  verification_method: 'dns' | 'file_upload';
+  is_verified: boolean;
+  verified_at: string | null;
+  verification_attempts: number;
+  last_verification_check: string | null;
+  expires_at: string;
+  can_create_listing: boolean;
+  listing_id: number | null;
+  message: string;
+}
 
 export const {
   useGetProductVerificationsQuery,
   useGetProductVerificationQuery,
   useCreateProductVerificationMutation,
+  useVerifyProductVerificationMutation,
 } = productVerificationApi;
 
