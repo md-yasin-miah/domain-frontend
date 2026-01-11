@@ -1383,7 +1383,8 @@
       "updated_at": "Updated At",
       "expires_at": "Expires At",
       "verified_at": "Verified At",
-      "attempts": "Verification Attempts"
+      "attempts": "Verification Attempts",
+      "verify_product": "Verify Product"
     },
     "create": {
       "title": "Create Product Verification",

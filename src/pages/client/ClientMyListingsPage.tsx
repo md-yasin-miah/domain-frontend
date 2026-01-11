@@ -37,6 +37,7 @@ import {
   Copy,
   Download,
   Plus,
+  CheckCircle,
 } from "lucide-react";
 import {
   useGetProductVerificationsQuery,
@@ -810,10 +811,7 @@ const ClientMyListingsPage = () => {
                       {t("my_listings.details.created_at") || "Created At"}
                     </label>
                     <p className="font-medium">
-                      {timeFormat(
-                        selectedVerification.created_at,
-                        "MM/DD/YYYY HH:mm"
-                      )}
+                      {timeFormat(selectedVerification.created_at, "lll")}
                     </p>
                   </div>
                   <div>
@@ -821,10 +819,7 @@ const ClientMyListingsPage = () => {
                       {t("my_listings.details.updated_at") || "Updated At"}
                     </label>
                     <p className="font-medium">
-                      {timeFormat(
-                        selectedVerification.updated_at,
-                        "MM/DD/YYYY HH:mm"
-                      )}
+                      {timeFormat(selectedVerification.updated_at, "lll")}
                     </p>
                   </div>
                   {selectedVerification.expires_at && (
@@ -833,10 +828,7 @@ const ClientMyListingsPage = () => {
                         {t("my_listings.details.expires_at") || "Expires At"}
                       </label>
                       <p className="font-medium">
-                        {timeFormat(
-                          selectedVerification.expires_at,
-                          "MM/DD/YYYY HH:mm"
-                        )}
+                        {timeFormat(selectedVerification.expires_at, "lll")}
                       </p>
                     </div>
                   )}
@@ -846,10 +838,7 @@ const ClientMyListingsPage = () => {
                         {t("my_listings.details.verified_at") || "Verified At"}
                       </label>
                       <p className="font-medium">
-                        {timeFormat(
-                          selectedVerification.verified_at,
-                          "MM/DD/YYYY HH:mm"
-                        )}
+                        {timeFormat(selectedVerification.verified_at, "lll")}
                       </p>
                     </div>
                   )}
@@ -865,6 +854,10 @@ const ClientMyListingsPage = () => {
                 </div>
               </div>
               <DialogFooter>
+                <Button className="bg-green-500 text-white">
+                  {t("my_listings.details.verify_product") || "Verify Product"}
+                  <CheckCircle className="w-4 h-4" />
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => setDetailDialogOpen(false)}

@@ -709,10 +709,10 @@
       "error": {
         "title": "Orden No Encontrada",
         "description": "La orden que buscas no existe o no tienes permiso para verla."
-       }
-     }
-   },
-   "offers": {
+      }
+    }
+  },
+  "offers": {
      "all_offers": "Todas las Ofertas",
      "description": "Ver y gestionar todas tus ofertas",
      "search_placeholder": "Buscar por ID de oferta, listado...",
@@ -783,78 +783,79 @@
        "updated_at": "Última Actualización",
        "message": "Mensaje"
      }
-   },
-   "my_listings": {
-     "subtitle": "Gestiona y rastrea tus verificaciones de productos",
-     "search_placeholder": "Buscar por dominio, URL o código de verificación...",
-     "filter_by_status": "Filtrar por estado",
-     "filter_by_type": "Filtrar por tipo",
-     "verification_method": "Método de Verificación",
-     "file_upload": "Carga de Archivo",
-     "created_at": "Creado",
-     "expires_at": "Expira",
-     "attempts": "Intentos de Verificación",
-     "unknown_domain": "Dominio Desconocido",
-     "unknown_website": "Sitio Web Desconocido",
-     "create_verification": "Crear una verificación de producto",
-     "type": {
-       "all": "Todos los Tipos"
-     },
-     "empty": {
-       "title": "No se encontraron listados",
-       "description": "Aún no has creado ningún listado.",
-       "filtered": "Ningún listado coincide con tus filtros"
-     },
-     "error": {
-       "title": "Error al cargar listados",
-       "description": "Error al cargar tus listados. Por favor, inténtalo de nuevo más tarde."
-     },
-     "details": {
-       "title": "Detalles de Verificación",
-       "description": "Ver información detallada sobre tu verificación",
-       "product_type": "Tipo de Producto",
-       "domain": "Dominio",
-       "website_url": "URL del Sitio Web",
-       "verification_method": "Método de Verificación",
-       "verification_code": "Código de Verificación",
-       "dns_record": "Registro DNS",
-       "dns_type": "Tipo",
-       "dns_name": "Nombre/Host",
-       "dns_value": "Valor",
-       "full_record": "Registro Completo",
-       "verification_file": "Archivo de Verificación",
-       "filename": "Nombre del Archivo",
-       "file_url": "URL del Archivo",
-       "instructions": "Instrucciones",
-       "created_at": "Fecha de Creación",
-       "updated_at": "Última Actualización",
-       "expires_at": "Fecha de Expiración",
-       "verified_at": "Fecha de Verificación",
-       "attempts": "Intentos de Verificación"
-     },
-     "create": {
-       "title": "Crear Verificación de Producto",
-       "description": "Crea una nueva verificación de producto para listar tu dominio o sitio web",
-       "product_type": "Tipo de Producto",
-       "select_product_type": "Seleccionar tipo de producto",
-       "domain_name": "Nombre del Dominio",
-       "domain_extension": "Extensión del Dominio",
-       "domain_extension_hint": "Incluye el punto (ej., .com, .io, .net)",
-       "website_url": "URL del Sitio Web",
-       "website_url_hint": "Ingresa la URL completa incluyendo https://",
-       "submit": "Crear Verificación",
-       "creating": "Creando...",
-       "success": {
-         "title": "Éxito",
-         "description": "Verificación de producto creada exitosamente"
-       },
-       "error": {
-         "title": "Error",
-         "description": "Error al crear la verificación de producto",
-         "product_type_required": "El tipo de producto es requerido",
-         "domain_name_required": "El nombre del dominio es requerido",
-         "website_url_required": "La URL del sitio web es requerida"
-       }
-     }
-   }
- }
+  },
+  "my_listings": {
+    "subtitle": "Gestiona y rastrea tus verificaciones de productos",
+    "search_placeholder": "Buscar por dominio, URL o código de verificación...",
+    "filter_by_status": "Filtrar por estado",
+    "filter_by_type": "Filtrar por tipo",
+    "verification_method": "Método de Verificación",
+    "file_upload": "Carga de Archivo",
+    "created_at": "Creado",
+    "expires_at": "Expira",
+    "attempts": "Intentos de Verificación",
+    "unknown_domain": "Dominio Desconocido",
+    "unknown_website": "Sitio Web Desconocido",
+    "create_verification": "Crear una verificación de producto",
+    "type": {
+      "all": "Todos los Tipos"
+    },
+    "empty": {
+      "title": "No se encontraron listados",
+      "description": "Aún no has creado ningún listado.",
+      "filtered": "Ningún listado coincide con tus filtros"
+    },
+    "error": {
+      "title": "Error al cargar listados",
+      "description": "Error al cargar tus listados. Por favor, inténtalo de nuevo más tarde."
+    },
+    "details": {
+      "title": "Detalles de Verificación",
+      "description": "Ver información detallada sobre tu verificación",
+      "product_type": "Tipo de Producto",
+      "domain": "Dominio",
+      "website_url": "URL del Sitio Web",
+      "verification_method": "Método de Verificación",
+      "verification_code": "Código de Verificación",
+      "dns_record": "Registro DNS",
+      "dns_type": "Tipo",
+      "dns_name": "Nombre/Host",
+      "dns_value": "Valor",
+      "full_record": "Registro Completo",
+      "verification_file": "Archivo de Verificación",
+      "filename": "Nombre del Archivo",
+      "file_url": "URL del Archivo",
+      "instructions": "Instrucciones",
+      "created_at": "Fecha de Creación",
+      "updated_at": "Última Actualización",
+      "expires_at": "Fecha de Expiración",
+      "verified_at": "Fecha de Verificación",
+      "attempts": "Intentos de Verificación",
+      "verify_product": "Verificar Producto"
+    },
+    "create": {
+      "title": "Crear Verificación de Producto",
+      "description": "Crea una nueva verificación de producto para listar tu dominio o sitio web",
+      "product_type": "Tipo de Producto",
+      "select_product_type": "Seleccionar tipo de producto",
+      "domain_name": "Nombre del Dominio",
+      "domain_extension": "Extensión del Dominio",
+      "domain_extension_hint": "Incluye el punto (ej., .com, .io, .net)",
+      "website_url": "URL del Sitio Web",
+      "website_url_hint": "Ingresa la URL completa incluyendo https://",
+      "submit": "Crear Verificación",
+      "creating": "Creando...",
+      "success": {
+        "title": "Éxito",
+        "description": "Verificación de producto creada exitosamente"
+      },
+      "error": {
+        "title": "Error",
+        "description": "Error al crear la verificación de producto",
+        "product_type_required": "El tipo de producto es requerido",
+        "domain_name_required": "El nombre del dominio es requerido",
+        "website_url_required": "La URL del sitio web es requerida"
+      }
+    }
+  }
+}
