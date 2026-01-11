@@ -70,9 +70,14 @@ import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
 import ClientOffersPage from "./pages/client/ClientOffersPage";
+import ClientMyListingsPage from "./pages/client/ClientMyListingsPage";
+import ClientAuctionsPage from "./pages/client/ClientAuctionsPage";
+import ClientSavedSearchPage from "./pages/client/ClientSavedSearchPage";
 
+const getLastPath = (route: string) => {
+  return route.split("/").pop();
+};
 export const router = createBrowserRouter([
-  // Root route
   {
     path: "/",
     element: (
@@ -312,11 +317,11 @@ export const router = createBrowserRouter([
         element: <Navigate to={ROUTES.CLIENT.DASHBOARD} replace />,
       },
       {
-        path: "dashboard",
+        path: getLastPath(ROUTES.CLIENT.DASHBOARD),
         element: <ClientDashboard />,
       },
       {
-        path: "orders",
+        path: getLastPath(ROUTES.CLIENT.ORDERS.INDEX),
         children: [
           {
             index: true,
@@ -327,53 +332,77 @@ export const router = createBrowserRouter([
             element: <ClientOrderDetailsPage />,
           },
           {
-            path: "invoices",
+            path: getLastPath(ROUTES.CLIENT.ORDERS.INVOICES),
             element: <ClientInvoicePage />,
           },
           {
-            path: "payments",
+            path: getLastPath(ROUTES.CLIENT.ORDERS.PAYMENTS),
             element: <ClientPaymentPage />,
           },
           {
-            path: "escrows",
+            path: getLastPath(ROUTES.CLIENT.ORDERS.ESCROWS),
             element: <ClientEscrowsPage />,
           },
         ],
       },
       {
-        path: "offers",
+        path: getLastPath(ROUTES.CLIENT.MARKETPLACE.ROOT),
+        children: [
+          {
+            index: true,
+            element: (
+              <Navigate to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS} replace />
+            ),
+          },
+          {
+            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS),
+            index: true,
+            element: <ClientMyListingsPage />,
+          },
+          {
+            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.APPS),
+            element: <ClientAppsPage />,
+          },
+          {
+            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.DOMAINS),
+            element: <ClientDomainsPage />,
+          },
+          {
+            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.WEBSITES),
+            element: <ClientWebsitesPage />,
+          },
+        ],
+      },
+      {
+        path: getLastPath(ROUTES.CLIENT.OFFERS),
         element: <ClientOffersPage />,
       },
       {
-        path: "profile",
+        path: getLastPath(ROUTES.CLIENT.AUCTIONS),
+        element: <ClientAuctionsPage />,
+      },
+      {
+        path: getLastPath(ROUTES.CLIENT.SAVED_SEARCH),
+        element: <ClientSavedSearchPage />,
+      },
+      {
+        path: getLastPath(ROUTES.CLIENT.PROFILE),
         element: <ClientProfile />,
       },
       {
-        path: "profile-setup",
+        path: getLastPath(ROUTES.CLIENT.PROFILE_SETUP),
         element: <ProfileSetup />,
       },
       {
-        path: "domains",
-        element: <ClientDomainsPage />,
-      },
-      {
-        path: "apps",
-        element: <ClientAppsPage />,
-      },
-      {
-        path: "websites",
-        element: <ClientWebsitesPage />,
-      },
-      {
-        path: "facturas",
+        path: getLastPath(ROUTES.CLIENT.FACTURAS),
         element: <Facturas />,
       },
       {
-        path: "support",
+        path: getLastPath(ROUTES.CLIENT.SUPPORT),
         element: <SupportPage />,
       },
       {
-        path: "faq",
+        path: getLastPath(ROUTES.CLIENT.FAQ),
         element: <FAQ />,
       },
     ],

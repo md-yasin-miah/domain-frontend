@@ -98,7 +98,7 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto">
+      <div>
         <div className="grid gap-6 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
@@ -116,7 +116,7 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="container mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">{t("client_dashboard.title")}</h1>
@@ -217,7 +217,7 @@ export default function ClientDashboard() {
               <div className="space-y-3">
                 {domains?.items?.map((domain, index) => (
                   <div key={index}>
-                    <Link to={ROUTES.CLIENT.DOMAINS}>
+                    <Link to={ROUTES.CLIENT.MARKETPLACE.DOMAINS}>
                       <div className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <h4 className="font-medium">{domain.domain_name}</h4>
@@ -385,7 +385,7 @@ export default function ClientDashboard() {
         </Button>
         <Button
           variant="outline"
-          onClick={() => navigate(ROUTES.CLIENT.DOMAINS)}
+          onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.DOMAINS)}
         >
           <Globe className="h-4 w-4 mr-2" />
           {t("client_dashboard.actions.manage_domains")}

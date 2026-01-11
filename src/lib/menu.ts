@@ -174,7 +174,7 @@ const getClientMenuItems = (t: TFunction): MenuItem[] => {
       subItems: [
         {
           title: t('nav.myListings'),
-          url: ROUTES.CLIENT.MARKETPLACE.ROOT,
+          url: ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS,
           icon: ShoppingCart,
         },
         {

@@ -16,6 +16,7 @@ export const ROUTES = {
   },
   CLIENT: {
     ROOT: '/client',
+    FACTURAS: '/client/facturas',
     AUCTIONS: '/client/auctions',
     DASHBOARD: '/client/dashboard',
     FAQ: '/client/faq',
@@ -27,7 +28,8 @@ export const ROUTES = {
       ESCROWS: '/client/orders/escrows',
     },
     MARKETPLACE:{
-      ROOT: '/client/marketplace/my-listings',
+      ROOT: '/client/marketplace',
+      MY_LISTINGS: '/client/marketplace/my-listings',
       APPS: '/client/marketplace/apps',
       DOMAINS: '/client/marketplace/domains',
       WEBSITES: '/client/marketplace/websites',
