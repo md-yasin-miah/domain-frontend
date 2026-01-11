@@ -40,8 +40,13 @@ import {
 } from "lucide-react";
 import {
   useGetProductVerificationsQuery,
-  type ProductVerification,
-} from "@/store/api/verificationApi";
+  useCreateProductVerificationMutation,
+} from "@/store/api/productVerification";
+import {
+  useGetMarketplaceListingTypesQuery,
+  type ListingType,
+} from "@/store/api/marketplaceApi";
+import { Label } from "@/components/ui/label";
 import {
   getStatusColor,
   getStatusBadgeVariant,
@@ -68,12 +73,24 @@ const ClientMyListingsPage = () => {
   const [selectedVerification, setSelectedVerification] =
     useState<ProductVerification | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [formData, setFormData] = useState<ProductVerificationCreateRequest>({
+    product_type: "",
+    domain_name: "",
+    domain_extension: "",
+    website_url: "",
+  });
 
   const {
     data: verifications,
     isLoading,
     error,
+    refetch,
   } = useGetProductVerificationsQuery({});
+  const { data: listingTypes, isLoading: listingTypesLoading } =
+    useGetMarketplaceListingTypesQuery();
+  const [createVerification, { isLoading: isCreating }] =
+    useCreateProductVerificationMutation();
 
   // Filter verifications
   const filteredVerifications = useMemo(() => {
@@ -161,6 +178,104 @@ const ClientMyListingsPage = () => {
     setDetailDialogOpen(true);
   };
 
+  const handleCreateClick = () => {
+    setCreateDialogOpen(true);
+    setFormData({
+      product_type: "",
+      domain_name: "",
+      domain_extension: "",
+      website_url: "",
+    });
+  };
+
+  const handleFormChange = (
+    field: keyof ProductVerificationCreateRequest,
+    value: string
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateSubmit = async () => {
+    try {
+      // Validate required fields
+      if (!formData.product_type) {
+        toast({
+          title: t("my_listings.create.error.title") || "Validation Error",
+          description:
+            t("my_listings.create.error.product_type_required") ||
+            "Product type is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate domain fields if product type is domain
+      const selectedType = listingTypes?.find(
+        (type) => type.slug === formData.product_type
+      );
+      const isDomainType =
+        selectedType?.slug === "domain" || formData.product_type === "domain";
+
+      if (isDomainType) {
+        if (!formData.domain_name) {
+          toast({
+            title: t("my_listings.create.error.title") || "Validation Error",
+            description:
+              t("my_listings.create.error.domain_name_required") ||
+              "Domain name is required",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else {
+        // For website type
+        if (!formData.website_url) {
+          toast({
+            title: t("my_listings.create.error.title") || "Validation Error",
+            description:
+              t("my_listings.create.error.website_url_required") ||
+              "Website URL is required",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      await createVerification(formData).unwrap();
+      toast({
+        title: t("my_listings.create.success.title") || "Success",
+        description:
+          t("my_listings.create.success.description") ||
+          "Product verification created successfully",
+      });
+      setCreateDialogOpen(false);
+      refetch();
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "data" in error
+          ? (error as { data?: { message?: string } }).data?.message
+          : undefined;
+      toast({
+        title: t("my_listings.create.error.title") || "Error",
+        description:
+          errorMessage ||
+          t("my_listings.create.error.description") ||
+          "Failed to create product verification",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const selectedListingType = listingTypes?.find(
+    (type) => type.slug === formData.product_type
+  );
+  const isDomainType =
+    selectedListingType?.slug === "domain" ||
+    formData.product_type === "domain";
+  const isWebsiteType =
+    selectedListingType?.slug === "website" ||
+    formData.product_type === "website";
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -205,8 +320,8 @@ const ClientMyListingsPage = () => {
               "Manage and track your product verifications"}
           </p>
         </div>
-        <Button>
-          <Plus className="w-4 h-4" />
+        <Button onClick={handleCreateClick}>
+          <Plus className="w-4 h-4 mr-2" />
           {t("my_listings.create_verification")}
         </Button>
       </div>
@@ -776,6 +891,139 @@ const ClientMyListingsPage = () => {
               </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Verification Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
+              {t("my_listings.create.title") || "Create Product Verification"}
+            </DialogTitle>
+            <DialogDescription>
+              {t("my_listings.create.description") ||
+                "Create a new product verification to list your domain or website"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {/* Product Type */}
+            <div className="space-y-2">
+              <Label htmlFor="product_type">
+                {t("my_listings.create.product_type") || "Product Type"} *
+              </Label>
+              <Select
+                value={formData.product_type}
+                onValueChange={(value) =>
+                  handleFormChange("product_type", value)
+                }
+                disabled={listingTypesLoading}
+              >
+                <SelectTrigger id="product_type">
+                  <SelectValue
+                    placeholder={
+                      listingTypesLoading
+                        ? t("common.loading") || "Loading..."
+                        : t("my_listings.create.select_product_type") ||
+                          "Select product type"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {listingTypes
+                    ?.filter((type) => type.is_active)
+                    .map((type) => (
+                      <SelectItem key={type.id} value={type.slug}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              {selectedListingType && (
+                <p className="text-sm text-muted-foreground">
+                  {selectedListingType.description}
+                </p>
+              )}
+            </div>
+
+            {/* Domain Fields */}
+            {isDomainType && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="domain_name">
+                    {t("my_listings.create.domain_name") || "Domain Name"} *
+                  </Label>
+                  <Input
+                    id="domain_name"
+                    placeholder="example"
+                    value={formData.domain_name || ""}
+                    onChange={(e) =>
+                      handleFormChange("domain_name", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="domain_extension">
+                    {t("my_listings.create.domain_extension") ||
+                      "Domain Extension"}
+                  </Label>
+                  <Input
+                    id="domain_extension"
+                    placeholder=".com"
+                    value={formData.domain_extension || ""}
+                    onChange={(e) =>
+                      handleFormChange("domain_extension", e.target.value)
+                    }
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    {t("my_listings.create.domain_extension_hint") ||
+                      "Include the dot (e.g., .com, .io, .net)"}
+                  </p>
+                </div>
+              </>
+            )}
+
+            {/* Website Field */}
+            {isWebsiteType && (
+              <div className="space-y-2">
+                <Label htmlFor="website_url">
+                  {t("my_listings.create.website_url") || "Website URL"} *
+                </Label>
+                <Input
+                  id="website_url"
+                  type="url"
+                  placeholder="https://example.com"
+                  value={formData.website_url || ""}
+                  onChange={(e) =>
+                    handleFormChange("website_url", e.target.value)
+                  }
+                />
+                <p className="text-sm text-muted-foreground">
+                  {t("my_listings.create.website_url_hint") ||
+                    "Enter the full URL including https://"}
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCreateDialogOpen(false)}
+              disabled={isCreating}
+            >
+              {t("common.cancel") || "Cancel"}
+            </Button>
+            <Button onClick={handleCreateSubmit} disabled={isCreating}>
+              {isCreating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t("my_listings.create.creating") || "Creating..."}
+                </>
+              ) : (
+                t("my_listings.create.submit") || "Create Verification"
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

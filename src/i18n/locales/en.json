@@ -1419,6 +1419,30 @@
       "expires_at": "Expires At",
       "verified_at": "Verified At",
       "attempts": "Verification Attempts"
+    },
+    "create": {
+      "title": "Create Product Verification",
+      "description": "Create a new product verification to list your domain or website",
+      "product_type": "Product Type",
+      "select_product_type": "Select product type",
+      "domain_name": "Domain Name",
+      "domain_extension": "Domain Extension",
+      "domain_extension_hint": "Include the dot (e.g., .com, .io, .net)",
+      "website_url": "Website URL",
+      "website_url_hint": "Enter the full URL including https://",
+      "submit": "Create Verification",
+      "creating": "Creating...",
+      "success": {
+        "title": "Success",
+        "description": "Product verification created successfully"
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to create product verification",
+        "product_type_required": "Product type is required",
+        "domain_name_required": "Domain name is required",
+        "website_url_required": "Website URL is required"
+      }
     }
   }
 }

@@ -1,5 +1,16 @@
 import { apiSlice } from './apiSlice';
 
+export interface ListingType {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  is_active: boolean;
+  icon: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const marketplaceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getMarketplaceListings: builder.query<PaginatedResponse<MarketplaceListing>, MarketplaceListingFilters>({
@@ -61,7 +72,7 @@ export const marketplaceApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Domain', id }, 'Domain'],
     }),
-    getMarketplaceListingTypes: builder.query<any[], void>({
+    getMarketplaceListingTypes: builder.query<ListingType[], void>({
       query: () => ({
         url: '/marketplace/listing-types',
         method: 'GET',

@@ -75,6 +75,7 @@ export const apiSlice = createApi({
     'SearchAlert',
     'Commission',
     'Offer',
+    'ProductVerification',
   ],
   endpoints: () => ({}),
 });

@@ -862,6 +862,30 @@
        "expires_at": "Fecha de Expiración",
        "verified_at": "Fecha de Verificación",
        "attempts": "Intentos de Verificación"
+     },
+     "create": {
+       "title": "Crear Verificación de Producto",
+       "description": "Crea una nueva verificación de producto para listar tu dominio o sitio web",
+       "product_type": "Tipo de Producto",
+       "select_product_type": "Seleccionar tipo de producto",
+       "domain_name": "Nombre del Dominio",
+       "domain_extension": "Extensión del Dominio",
+       "domain_extension_hint": "Incluye el punto (ej., .com, .io, .net)",
+       "website_url": "URL del Sitio Web",
+       "website_url_hint": "Ingresa la URL completa incluyendo https://",
+       "submit": "Crear Verificación",
+       "creating": "Creando...",
+       "success": {
+         "title": "Éxito",
+         "description": "Verificación de producto creada exitosamente"
+       },
+       "error": {
+         "title": "Error",
+         "description": "Error al crear la verificación de producto",
+         "product_type_required": "El tipo de producto es requerido",
+         "domain_name_required": "El nombre del dominio es requerido",
+         "website_url_required": "La URL del sitio web es requerida"
+       }
      }
    }
  }
