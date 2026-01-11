@@ -27,8 +27,8 @@ import {
   formatCurrency,
   formatNumber,
   getStatusColor,
-  getMarketStatusLabel,
   timeFormat,
+  getStatusLabel,
 } from "@/lib/helperFun";
 import { Link } from "react-router-dom";
 
@@ -117,9 +117,9 @@ const ClientWebsitesPage = () => {
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span>{t("websites.labels.status")}</span>
+                  <span>{t("common.status.status")}:</span>
                   <span className="font-medium">
-                    {getMarketStatusLabel(website.status, t, "websites")}
+                    {getStatusLabel(website.status, t)}
                   </span>
                 </div>
                 <div className="flex justify-between">

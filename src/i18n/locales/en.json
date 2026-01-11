@@ -349,7 +349,6 @@
         "question": "Question",
         "category": "Category",
         "order": "Order",
-        "status": "Status",
         "actions": "Actions"
       },
       "messages": {
@@ -429,7 +428,6 @@
         "title": "Title",
         "category": "Category",
         "author": "Author",
-        "status": "Status",
         "views": "Views",
         "actions": "Actions"
       },
@@ -517,7 +515,6 @@
           "author": "Author",
           "post": "Post",
           "comment": "Comment",
-          "status": "Status",
           "date": "Date",
           "actions": "Actions"
         },
@@ -597,7 +594,6 @@
         "table": {
           "post": "Post",
           "meta_title": "Meta Title",
-          "status": "Status",
           "actions": "Actions"
         },
         "messages": {
@@ -841,6 +837,27 @@
       "of": "of",
       "previous": "Previous",
       "next": "Next"
+    },
+    "status": {
+      "status": "Status",
+      "all": "All Statuses",
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "active": "Active",
+      "accepted": "Accepted",
+      "countered": "Countered",
+      "withdrawn": "Withdrawn",
+      "open": "Open",
+      "in_progress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded",
+      "failed": "Failed"
     }
   },
   "faq": {
@@ -899,11 +916,6 @@
       "expiring": "Expiring Soon",
       "expired": "Expired"
     },
-    "status": {
-      "active": "Active",
-      "expired": "Expired",
-      "pending": "Pending"
-    },
     "expires_in": "Expires in",
     "days": "days",
     "configure": "Configure",
@@ -914,7 +926,6 @@
       "quick_actions": "QUICK ACTIONS"
     },
     "labels": {
-      "status": "Status:",
       "expires": "Expires:",
       "auto_renewal": "Auto-renewal:",
       "dns_records": "DNS Records:",
@@ -954,11 +965,6 @@
       "all": "All",
       "active": "Active"
     },
-    "status": {
-      "active": "Active",
-      "inactive": "Inactive",
-      "pending": "Pending"
-    },
     "configure": "Configure",
     "registered_by": "Registered by",
     "sections": {
@@ -967,7 +973,6 @@
       "quick_actions": "QUICK ACTIONS"
     },
     "labels": {
-      "status": "Status:",
       "url": "URL:",
       "traffic_monthly": "Monthly Traffic:",
       "revenue_monthly": "Monthly Revenue:",
@@ -1000,11 +1005,6 @@
       "all": "All",
       "active": "Active"
     },
-    "status": {
-      "active": "Active",
-      "inactive": "Inactive",
-      "pending": "Pending"
-    },
     "configure": "Configure",
     "registered_by": "Registered by",
     "sections": {
@@ -1013,7 +1013,6 @@
       "quick_actions": "QUICK ACTIONS"
     },
     "labels": {
-      "status": "Status:",
       "url": "URL:",
       "platform": "Platform:",
       "downloads": "Downloads:",
@@ -1046,12 +1045,6 @@
     "filter_status": "Filter by status",
     "filter": {
       "all": "All Statuses"
-    },
-    "status": {
-      "open": "Open",
-      "in_progress": "In Progress",
-      "resolved": "Resolved",
-      "closed": "Closed"
     },
     "priority": {
       "low": "Low",
@@ -1100,7 +1093,6 @@
     },
     "detail": {
       "description": "Ticket details and information",
-      "status": "Status",
       "description_label": "Description",
       "category": "Category",
       "created": "Created",
@@ -1195,14 +1187,6 @@
     "description": "View and manage all your orders",
     "search_placeholder": "Search by order number, listing...",
     "filter_by_status": "Filter by status",
-    "status": {
-      "all": "All",
-      "pending": "Pending",
-      "processing": "Processing",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "refunded": "Refunded"
-    },
     "table": {
       "title": "Orders",
       "order_number": "Order Number",
@@ -1211,7 +1195,6 @@
       "buyer": "Buyer",
       "seller": "Seller",
       "price": "Price",
-      "status": "Status",
       "created_at": "Created At",
       "actions": "Actions",
       "total_orders": "total orders"
@@ -1287,14 +1270,6 @@
     "description": "View and manage all your offers",
     "search_placeholder": "Search by offer ID, listing...",
     "filter_by_status": "Filter by status",
-    "status": {
-      "all": "All",
-      "pending": "Pending",
-      "accepted": "Accepted",
-      "rejected": "Rejected",
-      "countered": "Countered",
-      "withdrawn": "Withdrawn"
-    },
     "table": {
       "title": "Offers",
       "offer_id": "Offer ID",
@@ -1303,7 +1278,6 @@
       "buyer": "Buyer",
       "amount": "Amount",
       "listing_price": "Listing Price",
-      "status": "Status",
       "expires_at": "Expires At",
       "created_at": "Created At",
       "actions": "Actions",
@@ -1357,7 +1331,6 @@
       "buyer": "Buyer",
       "amount": "Amount",
       "listing_price": "Listing Price",
-      "status": "Status",
       "expires_at": "Expires At",
       "created_at": "Created At",
       "updated_at": "Updated At",
@@ -1377,13 +1350,6 @@
     "unknown_domain": "Unknown Domain",
     "unknown_website": "Unknown Website",
     "create_verification": "Create a product verification",
-    "status": {
-      "all": "All Status",
-      "pending": "Pending",
-      "verified": "Verified",
-      "rejected": "Rejected",
-      "expired": "Expired"
-    },
     "type": {
       "all": "All Types"
     },
@@ -1400,7 +1366,6 @@
       "title": "Verification Details",
       "description": "View detailed information about your verification",
       "product_type": "Product Type",
-      "status": "Status",
       "domain": "Domain",
       "website_url": "Website URL",
       "verification_method": "Verification Method",

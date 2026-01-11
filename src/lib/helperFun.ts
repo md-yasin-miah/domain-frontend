@@ -1,6 +1,5 @@
 import { TFunction } from "i18next";
 import moment from "moment";
-
 export const formatCurrency = (value: number | string | null | undefined): string => {
   if (!value) return '---';
   const numValue = typeof value === 'string' ? parseFloat(value) : value;
@@ -21,37 +20,30 @@ export const formatNumber = (value: number | string | null | undefined): string 
 };
 
 export const getStatusColor = (status: string) => {
+  const statusColor = () => {
   switch (status) {
-    case 'active':
-    case 'Activo': return 'bg-green-500';
-    case 'inactive':
-    case 'Inactivo': return 'bg-red-500';
-    case 'expired':
-    case 'Expirado': return 'bg-red-500';
-    case 'pending':
-    case 'Pendiente': return 'bg-yellow-500';
-    // Support ticket statuses
-    case 'open': return 'bg-blue-500';
-    case 'in_progress': return 'bg-yellow-500';
-    case 'resolved': return 'bg-green-500';
-    case 'closed': return 'bg-gray-500';
-    // Offer statuses
+    case 'resolved':
     case 'accepted':
-    case 'verified': return 'bg-green-500';
-    case 'rejected': return 'bg-red-500';
+    case 'verified':
+    case 'active':return 'bg-green-500';
+    case 'failed': 
+    case 'rejected': 
+    case 'inactive':
+    case 'expired': return 'bg-red-500';
+    case 'in_progress': 
+    case 'pending': return 'bg-yellow-500';
+    case 'open': 
     case 'countered': return 'bg-blue-500';
+    case 'closed': 
     case 'withdrawn': return 'bg-gray-500';
     default: return 'bg-gray-500';
   }
+}
+return "text-white " + statusColor();
 };
-export const getMarketStatusLabel = (status: string, t: TFunction, type: 'domains' | 'websites' | 'apps' = 'domains') => {
-  const statusMap: Record<string, string> = {
-    'active': type === 'domains' ? t('domains.status.active') : type === 'websites' ? t('websites.status.active') : t('apps.status.active'),
-    'inactive': type === 'websites' ? t('websites.status.inactive') : t('apps.status.inactive'),
-    'expired': t('domains.status.expired'),
-    'pending': type === 'domains' ? t('domains.status.pending') : type === 'websites' ? t('websites.status.pending') : t('apps.status.pending')
-  };
-  return statusMap[status] || status;
+
+export const getStatusLabel = (status: string,t: TFunction) => {
+  return t(`common.status.${status}`) || status;
 };
 export const timeFormat = (date: string, format: string = 'MM/DD/YYYY') => {
   if (!date) return '---';

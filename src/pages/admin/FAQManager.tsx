@@ -1,33 +1,39 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { mockData, mockAuth } from '@/lib/mockData';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  HelpCircle, 
-  Search, 
-  Loader2, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { mockData, mockAuth } from "@/lib/mockData";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import {
+  HelpCircle,
+  Search,
+  Loader2,
+  Plus,
+  Edit,
+  Trash2,
   X,
   Check,
-  XCircle
-} from 'lucide-react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
+  XCircle,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
-  DialogFooter
-} from '@/components/ui/dialog';
-import { 
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -36,10 +42,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Switch } from '@/components/ui/switch';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
 
 interface FAQ {
   id: string;
@@ -64,7 +77,7 @@ export default function FAQManager() {
   const { t } = useTranslation();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -74,9 +87,9 @@ export default function FAQManager() {
   const { toast } = useToast();
 
   const [formData, setFormData] = useState<FAQFormData>({
-    question: '',
-    answer: '',
-    category: '',
+    question: "",
+    answer: "",
+    category: "",
     order_index: 0,
     is_published: true,
   });
@@ -90,19 +103,19 @@ export default function FAQManager() {
       setLoading(true);
       // Admins can view all FAQs (including unpublished)
       const { data, error } = await supabase
-        .from('faqs')
-        .select('*')
-        .order('order_index', { ascending: true })
-        .order('created_at', { ascending: false });
+        .from("faqs")
+        .select("*")
+        .order("order_index", { ascending: true })
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setFaqs(data || []);
     } catch (error: any) {
-      console.error('Error fetching FAQs:', error);
+      console.error("Error fetching FAQs:", error);
       toast({
-        title: t('admin.faq.errors.fetch_error'),
+        title: t("admin.faq.errors.fetch_error"),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -111,9 +124,9 @@ export default function FAQManager() {
 
   const resetForm = () => {
     setFormData({
-      question: '',
-      answer: '',
-      category: '',
+      question: "",
+      answer: "",
+      category: "",
       order_index: 0,
       is_published: true,
     });
@@ -123,8 +136,8 @@ export default function FAQManager() {
   const handleCreate = async () => {
     if (!formData.question || !formData.answer) {
       toast({
-        title: t('admin.faq.errors.required_fields'),
-        variant: 'destructive',
+        title: t("admin.faq.errors.required_fields"),
+        variant: "destructive",
       });
       return;
     }
@@ -132,7 +145,7 @@ export default function FAQManager() {
     try {
       setFormLoading(true);
 
-      const { data, error } = await supabase.functions.invoke('create-faq', {
+      const { data, error } = await supabase.functions.invoke("create-faq", {
         body: {
           question: formData.question,
           answer: formData.answer,
@@ -145,23 +158,23 @@ export default function FAQManager() {
       if (error) throw error;
 
       if (!data || !data.success) {
-        throw new Error(data?.error || t('admin.faq.errors.create_error'));
+        throw new Error(data?.error || t("admin.faq.errors.create_error"));
       }
 
       toast({
-        title: t('admin.faq.messages.create_success'),
-        description: t('admin.faq.messages.create_success_desc'),
+        title: t("admin.faq.messages.create_success"),
+        description: t("admin.faq.messages.create_success_desc"),
       });
 
       setShowCreateDialog(false);
       resetForm();
       fetchData();
     } catch (error: any) {
-      console.error('Error creating FAQ:', error);
+      console.error("Error creating FAQ:", error);
       toast({
-        title: t('admin.faq.errors.create_error'),
+        title: t("admin.faq.errors.create_error"),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setFormLoading(false);
@@ -173,7 +186,7 @@ export default function FAQManager() {
     setFormData({
       question: faq.question,
       answer: faq.answer,
-      category: faq.category || '',
+      category: faq.category || "",
       order_index: faq.order_index,
       is_published: faq.is_published,
     });
@@ -183,8 +196,8 @@ export default function FAQManager() {
   const handleUpdate = async () => {
     if (!editingFAQ || !formData.question || !formData.answer) {
       toast({
-        title: t('admin.faq.errors.required_fields'),
-        variant: 'destructive',
+        title: t("admin.faq.errors.required_fields"),
+        variant: "destructive",
       });
       return;
     }
@@ -192,7 +205,7 @@ export default function FAQManager() {
     try {
       setFormLoading(true);
 
-      const { data, error } = await supabase.functions.invoke('update-faq', {
+      const { data, error } = await supabase.functions.invoke("update-faq", {
         body: {
           id: editingFAQ.id,
           question: formData.question,
@@ -206,23 +219,23 @@ export default function FAQManager() {
       if (error) throw error;
 
       if (!data || !data.success) {
-        throw new Error(data?.error || t('admin.faq.errors.update_error'));
+        throw new Error(data?.error || t("admin.faq.errors.update_error"));
       }
 
       toast({
-        title: t('admin.faq.messages.update_success'),
-        description: t('admin.faq.messages.update_success_desc'),
+        title: t("admin.faq.messages.update_success"),
+        description: t("admin.faq.messages.update_success_desc"),
       });
 
       setShowEditDialog(false);
       resetForm();
       fetchData();
     } catch (error: any) {
-      console.error('Error updating FAQ:', error);
+      console.error("Error updating FAQ:", error);
       toast({
-        title: t('admin.faq.errors.update_error'),
+        title: t("admin.faq.errors.update_error"),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setFormLoading(false);
@@ -235,7 +248,7 @@ export default function FAQManager() {
     try {
       setFormLoading(true);
 
-      const { data, error } = await supabase.functions.invoke('delete-faq', {
+      const { data, error } = await supabase.functions.invoke("delete-faq", {
         body: {
           id: faqToDelete.id,
         },
@@ -244,36 +257,40 @@ export default function FAQManager() {
       if (error) throw error;
 
       if (!data || !data.success) {
-        throw new Error(data?.error || t('admin.faq.errors.delete_error'));
+        throw new Error(data?.error || t("admin.faq.errors.delete_error"));
       }
 
       toast({
-        title: t('admin.faq.messages.delete_success'),
-        description: t('admin.faq.messages.delete_success_desc'),
+        title: t("admin.faq.messages.delete_success"),
+        description: t("admin.faq.messages.delete_success_desc"),
       });
 
       setShowDeleteDialog(false);
       setFaqToDelete(null);
       fetchData();
     } catch (error: any) {
-      console.error('Error deleting FAQ:', error);
+      console.error("Error deleting FAQ:", error);
       toast({
-        title: t('admin.faq.errors.delete_error'),
+        title: t("admin.faq.errors.delete_error"),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setFormLoading(false);
     }
   };
 
-  const filteredFAQs = faqs.filter(faq =>
-    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (faq.category && faq.category.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredFAQs = faqs.filter(
+    (faq) =>
+      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (faq.category &&
+        faq.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const categories = Array.from(new Set(faqs.map(faq => faq.category).filter(Boolean))) as string[];
+  const categories = Array.from(
+    new Set(faqs.map((faq) => faq.category).filter(Boolean))
+  ) as string[];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -283,85 +300,111 @@ export default function FAQManager() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <HelpCircle className="h-5 w-5" />
-                {t('admin.faq.title')}
+                {t("admin.faq.title")}
               </CardTitle>
-              <CardDescription>
-                {t('admin.faq.description')}
-              </CardDescription>
+              <CardDescription>{t("admin.faq.description")}</CardDescription>
             </div>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
                 <Button onClick={() => resetForm()}>
                   <Plus className="h-4 w-4 mr-2" />
-                  {t('admin.faq.create_faq')}
+                  {t("admin.faq.create_faq")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{t('admin.faq.create_dialog.title')}</DialogTitle>
+                  <DialogTitle>
+                    {t("admin.faq.create_dialog.title")}
+                  </DialogTitle>
                   <DialogDescription>
-                    {t('admin.faq.create_dialog.description')}
+                    {t("admin.faq.create_dialog.description")}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="question">{t('admin.faq.form.question')} *</Label>
+                    <Label htmlFor="question">
+                      {t("admin.faq.form.question")} *
+                    </Label>
                     <Input
                       id="question"
                       value={formData.question}
-                      onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                      placeholder={t('admin.faq.form.question_placeholder')}
+                      onChange={(e) =>
+                        setFormData({ ...formData, question: e.target.value })
+                      }
+                      placeholder={t("admin.faq.form.question_placeholder")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="answer">{t('admin.faq.form.answer')} *</Label>
+                    <Label htmlFor="answer">
+                      {t("admin.faq.form.answer")} *
+                    </Label>
                     <Textarea
                       id="answer"
                       value={formData.answer}
-                      onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                      placeholder={t('admin.faq.form.answer_placeholder')}
+                      onChange={(e) =>
+                        setFormData({ ...formData, answer: e.target.value })
+                      }
+                      placeholder={t("admin.faq.form.answer_placeholder")}
                       rows={6}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="category">{t('admin.faq.form.category')}</Label>
+                    <Label htmlFor="category">
+                      {t("admin.faq.form.category")}
+                    </Label>
                     <Input
                       id="category"
                       value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      placeholder={t('admin.faq.form.category_placeholder')}
+                      onChange={(e) =>
+                        setFormData({ ...formData, category: e.target.value })
+                      }
+                      placeholder={t("admin.faq.form.category_placeholder")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="order_index">{t('admin.faq.form.order_index')}</Label>
+                    <Label htmlFor="order_index">
+                      {t("admin.faq.form.order_index")}
+                    </Label>
                     <Input
                       id="order_index"
                       type="number"
                       value={formData.order_index}
-                      onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          order_index: parseInt(e.target.value) || 0,
+                        })
+                      }
                     />
                   </div>
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="is_published"
                       checked={formData.is_published}
-                      onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, is_published: checked })
+                      }
                     />
-                    <Label htmlFor="is_published">{t('admin.faq.form.is_published')}</Label>
+                    <Label htmlFor="is_published">
+                      {t("admin.faq.form.is_published")}
+                    </Label>
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                    {t('common.cancel')}
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCreateDialog(false)}
+                  >
+                    {t("common.cancel")}
                   </Button>
                   <Button onClick={handleCreate} disabled={formLoading}>
                     {formLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('common.loading')}
+                        {t("common.loading")}
                       </>
                     ) : (
-                      t('admin.faq.create_dialog.create')
+                      t("admin.faq.create_dialog.create")
                     )}
                   </Button>
                 </DialogFooter>
@@ -375,7 +418,7 @@ export default function FAQManager() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder={t('admin.faq.search_placeholder')}
+                  placeholder={t("admin.faq.search_placeholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -389,17 +432,19 @@ export default function FAQManager() {
               </div>
             ) : filteredFAQs.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                {searchTerm ? t('admin.faq.no_results') : t('admin.faq.no_faqs')}
+                {searchTerm
+                  ? t("admin.faq.no_results")
+                  : t("admin.faq.no_faqs")}
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('admin.faq.table.question')}</TableHead>
-                    <TableHead>{t('admin.faq.table.category')}</TableHead>
-                    <TableHead>{t('admin.faq.table.order')}</TableHead>
-                    <TableHead>{t('admin.faq.table.status')}</TableHead>
-                    <TableHead>{t('admin.faq.table.actions')}</TableHead>
+                    <TableHead>{t("admin.faq.table.question")}</TableHead>
+                    <TableHead>{t("admin.faq.table.category")}</TableHead>
+                    <TableHead>{t("admin.faq.table.order")}</TableHead>
+                    <TableHead>{t("common.status.status")}</TableHead>
+                    <TableHead>{t("admin.faq.table.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -423,12 +468,12 @@ export default function FAQManager() {
                         {faq.is_published ? (
                           <Badge className="bg-green-500">
                             <Check className="h-3 w-3 mr-1" />
-                            {t('admin.faq.published')}
+                            {t("admin.faq.published")}
                           </Badge>
                         ) : (
                           <Badge variant="secondary">
                             <XCircle className="h-3 w-3 mr-1" />
-                            {t('admin.faq.unpublished')}
+                            {t("admin.faq.unpublished")}
                           </Badge>
                         )}
                       </TableCell>
@@ -466,70 +511,93 @@ export default function FAQManager() {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('admin.faq.edit_dialog.title')}</DialogTitle>
+            <DialogTitle>{t("admin.faq.edit_dialog.title")}</DialogTitle>
             <DialogDescription>
-              {t('admin.faq.edit_dialog.description')}
+              {t("admin.faq.edit_dialog.description")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-question">{t('admin.faq.form.question')} *</Label>
+              <Label htmlFor="edit-question">
+                {t("admin.faq.form.question")} *
+              </Label>
               <Input
                 id="edit-question"
                 value={formData.question}
-                onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                placeholder={t('admin.faq.form.question_placeholder')}
+                onChange={(e) =>
+                  setFormData({ ...formData, question: e.target.value })
+                }
+                placeholder={t("admin.faq.form.question_placeholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-answer">{t('admin.faq.form.answer')} *</Label>
+              <Label htmlFor="edit-answer">
+                {t("admin.faq.form.answer")} *
+              </Label>
               <Textarea
                 id="edit-answer"
                 value={formData.answer}
-                onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                placeholder={t('admin.faq.form.answer_placeholder')}
+                onChange={(e) =>
+                  setFormData({ ...formData, answer: e.target.value })
+                }
+                placeholder={t("admin.faq.form.answer_placeholder")}
                 rows={6}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-category">{t('admin.faq.form.category')}</Label>
+              <Label htmlFor="edit-category">
+                {t("admin.faq.form.category")}
+              </Label>
               <Input
                 id="edit-category"
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder={t('admin.faq.form.category_placeholder')}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
+                placeholder={t("admin.faq.form.category_placeholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-order_index">{t('admin.faq.form.order_index')}</Label>
+              <Label htmlFor="edit-order_index">
+                {t("admin.faq.form.order_index")}
+              </Label>
               <Input
                 id="edit-order_index"
                 type="number"
                 value={formData.order_index}
-                onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    order_index: parseInt(e.target.value) || 0,
+                  })
+                }
               />
             </div>
             <div className="flex items-center space-x-2">
               <Switch
                 id="edit-is_published"
                 checked={formData.is_published}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, is_published: checked })
+                }
               />
-              <Label htmlFor="edit-is_published">{t('admin.faq.form.is_published')}</Label>
+              <Label htmlFor="edit-is_published">
+                {t("admin.faq.form.is_published")}
+              </Label>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditDialog(false)}>
-              {t('common.cancel')}
+              {t("common.cancel")}
             </Button>
             <Button onClick={handleUpdate} disabled={formLoading}>
               {formLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('common.loading')}
+                  {t("common.loading")}
                 </>
               ) : (
-                t('admin.faq.edit_dialog.update')
+                t("admin.faq.edit_dialog.update")
               )}
             </Button>
           </DialogFooter>
@@ -540,9 +608,11 @@ export default function FAQManager() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('admin.faq.delete_dialog.title')}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("admin.faq.delete_dialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('admin.faq.delete_dialog.description')}
+              {t("admin.faq.delete_dialog.description")}
               {faqToDelete && (
                 <div className="mt-2 p-2 bg-muted rounded">
                   <strong>{faqToDelete.question}</strong>
@@ -551,7 +621,7 @@ export default function FAQManager() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -560,10 +630,10 @@ export default function FAQManager() {
               {formLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('common.loading')}
+                  {t("common.loading")}
                 </>
               ) : (
-                t('common.delete')
+                t("common.delete")
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

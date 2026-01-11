@@ -215,6 +215,27 @@
       "of": "de",
       "previous": "Anterior",
       "next": "Siguiente"
+    },
+    "status": {
+      "status": "Estado",
+      "all": "Todos los Estados",
+      "pending": "Pendiente",
+      "verified": "Verificado",
+      "rejected": "Rechazado",
+      "expired": "Expirado",
+      "active": "Activo",
+      "accepted": "Aceptado",
+      "countered": "Contraoferta",
+      "withdrawn": "Retirado",
+      "open": "Abierto",
+      "in_progress": "En Progreso",
+      "resolved": "Resuelto",
+      "closed": "Cerrado",
+      "processing": "Procesando",
+      "completed": "Completado",
+      "cancelled": "Cancelado",
+      "refunded": "Reembolsado",
+      "failed": "Fallido"
     }
   },
   "dashboard": {
@@ -342,11 +363,6 @@
       "expiring": "Próximos a Expirar",
       "expired": "Expirados"
     },
-    "status": {
-      "active": "Activo",
-      "expired": "Expirado",
-      "pending": "Pendiente"
-    },
     "expires_in": "Expira en",
     "days": "días",
     "configure": "Configurar",
@@ -357,7 +373,6 @@
       "quick_actions": "ACCIONES RÁPIDAS"
     },
     "labels": {
-      "status": "Estado:",
       "expires": "Expira:",
       "auto_renewal": "Auto-renovación:",
       "dns_records": "Registros DNS:",
@@ -397,11 +412,6 @@
       "all": "Todos",
       "active": "Activos"
     },
-    "status": {
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "pending": "Pendiente"
-    },
     "configure": "Configurar",
     "registered_by": "Registrado por",
     "sections": {
@@ -410,7 +420,6 @@
       "quick_actions": "ACCIONES RÁPIDAS"
     },
     "labels": {
-      "status": "Estado:",
       "url": "URL:",
       "traffic_monthly": "Tráfico Mensual:",
       "revenue_monthly": "Ingresos Mensuales:",
@@ -443,11 +452,6 @@
       "all": "Todos",
       "active": "Activos"
     },
-    "status": {
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "pending": "Pendiente"
-    },
     "configure": "Configurar",
     "registered_by": "Registrado por",
     "sections": {
@@ -456,7 +460,6 @@
       "quick_actions": "ACCIONES RÁPIDAS"
     },
     "labels": {
-      "status": "Estado:",
       "url": "URL:",
       "platform": "Plataforma:",
       "downloads": "Descargas:",
@@ -489,12 +492,6 @@
     "filter_status": "Filtrar por estado",
     "filter": {
       "all": "Todos los Estados"
-    },
-    "status": {
-      "open": "Abierto",
-      "in_progress": "En Progreso",
-      "resolved": "Resuelto",
-      "closed": "Cerrado"
     },
     "priority": {
       "low": "Baja",
@@ -543,7 +540,6 @@
     },
     "detail": {
       "description": "Detalles e información del ticket",
-      "status": "Estado",
       "description_label": "Descripción",
       "category": "Categoría",
       "created": "Creado",
@@ -638,14 +634,6 @@
     "description": "Ver y gestionar todas tus órdenes",
     "search_placeholder": "Buscar por número de orden, listado...",
     "filter_by_status": "Filtrar por estado",
-    "status": {
-      "all": "Todas",
-      "pending": "Pendiente",
-      "processing": "En Proceso",
-      "completed": "Completada",
-      "cancelled": "Cancelada",
-      "refunded": "Reembolsada"
-    },
     "table": {
       "title": "Órdenes",
       "order_number": "Número de Orden",
@@ -654,7 +642,6 @@
       "buyer": "Comprador",
       "seller": "Vendedor",
       "price": "Precio",
-      "status": "Estado",
       "created_at": "Fecha de Creación",
       "actions": "Acciones",
       "total_orders": "órdenes en total"
@@ -730,14 +717,6 @@
      "description": "Ver y gestionar todas tus ofertas",
      "search_placeholder": "Buscar por ID de oferta, listado...",
      "filter_by_status": "Filtrar por estado",
-     "status": {
-       "all": "Todas",
-       "pending": "Pendiente",
-       "accepted": "Aceptada",
-       "rejected": "Rechazada",
-       "countered": "Contraoferta",
-       "withdrawn": "Retirada"
-     },
      "table": {
        "title": "Ofertas",
        "offer_id": "ID de Oferta",
@@ -746,7 +725,6 @@
        "buyer": "Comprador",
        "amount": "Monto",
        "listing_price": "Precio del Listado",
-       "status": "Estado",
        "expires_at": "Expira",
        "created_at": "Fecha de Creación",
        "actions": "Acciones",
@@ -800,7 +778,6 @@
        "buyer": "Comprador",
        "amount": "Monto",
        "listing_price": "Precio del Listado",
-       "status": "Estado",
        "expires_at": "Expira",
        "created_at": "Fecha de Creación",
        "updated_at": "Última Actualización",
@@ -820,13 +797,6 @@
      "unknown_domain": "Dominio Desconocido",
      "unknown_website": "Sitio Web Desconocido",
      "create_verification": "Crear una verificación de producto",
-     "status": {
-       "all": "Todos los Estados",
-       "pending": "Pendiente",
-       "verified": "Verificado",
-       "rejected": "Rechazado",
-       "expired": "Expirado"
-     },
      "type": {
        "all": "Todos los Tipos"
      },
@@ -843,7 +813,6 @@
        "title": "Detalles de Verificación",
        "description": "Ver información detallada sobre tu verificación",
        "product_type": "Tipo de Producto",
-       "status": "Estado",
        "domain": "Dominio",
        "website_url": "URL del Sitio Web",
        "verification_method": "Método de Verificación",

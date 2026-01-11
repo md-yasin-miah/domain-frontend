@@ -162,7 +162,7 @@ const SupportPage = () => {
   };
 
   const getStatusLabel = (status: string) => {
-    return t(`support.status.${status}`) || status;
+    return t(`common.status.${status}`) || status;
   };
   const handleCreateTicket = async (data: TicketCreateFormData) => {
     try {

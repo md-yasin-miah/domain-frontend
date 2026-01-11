@@ -113,7 +113,7 @@ const ClientOffersPage = () => {
   const columns: ColumnDef<Offer>[] = useMemo(() => {
     // Get status label helper
     const getStatusLabel = (status: string) => {
-      return t(`offers.status.${status}`) || status;
+      return t(`common.status.${status}`) || status;
     };
 
     return [
@@ -172,7 +172,7 @@ const ClientOffersPage = () => {
       {
         id: "status",
         accessorKey: "status",
-        header: t("offers.table.status"),
+        header: t("common.status.status"),
         cell: ({ row }) => (
           <Badge
             variant={getStatusBadgeVariant(row.status)}
@@ -417,22 +417,22 @@ const ClientOffersPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">
-                        {t("offers.status.all")}
+                        {t("common.status.all")}
                       </SelectItem>
                       <SelectItem value="pending">
-                        {t("offers.status.pending")}
+                        {t("common.status.pending")}
                       </SelectItem>
                       <SelectItem value="accepted">
-                        {t("offers.status.accepted")}
+                        {t("common.status.accepted")}
                       </SelectItem>
                       <SelectItem value="rejected">
-                        {t("offers.status.rejected")}
+                        {t("common.status.rejected")}
                       </SelectItem>
                       <SelectItem value="countered">
-                        {t("offers.status.countered")}
+                        {t("common.status.countered")}
                       </SelectItem>
                       <SelectItem value="withdrawn">
-                        {t("offers.status.withdrawn")}
+                        {t("common.status.withdrawn")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -624,7 +624,7 @@ const ClientOffersPage = () => {
                       "text-white block w-fit"
                     )}
                   >
-                    {t(`offers.status.${selectedOfferData.status}`)}
+                    {t(`common.status.${selectedOfferData.status}`)}
                   </Badge>
                 </div>
                 <div>

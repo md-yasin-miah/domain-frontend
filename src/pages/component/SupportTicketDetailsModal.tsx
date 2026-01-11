@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -29,16 +29,21 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'open': return 'default';
-      case 'in_progress': return 'secondary';
-      case 'resolved': return 'default';
-      case 'closed': return 'outline';
-      default: return 'outline';
+      case "open":
+        return "default";
+      case "in_progress":
+        return "secondary";
+      case "resolved":
+        return "default";
+      case "closed":
+        return "outline";
+      default:
+        return "outline";
     }
   };
 
   const getStatusLabel = (status: string) => {
-    return t(`support.status.${status}`) || status;
+    return t(`common.status.${status}`) || status;
   };
 
   return (
@@ -55,14 +60,16 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
             </Badge>
           </div>
           <DialogDescription>
-            {t('support.detail.description')}
+            {t("support.detail.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2 mt-4">
           {/* Description */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">{t('support.detail.description_label')}</h3>
+            <h3 className="text-sm font-semibold mb-2">
+              {t("support.detail.description_label")}
+            </h3>
             <p className="text-sm text-muted-foreground whitespace-pre-wrap">
               {ticket.description}
             </p>
@@ -72,9 +79,11 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
 
           {/* Category */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">{t('support.detail.category')}</h3>
+            <h3 className="text-sm font-semibold mb-2">
+              {t("support.detail.category")}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              {ticket.category?.name || t('support.no_category')}
+              {ticket.category?.name || t("support.no_category")}
             </p>
           </div>
 
@@ -83,15 +92,19 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
           {/* Dates */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="text-sm font-semibold mb-2">{t('support.detail.created')}</h3>
+              <h3 className="text-sm font-semibold mb-2">
+                {t("support.detail.created")}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                {timeFormat(ticket.created_at, 'lll')}
+                {timeFormat(ticket.created_at, "lll")}
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold mb-2">{t('support.detail.updated')}</h3>
+              <h3 className="text-sm font-semibold mb-2">
+                {t("support.detail.updated")}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                {timeFormat(ticket.updated_at, 'lll')}
+                {timeFormat(ticket.updated_at, "lll")}
               </p>
             </div>
           </div>
@@ -103,11 +116,14 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
             <>
               <div>
                 <h3 className="text-sm font-semibold mb-2">
-                  {t('support.detail.created')} By
+                  {t("support.detail.created")} By
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  <span className='font-semibold'>{t('common.name')}</span>: {ticket.created_by.username} <br />
-                  <span className='font-semibold'>{t('common.email')}</span>: {ticket.created_by.email}
+                  <span className="font-semibold">{t("common.name")}</span>:{" "}
+                  {ticket.created_by.username} <br />
+                  <span className="font-semibold">
+                    {t("common.email")}
+                  </span>: {ticket.created_by.email}
                 </p>
               </div>
               <Separator />
@@ -118,7 +134,9 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
           {ticket.assigned_to ? (
             <>
               <div>
-                <h3 className="text-sm font-semibold mb-2">{t('support.detail.assigned_to')}</h3>
+                <h3 className="text-sm font-semibold mb-2">
+                  {t("support.detail.assigned_to")}
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   {ticket.assigned_to.username || ticket.assigned_to.email}
                 </p>
@@ -128,7 +146,9 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
           ) : (
             <>
               <div>
-                <h3 className="text-sm font-semibold mb-2">{t('support.detail.assigned_to')}</h3>
+                <h3 className="text-sm font-semibold mb-2">
+                  {t("support.detail.assigned_to")}
+                </h3>
                 <p className="text-sm text-muted-foreground italic">
                   Not assigned
                 </p>

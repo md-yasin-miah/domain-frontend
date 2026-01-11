@@ -80,7 +80,7 @@ const ClientOrderDetailsPage = () => {
 
   // Get status label
   const getStatusLabel = (status: string) => {
-    return t(`orders.status.${status}`) || status;
+    return t(`common.status.${status}`) || status;
   };
 
   // Handle cancel order

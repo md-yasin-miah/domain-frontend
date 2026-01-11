@@ -28,8 +28,8 @@ import {
   formatCurrency,
   formatNumber,
   getStatusColor,
-  getMarketStatusLabel,
   timeFormat,
+  getStatusLabel,
 } from "@/lib/helperFun";
 
 const ClientAppsPage = () => {
@@ -115,9 +115,9 @@ const ClientAppsPage = () => {
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span>{t("apps.labels.status")}</span>
+                  <span>{t("common.status.status")}:</span>
                   <span className="font-medium">
-                    {getMarketStatusLabel(app.status, t, "apps")}
+                    {getStatusLabel(app.status, t)}
                   </span>
                 </div>
                 <div className="flex justify-between">

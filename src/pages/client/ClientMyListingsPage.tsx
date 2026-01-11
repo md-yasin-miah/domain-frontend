@@ -51,9 +51,11 @@ import {
   getStatusColor,
   getStatusBadgeVariant,
   timeFormat,
+  getStatusLabel,
 } from "@/lib/helperFun";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import StatusIcon from "@/components/common/StatusIcon";
 
 type VerificationStatus =
   | "pending"
@@ -143,25 +145,6 @@ const ClientMyListingsPage = () => {
       expired: verifications.filter((v) => v.status === "expired").length,
     };
   }, [verifications]);
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "verified":
-        return <CheckCircle2 className="w-4 h-4" />;
-      case "pending":
-        return <Clock className="w-4 h-4" />;
-      case "rejected":
-        return <XCircle className="w-4 h-4" />;
-      case "expired":
-        return <AlertTriangle className="w-4 h-4" />;
-      default:
-        return null;
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    return t(`my_listings.status.${status}`) || status;
-  };
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -357,23 +340,23 @@ const ClientMyListingsPage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
-                  {t("my_listings.status.all") || "All Status"} (
+                  {t("common.status.all") || "All Status"} (
                   {verifications?.length || 0})
                 </SelectItem>
                 <SelectItem value="pending">
-                  {t("my_listings.status.pending") || "Pending"} (
+                  {t("common.status.pending") || "Pending"} (
                   {statusCounts.pending})
                 </SelectItem>
                 <SelectItem value="verified">
-                  {t("my_listings.status.verified") || "Verified"} (
+                  {t("common.status.verified") || "Verified"} (
                   {statusCounts.verified})
                 </SelectItem>
                 <SelectItem value="rejected">
-                  {t("my_listings.status.rejected") || "Rejected"} (
+                  {t("common.status.rejected") || "Rejected"} (
                   {statusCounts.rejected})
                 </SelectItem>
                 <SelectItem value="expired">
-                  {t("my_listings.status.expired") || "Expired"} (
+                  {t("common.status.expired") || "Expired"} (
                   {statusCounts.expired})
                 </SelectItem>
               </SelectContent>
@@ -471,8 +454,8 @@ const ClientMyListingsPage = () => {
                             getStatusColor(verification.status)
                           )}
                         >
-                          {getStatusIcon(verification.status)}
-                          {getStatusLabel(verification.status)}
+                          <StatusIcon status={verification.status} />
+                          {getStatusLabel(verification.status, t)}
                         </Badge>
                       </CardDescription>
                     </div>
@@ -562,8 +545,8 @@ const ClientMyListingsPage = () => {
                         )}
                         className="flex items-center gap-1 w-fit"
                       >
-                        {getStatusIcon(selectedVerification.status)}
-                        {getStatusLabel(selectedVerification.status)}
+                        <StatusIcon status={selectedVerification.status} />
+                        {getStatusLabel(selectedVerification.status, t)}
                       </Badge>
                     </div>
                   </div>

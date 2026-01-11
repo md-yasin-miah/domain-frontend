@@ -1,25 +1,31 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { mockData, mockAuth } from '@/lib/mockData';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  FileText, 
-  Search, 
-  Loader2, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { mockData, mockAuth } from "@/lib/mockData";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import {
+  FileText,
+  Search,
+  Loader2,
+  Plus,
+  Edit,
+  Trash2,
   Eye,
   Check,
   XCircle,
   FolderTree,
   MessageSquare,
-  TrendingUp
-} from 'lucide-react';
-import { 
+  TrendingUp,
+} from "lucide-react";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -28,10 +34,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Link } from 'react-router-dom';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Link } from "react-router-dom";
 
 interface BlogPost {
   id: string;
@@ -72,7 +85,7 @@ export default function BlogManager() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [postToDelete, setPostToDelete] = useState<BlogPost | null>(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -86,14 +99,14 @@ export default function BlogManager() {
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
-        .from('blog_categories')
-        .select('*')
-        .order('name');
+        .from("blog_categories")
+        .select("*")
+        .order("name");
 
       if (error) throw error;
       setCategories(data || []);
     } catch (error: any) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -101,12 +114,14 @@ export default function BlogManager() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('blog_posts')
-        .select(`
+        .from("blog_posts")
+        .select(
+          `
           *,
           category:blog_categories(id, name, slug)
-        `)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
@@ -114,9 +129,9 @@ export default function BlogManager() {
       const postsWithAuthors = await Promise.all(
         (data || []).map(async (post) => {
           const { data: profile } = await supabase
-            .from('client_profiles')
-            .select('full_name, email')
-            .eq('user_id', post.author_id)
+            .from("client_profiles")
+            .select("full_name, email")
+            .eq("user_id", post.author_id)
             .single();
 
           return {
@@ -131,11 +146,11 @@ export default function BlogManager() {
 
       setPosts(postsWithAuthors);
     } catch (error: any) {
-      console.error('Error fetching blog posts:', error);
+      console.error("Error fetching blog posts:", error);
       toast({
-        title: t('admin.blog.errors.fetch_error'),
+        title: t("admin.blog.errors.fetch_error"),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -148,42 +163,48 @@ export default function BlogManager() {
     try {
       setFormLoading(true);
 
-      const { data, error } = await supabase.functions.invoke('delete-blog-post', {
-        body: {
-          id: postToDelete.id,
-        },
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "delete-blog-post",
+        {
+          body: {
+            id: postToDelete.id,
+          },
+        }
+      );
 
       if (error) throw error;
 
       if (!data || !data.success) {
-        throw new Error(data?.error || t('admin.blog.errors.delete_error'));
+        throw new Error(data?.error || t("admin.blog.errors.delete_error"));
       }
 
       toast({
-        title: t('admin.blog.messages.delete_success'),
-        description: t('admin.blog.messages.delete_success_desc'),
+        title: t("admin.blog.messages.delete_success"),
+        description: t("admin.blog.messages.delete_success_desc"),
       });
 
       setShowDeleteDialog(false);
       setPostToDelete(null);
       fetchData();
     } catch (error: any) {
-      console.error('Error deleting blog post:', error);
+      console.error("Error deleting blog post:", error);
       toast({
-        title: t('admin.blog.errors.delete_error'),
+        title: t("admin.blog.errors.delete_error"),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setFormLoading(false);
     }
   };
 
-  const filteredPosts = posts.filter(post =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredPosts = posts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.tags.some((tag) =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   return (
@@ -194,16 +215,14 @@ export default function BlogManager() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                {t('admin.blog.title')}
+                {t("admin.blog.title")}
               </CardTitle>
-              <CardDescription>
-                {t('admin.blog.description')}
-              </CardDescription>
+              <CardDescription>{t("admin.blog.description")}</CardDescription>
             </div>
             <Button asChild>
               <Link to="/admin/blog-manager/create">
                 <Plus className="h-4 w-4 mr-2" />
-                {t('admin.blog.create_post')}
+                {t("admin.blog.create_post")}
               </Link>
             </Button>
           </div>
@@ -216,8 +235,12 @@ export default function BlogManager() {
                 <Link to="/admin/blog-manager/categories">
                   <FolderTree className="h-5 w-5 mr-2" />
                   <div className="text-left">
-                    <div className="font-semibold">{t('admin.blog.categories.title')}</div>
-                    <div className="text-sm text-muted-foreground">{t('admin.blog.categories.manage')}</div>
+                    <div className="font-semibold">
+                      {t("admin.blog.categories.title")}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("admin.blog.categories.manage")}
+                    </div>
                   </div>
                 </Link>
               </Button>
@@ -225,8 +248,12 @@ export default function BlogManager() {
                 <Link to="/admin/blog-manager/comments">
                   <MessageSquare className="h-5 w-5 mr-2" />
                   <div className="text-left">
-                    <div className="font-semibold">{t('admin.blog.comments.title')}</div>
-                    <div className="text-sm text-muted-foreground">{t('admin.blog.comments.manage')}</div>
+                    <div className="font-semibold">
+                      {t("admin.blog.comments.title")}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("admin.blog.comments.manage")}
+                    </div>
                   </div>
                 </Link>
               </Button>
@@ -234,8 +261,12 @@ export default function BlogManager() {
                 <Link to="/admin/blog-manager/seo">
                   <TrendingUp className="h-5 w-5 mr-2" />
                   <div className="text-left">
-                    <div className="font-semibold">{t('admin.blog.seo.title')}</div>
-                    <div className="text-sm text-muted-foreground">{t('admin.blog.seo.manage')}</div>
+                    <div className="font-semibold">
+                      {t("admin.blog.seo.title")}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("admin.blog.seo.manage")}
+                    </div>
                   </div>
                 </Link>
               </Button>
@@ -245,7 +276,7 @@ export default function BlogManager() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder={t('admin.blog.search_placeholder')}
+                  placeholder={t("admin.blog.search_placeholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -259,18 +290,20 @@ export default function BlogManager() {
               </div>
             ) : filteredPosts.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                {searchTerm ? t('admin.blog.no_results') : t('admin.blog.no_posts')}
+                {searchTerm
+                  ? t("admin.blog.no_results")
+                  : t("admin.blog.no_posts")}
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('admin.blog.table.title')}</TableHead>
-                    <TableHead>{t('admin.blog.table.category')}</TableHead>
-                    <TableHead>{t('admin.blog.table.author')}</TableHead>
-                    <TableHead>{t('admin.blog.table.status')}</TableHead>
-                    <TableHead>{t('admin.blog.table.views')}</TableHead>
-                    <TableHead>{t('admin.blog.table.actions')}</TableHead>
+                    <TableHead>{t("admin.blog.table.title")}</TableHead>
+                    <TableHead>{t("admin.blog.table.category")}</TableHead>
+                    <TableHead>{t("admin.blog.table.author")}</TableHead>
+                    <TableHead>{t("common.status.status")}</TableHead>
+                    <TableHead>{t("admin.blog.table.views")}</TableHead>
+                    <TableHead>{t("admin.blog.table.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -293,7 +326,9 @@ export default function BlogManager() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {post.author?.profile?.full_name || post.author?.email || 'Unknown'}
+                          {post.author?.profile?.full_name ||
+                            post.author?.email ||
+                            "Unknown"}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -301,17 +336,17 @@ export default function BlogManager() {
                           {post.is_published ? (
                             <Badge className="bg-green-500">
                               <Check className="h-3 w-3 mr-1" />
-                              {t('admin.blog.published')}
+                              {t("admin.blog.published")}
                             </Badge>
                           ) : (
                             <Badge variant="secondary">
                               <XCircle className="h-3 w-3 mr-1" />
-                              {t('admin.blog.unpublished')}
+                              {t("admin.blog.unpublished")}
                             </Badge>
                           )}
                           {post.is_featured && (
                             <Badge variant="outline" className="text-xs">
-                              {t('admin.blog.featured')}
+                              {t("admin.blog.featured")}
                             </Badge>
                           )}
                         </div>
@@ -320,21 +355,13 @@ export default function BlogManager() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {post.is_published && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              asChild
-                            >
+                            <Button variant="ghost" size="sm" asChild>
                               <Link to={`/blog/${post.slug}`} target="_blank">
                                 <Eye className="h-4 w-4" />
                               </Link>
                             </Button>
                           )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                          >
+                          <Button variant="ghost" size="sm" asChild>
                             <Link to={`/admin/blog-manager/edit/${post.id}`}>
                               <Edit className="h-4 w-4" />
                             </Link>
@@ -364,9 +391,11 @@ export default function BlogManager() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('admin.blog.delete_dialog.title')}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("admin.blog.delete_dialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('admin.blog.delete_dialog.description')}
+              {t("admin.blog.delete_dialog.description")}
               {postToDelete && (
                 <div className="mt-2 p-2 bg-muted rounded">
                   <strong>{postToDelete.title}</strong>
@@ -375,7 +404,7 @@ export default function BlogManager() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -384,10 +413,10 @@ export default function BlogManager() {
               {formLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('common.loading')}
+                  {t("common.loading")}
                 </>
               ) : (
-                t('common.delete')
+                t("common.delete")
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -24,11 +24,7 @@ import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
 import { useTranslation } from "react-i18next";
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from "@/lib/utils";
-import {
-  getStatusColor,
-  getMarketStatusLabel,
-  timeFormat,
-} from "@/lib/helperFun";
+import { getStatusColor, getStatusLabel, timeFormat } from "@/lib/helperFun";
 
 const ClientDomainsPage = () => {
   const { t } = useTranslation();
@@ -157,9 +153,9 @@ const ClientDomainsPage = () => {
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span>{t("domains.labels.status")}</span>
+                  <span>{t("common.status.status")}:</span>
                   <span className="font-medium">
-                    {getMarketStatusLabel(domain.status, t, "domains")}
+                    {getStatusLabel(domain.status, t)}
                   </span>
                 </div>
                 <div className="flex justify-between">

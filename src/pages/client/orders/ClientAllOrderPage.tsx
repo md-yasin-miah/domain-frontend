@@ -141,7 +141,7 @@ const ClientAllOrderPage = () => {
       {
         id: "status",
         accessorKey: "status",
-        header: t("orders.table.status"),
+        header: t("common.status.status"),
         cell: ({ row }) => (
           <Badge
             variant={getStatusBadgeVariant(row.status)}
@@ -219,22 +219,22 @@ const ClientAllOrderPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">
-                        {t("orders.status.all")}
+                        {t("common.status.all")}
                       </SelectItem>
                       <SelectItem value="pending">
-                        {t("orders.status.pending")}
+                        {t("common.status.pending")}
                       </SelectItem>
                       <SelectItem value="processing">
-                        {t("orders.status.processing")}
+                        {t("common.status.processing")}
                       </SelectItem>
                       <SelectItem value="completed">
-                        {t("orders.status.completed")}
+                        {t("common.status.completed")}
                       </SelectItem>
                       <SelectItem value="cancelled">
-                        {t("orders.status.cancelled")}
+                        {t("common.status.cancelled")}
                       </SelectItem>
                       <SelectItem value="refunded">
-                        {t("orders.status.refunded")}
+                        {t("common.status.refunded")}
                       </SelectItem>
                     </SelectContent>
                   </Select>

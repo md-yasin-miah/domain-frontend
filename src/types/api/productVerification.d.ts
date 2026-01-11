@@ -24,7 +24,7 @@ interface ProductVerification {
     verification_code: string;
     instructions: string;
   } | null;
-  status: 'pending' | 'verified' | 'rejected' | 'expired';
+  status: 'pending' | 'verified' | 'rejected' | 'expired' | 'failed';
   verified_at: string | null;
   verified_by_id: number | null;
   verification_attempts: number;
@@ -35,7 +35,7 @@ interface ProductVerification {
 }
 
 interface ProductVerificationFilters {
-  status?: 'pending' | 'verified' | 'rejected' | 'expired';
+  status?: 'pending' | 'verified' | 'rejected' | 'expired' | 'failed';
   product_type?: 'domain' | 'website';
 }
 
