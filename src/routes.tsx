@@ -71,11 +71,8 @@ import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
 import ClientOffersPage from "./pages/client/ClientOffersPage";
 import ClientMyListingsPage from "./pages/client/ClientMyListingsPage";
-<<<<<<< HEAD
 import ClientAuctionsPage from "./pages/client/ClientAuctionsPage";
 import ClientSavedSearchPage from "./pages/client/ClientSavedSearchPage";
-=======
->>>>>>> ba9336ccf2677025bb0e5e847d312eb8c7ee3a20
 
 const getLastPath = (route: string) => {
   return route.split("/").pop();
@@ -349,7 +346,6 @@ export const router = createBrowserRouter([
         ],
       },
       {
-<<<<<<< HEAD
         path: getLastPath(ROUTES.CLIENT.MARKETPLACE.ROOT),
         children: [
           {
@@ -360,7 +356,6 @@ export const router = createBrowserRouter([
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS),
-            index: true,
             element: <ClientMyListingsPage />,
           },
           {
@@ -373,38 +368,12 @@ export const router = createBrowserRouter([
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.WEBSITES),
-=======
-        path: "marketplace",
-        children: [
-          {
-            index: true,
-            element: <Navigate to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS} replace />,
-          },
-          {
-            path: "my-listings",
-            element: <ClientMyListingsPage />,
-          },
-          {
-            path: "apps",
-            element: <ClientAppsPage />,
-          },
-          {
-            path: "domains",
-            element: <ClientDomainsPage />,
-          },
-          {
-            path: "websites",
->>>>>>> ba9336ccf2677025bb0e5e847d312eb8c7ee3a20
             element: <ClientWebsitesPage />,
           },
         ],
       },
       {
-<<<<<<< HEAD
         path: getLastPath(ROUTES.CLIENT.OFFERS),
-=======
-        path: "offers",
->>>>>>> ba9336ccf2677025bb0e5e847d312eb8c7ee3a20
         element: <ClientOffersPage />,
       },
       {
@@ -424,11 +393,7 @@ export const router = createBrowserRouter([
         element: <ProfileSetup />,
       },
       {
-<<<<<<< HEAD
         path: getLastPath(ROUTES.CLIENT.FACTURAS),
-=======
-        path: "facturas",
->>>>>>> ba9336ccf2677025bb0e5e847d312eb8c7ee3a20
         element: <Facturas />,
       },
       {
@@ -438,10 +403,6 @@ export const router = createBrowserRouter([
       {
         path: getLastPath(ROUTES.CLIENT.FAQ),
         element: <FAQ />,
-      },
-      {
-        path: "my-listings",
-        element: <ClientMyListingsPage />,
       },
     ],
   },

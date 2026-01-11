@@ -16,7 +16,7 @@
     "buyer": "Comprador",
     "marketplaceListing": "Listado del Marketplace",
     "offers": "Ofertas",
-    "actions": "Acciones",
+    "auctions": "Subastas",
     "savedSearch": "Búsqueda Guardada",
     "orders": "Pedidos",
     "allOrders": "Todos los Pedidos",
@@ -208,6 +208,8 @@
     "previous": "Anterior",
     "next": "Siguiente",
     "close": "Cerrar",
+    "copied": "Copiado",
+    "copied_to_clipboard": "copiado al portapapeles",
     "pagination": {
       "showing": "Mostrando",
       "of": "de",
@@ -539,9 +541,6 @@
       "title": "Error al Cargar Tickets",
       "description": "Error al cargar los tickets de soporte. Por favor intenta de nuevo."
     },
-    "pagination": {
-      "showing": "Mostrando {{from}} a {{to}} de {{total}} tickets"
-    },
     "detail": {
       "description": "Detalles e información del ticket",
       "status": "Estado",
@@ -662,13 +661,6 @@
     },
     "actions": {
       "view": "Ver"
-    },
-    "pagination": {
-      "showing": "Mostrando",
-      "of": "de",
-      "per_page": "Por página",
-      "previous": "Anterior",
-      "next": "Siguiente"
     },
     "empty": {
       "no_orders": "No se encontraron órdenes"
@@ -794,13 +786,6 @@
          "message_placeholder": "Agrega un mensaje a tu contraoferta..."
        }
      },
-     "pagination": {
-       "showing": "Mostrando",
-       "of": "de",
-       "per_page": "Por página",
-       "previous": "Anterior",
-       "next": "Siguiente"
-     },
      "empty": {
        "no_offers": "No se encontraron ofertas"
      },
@@ -820,6 +805,63 @@
        "created_at": "Fecha de Creación",
        "updated_at": "Última Actualización",
        "message": "Mensaje"
+     }
+   },
+   "my_listings": {
+     "subtitle": "Gestiona y rastrea tus verificaciones de productos",
+     "search_placeholder": "Buscar por dominio, URL o código de verificación...",
+     "filter_by_status": "Filtrar por estado",
+     "filter_by_type": "Filtrar por tipo",
+     "verification_method": "Método de Verificación",
+     "file_upload": "Carga de Archivo",
+     "created_at": "Creado",
+     "expires_at": "Expira",
+     "attempts": "Intentos de Verificación",
+     "unknown_domain": "Dominio Desconocido",
+     "unknown_website": "Sitio Web Desconocido",
+     "create_verification": "Crear una verificación de producto",
+     "status": {
+       "all": "Todos los Estados",
+       "pending": "Pendiente",
+       "verified": "Verificado",
+       "rejected": "Rechazado",
+       "expired": "Expirado"
+     },
+     "type": {
+       "all": "Todos los Tipos"
+     },
+     "empty": {
+       "title": "No se encontraron listados",
+       "description": "Aún no has creado ningún listado.",
+       "filtered": "Ningún listado coincide con tus filtros"
+     },
+     "error": {
+       "title": "Error al cargar listados",
+       "description": "Error al cargar tus listados. Por favor, inténtalo de nuevo más tarde."
+     },
+     "details": {
+       "title": "Detalles de Verificación",
+       "description": "Ver información detallada sobre tu verificación",
+       "product_type": "Tipo de Producto",
+       "status": "Estado",
+       "domain": "Dominio",
+       "website_url": "URL del Sitio Web",
+       "verification_method": "Método de Verificación",
+       "verification_code": "Código de Verificación",
+       "dns_record": "Registro DNS",
+       "dns_type": "Tipo",
+       "dns_name": "Nombre/Host",
+       "dns_value": "Valor",
+       "full_record": "Registro Completo",
+       "verification_file": "Archivo de Verificación",
+       "filename": "Nombre del Archivo",
+       "file_url": "URL del Archivo",
+       "instructions": "Instrucciones",
+       "created_at": "Fecha de Creación",
+       "updated_at": "Última Actualización",
+       "expires_at": "Fecha de Expiración",
+       "verified_at": "Fecha de Verificación",
+       "attempts": "Intentos de Verificación"
      }
    }
  }

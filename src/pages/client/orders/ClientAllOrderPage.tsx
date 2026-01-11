@@ -291,7 +291,6 @@ const ClientAllOrderPage = () => {
                   isLoading={isLoading}
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
-                  translationKey="orders.pagination"
                 />
               )}
             </>

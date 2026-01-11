@@ -16,7 +16,7 @@
     "buyer": "Buyer",
     "marketplaceListing": "Marketplace Listing",
     "offers": "Offers",
-    "actions": "Actions",
+    "auctions": "Auctions",
     "savedSearch": "Saved Search",
     "orders": "Orders",
     "allOrders": "All Orders",
@@ -834,6 +834,8 @@
     "previous": "Previous",
     "next": "Next",
     "close": "Close",
+    "copied": "Copied",
+    "copied_to_clipboard": "copied to clipboard",
     "pagination": {
       "showing": "Showing",
       "of": "of",
@@ -1096,9 +1098,6 @@
       "title": "Error Loading Tickets",
       "description": "Failed to load support tickets. Please try again."
     },
-    "pagination": {
-      "showing": "Showing {{from}} to {{to}} of {{total}} tickets"
-    },
     "detail": {
       "description": "Ticket details and information",
       "status": "Status",
@@ -1219,13 +1218,6 @@
     },
     "actions": {
       "view": "View"
-    },
-    "pagination": {
-      "showing": "Showing",
-      "of": "of",
-      "per_page": "Per page",
-      "previous": "Previous",
-      "next": "Next"
     },
     "empty": {
       "no_orders": "No orders found"
@@ -1351,13 +1343,6 @@
         "message_placeholder": "Add a message to your counter offer..."
       }
     },
-    "pagination": {
-      "showing": "Showing",
-      "of": "of",
-      "per_page": "Per page",
-      "previous": "Previous",
-      "next": "Next"
-    },
     "empty": {
       "no_offers": "No offers found"
     },
@@ -1377,6 +1362,63 @@
       "created_at": "Created At",
       "updated_at": "Updated At",
       "message": "Message"
+    }
+  },
+  "my_listings": {
+    "subtitle": "Manage and track your product verifications",
+    "search_placeholder": "Search by domain, URL, or verification code...",
+    "filter_by_status": "Filter by status",
+    "filter_by_type": "Filter by type",
+    "verification_method": "Verification Method",
+    "file_upload": "File Upload",
+    "created_at": "Created",
+    "expires_at": "Expires",
+    "attempts": "Verification Attempts",
+    "unknown_domain": "Unknown Domain",
+    "unknown_website": "Unknown Website",
+    "create_verification": "Create a product verification",
+    "status": {
+      "all": "All Status",
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "type": {
+      "all": "All Types"
+    },
+    "empty": {
+      "title": "No listings found",
+      "description": "You haven't created any listings yet.",
+      "filtered": "No listings match your filters"
+    },
+    "error": {
+      "title": "Error loading listings",
+      "description": "Failed to load your listings. Please try again later."
+    },
+    "details": {
+      "title": "Verification Details",
+      "description": "View detailed information about your verification",
+      "product_type": "Product Type",
+      "status": "Status",
+      "domain": "Domain",
+      "website_url": "Website URL",
+      "verification_method": "Verification Method",
+      "verification_code": "Verification Code",
+      "dns_record": "DNS Record",
+      "dns_type": "Type",
+      "dns_name": "Name/Host",
+      "dns_value": "Value",
+      "full_record": "Full Record",
+      "verification_file": "Verification File",
+      "filename": "Filename",
+      "file_url": "File URL",
+      "instructions": "Instructions",
+      "created_at": "Created At",
+      "updated_at": "Updated At",
+      "expires_at": "Expires At",
+      "verified_at": "Verified At",
+      "attempts": "Verification Attempts"
     }
   }
 }

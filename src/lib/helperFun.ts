@@ -36,7 +36,8 @@ export const getStatusColor = (status: string) => {
     case 'resolved': return 'bg-green-500';
     case 'closed': return 'bg-gray-500';
     // Offer statuses
-    case 'accepted': return 'bg-green-500';
+    case 'accepted':
+    case 'verified': return 'bg-green-500';
     case 'rejected': return 'bg-red-500';
     case 'countered': return 'bg-blue-500';
     case 'withdrawn': return 'bg-gray-500';
@@ -59,14 +60,16 @@ export const timeFormat = (date: string, format: string = 'MM/DD/YYYY') => {
 export const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case 'completed':
-    case 'accepted': return 'default';
+    case 'accepted':
+    case 'verified': return 'default';
     case 'processing': return 'secondary';
     case 'pending': return 'outline';
     case 'cancelled':
     case 'rejected': return 'destructive';
     case 'refunded': return 'destructive';
     case 'countered': return 'secondary';
-    case 'withdrawn': return 'outline';
+    case 'withdrawn':
+    case 'expired': return 'outline';
     default: return 'outline';
   }
 };

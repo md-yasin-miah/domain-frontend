@@ -489,7 +489,6 @@ const ClientOffersPage = () => {
                   isLoading={isLoading}
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
-                  translationKey="offers.pagination"
                 />
               )}
             </>
