@@ -25,7 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import StatusIcon from "@/components/common/StatusIcon";
 import { ROUTES } from "@/lib/routes";
 
-const ClientListingDetailsPage = () => {
+const DetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -49,9 +49,8 @@ const ClientListingDetailsPage = () => {
     navigator.clipboard.writeText(text);
     toast({
       title: t("common.copied") || "Copied",
-      description: `${label} ${
-        t("common.copied_to_clipboard") || "copied to clipboard"
-      }`,
+      description: `${label} ${t("common.copied_to_clipboard") || "copied to clipboard"
+        }`,
     });
   };
 
@@ -64,17 +63,17 @@ const ClientListingDetailsPage = () => {
       if (response.is_verified) {
         toast({
           title:
-            t("my_listings.verify.success.title") || "Verification Successful",
+            t("productsVerification.verify.success.title") || "Verification Successful",
           description:
-            t("my_listings.verify.success.description") ||
+            t("productsVerification.verify.success.description") ||
             "Your product has been successfully verified!",
         });
       } else {
         toast({
-          title: t("my_listings.verify.failed.title") || "Verification Failed",
+          title: t("productsVerification.verify.failed.title") || "Verification Failed",
           description:
             response.message ||
-            t("my_listings.verify.failed.description") ||
+            t("productsVerification.verify.failed.description") ||
             "Verification failed. Please check your DNS record or file upload.",
           variant: "destructive",
         });
@@ -89,10 +88,10 @@ const ClientListingDetailsPage = () => {
           : undefined;
 
       toast({
-        title: t("my_listings.verify.error.title") || "Error",
+        title: t("productsVerification.verify.error.title") || "Error",
         description:
           errorMessage ||
-          t("my_listings.verify.error.description") ||
+          t("productsVerification.verify.error.description") ||
           "Failed to verify product. Please try again later.",
         variant: "destructive",
       });
@@ -106,7 +105,7 @@ const ClientListingDetailsPage = () => {
           <div className="text-center space-y-4">
             <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
             <p className="text-muted-foreground">
-              {t("my_listings.loading") || "Loading..."}
+              {t("productsVerification.loading") || "Loading..."}
             </p>
           </div>
         </div>
@@ -121,15 +120,15 @@ const ClientListingDetailsPage = () => {
           <CardContent className="py-12">
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-2">
-                {t("my_listings.details.not_found") || "Verification Not Found"}
+                {t("productsVerification.details.not_found") || "Verification Not Found"}
               </h3>
               <p className="text-muted-foreground mb-4">
-                {t("my_listings.details.not_found_desc") ||
+                {t("productsVerification.details.not_found_desc") ||
                   "The verification you're looking for doesn't exist or has been removed."}
               </p>
               <Button
                 variant="outline"
-                onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS)}
+                onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION)}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 {t("common.back_to_listings") || "Back to Listings"}
@@ -147,7 +146,7 @@ const ClientListingDetailsPage = () => {
       <div className="mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS)}
+          onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION)}
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -156,10 +155,10 @@ const ClientListingDetailsPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">
-              {t("my_listings.details.title") || "Verification Details"}
+              {t("productsVerification.details.title") || "Verification Details"}
             </h1>
             <p className="text-muted-foreground mt-2">
-              {t("my_listings.details.description") ||
+              {t("productsVerification.details.description") ||
                 "View detailed information about your verification"}
             </p>
           </div>
@@ -180,14 +179,14 @@ const ClientListingDetailsPage = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              {t("my_listings.details.basic_info") || "Basic Information"}
+              {t("productsVerification.details.basic_info") || "Basic Information"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="text-sm text-muted-foreground">
-                  {t("my_listings.details.product_type") || "Product Type"}
+                  {t("productsVerification.details.product_type") || "Product Type"}
                 </label>
                 <p className="font-medium capitalize mt-1">
                   {verification.product_type}
@@ -212,7 +211,7 @@ const ClientListingDetailsPage = () => {
               {verification.domain_name && (
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.domain") || "Domain"}
+                    {t("productsVerification.details.domain") || "Domain"}
                   </label>
                   <p className="font-medium mt-1">
                     {verification.domain_name}
@@ -223,7 +222,7 @@ const ClientListingDetailsPage = () => {
               {verification.website_url && (
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.website_url") || "Website URL"}
+                    {t("productsVerification.details.website_url") || "Website URL"}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="font-medium truncate">
@@ -243,7 +242,7 @@ const ClientListingDetailsPage = () => {
               )}
               <div>
                 <label className="text-sm text-muted-foreground">
-                  {t("my_listings.details.verification_method") ||
+                  {t("productsVerification.details.verification_method") ||
                     "Verification Method"}
                 </label>
                 <p className="font-medium capitalize mt-1">
@@ -252,7 +251,7 @@ const ClientListingDetailsPage = () => {
               </div>
               <div>
                 <label className="text-sm text-muted-foreground">
-                  {t("my_listings.details.verification_code") ||
+                  {t("productsVerification.details.verification_code") ||
                     "Verification Code"}
                 </label>
                 <div className="flex items-center gap-2 mt-1">
@@ -265,8 +264,8 @@ const ClientListingDetailsPage = () => {
                     onClick={() =>
                       copyToClipboard(
                         verification.verification_code,
-                        t("my_listings.details.verification_code") ||
-                          "Verification code"
+                        t("productsVerification.details.verification_code") ||
+                        "Verification code"
                       )
                     }
                   >
@@ -283,14 +282,14 @@ const ClientListingDetailsPage = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                {t("my_listings.details.dns_record") || "DNS Record"}
+                {t("productsVerification.details.dns_record") || "DNS Record"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.dns_type") || "Type"}
+                    {t("productsVerification.details.dns_type") || "Type"}
                   </label>
                   <p className="font-medium mt-1">
                     {verification.dns_record_data.type}
@@ -298,7 +297,7 @@ const ClientListingDetailsPage = () => {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.dns_name") || "Name/Host"}
+                    {t("productsVerification.details.dns_name") || "Name/Host"}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="font-medium font-mono text-sm">
@@ -310,7 +309,7 @@ const ClientListingDetailsPage = () => {
                       onClick={() =>
                         copyToClipboard(
                           verification.dns_record_data!.name,
-                          t("my_listings.details.dns_name") || "DNS Name"
+                          t("productsVerification.details.dns_name") || "DNS Name"
                         )
                       }
                     >
@@ -320,7 +319,7 @@ const ClientListingDetailsPage = () => {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.dns_value") || "Value"}
+                    {t("productsVerification.details.dns_value") || "Value"}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="font-medium font-mono text-sm break-all">
@@ -332,7 +331,7 @@ const ClientListingDetailsPage = () => {
                       onClick={() =>
                         copyToClipboard(
                           verification.dns_record_data!.value,
-                          t("my_listings.details.dns_value") || "DNS Value"
+                          t("productsVerification.details.dns_value") || "DNS Value"
                         )
                       }
                     >
@@ -342,7 +341,7 @@ const ClientListingDetailsPage = () => {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.full_record") || "Full Record"}
+                    {t("productsVerification.details.full_record") || "Full Record"}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="font-medium font-mono text-xs break-all bg-muted p-2 rounded">
@@ -354,7 +353,7 @@ const ClientListingDetailsPage = () => {
                       onClick={() =>
                         copyToClipboard(
                           verification.dns_record_data!.full_record,
-                          t("my_listings.details.full_record") || "Full Record"
+                          t("productsVerification.details.full_record") || "Full Record"
                         )
                       }
                     >
@@ -365,7 +364,7 @@ const ClientListingDetailsPage = () => {
                 {verification.dns_record_data.instructions && (
                   <div>
                     <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.instructions") || "Instructions"}
+                      {t("productsVerification.details.instructions") || "Instructions"}
                     </label>
                     <p className="text-sm whitespace-pre-wrap mt-1">
                       {verification.dns_record_data.instructions}
@@ -382,7 +381,7 @@ const ClientListingDetailsPage = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                {t("my_listings.details.verification_file") ||
+                {t("productsVerification.details.verification_file") ||
                   "Verification File"}
               </CardTitle>
             </CardHeader>
@@ -390,7 +389,7 @@ const ClientListingDetailsPage = () => {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.filename") || "Filename"}
+                    {t("productsVerification.details.filename") || "Filename"}
                   </label>
                   <p className="font-medium mt-1">
                     {verification.verification_file_data.filename}
@@ -398,7 +397,7 @@ const ClientListingDetailsPage = () => {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.file_url") || "File URL"}
+                    {t("productsVerification.details.file_url") || "File URL"}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="font-medium text-sm truncate">
@@ -421,7 +420,7 @@ const ClientListingDetailsPage = () => {
                 {verification.verification_file_data.instructions && (
                   <div>
                     <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.instructions") || "Instructions"}
+                      {t("productsVerification.details.instructions") || "Instructions"}
                     </label>
                     <p className="text-sm whitespace-pre-wrap mt-1">
                       {verification.verification_file_data.instructions}
@@ -437,14 +436,14 @@ const ClientListingDetailsPage = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              {t("my_listings.details.additional_info") || "Additional Information"}
+              {t("productsVerification.details.additional_info") || "Additional Information"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="text-sm text-muted-foreground">
-                  {t("my_listings.details.created_at") || "Created At"}
+                  {t("productsVerification.details.created_at") || "Created At"}
                 </label>
                 <p className="font-medium mt-1">
                   {timeFormat(verification.created_at, "lll")}
@@ -452,7 +451,7 @@ const ClientListingDetailsPage = () => {
               </div>
               <div>
                 <label className="text-sm text-muted-foreground">
-                  {t("my_listings.details.updated_at") || "Updated At"}
+                  {t("productsVerification.details.updated_at") || "Updated At"}
                 </label>
                 <p className="font-medium mt-1">
                   {timeFormat(verification.updated_at, "lll")}
@@ -461,7 +460,7 @@ const ClientListingDetailsPage = () => {
               {verification.expires_at && (
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.expires_at") || "Expires At"}
+                    {t("productsVerification.details.expires_at") || "Expires At"}
                   </label>
                   <p className="font-medium mt-1">
                     {timeFormat(verification.expires_at, "lll")}
@@ -471,7 +470,7 @@ const ClientListingDetailsPage = () => {
               {verification.verified_at && (
                 <div>
                   <label className="text-sm text-muted-foreground">
-                    {t("my_listings.details.verified_at") || "Verified At"}
+                    {t("productsVerification.details.verified_at") || "Verified At"}
                   </label>
                   <p className="font-medium mt-1">
                     {timeFormat(verification.verified_at, "lll")}
@@ -480,7 +479,7 @@ const ClientListingDetailsPage = () => {
               )}
               <div>
                 <label className="text-sm text-muted-foreground">
-                  {t("my_listings.details.attempts") ||
+                  {t("productsVerification.details.attempts") ||
                     "Verification Attempts"}
                 </label>
                 <p className="font-medium mt-1">
@@ -497,7 +496,7 @@ const ClientListingDetailsPage = () => {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS)}
+                onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION)}
               >
                 {t("common.close") || "Close"}
               </Button>
@@ -509,12 +508,12 @@ const ClientListingDetailsPage = () => {
                 {isVerifying ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t("my_listings.verify.verifying") || "Verifying..."}
+                    {t("productsVerification.verify.verifying") || "Verifying..."}
                   </>
                 ) : (
                   <>
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    {t("my_listings.details.verify_product") ||
+                    {t("productsVerification.details.verify_product") ||
                       "Verify Product"}
                   </>
                 )}
@@ -527,5 +526,5 @@ const ClientListingDetailsPage = () => {
   );
 };
 
-export default ClientListingDetailsPage;
+export default DetailsPage;
 

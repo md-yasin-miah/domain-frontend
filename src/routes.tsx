@@ -70,8 +70,8 @@ import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
 import ClientOffersPage from "./pages/client/ClientOffersPage";
-import ClientMyListingsPage from "./pages/client/ClientMyListingsPage";
-import ClientListingDetailsPage from "./pages/client/ClientListingDetailsPage";
+import ClientProductsVerificationsPage from "./pages/client/marketplace/productsVerification";
+import ClientProductsDetailsPage from "./pages/client/marketplace/productsVerification/Details";
 import ClientAuctionsPage from "./pages/client/ClientAuctionsPage";
 import ClientSavedSearchPage from "./pages/client/ClientSavedSearchPage";
 
@@ -352,19 +352,19 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: (
-              <Navigate to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS} replace />
+              <Navigate to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION} replace />
             ),
           },
           {
-            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS),
+            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION),
             children: [
               {
                 index: true,
-                element: <ClientMyListingsPage />,
+                element: <ClientProductsVerificationsPage />,
               },
               {
                 path: ":id",
-                element: <ClientListingDetailsPage />,
+                element: <ClientProductsDetailsPage />,
               },
             ],
           },

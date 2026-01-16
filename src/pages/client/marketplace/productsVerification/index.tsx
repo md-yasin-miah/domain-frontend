@@ -69,7 +69,7 @@ type VerificationStatus =
   | "all";
 type ProductType = "domain" | "website" | "all";
 
-const ClientMyListingsPage = () => {
+const ClientProductsVerificationsPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -158,7 +158,7 @@ const ClientMyListingsPage = () => {
   };
 
   const handleViewDetails = (verification: ProductVerification) => {
-    navigate(ROUTES.CLIENT.MARKETPLACE.LISTING_DETAILS(verification.id));
+    navigate(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(verification.id));
   };
 
   const handleCreateClick = () => {
@@ -183,9 +183,9 @@ const ClientMyListingsPage = () => {
       // Validate required fields
       if (!formData.product_type) {
         toast({
-          title: t("my_listings.create.error.title") || "Validation Error",
+          title: t("productsVerification.create.error.title") || "Validation Error",
           description:
-            t("my_listings.create.error.product_type_required") ||
+            t("productsVerification.create.error.product_type_required") ||
             "Product type is required",
           variant: "destructive",
         });
@@ -202,9 +202,9 @@ const ClientMyListingsPage = () => {
       if (isDomainType) {
         if (!formData.domain_name) {
           toast({
-            title: t("my_listings.create.error.title") || "Validation Error",
+            title: t("productsVerification.create.error.title") || "Validation Error",
             description:
-              t("my_listings.create.error.domain_name_required") ||
+              t("productsVerification.create.error.domain_name_required") ||
               "Domain name is required",
             variant: "destructive",
           });
@@ -214,9 +214,9 @@ const ClientMyListingsPage = () => {
         // For website type
         if (!formData.website_url) {
           toast({
-            title: t("my_listings.create.error.title") || "Validation Error",
+            title: t("productsVerification.create.error.title") || "Validation Error",
             description:
-              t("my_listings.create.error.website_url_required") ||
+              t("productsVerification.create.error.website_url_required") ||
               "Website URL is required",
             variant: "destructive",
           });
@@ -226,16 +226,16 @@ const ClientMyListingsPage = () => {
 
       const response = await createVerification(formData).unwrap();
       toast({
-        title: t("my_listings.create.success.title") || "Success",
+        title: t("productsVerification.create.success.title") || "Success",
         description:
-          t("my_listings.create.success.description") ||
+          t("productsVerification.create.success.description") ||
           "Product verification created successfully",
       });
       setCreateDialogOpen(false);
       refetch();
       // Navigate to details page
       if (response?.id) {
-        navigate(ROUTES.CLIENT.MARKETPLACE.LISTING_DETAILS(response.id));
+        navigate(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(response.id));
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -243,10 +243,10 @@ const ClientMyListingsPage = () => {
           ? (error as { data?: { message?: string } }).data?.message
           : undefined;
       toast({
-        title: t("my_listings.create.error.title") || "Error",
+        title: t("productsVerification.create.error.title") || "Error",
         description:
           errorMessage ||
-          t("my_listings.create.error.description") ||
+          t("productsVerification.create.error.description") ||
           "Failed to create product verification",
         variant: "destructive",
       });
@@ -281,10 +281,10 @@ const ClientMyListingsPage = () => {
           <AlertTriangle className="w-16 h-16 text-destructive" />
           <div>
             <h3 className="text-lg font-semibold">
-              {t("my_listings.error.title") || "Error loading listings"}
+              {t("productsVerification.error.title") || "Error loading listings"}
             </h3>
             <p className="text-muted-foreground">
-              {t("my_listings.error.description") ||
+              {t("productsVerification.error.description") ||
                 "Failed to load your listings. Please try again later."}
             </p>
           </div>
@@ -300,16 +300,16 @@ const ClientMyListingsPage = () => {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <FileText className="w-8 h-8 text-primary" />
-            {t("nav.myListings") || "My Listings"}
+            {t("nav.productsVerification") || "Products Verification"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {t("my_listings.subtitle") ||
+            {t("productsVerification.subtitle") ||
               "Manage and track your product verifications"}
           </p>
         </div>
         <Button onClick={handleCreateClick}>
           <Plus className="w-4 h-4 mr-2" />
-          {t("my_listings.create_verification")}
+          {t("productsVerification.create_verification")}
         </Button>
       </div>
 
@@ -321,7 +321,7 @@ const ClientMyListingsPage = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={
-                  t("my_listings.search_placeholder") ||
+                  t("productsVerification.search_placeholder") ||
                   "Search by domain, URL, or verification code..."
                 }
                 value={searchTerm}
@@ -338,7 +338,7 @@ const ClientMyListingsPage = () => {
               <SelectTrigger className="w-[180px]">
                 <SelectValue
                   placeholder={
-                    t("my_listings.filter_by_status") || "Filter by status"
+                    t("productsVerification.filter_by_status") || "Filter by status"
                   }
                 />
               </SelectTrigger>
@@ -374,13 +374,13 @@ const ClientMyListingsPage = () => {
               <SelectTrigger className="w-[180px]">
                 <SelectValue
                   placeholder={
-                    t("my_listings.filter_by_type") || "Filter by type"
+                    t("productsVerification.filter_by_type") || "Filter by type"
                   }
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
-                  {t("my_listings.type.all") || "All Types"}
+                  {t("productsVerification.type.all") || "All Types"}
                 </SelectItem>
                 <SelectItem value="domain">
                   {t("nav.domains") || "Domains"}
@@ -401,15 +401,15 @@ const ClientMyListingsPage = () => {
             <div className="text-center">
               <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                {t("my_listings.empty.title") || "No listings found"}
+                {t("productsVerification.empty.title") || "No listings found"}
               </h3>
               <p className="text-muted-foreground">
                 {searchTerm ||
                   statusFilter !== "all" ||
                   productTypeFilter !== "all"
-                  ? t("my_listings.empty.filtered") ||
+                  ? t("productsVerification.empty.filtered") ||
                   "No listings match your filters"
-                  : t("my_listings.empty.description") ||
+                  : t("productsVerification.empty.description") ||
                   "You haven't created any listings yet."}
               </p>
             </div>
@@ -438,10 +438,10 @@ const ClientMyListingsPage = () => {
                           ? verification.domain_name
                             ? `${verification.domain_name}${verification.domain_extension || ""
                             }`
-                            : t("my_listings.unknown_domain") ||
+                            : t("productsVerification.unknown_domain") ||
                             "Unknown Domain"
                           : verification.website_url ||
-                          t("my_listings.unknown_website") ||
+                          t("productsVerification.unknown_website") ||
                           "Unknown Website"}
                       </CardTitle>
                       <CardDescription className="flex items-center gap-2 mt-1">
@@ -469,17 +469,17 @@ const ClientMyListingsPage = () => {
                 <div className="space-y-3">
                   <div className="text-sm">
                     <span className="text-muted-foreground">
-                      {t("my_listings.verification_method") || "Method"}:
+                      {t("productsVerification.verification_method") || "Method"}:
                     </span>
                     <span className="ml-2 font-medium">
                       {verification.verification_method === "dns"
                         ? "DNS"
-                        : t("my_listings.file_upload") || "File Upload"}
+                        : t("productsVerification.file_upload") || "File Upload"}
                     </span>
                   </div>
                   <div className="text-sm">
                     <span className="text-muted-foreground">
-                      {t("my_listings.created_at") || "Created"}:
+                      {t("productsVerification.created_at") || "Created"}:
                     </span>
                     <span className="ml-2 font-medium">
                       {timeFormat(verification.created_at, "MM/DD/YYYY")}
@@ -488,7 +488,7 @@ const ClientMyListingsPage = () => {
                   {verification.expires_at && (
                     <div className="text-sm">
                       <span className="text-muted-foreground">
-                        {t("my_listings.expires_at") || "Expires"}:
+                        {t("productsVerification.expires_at") || "Expires"}:
                       </span>
                       <span className="ml-2 font-medium">
                         {timeFormat(verification.expires_at, "MM/DD/YYYY")}
@@ -498,7 +498,7 @@ const ClientMyListingsPage = () => {
                   {verification.verification_attempts > 0 && (
                     <div className="text-sm">
                       <span className="text-muted-foreground">
-                        {t("my_listings.attempts") || "Attempts"}:
+                        {t("productsVerification.attempts") || "Attempts"}:
                       </span>
                       <span className="ml-2 font-medium">
                         {verification.verification_attempts}
@@ -518,10 +518,10 @@ const ClientMyListingsPage = () => {
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {t("my_listings.create.title") || "Create Product Verification"}
+              {t("productsVerification.create.title") || "Create Product Verification"}
             </DialogTitle>
             <DialogDescription>
-              {t("my_listings.create.description") ||
+              {t("productsVerification.create.description") ||
                 "Create a new product verification to list your domain or website"}
             </DialogDescription>
           </DialogHeader>
@@ -529,7 +529,7 @@ const ClientMyListingsPage = () => {
             {/* Product Type */}
             <div className="space-y-2">
               <Label htmlFor="product_type">
-                {t("my_listings.create.product_type") || "Product Type"} *
+                {t("productsVerification.create.product_type") || "Product Type"} *
               </Label>
               <Select
                 value={formData.product_type}
@@ -543,7 +543,7 @@ const ClientMyListingsPage = () => {
                     placeholder={
                       listingTypesLoading
                         ? t("common.loading") || "Loading..."
-                        : t("my_listings.create.select_product_type") ||
+                        : t("productsVerification.create.select_product_type") ||
                         "Select product type"
                     }
                   />
@@ -570,7 +570,7 @@ const ClientMyListingsPage = () => {
               <>
                 <div className="space-y-2">
                   <Label htmlFor="domain_name">
-                    {t("my_listings.create.domain_name") || "Domain Name"} *
+                    {t("productsVerification.create.domain_name") || "Domain Name"} *
                   </Label>
                   <Input
                     id="domain_name"
@@ -583,7 +583,7 @@ const ClientMyListingsPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="domain_extension">
-                    {t("my_listings.create.domain_extension") ||
+                    {t("productsVerification.create.domain_extension") ||
                       "Domain Extension"}
                   </Label>
                   <Input
@@ -595,7 +595,7 @@ const ClientMyListingsPage = () => {
                     }
                   />
                   <p className="text-sm text-muted-foreground">
-                    {t("my_listings.create.domain_extension_hint") ||
+                    {t("productsVerification.create.domain_extension_hint") ||
                       "Include the dot (e.g., .com, .io, .net)"}
                   </p>
                 </div>
@@ -606,7 +606,7 @@ const ClientMyListingsPage = () => {
             {isWebsiteType && (
               <div className="space-y-2">
                 <Label htmlFor="website_url">
-                  {t("my_listings.create.website_url") || "Website URL"} *
+                  {t("productsVerification.create.website_url") || "Website URL"} *
                 </Label>
                 <Input
                   id="website_url"
@@ -618,7 +618,7 @@ const ClientMyListingsPage = () => {
                   }
                 />
                 <p className="text-sm text-muted-foreground">
-                  {t("my_listings.create.website_url_hint") ||
+                  {t("productsVerification.create.website_url_hint") ||
                     "Enter the full URL including https://"}
                 </p>
               </div>
@@ -636,10 +636,10 @@ const ClientMyListingsPage = () => {
               {isCreating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t("my_listings.create.creating") || "Creating..."}
+                  {t("productsVerification.create.creating") || "Creating..."}
                 </>
               ) : (
-                t("my_listings.create.submit") || "Create Verification"
+                t("productsVerification.create.submit") || "Create Verification"
               )}
             </Button>
           </DialogFooter>
@@ -649,4 +649,4 @@ const ClientMyListingsPage = () => {
   );
 };
 
-export default ClientMyListingsPage;
+export default ClientProductsVerificationsPage;

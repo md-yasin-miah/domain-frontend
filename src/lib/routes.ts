@@ -27,13 +27,15 @@ export const ROUTES = {
       PAYMENTS: '/client/orders/payments',
       ESCROWS: '/client/orders/escrows',
     },
-    MARKETPLACE:{
+    MARKETPLACE: {
       ROOT: '/client/marketplace',
       MY_LISTINGS: '/client/marketplace/my-listings',
-      LISTING_DETAILS: (id: number) => `/client/marketplace/my-listings/${id}`,
+      MY_LISTINGS_DETAILS: (id: number) => `/client/marketplace/my-listings/${id}`,
+      PRODUCTS_VERIFICATION: '/client/marketplace/products-verification',
+      PRODUCTS_VERIFICATION_DETAILS: (id: number) => `/client/marketplace/products-verification/${id}`,
       APPS: '/client/marketplace/apps',
       DOMAINS: '/client/marketplace/domains',
-      WEBSITES: '/client/marketplace/websites',
+      WEBSITES: '/client/marketplace/websites'
     },
     OFFERS: '/client/offers',
     PROFILE: '/client/profile',

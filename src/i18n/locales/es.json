@@ -3,6 +3,7 @@
     "home": "Inicio",
     "marketplace": "Marketplace",
     "myListings": "Mis Listados",
+    "productsVerification": "Verificación de Productos",
     "domains": "Dominios",
     "websites": "Sitios Web",
     "categories": "Categorías",
@@ -785,7 +786,7 @@
       "message": "Mensaje"
     }
   },
-  "my_listings": {
+  "productsVerification": {
     "subtitle": "Gestiona y rastrea tus verificaciones de productos",
     "search_placeholder": "Buscar por dominio, URL o código de verificación...",
     "filter_by_status": "Filtrar por estado",

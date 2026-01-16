@@ -24,6 +24,8 @@ import {
   Grid3X3,
   BookOpen,
   Home,
+  Verified,
+  List,
 } from 'lucide-react';
 import { ROUTES } from "./routes";
 import { TFunction } from "i18next";
@@ -168,14 +170,19 @@ const getClientMenuItems = (t: TFunction): MenuItem[] => {
       icon: LayoutDashboard,
     },
     {
-      title: t('nav.marketplaceListing'),
+      title: t('nav.marketplace'),
       url: '#',
       icon: ShoppingCart,
       subItems: [
         {
+          title: t('nav.productsVerification'),
+          url: ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION,
+          icon: Verified,
+        },
+        {
           title: t('nav.myListings'),
           url: ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS,
-          icon: ShoppingCart,
+          icon: List,
         },
         {
           title: t('nav.apps'),

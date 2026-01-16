@@ -47,8 +47,6 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
   // Helper function to check if a path is active, including nested routes
   const isPathActive = (path: string): boolean => {
     if (location.pathname === path) return true;
-    // Check if pathname starts with the path followed by / (for nested routes)
-    // e.g., /client/marketplace/my-listings/123 should match /client/marketplace/my-listings
     if (path !== '#' && location.pathname.startsWith(path + '/')) return true;
     return false;
   };
