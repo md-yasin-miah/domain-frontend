@@ -44,14 +44,23 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMenuItems, setExpandedMenuItems] = useState<Record<string, boolean>>({});
 
+  // Helper function to check if a path is active, including nested routes
+  const isPathActive = (path: string): boolean => {
+    if (location.pathname === path) return true;
+    // Check if pathname starts with the path followed by / (for nested routes)
+    // e.g., /client/marketplace/my-listings/123 should match /client/marketplace/my-listings
+    if (path !== '#' && location.pathname.startsWith(path + '/')) return true;
+    return false;
+  };
+
   // Helper function to check if a menu item or any of its subItems is active
   const isItemActive = (item: MenuItem): boolean => {
     // Check if the item's URL matches the current location
-    if (location.pathname === item.url) return true;
+    if (isPathActive(item.url)) return true;
 
-    // Check if any subItem's URL matches the current location
+    // Check if any subItem's URL matches the current location (including nested routes)
     if (item.subItems) {
-      return item.subItems.some((subItem) => location.pathname === subItem.url);
+      return item.subItems.some((subItem) => isPathActive(subItem.url));
     }
 
     return false;
@@ -120,7 +129,7 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                       >
                         <div className={item.subItems.length > 5 ? 'grid grid-cols-2 gap-1' : 'space-y-1'}>
                           {item.subItems?.map((subItem) => {
-                            const isSubItemActive = location.pathname === subItem.url;
+                            const isSubItemActive = isPathActive(subItem.url);
                             return (
                               <DropdownMenuItem key={subItem.title} asChild>
                                 <Link
@@ -336,7 +345,7 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                       {isExpanded && (
                         <div className={isGridLayout ? 'grid grid-cols-2 gap-2' : 'space-y-1'}>
                           {item.subItems.map((subItem) => {
-                            const isSubItemActive = location.pathname === subItem.url;
+                            const isSubItemActive = isPathActive(subItem.url);
                             return (
                               <Link
                                 key={subItem.title}

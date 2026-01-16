@@ -1,4 +1,4 @@
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { LucideIcon, ChevronRight, LogOut } from 'lucide-react';
 import {
@@ -59,7 +59,11 @@ export function AppSidebar({
   const { t } = useTranslation();
   const isCollapsed = state === 'collapsed';
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (location.pathname === path) return true;
+    if (path !== '#' && location.pathname.startsWith(path + '/')) return true;
+    return false;
+  };
 
   // Initialize open submenus if any subitem is active
   const getInitialOpenSubmenus = (): Record<string, boolean> => {
@@ -78,6 +82,26 @@ export function AppSidebar({
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>(() =>
     getInitialOpenSubmenus()
   );
+
+  // Update open submenus when location changes (for nested routes)
+  useEffect(() => {
+    const updated: Record<string, boolean> = {};
+    menuItems.forEach((item) => {
+      if (item.subItems) {
+        const hasActiveSubItem = item.subItems.some((sub) => {
+          const path = sub.url;
+          if (location.pathname === path) return true;
+          // Check if pathname starts with the path followed by / (for nested routes)
+          if (path !== '#' && location.pathname.startsWith(path + '/')) return true;
+          return false;
+        });
+        if (hasActiveSubItem) {
+          updated[item.url] = true;
+        }
+      }
+    });
+    setOpenSubmenus((prev) => ({ ...prev, ...updated }));
+  }, [location.pathname, menuItems]);
 
   const toggleSubmenu = (itemUrl: string) => {
     setOpenSubmenus((prev) => ({
