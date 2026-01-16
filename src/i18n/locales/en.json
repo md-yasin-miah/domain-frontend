@@ -815,6 +815,7 @@
     "error": "Error",
     "success": "Success",
     "save": "Save",
+    "back": "Back",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -1367,6 +1368,8 @@
       "description": "View detailed information about your verification",
       "product_type": "Product Type",
       "domain": "Domain",
+      "basic_info": "Basic Information",
+      "additional_info": "Additional Information",
       "website_url": "Website URL",
       "verification_method": "Verification Method",
       "verification_code": "Verification Code",
@@ -1382,25 +1385,25 @@
       "created_at": "Created At",
       "updated_at": "Updated At",
       "expires_at": "Expires At",
-        "verified_at": "Verified At",
-        "attempts": "Verification Attempts",
-        "verify_product": "Verify Product"
+      "verified_at": "Verified At",
+      "attempts": "Verification Attempts",
+      "verify_product": "Verify Product"
+    },
+    "verify": {
+      "verifying": "Verifying...",
+      "success": {
+        "title": "Verification Successful",
+        "description": "Your product has been successfully verified!"
       },
-      "verify": {
-        "verifying": "Verifying...",
-        "success": {
-          "title": "Verification Successful",
-          "description": "Your product has been successfully verified!"
-        },
-        "failed": {
-          "title": "Verification Failed",
-          "description": "Verification failed. Please check your DNS record or file upload."
-        },
-        "error": {
-          "title": "Error",
-          "description": "Failed to verify product. Please try again later."
-        }
+      "failed": {
+        "title": "Verification Failed",
+        "description": "Verification failed. Please check your DNS record or file upload."
       },
+      "error": {
+        "title": "Error",
+        "description": "Failed to verify product. Please try again later."
+      }
+    },
     "create": {
       "title": "Create Product Verification",
       "description": "Create a new product verification to list your domain or website",

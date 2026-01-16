@@ -1,5 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
 
 export interface EndpointPermission {
   id: number;

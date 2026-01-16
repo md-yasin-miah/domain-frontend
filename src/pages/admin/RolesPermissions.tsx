@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mockData, mockAuth } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,133 +7,156 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Plus, Trash2, Edit2, Save, X } from 'lucide-react';
+import { Shield, Plus, Trash2, Edit2, Save, X, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import {
+  useListRolesQuery,
+  useListPermissionsQuery,
+  useCreateRoleMutation,
+  useUpdateRoleMutation,
+  useDeleteRoleMutation,
+  useAssignPermissionsToRoleMutation,
+  useRemovePermissionFromRoleMutation,
+  useGetRolePermissionsQuery,
+  type RoleResponse,
+  type PermissionResponse,
+} from '@/store/api/rolesPermissionsApi';
+import { extractErrorMessage } from '@/lib/errorHandler';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
-interface Role {
-  id: string;
-  name: string;
-  description: string;
-  is_system_role: boolean;
-}
-
-interface Permission {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-}
-
-interface RolePermission {
-  role_id: string;
-  permission_id: string;
+// Extended Permission type with category for grouping
+interface PermissionWithCategory extends PermissionResponse {
+  category?: string;
 }
 
 export default function RolesPermissions() {
   const { t } = useTranslation();
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [rolePermissions, setRolePermissions] = useState<RolePermission[]>([]);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editingRole, setEditingRole] = useState<Role | null>(null);
-  const [newRole, setNewRole] = useState({ name: '', description: '' });
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const { toast } = useToast();
 
+  // RTK Query hooks
+  const { data: rolesData = [], isLoading: rolesLoading, error: rolesError } = useListRolesQuery({});
+  const { data: permissionsData = [], isLoading: permissionsLoading, error: permissionsError } = useListPermissionsQuery({});
+  const [createRole, { isLoading: isCreating }] = useCreateRoleMutation();
+  const [updateRole, { isLoading: isUpdating }] = useUpdateRoleMutation();
+  const [deleteRole, { isLoading: isDeleting }] = useDeleteRoleMutation();
+  const [assignPermissions, { isLoading: isAssigning }] = useAssignPermissionsToRoleMutation();
+  const [removePermission, { isLoading: isRemoving }] = useRemovePermissionFromRoleMutation();
+
+  // Local state
+  const [selectedRole, setSelectedRole] = useState<number | null>(null);
+  const [editingRole, setEditingRole] = useState<RoleResponse | null>(null);
+  const [newRole, setNewRole] = useState({ name: '', description: '' });
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<{ id: number; isSystemRole: boolean } | null>(null);
+
+  const loading = rolesLoading || permissionsLoading;
+  const error = rolesError || permissionsError;
+
+  // Set initial selected role
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (rolesData.length > 0 && !selectedRole) {
+      setSelectedRole(rolesData[0].id);
+    }
+  }, [rolesData, selectedRole]);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [rolesData, permissionsData, rolePermsData] = await Promise.all([
-        supabase.from('roles').select('*').order('name'),
-        supabase.from('permissions').select('*').order('category, name'),
-        supabase.from('role_permissions').select('role_id, permission_id'),
-      ]);
-
-      if (rolesData.error) throw rolesData.error;
-      if (permissionsData.error) throw permissionsData.error;
-      if (rolePermsData.error) throw rolePermsData.error;
-
-      setRoles(rolesData.data || []);
-      setPermissions(permissionsData.data || []);
-      setRolePermissions(rolePermsData.data || []);
-
-      if (rolesData.data && rolesData.data.length > 0 && !selectedRole) {
-        setSelectedRole(rolesData.data[0].id);
-      }
-    } catch (error: any) {
+  // Show error toast if there's an error
+  useEffect(() => {
+    if (error) {
       toast({
         title: t('admin.roles_permissions.errors.fetch_error'),
-        description: error.message,
+        description: extractErrorMessage(error),
         variant: 'destructive',
       });
-    } finally {
-      setLoading(false);
     }
+  }, [error, toast, t]);
+
+  // Create permission name to ID mapping
+  const permissionNameToId = useMemo(() => {
+    const map = new Map<string, number>();
+    permissionsData.forEach(perm => {
+      map.set(perm.name, perm.id);
+    });
+    return map;
+  }, [permissionsData]);
+
+  // Check if role has permission (by permission name)
+  const hasPermission = (role: RoleResponse, permissionName: string): boolean => {
+    return role.permissions.includes(permissionName);
   };
 
-  const hasPermission = (roleId: string, permissionId: string) => {
-    return rolePermissions.some(
-      rp => rp.role_id === roleId && rp.permission_id === permissionId
-    );
+  // Get permission ID by name
+  const getPermissionId = (permissionName: string): number | null => {
+    return permissionNameToId.get(permissionName) || null;
   };
 
-  const togglePermission = async (roleId: string, permissionId: string) => {
-    const exists = hasPermission(roleId, permissionId);
+  const togglePermission = async (role: RoleResponse, permissionName: string) => {
+    const permissionId = getPermissionId(permissionName);
+    if (!permissionId) {
+      toast({
+        title: t('admin.roles_permissions.errors.permission_toggle_error'),
+        description: 'Permission not found',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const exists = hasPermission(role, permissionName);
 
     try {
-      // Use Edge Function to toggle permission (checks Admin role from user_roles table)
-      const { data, error } = await supabase.functions.invoke('toggle-role-permission', {
-        body: {
-          role_id: roleId,
-          permission_id: permissionId,
-          action: exists ? 'remove' : 'assign',
-        },
-      });
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Failed to toggle permission');
-      }
-
-      // Update local state
       if (exists) {
-        setRolePermissions(prev =>
-          prev.filter(rp => !(rp.role_id === roleId && rp.permission_id === permissionId))
-        );
+        // Remove permission
+        await removePermission({
+          roleId: role.id,
+          permissionId,
+        }).unwrap();
 
         toast({
           title: t('admin.roles_permissions.permission_removed'),
           description: t('admin.roles_permissions.permission_removed_desc'),
         });
       } else {
-        setRolePermissions(prev => [...prev, { role_id: roleId, permission_id: permissionId }]);
+        // Get current permissions and add the new one
+        const currentPermissionIds = role.permissions
+          .map(name => getPermissionId(name))
+          .filter((id): id is number => id !== null);
+
+        const updatedPermissionIds = [...currentPermissionIds, permissionId];
+
+        await assignPermissions({
+          roleId: role.id,
+          data: { permission_ids: updatedPermissionIds },
+        }).unwrap();
 
         toast({
           title: t('admin.roles_permissions.permission_assigned'),
           description: t('admin.roles_permissions.permission_assigned_desc'),
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.permission_toggle_error'),
-        description: error.message,
+        description: extractErrorMessage(error),
         variant: 'destructive',
       });
     }
   };
 
-  const createRole = async () => {
-    if (!newRole.name) {
+  const handleCreateRole = async () => {
+    if (!newRole.name.trim()) {
       toast({
         title: t('admin.roles_permissions.errors.role_name_required'),
         description: t('admin.roles_permissions.errors.role_name_required'),
@@ -144,21 +166,11 @@ export default function RolesPermissions() {
     }
 
     try {
-      // Use Edge Function to create role (checks Admin role from user_roles table)
-      const { data, error } = await supabase.functions.invoke('create-role', {
-        body: {
-          name: newRole.name,
-          description: newRole.description || '',
-        },
-      });
+      await createRole({
+        name: newRole.name.trim(),
+        description: newRole.description.trim() || null,
+      }).unwrap();
 
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Failed to create role');
-      }
-
-      setRoles(prev => [...prev, data.role]);
       setNewRole({ name: '', description: '' });
       setShowCreateDialog(false);
 
@@ -166,53 +178,44 @@ export default function RolesPermissions() {
         title: t('admin.roles_permissions.role_created'),
         description: t('admin.roles_permissions.role_created_desc'),
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.create_error'),
-        description: error.message,
+        description: extractErrorMessage(error),
         variant: 'destructive',
       });
     }
   };
 
-  const updateRole = async () => {
+  const handleUpdateRole = async () => {
     if (!editingRole) return;
 
     try {
-      // Use Edge Function to update role (checks Admin role from user_roles table)
-      const { data, error } = await supabase.functions.invoke('update-role', {
-        body: {
-          role_id: editingRole.id,
-          name: editingRole.name,
-          description: editingRole.description || '',
+      await updateRole({
+        roleId: editingRole.id,
+        data: {
+          name: editingRole.name.trim(),
+          description: editingRole.description || null,
         },
-      });
+      }).unwrap();
 
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Failed to update role');
-      }
-
-      setRoles(prev =>
-        prev.map(r => (r.id === editingRole.id ? data.role : r))
-      );
       setEditingRole(null);
 
       toast({
         title: t('admin.roles_permissions.role_updated'),
         description: t('admin.roles_permissions.role_updated_desc'),
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.update_error'),
-        description: error.message,
+        description: extractErrorMessage(error),
         variant: 'destructive',
       });
     }
   };
 
-  const deleteRole = async (roleId: string, isSystemRole: boolean) => {
+  const handleDeleteClick = (role: RoleResponse) => {
+    const isSystemRole = role.name.toLowerCase() === 'admin' || role.name.toLowerCase() === 'user';
     if (isSystemRole) {
       toast({
         title: t('admin.roles_permissions.cannot_delete_system'),
@@ -222,49 +225,59 @@ export default function RolesPermissions() {
       return;
     }
 
-    if (!confirm(t('admin.roles_permissions.delete_confirm'))) {
-      return;
-    }
+    setRoleToDelete({ id: role.id, isSystemRole });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!roleToDelete) return;
 
     try {
-      // Use Edge Function to delete role (checks Admin role from user_roles table)
-      const { data, error } = await supabase.functions.invoke('delete-role', {
-        body: {
-          role_id: roleId,
-        },
-      });
+      await deleteRole(roleToDelete.id).unwrap();
 
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Failed to delete role');
+      if (selectedRole === roleToDelete.id) {
+        const remainingRoles = rolesData.filter(r => r.id !== roleToDelete.id);
+        setSelectedRole(remainingRoles.length > 0 ? remainingRoles[0].id : null);
       }
 
-      setRoles(prev => prev.filter(r => r.id !== roleId));
-      if (selectedRole === roleId) {
-        setSelectedRole(roles.find(r => r.id !== roleId)?.id || null);
-      }
+      setDeleteConfirmOpen(false);
+      setRoleToDelete(null);
 
       toast({
         title: t('admin.roles_permissions.role_deleted'),
         description: t('admin.roles_permissions.role_deleted_desc'),
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.delete_error'),
-        description: error.message,
+        description: extractErrorMessage(error),
         variant: 'destructive',
       });
     }
   };
 
-  const groupedPermissions = permissions.reduce((acc, perm) => {
-    if (!acc[perm.category]) {
-      acc[perm.category] = [];
-    }
-    acc[perm.category].push(perm);
-    return acc;
-  }, {} as Record<string, Permission[]>);
+  // Group permissions by category (if category exists in permission name or use 'other')
+  // Since API doesn't return category, we'll group by prefix in permission name
+  const groupedPermissions = useMemo(() => {
+    const grouped: Record<string, PermissionResponse[]> = {};
+    permissionsData.forEach(perm => {
+      // Extract category from permission name (e.g., "user_management.create" -> "user_management")
+      const parts = perm.name.split('.');
+      const category = parts.length > 1 ? parts[0] : 'other';
+
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push(perm);
+    });
+
+    // Sort permissions within each category
+    Object.keys(grouped).forEach(category => {
+      grouped[category].sort((a, b) => a.name.localeCompare(b.name));
+    });
+
+    return grouped;
+  }, [permissionsData]);
 
   const categoryNames: Record<string, string> = {
     user_management: t('admin.roles_permissions.categories.user_management'),
@@ -274,18 +287,22 @@ export default function RolesPermissions() {
     support_management: t('admin.roles_permissions.categories.support_management'),
     financial_management: t('admin.roles_permissions.categories.financial_management'),
     system_management: t('admin.roles_permissions.categories.system_management'),
+    other: t('admin.roles_permissions.categories.other', { defaultValue: 'Other' }),
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center space-y-4">
-          <Shield className="h-12 w-12 animate-pulse mx-auto text-primary" />
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground">{t('admin.roles_permissions.loading')}</p>
         </div>
       </div>
     );
   }
+
+  const selectedRoleData = rolesData.find(r => r.id === selectedRole);
+  const isSystemRole = (role: RoleResponse) => role.name.toLowerCase() === 'admin' || role.name.toLowerCase() === 'user';
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -335,8 +352,15 @@ export default function RolesPermissions() {
                       placeholder={t('admin.roles_permissions.role_description_placeholder')}
                     />
                   </div>
-                  <Button onClick={createRole} className="w-full">
-                    {t('admin.roles_permissions.create_role')}
+                  <Button onClick={handleCreateRole} className="w-full" disabled={isCreating}>
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t('admin.roles_permissions.creating', { defaultValue: 'Creating...' })}
+                      </>
+                    ) : (
+                      t('admin.roles_permissions.create_role')
+                    )}
                   </Button>
                 </div>
               </DialogContent>
@@ -345,12 +369,12 @@ export default function RolesPermissions() {
         </div>
       </div>
 
-      <Tabs value={selectedRole || undefined} onValueChange={setSelectedRole}>
+      <Tabs value={selectedRole?.toString() || undefined} onValueChange={(value) => setSelectedRole(Number(value))}>
         <TabsList className="grid grid-cols-2 lg:grid-cols-4 gap-2 h-auto">
-          {roles.map(role => (
-            <TabsTrigger key={role.id} value={role.id} className="flex items-center gap-2">
+          {rolesData.map(role => (
+            <TabsTrigger key={role.id} value={role.id.toString()} className="flex items-center gap-2">
               {role.name}
-              {role.is_system_role && (
+              {isSystemRole(role) && (
                 <Badge variant="secondary" className="text-xs">
                   {t('admin.roles_permissions.system')}
                 </Badge>
@@ -359,8 +383,8 @@ export default function RolesPermissions() {
           ))}
         </TabsList>
 
-        {roles.map(role => (
-          <TabsContent key={role.id} value={role.id} className="mt-6">
+        {rolesData.map(role => (
+          <TabsContent key={role.id} value={role.id.toString()} className="mt-6">
             <Card>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -372,7 +396,7 @@ export default function RolesPermissions() {
                           onChange={e =>
                             setEditingRole(prev => prev ? { ...prev, name: e.target.value } : null)
                           }
-                          disabled={role.is_system_role}
+                          disabled={isSystemRole(role)}
                         />
                         <Textarea
                           value={editingRole.description || ''}
@@ -381,8 +405,12 @@ export default function RolesPermissions() {
                           }
                         />
                         <div className="flex gap-2">
-                          <Button size="sm" onClick={updateRole}>
-                            <Save className="h-4 w-4 mr-2" />
+                          <Button size="sm" onClick={handleUpdateRole} disabled={isUpdating}>
+                            {isUpdating ? (
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            ) : (
+                              <Save className="h-4 w-4 mr-2" />
+                            )}
                             {t('admin.roles_permissions.save')}
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => setEditingRole(null)}>
@@ -407,11 +435,12 @@ export default function RolesPermissions() {
                       >
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      {!role.is_system_role && (
+                      {!isSystemRole(role) && (
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => deleteRole(role.id, role.is_system_role)}
+                          onClick={() => handleDeleteClick(role)}
+                          disabled={isDeleting}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -428,7 +457,7 @@ export default function RolesPermissions() {
                         <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                           {categoryNames[category] || category}
                           <Badge variant="outline">
-                            {perms.filter(p => hasPermission(role.id, p.id)).length}/{perms.length}
+                            {perms.filter(p => hasPermission(role, p.name)).length}/{perms.length}
                           </Badge>
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -439,9 +468,9 @@ export default function RolesPermissions() {
                             >
                               <Checkbox
                                 id={`${role.id}-${permission.id}`}
-                                checked={hasPermission(role.id, permission.id)}
-                                onCheckedChange={() => togglePermission(role.id, permission.id)}
-                                disabled={role.name === 'Admin'}
+                                checked={hasPermission(role, permission.name)}
+                                onCheckedChange={() => togglePermission(role, permission.name)}
+                                disabled={role.name.toLowerCase() === 'admin' || isAssigning || isRemoving}
                               />
                               <div className="flex-1">
                                 <Label
@@ -451,7 +480,7 @@ export default function RolesPermissions() {
                                   {permission.name}
                                 </Label>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                  {permission.description}
+                                  {permission.description || 'No description'}
                                 </p>
                               </div>
                             </div>
@@ -473,6 +502,37 @@ export default function RolesPermissions() {
           </TabsContent>
         ))}
       </Tabs>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.roles_permissions.delete_confirm_title', { defaultValue: 'Delete Role' })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('admin.roles_permissions.delete_confirm')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setRoleToDelete(null)}>
+              {t('admin.roles_permissions.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('admin.roles_permissions.deleting', { defaultValue: 'Deleting...' })}
+                </>
+              ) : (
+                t('admin.roles_permissions.delete', { defaultValue: 'Delete' })
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

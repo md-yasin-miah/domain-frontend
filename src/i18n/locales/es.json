@@ -193,6 +193,7 @@
     "error": "Error",
     "success": "Éxito",
     "save": "Guardar",
+    "back": "Volver",
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "edit": "Editar",
@@ -713,76 +714,76 @@
     }
   },
   "offers": {
-     "all_offers": "Todas las Ofertas",
-     "description": "Ver y gestionar todas tus ofertas",
-     "search_placeholder": "Buscar por ID de oferta, listado...",
-     "filter_by_status": "Filtrar por estado",
-     "table": {
-       "title": "Ofertas",
-       "offer_id": "ID de Oferta",
-       "listing": "Listado",
-       "listing_id": "ID de Listado",
-       "buyer": "Comprador",
-       "amount": "Monto",
-       "listing_price": "Precio del Listado",
-       "expires_at": "Expira",
-       "created_at": "Fecha de Creación",
-       "actions": "Acciones",
-       "total_offers": "ofertas en total",
-       "no_expiry": "Sin expiración"
-     },
-     "actions": {
-       "accept": "Aceptar",
-       "reject": "Rechazar",
-       "counter": "Contraoferta",
-       "withdraw": "Retirar",
-       "view": "Ver",
-       "accept_success": "Oferta Aceptada",
-       "accept_success_desc": "La oferta ha sido aceptada exitosamente.",
-       "accept_error": "Error al Aceptar",
-       "accept_error_desc": "No se pudo aceptar la oferta. Por favor, intenta de nuevo.",
-       "reject_success": "Oferta Rechazada",
-       "reject_success_desc": "La oferta ha sido rechazada.",
-       "reject_error": "Error al Rechazar",
-       "reject_error_desc": "No se pudo rechazar la oferta. Por favor, intenta de nuevo.",
-       "counter_success": "Contraoferta Enviada",
-       "counter_success_desc": "Tu contraoferta ha sido enviada exitosamente.",
-       "counter_error": "Error en Contraoferta",
-       "counter_error_desc": "Por favor ingresa un monto válido.",
-       "countering": "Enviando...",
-       "counter_submit": "Enviar Contraoferta",
-       "withdraw_success": "Oferta Retirada",
-       "withdraw_success_desc": "La oferta ha sido retirada exitosamente.",
-       "withdraw_error": "Error al Retirar",
-       "withdraw_error_desc": "No se pudo retirar la oferta. Por favor, intenta de nuevo.",
-       "counter_dialog": {
-         "title": "Contraoferta",
-         "description": "Haz una contraoferta con un monto diferente",
-         "amount": "Monto de Contraoferta",
-         "amount_placeholder": "Ingresa el monto de contraoferta",
-         "message": "Mensaje (Opcional)",
-         "message_placeholder": "Agrega un mensaje a tu contraoferta..."
-       }
-     },
-     "empty": {
-       "no_offers": "No se encontraron ofertas"
-     },
-     "error": {
-       "title": "Error al cargar ofertas",
-       "description": "Hubo un error al cargar tus ofertas. Por favor, intenta de nuevo más tarde."
-     },
-     "details": {
-       "title": "Detalles de la Oferta",
-       "description": "Ver información detallada sobre esta oferta",
-       "listing": "Listado",
-       "buyer": "Comprador",
-       "amount": "Monto",
-       "listing_price": "Precio del Listado",
-       "expires_at": "Expira",
-       "created_at": "Fecha de Creación",
-       "updated_at": "Última Actualización",
-       "message": "Mensaje"
-     }
+    "all_offers": "Todas las Ofertas",
+    "description": "Ver y gestionar todas tus ofertas",
+    "search_placeholder": "Buscar por ID de oferta, listado...",
+    "filter_by_status": "Filtrar por estado",
+    "table": {
+      "title": "Ofertas",
+      "offer_id": "ID de Oferta",
+      "listing": "Listado",
+      "listing_id": "ID de Listado",
+      "buyer": "Comprador",
+      "amount": "Monto",
+      "listing_price": "Precio del Listado",
+      "expires_at": "Expira",
+      "created_at": "Fecha de Creación",
+      "actions": "Acciones",
+      "total_offers": "ofertas en total",
+      "no_expiry": "Sin expiración"
+    },
+    "actions": {
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "counter": "Contraoferta",
+      "withdraw": "Retirar",
+      "view": "Ver",
+      "accept_success": "Oferta Aceptada",
+      "accept_success_desc": "La oferta ha sido aceptada exitosamente.",
+      "accept_error": "Error al Aceptar",
+      "accept_error_desc": "No se pudo aceptar la oferta. Por favor, intenta de nuevo.",
+      "reject_success": "Oferta Rechazada",
+      "reject_success_desc": "La oferta ha sido rechazada.",
+      "reject_error": "Error al Rechazar",
+      "reject_error_desc": "No se pudo rechazar la oferta. Por favor, intenta de nuevo.",
+      "counter_success": "Contraoferta Enviada",
+      "counter_success_desc": "Tu contraoferta ha sido enviada exitosamente.",
+      "counter_error": "Error en Contraoferta",
+      "counter_error_desc": "Por favor ingresa un monto válido.",
+      "countering": "Enviando...",
+      "counter_submit": "Enviar Contraoferta",
+      "withdraw_success": "Oferta Retirada",
+      "withdraw_success_desc": "La oferta ha sido retirada exitosamente.",
+      "withdraw_error": "Error al Retirar",
+      "withdraw_error_desc": "No se pudo retirar la oferta. Por favor, intenta de nuevo.",
+      "counter_dialog": {
+        "title": "Contraoferta",
+        "description": "Haz una contraoferta con un monto diferente",
+        "amount": "Monto de Contraoferta",
+        "amount_placeholder": "Ingresa el monto de contraoferta",
+        "message": "Mensaje (Opcional)",
+        "message_placeholder": "Agrega un mensaje a tu contraoferta..."
+      }
+    },
+    "empty": {
+      "no_offers": "No se encontraron ofertas"
+    },
+    "error": {
+      "title": "Error al cargar ofertas",
+      "description": "Hubo un error al cargar tus ofertas. Por favor, intenta de nuevo más tarde."
+    },
+    "details": {
+      "title": "Detalles de la Oferta",
+      "description": "Ver información detallada sobre esta oferta",
+      "listing": "Listado",
+      "buyer": "Comprador",
+      "amount": "Monto",
+      "listing_price": "Precio del Listado",
+      "expires_at": "Expira",
+      "created_at": "Fecha de Creación",
+      "updated_at": "Última Actualización",
+      "message": "Mensaje"
+    }
   },
   "my_listings": {
     "subtitle": "Gestiona y rastrea tus verificaciones de productos",
@@ -814,7 +815,9 @@
       "description": "Ver información detallada sobre tu verificación",
       "product_type": "Tipo de Producto",
       "domain": "Dominio",
+      "basic_info": "Información Básica",
       "website_url": "URL del Sitio Web",
+      "additional_info": "Información Adicional",
       "verification_method": "Método de Verificación",
       "verification_code": "Código de Verificación",
       "dns_record": "Registro DNS",
@@ -829,25 +832,25 @@
       "created_at": "Fecha de Creación",
       "updated_at": "Última Actualización",
       "expires_at": "Fecha de Expiración",
-       "verified_at": "Fecha de Verificación",
-       "attempts": "Intentos de Verificación",
-       "verify_product": "Verificar Producto"
-     },
-     "verify": {
-       "verifying": "Verificando...",
-       "success": {
-         "title": "Verificación Exitosa",
-         "description": "¡Tu producto ha sido verificado exitosamente!"
-       },
-       "failed": {
-         "title": "Verificación Fallida",
-         "description": "La verificación falló. Por favor, verifica tu registro DNS o la carga del archivo."
-       },
-       "error": {
-         "title": "Error",
-         "description": "Error al verificar el producto. Por favor, inténtalo de nuevo más tarde."
-       }
-     },
+      "verified_at": "Fecha de Verificación",
+      "attempts": "Intentos de Verificación",
+      "verify_product": "Verificar Producto"
+    },
+    "verify": {
+      "verifying": "Verificando...",
+      "success": {
+        "title": "Verificación Exitosa",
+        "description": "¡Tu producto ha sido verificado exitosamente!"
+      },
+      "failed": {
+        "title": "Verificación Fallida",
+        "description": "La verificación falló. Por favor, verifica tu registro DNS o la carga del archivo."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Error al verificar el producto. Por favor, inténtalo de nuevo más tarde."
+      }
+    },
     "create": {
       "title": "Crear Verificación de Producto",
       "description": "Crea una nueva verificación de producto para listar tu dominio o sitio web",

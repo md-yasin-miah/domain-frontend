@@ -30,6 +30,7 @@ export const ROUTES = {
     MARKETPLACE:{
       ROOT: '/client/marketplace',
       MY_LISTINGS: '/client/marketplace/my-listings',
+      LISTING_DETAILS: (id: number) => `/client/marketplace/my-listings/${id}`,
       APPS: '/client/marketplace/apps',
       DOMAINS: '/client/marketplace/domains',
       WEBSITES: '/client/marketplace/websites',

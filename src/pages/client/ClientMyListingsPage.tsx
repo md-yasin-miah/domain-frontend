@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -58,6 +59,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import StatusIcon from "@/components/common/StatusIcon";
+import { ROUTES } from "@/lib/routes";
 
 type VerificationStatus =
   | "pending"
@@ -70,13 +72,11 @@ type ProductType = "domain" | "website" | "all";
 const ClientMyListingsPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<VerificationStatus>("all");
   const [productTypeFilter, setProductTypeFilter] =
     useState<ProductType>("all");
-  const [selectedVerification, setSelectedVerification] =
-    useState<ProductVerification | null>(null);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [formData, setFormData] = useState<ProductVerificationCreateRequest>({
     product_type: "",
@@ -95,8 +95,6 @@ const ClientMyListingsPage = () => {
     useGetMarketplaceListingTypesQuery();
   const [createVerification, { isLoading: isCreating }] =
     useCreateProductVerificationMutation();
-  const [verifyVerification, { isLoading: isVerifying }] =
-    useVerifyProductVerificationMutation();
 
   // Filter verifications
   const filteredVerifications = useMemo(() => {
@@ -154,70 +152,13 @@ const ClientMyListingsPage = () => {
     navigator.clipboard.writeText(text);
     toast({
       title: t("common.copied") || "Copied",
-      description: `${label} ${
-        t("common.copied_to_clipboard") || "copied to clipboard"
-      }`,
+      description: `${label} ${t("common.copied_to_clipboard") || "copied to clipboard"
+        }`,
     });
   };
 
   const handleViewDetails = (verification: ProductVerification) => {
-    setSelectedVerification(verification);
-    setDetailDialogOpen(true);
-  };
-
-  const handleVerifyProduct = async () => {
-    if (!selectedVerification) return;
-
-    try {
-      const response = await verifyVerification(
-        selectedVerification.id
-      ).unwrap();
-
-      // Update the selected verification with the response
-      setSelectedVerification({
-        ...selectedVerification,
-        status: response.status,
-        verified_at: response.verified_at,
-        verification_attempts: response.verification_attempts,
-        last_verification_check: response.last_verification_check,
-      });
-
-      if (response.is_verified) {
-        toast({
-          title:
-            t("my_listings.verify.success.title") || "Verification Successful",
-          description:
-            t("my_listings.verify.success.description") ||
-            "Your product has been successfully verified!",
-        });
-      } else {
-        toast({
-          title: t("my_listings.verify.failed.title") || "Verification Failed",
-          description:
-            response.message ||
-            t("my_listings.verify.failed.description") ||
-            "Verification failed. Please check your DNS record or file upload.",
-          variant: "destructive",
-        });
-      }
-
-      // Refetch the list to update all verifications
-      refetch();
-    } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === "object" && "data" in error
-          ? (error as { data?: { message?: string } }).data?.message
-          : undefined;
-
-      toast({
-        title: t("my_listings.verify.error.title") || "Error",
-        description:
-          errorMessage ||
-          t("my_listings.verify.error.description") ||
-          "Failed to verify product. Please try again later.",
-        variant: "destructive",
-      });
-    }
+    navigate(ROUTES.CLIENT.MARKETPLACE.LISTING_DETAILS(verification.id));
   };
 
   const handleCreateClick = () => {
@@ -283,7 +224,7 @@ const ClientMyListingsPage = () => {
         }
       }
 
-      await createVerification(formData).unwrap();
+      const response = await createVerification(formData).unwrap();
       toast({
         title: t("my_listings.create.success.title") || "Success",
         description:
@@ -292,6 +233,10 @@ const ClientMyListingsPage = () => {
       });
       setCreateDialogOpen(false);
       refetch();
+      // Navigate to details page
+      if (response?.id) {
+        navigate(ROUTES.CLIENT.MARKETPLACE.LISTING_DETAILS(response.id));
+      }
     } catch (error: unknown) {
       const errorMessage =
         error && typeof error === "object" && "data" in error
@@ -460,12 +405,12 @@ const ClientMyListingsPage = () => {
               </h3>
               <p className="text-muted-foreground">
                 {searchTerm ||
-                statusFilter !== "all" ||
-                productTypeFilter !== "all"
+                  statusFilter !== "all" ||
+                  productTypeFilter !== "all"
                   ? t("my_listings.empty.filtered") ||
-                    "No listings match your filters"
+                  "No listings match your filters"
                   : t("my_listings.empty.description") ||
-                    "You haven't created any listings yet."}
+                  "You haven't created any listings yet."}
               </p>
             </div>
           </CardContent>
@@ -491,14 +436,13 @@ const ClientMyListingsPage = () => {
                       <CardTitle className="text-lg">
                         {verification.product_type === "domain"
                           ? verification.domain_name
-                            ? `${verification.domain_name}${
-                                verification.domain_extension || ""
-                              }`
+                            ? `${verification.domain_name}${verification.domain_extension || ""
+                            }`
                             : t("my_listings.unknown_domain") ||
-                              "Unknown Domain"
+                            "Unknown Domain"
                           : verification.website_url ||
-                            t("my_listings.unknown_website") ||
-                            "Unknown Website"}
+                          t("my_listings.unknown_website") ||
+                          "Unknown Website"}
                       </CardTitle>
                       <CardDescription className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-xs">
@@ -568,380 +512,6 @@ const ClientMyListingsPage = () => {
         </div>
       )}
 
-      {/* Detail Dialog */}
-      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          {selectedVerification && (
-            <>
-              <DialogHeader>
-                <DialogTitle>
-                  {t("my_listings.details.title") || "Verification Details"}
-                </DialogTitle>
-                <DialogDescription>
-                  {t("my_listings.details.description") ||
-                    "View detailed information about your verification"}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-6 py-4">
-                {/* Basic Info */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.product_type") || "Product Type"}
-                    </label>
-                    <p className="font-medium capitalize">
-                      {selectedVerification.product_type}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      {t("common.status.status") || "Status"}
-                    </label>
-                    <div className="mt-1">
-                      <Badge
-                        variant={getStatusBadgeVariant(
-                          selectedVerification.status
-                        )}
-                        className="flex items-center gap-1 w-fit"
-                      >
-                        <StatusIcon status={selectedVerification.status} />
-                        {getStatusLabel(selectedVerification.status, t)}
-                      </Badge>
-                    </div>
-                  </div>
-                  {selectedVerification.domain_name && (
-                    <div>
-                      <label className="text-sm text-muted-foreground">
-                        {t("my_listings.details.domain") || "Domain"}
-                      </label>
-                      <p className="font-medium">
-                        {selectedVerification.domain_name}
-                        {selectedVerification.domain_extension}
-                      </p>
-                    </div>
-                  )}
-                  {selectedVerification.website_url && (
-                    <div>
-                      <label className="text-sm text-muted-foreground">
-                        {t("my_listings.details.website_url") || "Website URL"}
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium truncate">
-                          {selectedVerification.website_url}
-                        </p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            window.open(
-                              selectedVerification.website_url!,
-                              "_blank"
-                            )
-                          }
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.verification_method") ||
-                        "Verification Method"}
-                    </label>
-                    <p className="font-medium capitalize">
-                      {selectedVerification.verification_method.replace(
-                        "_",
-                        " "
-                      )}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.verification_code") ||
-                        "Verification Code"}
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium font-mono text-sm truncate">
-                        {selectedVerification.verification_code}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          copyToClipboard(
-                            selectedVerification.verification_code,
-                            t("my_listings.details.verification_code") ||
-                              "Verification code"
-                          )
-                        }
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* DNS Record Data */}
-                {selectedVerification.dns_record_data && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold">
-                      {t("my_listings.details.dns_record") || "DNS Record"}
-                    </h4>
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="space-y-3">
-                          <div>
-                            <label className="text-sm text-muted-foreground">
-                              {t("my_listings.details.dns_type") || "Type"}
-                            </label>
-                            <p className="font-medium">
-                              {selectedVerification.dns_record_data.type}
-                            </p>
-                          </div>
-                          <div>
-                            <label className="text-sm text-muted-foreground">
-                              {t("my_listings.details.dns_name") || "Name/Host"}
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium font-mono text-sm">
-                                {selectedVerification.dns_record_data.name}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  copyToClipboard(
-                                    selectedVerification.dns_record_data!.name,
-                                    t("my_listings.details.dns_name") ||
-                                      "DNS Name"
-                                  )
-                                }
-                              >
-                                <Copy className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          <div>
-                            <label className="text-sm text-muted-foreground">
-                              {t("my_listings.details.dns_value") || "Value"}
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium font-mono text-sm break-all">
-                                {selectedVerification.dns_record_data.value}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  copyToClipboard(
-                                    selectedVerification.dns_record_data!.value,
-                                    t("my_listings.details.dns_value") ||
-                                      "DNS Value"
-                                  )
-                                }
-                              >
-                                <Copy className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          <div>
-                            <label className="text-sm text-muted-foreground">
-                              {t("my_listings.details.full_record") ||
-                                "Full Record"}
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium font-mono text-xs break-all bg-muted p-2 rounded">
-                                {
-                                  selectedVerification.dns_record_data
-                                    .full_record
-                                }
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  copyToClipboard(
-                                    selectedVerification.dns_record_data!
-                                      .full_record,
-                                    t("my_listings.details.full_record") ||
-                                      "Full Record"
-                                  )
-                                }
-                              >
-                                <Copy className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          {selectedVerification.dns_record_data
-                            .instructions && (
-                            <div>
-                              <label className="text-sm text-muted-foreground">
-                                {t("my_listings.details.instructions") ||
-                                  "Instructions"}
-                              </label>
-                              <p className="text-sm whitespace-pre-wrap mt-1">
-                                {
-                                  selectedVerification.dns_record_data
-                                    .instructions
-                                }
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-
-                {/* File Upload Data */}
-                {selectedVerification.verification_file_data && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold">
-                      {t("my_listings.details.verification_file") ||
-                        "Verification File"}
-                    </h4>
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="space-y-3">
-                          <div>
-                            <label className="text-sm text-muted-foreground">
-                              {t("my_listings.details.filename") || "Filename"}
-                            </label>
-                            <p className="font-medium">
-                              {
-                                selectedVerification.verification_file_data
-                                  .filename
-                              }
-                            </p>
-                          </div>
-                          <div>
-                            <label className="text-sm text-muted-foreground">
-                              {t("my_listings.details.file_url") || "File URL"}
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium text-sm truncate">
-                                {
-                                  selectedVerification.verification_file_data
-                                    .file_url
-                                }
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  window.open(
-                                    selectedVerification.verification_file_data!
-                                      .file_url,
-                                    "_blank"
-                                  )
-                                }
-                              >
-                                <Download className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          {selectedVerification.verification_file_data
-                            .instructions && (
-                            <div>
-                              <label className="text-sm text-muted-foreground">
-                                {t("my_listings.details.instructions") ||
-                                  "Instructions"}
-                              </label>
-                              <p className="text-sm whitespace-pre-wrap mt-1">
-                                {
-                                  selectedVerification.verification_file_data
-                                    .instructions
-                                }
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-
-                {/* Additional Info */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.created_at") || "Created At"}
-                    </label>
-                    <p className="font-medium">
-                      {timeFormat(selectedVerification.created_at, "lll")}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.updated_at") || "Updated At"}
-                    </label>
-                    <p className="font-medium">
-                      {timeFormat(selectedVerification.updated_at, "lll")}
-                    </p>
-                  </div>
-                  {selectedVerification.expires_at && (
-                    <div>
-                      <label className="text-sm text-muted-foreground">
-                        {t("my_listings.details.expires_at") || "Expires At"}
-                      </label>
-                      <p className="font-medium">
-                        {timeFormat(selectedVerification.expires_at, "lll")}
-                      </p>
-                    </div>
-                  )}
-                  {selectedVerification.verified_at && (
-                    <div>
-                      <label className="text-sm text-muted-foreground">
-                        {t("my_listings.details.verified_at") || "Verified At"}
-                      </label>
-                      <p className="font-medium">
-                        {timeFormat(selectedVerification.verified_at, "lll")}
-                      </p>
-                    </div>
-                  )}
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      {t("my_listings.details.attempts") ||
-                        "Verification Attempts"}
-                    </label>
-                    <p className="font-medium">
-                      {selectedVerification.verification_attempts}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                  onClick={handleVerifyProduct}
-                  disabled={isVerifying}
-                >
-                  {isVerifying ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {t("my_listings.verify.verifying") || "Verifying..."}
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      {t("my_listings.details.verify_product") ||
-                        "Verify Product"}
-                    </>
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setDetailDialogOpen(false)}
-                  disabled={isVerifying}
-                >
-                  {t("common.close") || "Close"}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* Create Verification Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
@@ -974,7 +544,7 @@ const ClientMyListingsPage = () => {
                       listingTypesLoading
                         ? t("common.loading") || "Loading..."
                         : t("my_listings.create.select_product_type") ||
-                          "Select product type"
+                        "Select product type"
                     }
                   />
                 </SelectTrigger>

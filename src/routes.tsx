@@ -71,6 +71,7 @@ import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
 import ClientOffersPage from "./pages/client/ClientOffersPage";
 import ClientMyListingsPage from "./pages/client/ClientMyListingsPage";
+import ClientListingDetailsPage from "./pages/client/ClientListingDetailsPage";
 import ClientAuctionsPage from "./pages/client/ClientAuctionsPage";
 import ClientSavedSearchPage from "./pages/client/ClientSavedSearchPage";
 
@@ -356,7 +357,16 @@ export const router = createBrowserRouter([
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS),
-            element: <ClientMyListingsPage />,
+            children: [
+              {
+                index: true,
+                element: <ClientMyListingsPage />,
+              },
+              {
+                path: ":id",
+                element: <ClientListingDetailsPage />,
+              },
+            ],
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.APPS),
