@@ -45,3 +45,53 @@ interface ProductVerificationCreateRequest {
   domain_extension?: string;
   website_url?: string;
 }
+
+interface ProductVerificationStatusResponse {
+  id: number;
+  status: 'pending' | 'verified' | 'rejected' | 'expired' | 'failed';
+  verification_method: 'dns' | 'file_upload' | null;
+  is_verified: boolean;
+  verified_at: string | null;
+  verification_attempts: number;
+  last_verification_check: string | null;
+  expires_at: string | null;
+  can_create_listing: boolean;
+  listing_id: number | null;
+  message: string | null;
+}
+
+interface CreateListingFromVerificationRequest {
+  title: string;
+  description: string;
+  short_description?: string | null;
+  price: number | string;
+  currency?: string;
+  is_price_negotiable?: boolean;
+  listing_type_id: number;
+  // Additional optional fields
+  domain_age_years?: number | null;
+  domain_authority?: number | null;
+  domain_backlinks?: number | null;
+  website_traffic_monthly?: number | null;
+  website_revenue_monthly?: number | string | null;
+  website_profit_monthly?: number | string | null;
+  website_technology?: string | null;
+  status?: 'draft' | 'active' | 'sold' | 'expired' | 'suspended';
+  primary_image_url?: string | null;
+  image_urls?: string[] | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
+}
+interface ProductVerificationVerifyResponse {
+  id: number;
+  status: 'pending' | 'verified' | 'rejected' | 'expired' | 'failed';
+  verification_method: 'dns' | 'file_upload';
+  is_verified: boolean;
+  verified_at: string | null;
+  verification_attempts: number;
+  last_verification_check: string | null;
+  expires_at: string;
+  can_create_listing: boolean;
+  listing_id: number | null;
+  message: string;
+}

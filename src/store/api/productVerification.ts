@@ -36,27 +36,50 @@ export const productVerificationApi = apiSlice.injectEndpoints({
         'ProductVerification',
       ],
     }),
+    getProductVerificationStatus: builder.query<ProductVerificationStatusResponse, number>({
+      query: (verificationId) => ({
+        url: `/product-verification/${verificationId}/status`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, verificationId) => [
+        { type: 'ProductVerification', id: verificationId },
+        'ProductVerification',
+      ],
+    }),
+    createListingFromVerification: builder.mutation<MarketplaceListing, { verificationId: number; data: CreateListingFromVerificationRequest }>({
+      query: ({ verificationId, data }) => ({
+        url: `/product-verification/${verificationId}/create-listing`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { verificationId }) => [
+        { type: 'ProductVerification', id: verificationId },
+        'ProductVerification',
+        'MarketplaceListing',
+      ],
+    }),
+    downloadVerificationFile: builder.query<Blob, string>({
+      query: (filename) => ({
+        url: `/product-verification/files/${filename}`,
+        method: 'GET',
+        responseHandler: async (response) => {
+          if (!response.ok) {
+            throw new Error('Failed to download file');
+          }
+          return await response.blob();
+        },
+      }),
+    }),
   }),
-}); 
-
-export interface ProductVerificationVerifyResponse {
-  id: number;
-  status: 'pending' | 'verified' | 'rejected' | 'expired' | 'failed';
-  verification_method: 'dns' | 'file_upload';
-  is_verified: boolean;
-  verified_at: string | null;
-  verification_attempts: number;
-  last_verification_check: string | null;
-  expires_at: string;
-  can_create_listing: boolean;
-  listing_id: number | null;
-  message: string;
-}
+});
 
 export const {
   useGetProductVerificationsQuery,
   useGetProductVerificationQuery,
   useCreateProductVerificationMutation,
   useVerifyProductVerificationMutation,
+  useGetProductVerificationStatusQuery,
+  useCreateListingFromVerificationMutation,
+  useLazyDownloadVerificationFileQuery,
 } = productVerificationApi;
 
