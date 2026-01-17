@@ -28,7 +28,7 @@ export const messagingApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: 'Messaging', id }],
     }),
-    getMessages: builder.query<PaginatedResponse<Message> | Message[], { conversationId: number; params?: PaginationParams }>({
+    getMessages: builder.query<PaginatedResponse<Message>, { conversationId: number; params?: PaginationParams }>({
       query: ({ conversationId, params }) => ({
         url: `/messages/conversations/${conversationId}/messages`,
         method: 'GET',

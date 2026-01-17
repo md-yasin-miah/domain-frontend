@@ -42,7 +42,10 @@ export const ROUTES = {
     PROFILE_SETUP: '/client/profile-setup',
     SAVED_SEARCH: '/client/saved-search',
     SUPPORT: '/client/support',
-    CHAT: '/client/chat',
+    CHAT: {
+      ROOT: '/client/chat',
+      CONVERSATION: (id: number) => `/client/chat/${id}`,
+    },
     REVIEWS: '/client/reviews',
   },
 }; 

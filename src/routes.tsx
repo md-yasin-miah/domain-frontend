@@ -79,6 +79,7 @@ import ClientSavedSearchPage from "./pages/client/ClientSavedSearchPage";
 import MyListing from "./pages/client/marketplace/myListing";
 import MyListingDetails from "./pages/client/marketplace/myListing/Details";
 import ClientChatPage from "./pages/client/chat";
+import Conversation from "./pages/client/chat/Conversation";
 
 const getLastPath = (route: string) => {
   return route.split("/").pop();
@@ -429,8 +430,17 @@ export const router = createBrowserRouter([
         element: <SupportPage />,
       },
       {
-        path: getLastPath(ROUTES.CLIENT.CHAT),
-        element: <ClientChatPage />,
+        path: getLastPath(ROUTES.CLIENT.CHAT.ROOT),
+        children: [
+          {
+            index: true,
+            element: <ClientChatPage />,
+          },
+          {
+            path: ":id",
+            element: <Conversation />,
+          },
+        ],
       },
       {
         path: getLastPath(ROUTES.CLIENT.FAQ),
