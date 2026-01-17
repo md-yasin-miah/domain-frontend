@@ -1,4 +1,4 @@
-import { useGetMyMarketListingQuery } from '@/store/api/marketplaceApi';
+import { useGetMyMarketListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable, ColumnDef } from '@/components/ui/data-table';
@@ -13,12 +13,14 @@ import {
   Trash2,
   Search,
   Package,
-  ExternalLink
+  ExternalLink,
+  Power
 } from 'lucide-react';
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
+import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,12 +34,14 @@ import CreateListingModal from './components/CreateListingModal';
 const MyListing = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data, isLoading } = useGetMyMarketListingQuery({
     skip: 0,
     limit: 50,
   });
+  const [updateStatus] = useUpdateMarketplaceListingStatusMutation();
 
   // Filter data based on search term
   const filteredData = React.useMemo(() => {
@@ -49,6 +53,29 @@ const MyListing = () => {
       listing.listing_type.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [data?.items, searchTerm]);
+
+  // Handle status toggle
+  const handleStatusToggle = async (listing: MarketplaceListing, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newStatus = listing.status === 'active' ? 'draft' : 'active';
+    try {
+      await updateStatus({ id: listing.id, new_status: newStatus }).unwrap();
+
+      toast({
+        title: 'Success',
+        description: `Listing ${newStatus === 'active' ? 'published' : 'unpublished'} successfully`,
+      });
+    } catch (error: unknown) {
+      console.log({ error });
+      const errorMessage = (error as ApiError)?.data?.detail || 'Failed to update listing status';
+
+      toast({
+        title: 'Error',
+        description: errorMessage as string || 'Failed to update listing status',
+        variant: 'destructive',
+      });
+    }
+  };
 
   // Define table columns
   const columns: ColumnDef<MarketplaceListing>[] = [
@@ -241,6 +268,10 @@ const MyListing = () => {
               <DropdownMenuItem onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}>
                 <ExternalLink className="w-4 h-4 mr-2" />
                 View Listing
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => handleStatusToggle(row, e)}>
+                <Power className="w-4 h-4 mr-2" />
+                {row.status === 'active' ? 'Unpublish' : 'Publish'}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Edit className="w-4 h-4 mr-2" />

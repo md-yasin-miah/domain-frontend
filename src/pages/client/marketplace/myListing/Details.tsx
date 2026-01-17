@@ -16,20 +16,51 @@ import {
   Globe,
   Package,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Power
 } from 'lucide-react';
-import { useGetMarketplaceListingQuery } from '@/store/api/marketplaceApi';
+import { useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 const Details = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { data: listing, isLoading, error } = useGetMarketplaceListingQuery(Number(id));
+  const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateMarketplaceListingStatusMutation();
+
+  // Handle status toggle
+  const handleStatusToggle = async () => {
+    if (!listing) return;
+    const newStatus = listing.status === 'active' ? 'draft' : 'active';
+    try {
+      await updateStatus({ id: listing.id, new_status: newStatus }).unwrap();
+      
+      toast({
+        title: 'Success',
+        description: `Listing ${newStatus === 'active' ? 'published' : 'unpublished'} successfully`,
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === 'object' && 'data' in error
+          ? (error as { data?: { message?: string } }).data?.message
+          : error && typeof error === 'object' && 'message' in error
+          ? (error as { message?: string }).message
+          : 'Failed to update listing status';
+      
+      toast({
+        title: 'Error',
+        description: errorMessage || 'Failed to update listing status',
+        variant: 'destructive',
+      });
+    }
+  };
 
   // Loading state
   if (isLoading) {
@@ -94,6 +125,16 @@ const Details = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          {listing && (
+            <Button
+              variant={listing.status === 'active' ? 'outline' : 'default'}
+              onClick={handleStatusToggle}
+              disabled={isUpdatingStatus}
+            >
+              <Power className="w-4 h-4 mr-2" />
+              {listing.status === 'active' ? 'Unpublish' : 'Publish'}
+            </Button>
+          )}
           <Button variant="outline">
             <Edit className="w-4 h-4 mr-2" />
             Edit Listing
@@ -270,6 +311,15 @@ const Details = () => {
                 <p className="text-sm text-muted-foreground">{listing.currency}</p>
               </div>
               <div className="space-y-3">
+                <Button
+                  className="w-full"
+                  variant={listing.status === 'active' ? 'outline' : 'default'}
+                  onClick={handleStatusToggle}
+                  disabled={isUpdatingStatus}
+                >
+                  <Power className="w-4 h-4 mr-2" />
+                  {listing.status === 'active' ? 'Unpublish' : 'Publish'}
+                </Button>
                 <Button className="w-full" variant="outline">
                   <Edit className="w-4 h-4 mr-2" />
                   Update Price

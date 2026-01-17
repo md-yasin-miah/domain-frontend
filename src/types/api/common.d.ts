@@ -22,12 +22,14 @@ interface PaginationParams {
 
 // ============ Error Types ============
 interface ApiError {
-  detail: string | Array<{
-    type: string;
-    loc: (string | number)[];
-    msg: string;
-    input: any;
-  }>;
+  data?: {
+    detail: string | Array<{
+      type: string;
+      loc: (string | number)[];
+      msg: string;
+      input: any;
+    }>;
+  }
   message?: string;
   errors?: Record<string, string[]>;
   status?: number;

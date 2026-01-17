@@ -80,6 +80,19 @@ export const marketplaceApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Domain', id }, 'Domain'],
     }),
+    updateMarketplaceListingStatus: builder.mutation<MarketplaceListing, { id: number; new_status: 'active' | 'draft' }>({
+      query: ({ id, new_status }) => ({
+        url: `/marketplace/listings/${id}/status`,
+        method: 'PATCH',
+        params: { new_status },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Domain', id },
+        'Domain',
+        'MarketplaceListing',
+        'MyMarketplaceListing',
+      ],
+    }),
     getMarketplaceListingTypes: builder.query<ListingType[], void>({
       query: () => ({
         url: '/marketplace/listing-types',
@@ -108,6 +121,7 @@ export const {
   useDeleteMarketplaceListingMutation,
   useIncrementMarketplaceViewCountMutation,
   useFeatureMarketplaceListingMutation,
+  useUpdateMarketplaceListingStatusMutation,
   useGetMarketplaceListingTypesQuery,
   useCreateMarketplaceListingTypeMutation,
 } = marketplaceApi;
