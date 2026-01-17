@@ -304,7 +304,12 @@ const Conversation = () => {
   }, [messages, currentUser, conversationId, markAsRead, isConnected]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    } else {
+      // Fallback to scrollIntoView if container ref is not available
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleSendMessage = async () => {
