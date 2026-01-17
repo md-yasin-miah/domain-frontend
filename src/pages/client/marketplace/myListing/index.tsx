@@ -27,11 +27,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import CreateListingModal from './components/CreateListingModal';
 
 const MyListing = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { data, isLoading } = useGetMyMarketListingQuery({
     skip: 0,
     limit: 50,
@@ -172,7 +174,7 @@ const MyListing = () => {
             Manage and track your marketplace listings
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button className="bg-primary hover:bg-primary/90" onClick={() => setIsModalOpen(true)}>
           <Package className="w-4 h-4 mr-2" />
           Create New Listing
         </Button>
@@ -225,6 +227,7 @@ const MyListing = () => {
         emptyMessage="No listings found. Create your first listing to get started!"
         emptyIcon={<Package className="w-16 h-16" />}
         enableSorting={true}
+        onRowClick={(row) => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}
         renderActions={(row) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -253,6 +256,9 @@ const MyListing = () => {
         )}
         actionsColumnHeader="Actions"
       />
+
+      {/* Create Listing Modal */}
+      <CreateListingModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>
   );
 };
