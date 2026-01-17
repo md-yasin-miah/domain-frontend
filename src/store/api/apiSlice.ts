@@ -63,6 +63,7 @@ export const apiSlice = createApi({
     'Permission',
     'Invoice',
     'Ticket',
+    'Messaging',
     'Category',
     'Notification',
     'Upload',

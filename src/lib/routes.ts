@@ -42,6 +42,7 @@ export const ROUTES = {
     PROFILE_SETUP: '/client/profile-setup',
     SAVED_SEARCH: '/client/saved-search',
     SUPPORT: '/client/support',
+    CHAT: '/client/chat',
     REVIEWS: '/client/reviews',
   },
 }; 

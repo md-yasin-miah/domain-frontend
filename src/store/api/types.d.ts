@@ -160,34 +160,7 @@ interface AuctionUpdateRequest {
   status?: 'active' | 'ended' | 'cancelled';
 }
 
-// ============ Message Types ============
-interface Conversation {
-  id: number;
-  listing_id: number | null;
-  participant1_id: number;
-  participant2_id: number;
-  last_message_at: string | null;
-  unread_count: number;
-  created_at: string;
-}
 
-interface Message {
-  id: number;
-  conversation_id: number;
-  sender_id: number;
-  content: string;
-  is_read: boolean;
-  created_at: string;
-}
-
-interface MessageCreateRequest {
-  content: string;
-}
-
-interface ConversationCreateRequest {
-  listing_id?: number;
-  recipient_id: number;
-}
 
 // ============ Review Types ============
 interface Review {
