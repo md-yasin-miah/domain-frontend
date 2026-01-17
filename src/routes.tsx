@@ -62,6 +62,8 @@ import BlogSEOManagement from "./pages/admin/BlogSEOManagement";
 import FAQManager from "./pages/admin/FAQManager";
 import RolesPermissions from "./pages/admin/RolesPermissions";
 import UserManagement from "./pages/admin/UserManagement";
+
+// CLient pages here
 import ClientAppsPage from "./pages/client/ClientAppsPage";
 import ClientWebsitesPage from "./pages/client/ClientWebsitesPage";
 import ClientAllOrderPage from "./pages/client/orders/ClientAllOrderPage";
@@ -74,6 +76,7 @@ import ClientProductsVerificationsPage from "./pages/client/marketplace/products
 import ClientProductsDetailsPage from "./pages/client/marketplace/productsVerification/Details";
 import ClientAuctionsPage from "./pages/client/ClientAuctionsPage";
 import ClientSavedSearchPage from "./pages/client/ClientSavedSearchPage";
+import MyListing from "./pages/client/marketplace/myListing";
 
 const getLastPath = (route: string) => {
   return route.split("/").pop();
@@ -367,6 +370,10 @@ export const router = createBrowserRouter([
                 element: <ClientProductsDetailsPage />,
               },
             ],
+          },
+          {
+            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS),
+            element: <MyListing />
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.APPS),

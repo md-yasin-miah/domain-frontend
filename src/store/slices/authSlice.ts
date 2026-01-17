@@ -102,7 +102,7 @@ const authSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
       try {
-        localStorage.setItem('auth_token', action.payload);
+      localStorage.setItem('auth_token', action.payload);
       } catch (error) {
         console.error('Failed to store token in localStorage:', error);
       }
