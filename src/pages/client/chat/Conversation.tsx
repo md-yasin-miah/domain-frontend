@@ -16,6 +16,8 @@ import {
   CheckCheck,
   Loader2,
   AlertCircle,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { timeFormat } from '@/lib/helperFun';
 import { useTranslation } from 'react-i18next';
@@ -36,9 +38,19 @@ const Conversation = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const currentUser = useAppSelector((state) => state.auth.user);
+  const token = useAppSelector((state) => state.auth.token);
   const [messageContent, setMessageContent] = useState('');
+  const [localMessages, setLocalMessages] = useState<Message[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectAttemptsRef = useRef(0);
+  const pingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const maxReconnectAttempts = 5;
+  const PING_INTERVAL = 30000; // 30 seconds
 
   const conversationId = Number(id);
 
@@ -52,7 +64,7 @@ const Conversation = () => {
   const { data: messagesData, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery(
     {
       conversationId,
-      params: { skip: 0, limit: 0 }, // limit=0 to fetch all messages
+      // params: { limit: 0 }, // limit=0 to fetch all messages
     },
     { skip: !conversationId }
   );
@@ -61,12 +73,26 @@ const Conversation = () => {
   const [markAsRead] = useMarkMessageAsReadMutation();
 
   // Extract messages from response
-  const messages = React.useMemo(() => {
+  const apiMessages = React.useMemo(() => {
     if (!messagesData) return [];
     if (Array.isArray(messagesData)) return messagesData;
     if ('items' in messagesData) return messagesData.items;
     return [];
   }, [messagesData]);
+
+  // Merge API messages with local messages (from WebSocket)
+  const messages = React.useMemo(() => {
+    const allMessages = [...apiMessages, ...localMessages];
+    // Remove duplicates by ID and sort by created_at
+    const uniqueMessages = Array.from(
+      new Map(allMessages.map((msg) => [msg.id, msg])).values()
+    );
+    return uniqueMessages.sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return dateA - dateB;
+    });
+  }, [apiMessages, localMessages]);
 
   // Get the other participant
   const otherParticipant = React.useMemo(() => {
@@ -77,6 +103,182 @@ const Conversation = () => {
     return conversation.participant1;
   }, [conversation, currentUser]);
 
+  // Get WebSocket URL
+  const getWebSocketUrl = () => {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || '';
+    // Convert HTTP/HTTPS to WS/WSS
+    const wsUrl = apiUrl.replace(/^http/, 'ws');
+    return `${wsUrl}messages/ws/${conversationId}?token=${token}`;
+  };
+
+  // Connect to WebSocket
+  const connectWebSocket = () => {
+    if (!token || !conversationId || wsRef.current?.readyState === WebSocket.OPEN) {
+      return;
+    }
+
+    setIsConnecting(true);
+    const wsUrl = getWebSocketUrl();
+
+    try {
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setIsConnected(true);
+        setIsConnecting(false);
+        reconnectAttemptsRef.current = 0;
+
+        // Start ping interval to keep connection alive
+        pingIntervalRef.current = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
+          }
+        }, PING_INTERVAL);
+
+        toast({
+          title: 'Connected',
+          description: 'Real-time chat is now active',
+        });
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.type === 'new_message') {
+            // Add new message to local state
+            const newMessage = data.message;
+            setLocalMessages((prev) => {
+              // Check if message already exists
+              if (prev.some((msg) => msg.id === newMessage.id)) {
+                return prev;
+              }
+              return [...prev, newMessage];
+            });
+            scrollToBottom();
+          } else if (data.type === 'messages_read') {
+            // Update read status for messages
+            const messageIds = data.message_ids || [];
+            setLocalMessages((prev) =>
+              prev.map((msg) =>
+                messageIds.includes(msg.id)
+                  ? { ...msg, is_read: true, read_at: new Date().toISOString() }
+                  : msg
+              )
+            );
+          } else if (data.type === 'connected') {
+            // Connection confirmed
+            setIsConnected(true);
+            setIsConnecting(false);
+          } else if (data.type === 'error') {
+            toast({
+              title: 'WebSocket Error',
+              description: data.message || 'An error occurred',
+              variant: 'destructive',
+            });
+          } else if (data.type === 'pong') {
+            // Heartbeat response
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setIsConnecting(false);
+      };
+
+      ws.onclose = (event) => {
+        setIsConnected(false);
+        setIsConnecting(false);
+
+        // Attempt to reconnect if not a normal closure
+        if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
+          reconnectAttemptsRef.current += 1;
+          const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
+
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connectWebSocket();
+          }, delay);
+        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+          toast({
+            title: 'Connection Lost',
+            description: 'Unable to reconnect. Please refresh the page.',
+            variant: 'destructive',
+          });
+        }
+      };
+    } catch (error) {
+      console.error('Error creating WebSocket:', error);
+      setIsConnecting(false);
+      toast({
+        title: 'Connection Error',
+        description: 'Failed to connect to real-time chat',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Disconnect WebSocket
+  const disconnectWebSocket = () => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
+    if (wsRef.current) {
+      wsRef.current.close(1000, 'Component unmounting');
+      wsRef.current = null;
+    }
+    setIsConnected(false);
+    setIsConnecting(false);
+  };
+
+  // Send message via WebSocket
+  const sendMessageViaWebSocket = (content: string) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: 'send_message',
+          content: content.trim(),
+        })
+      );
+      return true;
+    }
+    return false;
+  };
+
+  // Mark messages as read via WebSocket
+  const markMessagesAsReadViaWebSocket = (messageIds: number[]): boolean => {
+    if (wsRef.current?.readyState === WebSocket.OPEN && messageIds.length > 0) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: 'mark_read',
+          message_ids: messageIds,
+        })
+      );
+      return true;
+    }
+    return false;
+  };
+
+  // Connect WebSocket when component mounts or conversation changes
+  useEffect(() => {
+    if (conversationId && token) {
+      connectWebSocket();
+    }
+
+    return () => {
+      disconnectWebSocket();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, token]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     scrollToBottom();
@@ -84,17 +286,22 @@ const Conversation = () => {
 
   // Mark messages as read when viewing
   useEffect(() => {
-    if (messages.length > 0 && currentUser) {
+    if (messages.length > 0 && currentUser && isConnected) {
       const unreadMessages = messages.filter(
         (msg) => !msg.is_read && msg.sender_id !== currentUser.id
       );
 
-      // Mark unread messages as read
-      unreadMessages.forEach((msg) => {
-        markAsRead({ messageId: msg.id, conversationId }).catch(console.error);
-      });
+      if (unreadMessages.length > 0) {
+        const messageIds = unreadMessages.map((msg) => msg.id);
+        // Try WebSocket first, fallback to REST API
+        if (!markMessagesAsReadViaWebSocket(messageIds)) {
+          unreadMessages.forEach((msg) => {
+            markAsRead({ messageId: msg.id, conversationId }).catch(console.error);
+          });
+        }
+      }
     }
-  }, [messages, currentUser, conversationId, markAsRead]);
+  }, [messages, currentUser, conversationId, markAsRead, isConnected]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -103,27 +310,36 @@ const Conversation = () => {
   const handleSendMessage = async () => {
     if (!messageContent.trim() || isSending) return;
 
-    try {
-      await sendMessage({
-        conversationId,
-        data: { content: messageContent.trim() },
-      }).unwrap();
+    const content = messageContent.trim();
+    setMessageContent('');
 
-      setMessageContent('');
-      // Refetch messages to get the latest
-      refetchMessages();
+    // Try WebSocket first for instant delivery
+    if (isConnected && sendMessageViaWebSocket(content)) {
+      // Message sent via WebSocket, it will appear in real-time
       scrollToBottom();
-    } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === 'object' && 'data' in error
-          ? (error as { data?: { message?: string } }).data?.message
-          : 'Failed to send message';
+    } else {
+      // Fallback to REST API
+      try {
+        await sendMessage({
+          conversationId,
+          data: { content },
+        }).unwrap();
 
-      toast({
-        title: 'Error',
-        description: errorMessage || 'Failed to send message',
-        variant: 'destructive',
-      });
+        // Refetch messages to get the latest
+        refetchMessages();
+        scrollToBottom();
+      } catch (error: unknown) {
+        const errorMessage =
+          error && typeof error === 'object' && 'data' in error
+            ? (error as { data?: { message?: string } }).data?.message
+            : 'Failed to send message';
+
+        toast({
+          title: 'Error',
+          description: errorMessage || 'Failed to send message',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
@@ -194,16 +410,37 @@ const Conversation = () => {
             </div>
           </div>
         </div>
-        {conversation.listing && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/marketplace/${conversation.listing?.slug}`)}
-          >
-            <Package className="w-4 h-4 mr-2" />
-            View Listing
-          </Button>
-        )}
+        <div className="flex items-center gap-3">
+          {/* Connection Status */}
+          <div className="flex items-center gap-2">
+            {isConnected ? (
+              <Badge variant="default" className="bg-green-500">
+                <Wifi className="w-3 h-3 mr-1" />
+                Connected
+              </Badge>
+            ) : isConnecting ? (
+              <Badge variant="secondary">
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                Connecting...
+              </Badge>
+            ) : (
+              <Badge variant="destructive">
+                <WifiOff className="w-3 h-3 mr-1" />
+                Disconnected
+              </Badge>
+            )}
+          </div>
+          {conversation.listing && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/marketplace/${conversation.listing?.slug}`)}
+            >
+              <Package className="w-4 h-4 mr-2" />
+              View Listing
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Messages Container */}

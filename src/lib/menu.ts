@@ -252,7 +252,7 @@ const getClientServices = (t: TFunction): MenuItem[] => {
     { title: t('nav.profile'), url: ROUTES.CLIENT.PROFILE, icon: User },
     { title: t('nav.settings'), url: ROUTES.CLIENT.PROFILE, icon: Settings },
     { title: t('nav.support'), url: ROUTES.CLIENT.SUPPORT, icon: MessageSquare },
-    { title: t('nav.chat'), url: ROUTES.CLIENT.CHAT, icon: MessagesSquare },
+    { title: t('nav.chat'), url: ROUTES.CLIENT.CHAT.ROOT, icon: MessagesSquare },
     { title: t('nav.reviews'), url: ROUTES.CLIENT.REVIEWS, icon: Star },
     { title: t('nav.faq'), url: ROUTES.CLIENT.FAQ, icon: HelpCircle },
   ];
