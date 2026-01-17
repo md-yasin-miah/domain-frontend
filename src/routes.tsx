@@ -77,6 +77,7 @@ import ClientProductsDetailsPage from "./pages/client/marketplace/productsVerifi
 import ClientAuctionsPage from "./pages/client/ClientAuctionsPage";
 import ClientSavedSearchPage from "./pages/client/ClientSavedSearchPage";
 import MyListing from "./pages/client/marketplace/myListing";
+import MyListingDetails from "./pages/client/marketplace/myListing/Details";
 
 const getLastPath = (route: string) => {
   return route.split("/").pop();
@@ -373,7 +374,16 @@ export const router = createBrowserRouter([
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS),
-            element: <MyListing />
+            children: [
+              {
+                index: true,
+                element: <MyListing />
+              },
+              {
+                path: ":id",
+                element: <MyListingDetails />
+              },
+            ],
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.APPS),

@@ -1,5 +1,6 @@
 import { useGetMyMarketListingQuery } from '@/store/api/marketplaceApi';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DataTable, ColumnDef } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import {
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/lib/routes';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +30,7 @@ import {
 
 const MyListing = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const { data, isLoading } = useGetMyMarketListingQuery({
     skip: 0,
@@ -232,7 +235,7 @@ const MyListing = () => {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}>
                 <ExternalLink className="w-4 h-4 mr-2" />
                 View Listing
               </DropdownMenuItem>
