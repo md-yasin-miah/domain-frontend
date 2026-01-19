@@ -1284,10 +1284,6 @@
       "refund_dialog": {
         "title": "Request Refund",
         "description": "Are you sure you want to request a refund for this order?"
-      },
-      "error": {
-        "title": "Order Not Found",
-        "description": "The order you're looking for doesn't exist or you don't have permission to view it."
       }
     }
   },
@@ -1315,8 +1311,13 @@
     },
     "actions": {
       "view_order": "View Order",
-      "download": "Download PDF"
+      "download": "Download PDF",
+      "issue": "Issue Invoice"
     },
+    "issue_success": "Invoice Issued",
+    "issue_success_desc": "Invoice has been issued and sent to the buyer successfully.",
+    "issue_error": "Issue Failed",
+    "issue_error_desc": "Failed to issue invoice. Please try again.",
     "download_success": "Invoice Downloaded",
     "download_success_desc": "Invoice has been downloaded successfully.",
     "download_error": "Download Failed",

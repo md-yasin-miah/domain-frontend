@@ -731,10 +731,6 @@
       "refund_dialog": {
         "title": "Solicitar Reembolso",
         "description": "¿Estás seguro de que deseas solicitar un reembolso para esta orden?"
-      },
-      "error": {
-        "title": "Orden No Encontrada",
-        "description": "La orden que buscas no existe o no tienes permiso para verla."
       }
     }
   },
@@ -762,8 +758,13 @@
     },
     "actions": {
       "view_order": "Ver Orden",
-      "download": "Descargar PDF"
+      "download": "Descargar PDF",
+      "issue": "Emitir Factura"
     },
+    "issue_success": "Factura Emitida",
+    "issue_success_desc": "La factura ha sido emitida y enviada al comprador exitosamente.",
+    "issue_error": "Error al Emitir",
+    "issue_error_desc": "No se pudo emitir la factura. Por favor, intenta de nuevo.",
     "download_success": "Factura Descargada",
     "download_success_desc": "La factura ha sido descargada exitosamente.",
     "download_error": "Error al Descargar",

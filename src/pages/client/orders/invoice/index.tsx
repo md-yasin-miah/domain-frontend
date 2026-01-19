@@ -30,8 +30,12 @@ import {
   Calendar,
   DollarSign,
   Package,
+  Send,
 } from "lucide-react";
-import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
+import {
+  useGetInvoicesQuery,
+  useIssueInvoiceMutation,
+} from "@/store/api/invoiceApi";
 import { useAuth } from "@/store/hooks/useAuth";
 import {
   formatCurrency,
@@ -46,6 +50,8 @@ import InvoicePDF from "@/components/invoice/InvoicePDF";
 import { generatePDF } from "@/lib/pdfUtils";
 import { ordersApi } from "@/store/api/ordersApi";
 import { store } from "@/store/index";
+import { Tooltip } from "@/components/ui/tooltip";
+import CustomTooltip from "@/components/common/CustomTooltip";
 
 type InvoiceStatus = "draft" | "issued" | "paid" | "overdue" | "cancelled";
 
@@ -96,10 +102,41 @@ const AllInvoice = () => {
     refetch,
   } = useGetInvoicesQuery(queryParams);
 
+  const [issueInvoice, { isLoading: isIssuing }] = useIssueInvoiceMutation();
+
   // Get status label
   const getStatusLabel = useCallback((status: string) => {
     return t(`common.status.${status}`) || status;
   }, [t]);
+
+  // Handle issue invoice
+  const handleIssueInvoice = async (invoice: Invoice) => {
+    try {
+      const result = await issueInvoice(invoice.id).unwrap();
+
+      toast({
+        title: t("invoices.issue_success") || "Invoice Issued",
+        description:
+          t("invoices.issue_success_desc") ||
+          `Invoice ${result.invoice_number} has been issued and sent to the buyer.`,
+      });
+
+      // Refetch invoices to update the list
+      refetch();
+    } catch (error: unknown) {
+      console.error("Error issuing invoice:", error);
+      const errorMessage =
+        error && typeof error === "object" && "data" in error
+          ? (error as { data?: { detail?: string } }).data?.detail
+          : t("invoices.issue_error_desc") || "Failed to issue invoice.";
+
+      toast({
+        title: t("invoices.issue_error") || "Issue Failed",
+        description: errorMessage || t("invoices.issue_error_desc") || "Failed to issue invoice. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Handle download invoice PDF
   const handleDownloadInvoice = async (invoice: Invoice) => {
@@ -265,8 +302,30 @@ const AllInvoice = () => {
 
   // Render actions for each row
   const renderActions = (invoice: Invoice) => {
+    const canIssue = invoice.status === "draft";
+    const isIssuingThis = isIssuing;
+
     return (
       <div className="flex items-center gap-1">
+        {canIssue && (
+          <CustomTooltip
+            content={t("invoices.actions.issue") || "Issue Invoice"}
+            side="top"
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleIssueInvoice(invoice)}
+              disabled={isIssuingThis}
+            >
+              {isIssuingThis ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+            </Button>
+          </CustomTooltip>
+        )}
         <Button
           variant="ghost"
           size="sm"
