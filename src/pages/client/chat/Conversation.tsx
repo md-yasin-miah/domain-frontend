@@ -63,12 +63,18 @@ const Conversation = () => {
   );
 
   // Fetch all messages (use large limit to fetch all messages)
+  // CRITICAL: Fetch all messages to ensure we have complete conversation history
+  // Backend stores messages in JSON, so we fetch all at once for smooth experience
   const { data: messagesData, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery(
     {
       conversationId,
       params: { skip: 0, limit: 1000 }, // Fetch all messages (backend supports up to 1000)
     },
-    { skip: !conversationId }
+    {
+      skip: !conversationId,
+      // Always refetch on mount to get latest messages from database
+      refetchOnMountOrArgChange: true,
+    }
   );
 
   const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
@@ -132,12 +138,18 @@ const Conversation = () => {
           read_at: msg.read_at ?? existing.read_at,
           // Preserve sender info from API if available
           sender: existing.sender || msg.sender,
+          // Preserve offer_id from API (source of truth)
+          offer_id: existing.offer_id ?? msg.offer_id ?? null,
         });
       } else {
         // New message from WebSocket that hasn't been fetched yet
         // This is critical for concurrent sends - preserves messages from both users
         // Backend will save it with proper ID, and it will appear in next API fetch
-        messageMap.set(msg.id, msg);
+        // Include all fields including offer_id if present
+        messageMap.set(msg.id, {
+          ...msg,
+          offer_id: msg.offer_id ?? null,
+        });
       }
     });
 
@@ -226,6 +238,7 @@ const Conversation = () => {
                 email: newMessage.sender.email,
               } : null,
               attachments: newMessage.attachments || [],
+              offer_id: newMessage.offer_id || null, // Include offer_id if present
             };
 
             // Remove from pending messages if this is a message we sent
@@ -439,9 +452,25 @@ const Conversation = () => {
   }, [conversationId, token]);
 
   // Auto-scroll to bottom when new messages arrive
+  // Only scroll if user is near bottom (within 100px) to avoid interrupting reading
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Small delay to ensure DOM is updated
+    const timeout = setTimeout(() => {
+      if (messagesContainerRef.current) {
+        const container = messagesContainerRef.current;
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+
+        // Only auto-scroll if user is near bottom or if it's the initial load (few messages)
+        if (isNearBottom || messages.length <= 10) {
+          scrollToBottom();
+        }
+      } else {
+        scrollToBottom();
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [messages.length]); // Only trigger on message count change, not on every message update
 
   // Mark messages as read when viewing
   useEffect(() => {
@@ -717,6 +746,21 @@ const Conversation = () => {
                     )}
                   >
                     <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+
+                    {/* Offer Link (if message is related to an offer) */}
+                    {message.offer_id && (
+                      <div className="mt-2 pt-2 border-t border-current/20">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs p-1"
+                          onClick={() => navigate(ROUTES.CLIENT.OFFERS.DETAILS(message.offer_id!))}
+                        >
+                          <Package className="h-3 w-3 mr-1" />
+                          View Offer #{message.offer_id}
+                        </Button>
+                      </div>
+                    )}
 
                     {/* Attachments */}
                     {message.attachments && message.attachments.length > 0 && (
