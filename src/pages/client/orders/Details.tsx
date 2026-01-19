@@ -1,0 +1,808 @@
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  ArrowLeft,
+  Package,
+  User,
+  DollarSign,
+  FileText,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  RefreshCw,
+  AlertTriangle,
+  CreditCard,
+  Clock,
+  ShoppingCart,
+  TrendingUp,
+  Calendar,
+  Sparkles,
+  ExternalLink,
+  Receipt,
+  MessageSquare,
+} from "lucide-react";
+import {
+  useGetOrderQuery,
+  useCancelOrderMutation,
+  useCompleteOrderMutation,
+  useRequestRefundMutation,
+} from "@/store/api/ordersApi";
+import { useAuth } from "@/store/hooks/useAuth";
+import {
+  formatCurrency,
+  timeFormat,
+  getStatusColor,
+  getStatusBadgeVariant,
+} from "@/lib/helperFun";
+import { cn } from "@/lib/utils";
+import { ROUTES } from "@/lib/routes";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CardDescription } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+const ClientOrderDetailsPage = () => {
+  const { t } = useTranslation();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const orderId = id ? parseInt(id, 10) : 0;
+  const {
+    data: order,
+    isLoading,
+    error,
+  } = useGetOrderQuery(orderId, {
+    skip: !orderId || isNaN(orderId),
+  });
+
+  const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
+  const [completeOrder, { isLoading: isCompleting }] =
+    useCompleteOrderMutation();
+  const [requestRefund, { isLoading: isRefunding }] =
+    useRequestRefundMutation();
+
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showRefundDialog, setShowRefundDialog] = useState(false);
+
+  // Get status label
+  const getStatusLabel = (status: string) => {
+    return t(`common.status.${status}`) || status;
+  };
+
+  // Handle cancel order
+  const handleCancelOrder = async () => {
+    if (!order) return;
+
+    try {
+      await cancelOrder(order.id).unwrap();
+      toast({
+        title: t("orders.details.cancel_success"),
+        description: t("orders.details.cancel_success_desc"),
+      });
+      setShowCancelDialog(false);
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "data" in error
+          ? (error as { data?: { detail?: string } }).data?.detail
+          : error && typeof error === "object" && "message" in error
+            ? (error as { message?: string }).message
+            : t("orders.details.cancel_error_desc");
+      toast({
+        title: t("orders.details.cancel_error"),
+        description: errorMessage || t("orders.details.cancel_error_desc"),
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle complete order
+  const handleCompleteOrder = async () => {
+    if (!order) return;
+
+    try {
+      await completeOrder(order.id).unwrap();
+      toast({
+        title: t("orders.details.complete_success"),
+        description: t("orders.details.complete_success_desc"),
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "data" in error
+          ? (error as { data?: { detail?: string } }).data?.detail
+          : error && typeof error === "object" && "message" in error
+            ? (error as { message?: string }).message
+            : t("orders.details.complete_error_desc");
+      toast({
+        title: t("orders.details.complete_error"),
+        description: errorMessage || t("orders.details.complete_error_desc"),
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle request refund
+  const handleRequestRefund = async () => {
+    if (!order) return;
+
+    try {
+      await requestRefund(order.id).unwrap();
+      toast({
+        title: t("orders.details.refund_success"),
+        description: t("orders.details.refund_success_desc"),
+      });
+      setShowRefundDialog(false);
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "data" in error
+          ? (error as { data?: { detail?: string } }).data?.detail
+          : error && typeof error === "object" && "message" in error
+            ? (error as { message?: string }).message
+            : t("orders.details.refund_error_desc");
+      toast({
+        title: t("orders.details.refund_error"),
+        description: errorMessage || t("orders.details.refund_error_desc"),
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Check if user can perform actions
+  const isBuyer = user?.id === order?.buyer_id;
+  const isSeller = user?.id === order?.seller_id;
+  const canCancel =
+    (isBuyer || isSeller) &&
+    ["pending", "processing"].includes(order?.status || "");
+  const canComplete = isSeller && order?.status === "processing";
+  const canRefund =
+    isBuyer && ["completed", "processing"].includes(order?.status || "");
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <div className="space-y-6 p-6">
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-xl" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Skeleton className="h-64 w-full rounded-xl" />
+              <Skeleton className="h-48 w-full rounded-xl" />
+            </div>
+            <div className="space-y-6">
+              <Skeleton className="h-64 w-full rounded-xl" />
+              <Skeleton className="h-48 w-full rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <div className="min-h-screen">
+        <div className="flex flex-col items-center justify-center py-12 px-6">
+          <div className="flex flex-col items-center gap-4 text-center max-w-md">
+            <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <AlertTriangle className="w-10 h-10 text-destructive" />
+            </div>
+            <h3 className="text-2xl font-bold">
+              {t("orders.details.error.title")}
+            </h3>
+            <p className="text-muted-foreground">
+              {t("orders.details.error.description")}
+            </p>
+            <Button
+              onClick={() => navigate(ROUTES.CLIENT.ORDERS.INDEX)}
+              className="mt-4"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t("orders.details.back_to_orders")}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate fee percentage
+  const feePercentage = order.listing_price
+    ? ((Number(order.platform_fee) / Number(order.listing_price)) * 100).toFixed(1)
+    : "0";
+
+  return (
+    <div className="min-h-screen">
+      <div className="space-y-6 p-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2">
+          <Link
+            to={ROUTES.CLIENT.ORDERS.INDEX}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            {t("orders.details.back_to_orders")}
+          </Link>
+          <span className="text-muted-foreground">•</span>
+          <span className="text-sm text-muted-foreground">
+            {t("orders.details.order_number")}: {order.order_number}
+          </span>
+        </div>
+
+        {/* Premium Header - Subtle Design */}
+        <div className="relative overflow-hidden rounded-xl bg-card border border-border/50 p-6 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted/50 border border-border">
+                <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight mb-1 text-foreground">
+                  {t("orders.details.title")}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {t("orders.details.order_number")}: {order.order_number}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge
+                variant={getStatusBadgeVariant(order.status)}
+                className={cn(
+                  "text-xs font-medium px-3 py-1 capitalize",
+                  getStatusColor(order.status),
+                  "text-white border-0"
+                )}
+              >
+                {getStatusLabel(order.status)}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Cards - Subtle Design */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Final Price</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {formatCurrency(order.final_price)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{order.currency}</p>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Listing Price</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {formatCurrency(order.listing_price)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{order.currency}</p>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Platform Fee</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {formatCurrency(order.platform_fee)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{feePercentage}% of listing</p>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <Receipt className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Order ID</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    #{order.id}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Unique identifier</p>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <Sparkles className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Order Information - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm">
+              <CardHeader className="border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold">{t("orders.details.order_information")}</CardTitle>
+                    <CardDescription className="text-xs">Complete order details and timeline</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* Order ID */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.order_id")}
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      #{order.id}
+                    </p>
+                  </div>
+
+                  {/* Order Number */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Receipt className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.order_number")}
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {order.order_number}
+                    </p>
+                  </div>
+
+                  {/* Created At */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.created_at")}
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {timeFormat(order.created_at, "MMM DD, YYYY")}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {timeFormat(order.created_at, "HH:mm")}
+                    </p>
+                  </div>
+
+                  {/* Updated At */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.updated_at")}
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {timeFormat(order.updated_at, "MMM DD, YYYY")}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {timeFormat(order.updated_at, "HH:mm")}
+                    </p>
+                  </div>
+
+                  {/* Paid At */}
+                  {order.paid_at && (
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CheckCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                        <label className="text-xs font-medium text-muted-foreground">
+                          {t("orders.details.paid_at")}
+                        </label>
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {timeFormat(order.paid_at, "MMM DD, YYYY")}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {timeFormat(order.paid_at, "HH:mm")}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Completed At */}
+                  {order.completed_at && (
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CheckCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                        <label className="text-xs font-medium text-muted-foreground">
+                          {t("orders.details.completed_at")}
+                        </label>
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {timeFormat(order.completed_at, "MMM DD, YYYY")}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {timeFormat(order.completed_at, "HH:mm")}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Cancelled At */}
+                  {order.cancelled_at && (
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="flex items-center gap-2 mb-1">
+                        <XCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                        <label className="text-xs font-medium text-muted-foreground">
+                          {t("orders.details.cancelled_at")}
+                        </label>
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {timeFormat(order.cancelled_at, "MMM DD, YYYY")}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {timeFormat(order.cancelled_at, "HH:mm")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Cancellation Reason */}
+                {order.cancellation_reason && (
+                  <>
+                    <Separator className="my-3" />
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" />
+                        <label className="text-xs font-medium text-muted-foreground">
+                          {t("orders.details.cancellation_reason")}
+                        </label>
+                      </div>
+                      <p className="text-sm text-foreground leading-relaxed">
+                        {order.cancellation_reason}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Listing Information - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm">
+              <CardHeader className="border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold">{t("orders.details.listing_information")}</CardTitle>
+                    <CardDescription className="text-xs">Product details and information</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                    {t("orders.details.listing_title")}
+                  </label>
+                  <p className="text-sm font-semibold text-foreground">
+                    {order.listing?.title || "N/A"}
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                      {t("orders.details.listing_id")}
+                    </label>
+                    <p className="text-sm font-semibold text-foreground">#{order.listing_id}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                      {t("orders.details.listing_price")}
+                    </label>
+                    <p className="text-sm font-semibold text-foreground">
+                      {formatCurrency(order.listing_price)} {order.currency}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Buyer & Seller Information - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm">
+              <CardHeader className="border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold">{t("orders.details.parties_information")}</CardTitle>
+                    <CardDescription className="text-xs">Buyer and seller details</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* Buyer */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.buyer")}
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground mb-0.5">
+                      {order.buyer?.username || order.buyer?.email || "N/A"}
+                    </p>
+                    {order.buyer?.email && (
+                      <p className="text-xs text-muted-foreground">
+                        {order.buyer.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Seller */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.seller")}
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground mb-0.5">
+                      {order.seller?.username || order.seller?.email || "N/A"}
+                    </p>
+                    {order.seller?.email && (
+                      <p className="text-xs text-muted-foreground">
+                        {order.seller.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Pricing Summary - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm">
+              <CardHeader className="border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold">{t("orders.details.pricing_summary")}</CardTitle>
+                    <CardDescription className="text-xs">Complete pricing breakdown</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex justify-between items-center p-2.5 rounded-lg bg-muted/30 border border-border">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {t("orders.details.listing_price")}
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    {formatCurrency(order.listing_price)} {order.currency}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2.5 rounded-lg bg-muted/30 border border-border">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {t("orders.details.platform_fee")}
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    {formatCurrency(order.platform_fee)} {order.currency}
+                  </span>
+                </div>
+                <Separator className="my-2" />
+                <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50 border border-border">
+                  <span className="text-sm font-semibold text-foreground">{t("orders.details.final_price")}</span>
+                  <span className="text-lg font-bold text-primary">
+                    {formatCurrency(order.final_price)} {order.currency}
+                  </span>
+                </div>
+                {order.seller_amount && (
+                  <>
+                    <Separator className="my-2" />
+                    <div className="flex justify-between items-center p-2.5 rounded-lg bg-muted/30 border border-border">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.seller_amount")}
+                      </span>
+                      <span className="text-sm font-semibold text-foreground">
+                        {formatCurrency(order.seller_amount)} {order.currency}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Payment Information - Clean Design */}
+            {order.payment_method && (
+              <Card className="border border-border/50 bg-card shadow-sm">
+                <CardHeader className="border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold">{t("orders.details.payment_information")}</CardTitle>
+                      <CardDescription className="text-xs">Payment method and transaction details</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                      {t("orders.details.payment_method")}
+                    </label>
+                    <p className="text-sm font-semibold text-foreground">{order.payment_method}</p>
+                  </div>
+                  {order.payment_transaction_id && (
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.transaction_id")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">
+                        #{order.payment_transaction_id}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Actions - Clean Design */}
+            {(canCancel || canComplete || canRefund) && (
+              <Card className="border border-border/50 bg-card shadow-sm">
+                <CardHeader className="border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <Sparkles className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <CardTitle className="text-lg font-semibold">{t("orders.details.actions")}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-2">
+                  {canCancel && (
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => setShowCancelDialog(true)}
+                      disabled={isCancelling}
+                      size="sm"
+                    >
+                      {isCancelling ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      ) : (
+                        <XCircle className="w-3.5 h-3.5 mr-2" />
+                      )}
+                      {t("orders.details.cancel_order")}
+                    </Button>
+                  )}
+                  {canComplete && (
+                    <Button
+                      variant="default"
+                      className="w-full"
+                      onClick={handleCompleteOrder}
+                      disabled={isCompleting}
+                      size="sm"
+                    >
+                      {isCompleting ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-3.5 h-3.5 mr-2" />
+                      )}
+                      {t("orders.details.complete_order")}
+                    </Button>
+                  )}
+                  {canRefund && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setShowRefundDialog(true)}
+                      disabled={isRefunding}
+                      size="sm"
+                    >
+                      {isRefunding ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-3.5 h-3.5 mr-2" />
+                      )}
+                      {t("orders.details.request_refund")}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Cancel Order Dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("orders.details.cancel_dialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("orders.details.cancel_dialog.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelOrder}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("orders.details.cancel_order")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Refund Dialog */}
+      <AlertDialog open={showRefundDialog} onOpenChange={setShowRefundDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("orders.details.refund_dialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("orders.details.refund_dialog.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRequestRefund}>
+              {t("orders.details.request_refund")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default ClientOrderDetailsPage;

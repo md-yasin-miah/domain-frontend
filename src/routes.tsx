@@ -70,7 +70,7 @@ import ClientAllOrderPage from "./pages/client/orders";
 import ClientInvoicePage from "./pages/client/orders/ClientInvoicePage";
 import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
-import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
+import ClientOrderDetailsPage from "./pages/client/orders/Details";
 import ClientOffersPage from "./pages/client/offers/ClientOffersPage";
 import OfferDetails from "./pages/client/offers/OfferDetails";
 import ClientProductsVerificationsPage from "./pages/client/marketplace/productsVerification";
