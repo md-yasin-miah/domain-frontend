@@ -1254,6 +1254,25 @@
       "refund_success_desc": "Your refund request has been submitted successfully.",
       "refund_error": "Refund Request Failed",
       "refund_error_desc": "Failed to request refund. Please try again.",
+      "invoice": "Invoice",
+      "invoice_description": "Generate invoice for this order",
+      "invoice_number": "Invoice Number",
+      "no_invoice": "No invoice has been generated for this order yet.",
+      "generate_invoice": "Generate Invoice",
+      "regenerate_invoice": "Regenerate Invoice",
+      "invoice_success": "Invoice Generated",
+      "invoice_success_desc": "Invoice has been generated successfully.",
+      "invoice_error": "Invoice Generation Failed",
+      "invoice_error_desc": "Failed to generate invoice. Please try again.",
+      "download_invoice": "Download Invoice",
+      "invoice_download_success": "Invoice Downloaded",
+      "invoice_download_success_desc": "Invoice has been downloaded successfully.",
+      "invoice_download_error": "Download Failed",
+      "invoice_download_error_desc": "Failed to download invoice. Please try again.",
+      "error": {
+        "title": "Order Not Found",
+        "description": "The order you're looking for doesn't exist or has been removed."
+      },
       "cancel_dialog": {
         "title": "Cancel Order",
         "description": "Are you sure you want to cancel this order? This action cannot be undone."

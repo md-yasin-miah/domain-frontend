@@ -701,6 +701,25 @@
       "refund_success_desc": "Tu solicitud de reembolso ha sido enviada exitosamente.",
       "refund_error": "Error al Solicitar Reembolso",
       "refund_error_desc": "No se pudo solicitar el reembolso. Por favor, intenta de nuevo.",
+      "invoice": "Factura",
+      "invoice_description": "Generar factura para esta orden",
+      "invoice_number": "Número de Factura",
+      "no_invoice": "Aún no se ha generado una factura para esta orden.",
+      "generate_invoice": "Generar Factura",
+      "regenerate_invoice": "Regenerar Factura",
+      "invoice_success": "Factura Generada",
+      "invoice_success_desc": "La factura ha sido generada exitosamente.",
+      "invoice_error": "Error al Generar Factura",
+      "invoice_error_desc": "No se pudo generar la factura. Por favor, intenta de nuevo.",
+      "download_invoice": "Descargar Factura",
+      "invoice_download_success": "Factura Descargada",
+      "invoice_download_success_desc": "La factura ha sido descargada exitosamente.",
+      "invoice_download_error": "Error al Descargar",
+      "invoice_download_error_desc": "No se pudo descargar la factura. Por favor, intenta de nuevo.",
+      "error": {
+        "title": "Orden No Encontrada",
+        "description": "La orden que buscas no existe o ha sido eliminada."
+      },
       "cancel_dialog": {
         "title": "Cancelar Orden",
         "description": "¿Estás seguro de que deseas cancelar esta orden? Esta acción no se puede deshacer."

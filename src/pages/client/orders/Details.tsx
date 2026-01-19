@@ -27,9 +27,9 @@ import {
   TrendingUp,
   Calendar,
   Sparkles,
-  ExternalLink,
   Receipt,
-  MessageSquare,
+  Download,
+  File,
 } from "lucide-react";
 import {
   useGetOrderQuery,
@@ -37,6 +37,10 @@ import {
   useCompleteOrderMutation,
   useRequestRefundMutation,
 } from "@/store/api/ordersApi";
+import {
+  useCreateInvoiceMutation,
+  useGetInvoiceByOrderQuery,
+} from "@/store/api/invoiceApi";
 import { useAuth } from "@/store/hooks/useAuth";
 import {
   formatCurrency,
@@ -62,6 +66,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import OfferDetailsSkeleton from "@/components/skeletons/OfferDetailsSkeleton";
 import EmptyState from "@/components/common/EmptyState";
+import InvoicePDF from "@/components/invoice/InvoicePDF";
+import { generatePDF } from "@/lib/pdfUtils";
 
 const ClientOrderDetailsPage = () => {
   const { t } = useTranslation();
@@ -84,9 +90,20 @@ const ClientOrderDetailsPage = () => {
     useCompleteOrderMutation();
   const [requestRefund, { isLoading: isRefunding }] =
     useRequestRefundMutation();
+  const [createInvoice, { isLoading: isGeneratingInvoice }] =
+    useCreateInvoiceMutation();
 
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showRefundDialog, setShowRefundDialog] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  // Check if invoice already exists for this order
+  const {
+    data: existingInvoice,
+    isLoading: isLoadingInvoice,
+  } = useGetInvoiceByOrderQuery(orderId, {
+    skip: !orderId || isNaN(orderId),
+  });
 
   // Get status label
   const getStatusLabel = (status: string) => {
@@ -167,6 +184,69 @@ const ClientOrderDetailsPage = () => {
         description: errorMessage || t("orders.details.refund_error_desc"),
         variant: "destructive",
       });
+    }
+  };
+
+  // Handle generate invoice
+  const handleGenerateInvoice = async () => {
+    if (!order) return;
+
+    try {
+      const invoice = await createInvoice({
+        order_id: order.id,
+        subtotal: Number(order.listing_price),
+        platform_fee: Number(order.platform_fee),
+        total_amount: Number(order.final_price),
+        currency: order.currency,
+      }).unwrap();
+
+      toast({
+        title: t("orders.details.invoice_success") || "Invoice Generated",
+        description:
+          t("orders.details.invoice_success_desc") ||
+          `Invoice #${invoice.invoice_number} has been generated successfully.`,
+      });
+    } catch (error: unknown) {
+      toast({
+        title: (error as ApiError)?.data?.detail || "Failed to generate invoice",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle download invoice as PDF
+  const handleDownloadInvoice = async () => {
+    if (!order) return;
+
+    setIsGeneratingPDF(true);
+    try {
+      const invoiceNumber =
+        existingInvoice?.invoice_number || `INV-${order.order_number}`;
+      const filename = `Invoice-${invoiceNumber}-${order.order_number}.pdf`;
+
+      // Generate PDF using react-pdf
+      await generatePDF(
+        <InvoicePDF order={order} invoice={existingInvoice || undefined} />,
+        filename
+      );
+
+      toast({
+        title: t("orders.details.invoice_download_success") || "Invoice Downloaded",
+        description:
+          t("orders.details.invoice_download_success_desc") ||
+          "Invoice has been downloaded successfully.",
+      });
+    } catch (error: unknown) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: t("orders.details.invoice_download_error") || "Download Failed",
+        description:
+          t("orders.details.invoice_download_error_desc") ||
+          "Failed to download invoice. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingPDF(false);
     }
   };
 
@@ -721,6 +801,94 @@ const ClientOrderDetailsPage = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Invoice Generation - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold">
+                      {t("orders.details.invoice") || "Invoice"}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      {t("orders.details.invoice_description") ||
+                        "Generate invoice for this order"}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                {existingInvoice ? (
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Receipt className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        {t("orders.details.invoice_number") || "Invoice Number"}
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground mb-2">
+                      {existingInvoice.invoice_number}
+                    </p>
+                    <Badge
+                      variant={
+                        existingInvoice.status === "paid"
+                          ? "default"
+                          : existingInvoice.status === "issued"
+                            ? "secondary"
+                            : "outline"
+                      }
+                      className={cn(
+                        "text-xs",
+                        existingInvoice.status === "paid" && "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30"
+                      )}
+                    >
+                      {existingInvoice.status}
+                    </Badge>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {t("orders.details.no_invoice") ||
+                      "No invoice has been generated for this order yet."}
+                  </p>
+                )}
+                {/* download invoice button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={handleDownloadInvoice}
+                  disabled={isGeneratingPDF || !order}
+                >
+                  {isGeneratingPDF ? (
+                    <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="w-3.5 h-3.5 mr-2" />
+                  )}
+                  {t("orders.details.download_invoice") || "Download Invoice"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGenerateInvoice}
+                  disabled={isGeneratingInvoice || isLoadingInvoice}
+                  size="sm"
+                >
+                  {isGeneratingInvoice ? (
+                    <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                  ) : (
+                    <File className="w-3.5 h-3.5 mr-2" />
+                  )}
+                  {existingInvoice
+                    ? t("orders.details.regenerate_invoice") ||
+                    "Regenerate Invoice"
+                    : t("orders.details.generate_invoice") ||
+                    "Generate Invoice"}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

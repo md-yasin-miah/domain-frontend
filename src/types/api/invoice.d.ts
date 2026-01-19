@@ -14,10 +14,11 @@ interface Invoice {
 }
 
 interface InvoiceCreateRequest {
-  order_id: number;
-  amount: number;
-  currency?: string;
-  due_date?: string;
+  order_id: number,
+  subtotal: number,
+  platform_fee: number,
+  total_amount: number,
+  currency: string
 }
 
 interface InvoiceUpdateRequest {
