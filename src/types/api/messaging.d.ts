@@ -53,7 +53,6 @@ interface Message {
   created_at: string;
   sender: UserBasicInfo | null;
   attachments: MessageAttachment[];
-  offer_id?: number | null; // Optional: link to offer if message is related to an offer
 }
 
 interface MessageCreateRequest {

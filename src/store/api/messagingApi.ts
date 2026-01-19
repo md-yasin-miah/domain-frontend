@@ -93,6 +93,21 @@ export const messagingApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, { messageId }) => [{ type: 'Messaging', id: messageId }, 'Messaging'],
     }),
+    // Sync Redis messages to database
+    syncMessages: builder.mutation<{ message: string; conversation_id: number }, number>({
+      query: (conversationId) => ({
+        url: `/messages/conversations/${conversationId}/sync`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, conversationId) => [{ type: 'Messaging', id: conversationId }, 'Messaging'],
+    }),
+    // Update user activity timestamp
+    updateActivity: builder.mutation<{ message: string; conversation_id: number }, number>({
+      query: (conversationId) => ({
+        url: `/messages/conversations/${conversationId}/activity`,
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
@@ -108,5 +123,7 @@ export const {
   useAttachFileToMessageMutation,
   useGetMessageAttachmentsQuery,
   useRemoveMessageAttachmentMutation,
+  useSyncMessagesMutation,
+  useUpdateActivityMutation,
 } = messagingApi;
 

@@ -15,8 +15,7 @@ import {
   CheckCheck,
   Loader2,
   AlertCircle,
-  Wifi,
-  WifiOff,
+  RefreshCw,
 } from 'lucide-react';
 import { timeFormat } from '@/lib/helperFun';
 import { useTranslation } from 'react-i18next';
@@ -27,9 +26,15 @@ import {
   useGetMessagesQuery,
   useSendMessageMutation,
   useMarkMessageAsReadMutation,
+  useSyncMessagesMutation,
+  useUpdateActivityMutation,
 } from '@/store/api/messagingApi';
 import { useAppSelector } from '@/store/hooks';
 import { useToast } from '@/hooks/use-toast';
+
+// Polling intervals (in milliseconds)
+const MESSAGE_POLL_INTERVAL = 2500; // Poll messages every 2.5 seconds
+const ACTIVITY_UPDATE_INTERVAL = 12000; // Update activity every 12 seconds
 
 const Conversation = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,22 +42,10 @@ const Conversation = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const currentUser = useAppSelector((state) => state.auth.user);
-  const token = useAppSelector((state) => state.auth.token);
   const [messageContent, setMessageContent] = useState('');
-  const [localMessages, setLocalMessages] = useState<Message[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [pendingMessages, setPendingMessages] = useState<Set<string>>(new Set()); // Track pending message content
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const reconnectAttemptsRef = useRef(0);
-  const pingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingMessageTimeoutRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
-  const maxReconnectAttempts = 5;
-  const PING_INTERVAL = 30000; // 30 seconds
-  const MESSAGE_TIMEOUT = 10000; // 10 seconds to wait for message confirmation
+  const activityUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const conversationId = Number(id);
 
@@ -62,9 +55,7 @@ const Conversation = () => {
     { skip: !conversationId }
   );
 
-  // Fetch all messages (use large limit to fetch all messages)
-  // CRITICAL: Fetch all messages to ensure we have complete conversation history
-  // Backend stores messages in JSON, so we fetch all at once for smooth experience
+  // Fetch all messages with polling enabled
   const { data: messagesData, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery(
     {
       conversationId,
@@ -72,102 +63,23 @@ const Conversation = () => {
     },
     {
       skip: !conversationId,
-      // Always refetch on mount to get latest messages from database
-      refetchOnMountOrArgChange: true,
+      // Enable polling for real-time updates
+      pollingInterval: MESSAGE_POLL_INTERVAL,
     }
   );
 
   const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
   const [markAsRead] = useMarkMessageAsReadMutation();
+  const [syncMessages] = useSyncMessagesMutation();
+  const [updateActivity] = useUpdateActivityMutation();
 
   // Extract messages from response
-  // CRITICAL: This is the source of truth from backend, includes messages from ALL users
-  const apiMessages = React.useMemo(() => {
+  const messages = React.useMemo(() => {
     if (!messagesData) return [];
     if (Array.isArray(messagesData)) return messagesData;
     if ('items' in messagesData) return messagesData.items;
     return [];
   }, [messagesData]);
-
-  // Effect to clean up localMessages that are now in API (prevents duplicates)
-  // This ensures we don't keep old local messages that are already fetched
-  // BUT preserves messages from both users during concurrent sends
-  React.useEffect(() => {
-    // Only clean up if we have both API messages and local messages
-    const apiMessageIds = new Set(apiMessages.map(m => m.id));
-    setLocalMessages((prev) => {
-      // If no local messages, nothing to clean up
-      if (prev.length === 0) return prev;
-
-      // Keep only messages that aren't in API yet
-      // This preserves messages from both users during concurrent sends
-      const filtered = prev.filter((msg) => !apiMessageIds.has(msg.id));
-
-      // Only update if we actually removed something (avoid unnecessary re-renders)
-      if (filtered.length !== prev.length) {
-        return filtered;
-      }
-      return prev;
-    });
-  }, [apiMessages]); // Only run when apiMessages change (after refetch)
-
-  // Merge API messages with local messages (from WebSocket)
-  // Backend stores messages in order with race condition fixes (row locking, duplicate ID detection)
-  // CRITICAL: We must preserve messages from BOTH users during concurrent sends
-  const messages = React.useMemo(() => {
-    // Create a map of all messages, prioritizing API messages (source of truth)
-    const messageMap = new Map<number, Message>();
-
-    // First, add all API messages (these are the source of truth from backend)
-    // Backend ensures all messages are saved even during concurrent sends
-    // This includes messages from both user1 and user2
-    apiMessages.forEach((msg) => {
-      messageMap.set(msg.id, msg);
-    });
-
-    // Then, add/update with any local WebSocket messages
-    // These are messages received via WebSocket that may not be in the API response yet
-    // IMPORTANT: We preserve ALL messages from ALL users (user1 and user2)
-    localMessages.forEach((msg) => {
-      const existing = messageMap.get(msg.id);
-      if (existing) {
-        // Message exists in API - merge WebSocket updates (read status, etc.)
-        messageMap.set(msg.id, {
-          ...existing,
-          is_read: msg.is_read ?? existing.is_read,
-          read_at: msg.read_at ?? existing.read_at,
-          // Preserve sender info from API if available
-          sender: existing.sender || msg.sender,
-          // Preserve offer_id from API (source of truth)
-          offer_id: existing.offer_id ?? msg.offer_id ?? null,
-        });
-      } else {
-        // New message from WebSocket that hasn't been fetched yet
-        // This is critical for concurrent sends - preserves messages from both users
-        // Backend will save it with proper ID, and it will appear in next API fetch
-        // Include all fields including offer_id if present
-        messageMap.set(msg.id, {
-          ...msg,
-          offer_id: msg.offer_id ?? null,
-        });
-      }
-    });
-
-    // Convert to array and sort by created_at (backend maintains order)
-    // Backend's duplicate ID detection ensures no ID conflicts
-    // This ensures messages from both users appear in correct order
-    const sortedMessages = Array.from(messageMap.values()).sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
-      // If dates are equal, sort by ID as tiebreaker (backend ensures unique IDs)
-      if (dateA === dateB) {
-        return a.id - b.id;
-      }
-      return dateA - dateB;
-    });
-
-    return sortedMessages;
-  }, [apiMessages, localMessages]);
 
   // Get the other participant
   const otherParticipant = React.useMemo(() => {
@@ -178,321 +90,75 @@ const Conversation = () => {
     return conversation.participant1;
   }, [conversation, currentUser]);
 
-  // Get WebSocket URL
-  const getWebSocketUrl = () => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || '';
-    // Convert HTTP/HTTPS to WS/WSS
-    const wsUrl = apiUrl.replace(/^http/, 'ws');
-    return `${wsUrl}messages/ws/${conversationId}?token=${token}`;
-  };
-
-  // Connect to WebSocket
-  const connectWebSocket = () => {
-    if (!token || !conversationId || wsRef.current?.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    setIsConnecting(true);
-    const wsUrl = getWebSocketUrl();
-
-    try {
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        setIsConnecting(false);
-        reconnectAttemptsRef.current = 0;
-
-        // Start ping interval to keep connection alive
-        pingIntervalRef.current = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'ping' }));
-          }
-        }, PING_INTERVAL);
-
-        // Wait for 'connected' message from server before showing toast
-        // The server sends a 'connected' message after authentication
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-
-          if (data.type === 'new_message') {
-            // Backend sends message in this format:
-            // { type: 'new_message', conversation_id: number, message: Message }
-            const newMessage = data.message;
-
-            // Ensure message has proper structure matching backend response
-            const formattedMessage: Message = {
-              id: newMessage.id,
-              conversation_id: newMessage.conversation_id || conversationId,
-              sender_id: newMessage.sender_id,
-              content: newMessage.content,
-              is_read: newMessage.is_read || false,
-              read_at: newMessage.read_at || null,
-              created_at: newMessage.created_at,
-              sender: newMessage.sender ? {
-                id: newMessage.sender.id,
-                username: newMessage.sender.username,
-                email: newMessage.sender.email,
-              } : null,
-              attachments: newMessage.attachments || [],
-              offer_id: newMessage.offer_id || null, // Include offer_id if present
-            };
-
-            // Remove from pending messages if this is a message we sent
-            if (currentUser && formattedMessage.sender_id === currentUser.id) {
-              setPendingMessages((prev) => {
-                const updated = new Set(prev);
-                updated.delete(formattedMessage.content);
-                return updated;
-              });
-
-              // Clear timeout for this message
-              const timeout = pendingMessageTimeoutRef.current.get(formattedMessage.content);
-              if (timeout) {
-                clearTimeout(timeout);
-                pendingMessageTimeoutRef.current.delete(formattedMessage.content);
-              }
-            }
-
-            setLocalMessages((prev) => {
-              // Check if message already exists (duplicate detection)
-              if (prev.some((msg) => msg.id === formattedMessage.id)) {
-                return prev;
-              }
-              // Add new message (from any user - user1 or user2)
-              return [...prev, formattedMessage];
-            });
-
-            // Don't immediately refetch - let the message appear first
-            // Only refetch if we need to sync with backend (after a delay to allow backend to save)
-            // This prevents overwriting messages during concurrent sends
-            setTimeout(() => {
-              refetchMessages();
-            }, 500); // Small delay to allow backend to save and broadcast
-
-            scrollToBottom();
-          } else if (data.type === 'messages_read') {
-            // Backend sends: { type: 'messages_read', conversation_id, message_ids, read_by }
-            const messageIds = data.message_ids || [];
-            setLocalMessages((prev) =>
-              prev.map((msg) =>
-                messageIds.includes(msg.id)
-                  ? { ...msg, is_read: true, read_at: new Date().toISOString() }
-                  : msg
-              )
-            );
-            // Refetch to sync read status, but preserve all messages
-            // Use a delay to avoid race conditions with concurrent message sends
-            setTimeout(() => {
-              refetchMessages();
-            }, 300);
-          } else if (data.type === 'connected') {
-            // Connection confirmed by server after authentication
-            setIsConnected(true);
-            setIsConnecting(false);
-            toast({
-              title: 'Connected',
-              description: 'Real-time chat is now active',
-            });
-          } else if (data.type === 'error') {
-            const errorMessage = data.message || 'An error occurred';
-
-            // If error occurred while sending a message, restore it to input
-            if (errorMessage.includes('message') || errorMessage.includes('save')) {
-              // Try to find the pending message and restore it
-              const pendingArray = Array.from(pendingMessages);
-              if (pendingArray.length > 0) {
-                // Restore the most recent pending message
-                const lastPending = pendingArray[pendingArray.length - 1];
-                setMessageContent(lastPending);
-                setPendingMessages((prev) => {
-                  const updated = new Set(prev);
-                  updated.delete(lastPending);
-                  return updated;
-                });
-              }
-            }
-
-            toast({
-              title: 'WebSocket Error',
-              description: errorMessage,
-              variant: 'destructive',
-            });
-          } else if (data.type === 'pong') {
-            // Heartbeat response - no action needed
-          }
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        setIsConnecting(false);
-      };
-
-      ws.onclose = (event) => {
-        setIsConnected(false);
-        setIsConnecting(false);
-
-        // Handle specific close codes from backend
-        if (event.code === 4001) {
-          toast({
-            title: 'Authentication Failed',
-            description: 'Please refresh the page and log in again.',
-            variant: 'destructive',
-          });
-          return; // Don't reconnect on auth failure
-        } else if (event.code === 4003) {
-          toast({
-            title: 'Access Denied',
-            description: 'You are not authorized to access this conversation.',
-            variant: 'destructive',
-          });
-          return; // Don't reconnect on authorization failure
-        } else if (event.code === 4004) {
-          toast({
-            title: 'Conversation Not Found',
-            description: 'This conversation no longer exists.',
-            variant: 'destructive',
-          });
-          return; // Don't reconnect if conversation doesn't exist
-        }
-
-        // Attempt to reconnect if not a normal closure
-        if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
-          reconnectAttemptsRef.current += 1;
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
-
-          reconnectTimeoutRef.current = setTimeout(() => {
-            connectWebSocket();
-          }, delay);
-        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-          toast({
-            title: 'Connection Lost',
-            description: 'Unable to reconnect. Please refresh the page.',
-            variant: 'destructive',
-          });
-        }
-      };
-    } catch (error) {
-      console.error('Error creating WebSocket:', error);
-      setIsConnecting(false);
-      toast({
-        title: 'Connection Error',
-        description: 'Failed to connect to real-time chat',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  // Disconnect WebSocket
-  const disconnectWebSocket = () => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-    if (pingIntervalRef.current) {
-      clearInterval(pingIntervalRef.current);
-      pingIntervalRef.current = null;
-    }
-    // Clear all pending message timeouts
-    pendingMessageTimeoutRef.current.forEach((timeout) => clearTimeout(timeout));
-    pendingMessageTimeoutRef.current.clear();
-
-    if (wsRef.current) {
-      wsRef.current.close(1000, 'Component unmounting');
-      wsRef.current = null;
-    }
-    setIsConnected(false);
-    setIsConnecting(false);
-  };
-
-  // Send message via WebSocket
-  const sendMessageViaWebSocket = (content: string) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: 'send_message',
-          content: content.trim(),
-        })
-      );
-      return true;
-    }
-    return false;
-  };
-
-  // Mark messages as read via WebSocket
-  const markMessagesAsReadViaWebSocket = (messageIds: number[]): boolean => {
-    if (wsRef.current?.readyState === WebSocket.OPEN && messageIds.length > 0) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: 'mark_read',
-          message_ids: messageIds,
-        })
-      );
-      return true;
-    }
-    return false;
-  };
-
-  // Connect WebSocket when component mounts or conversation changes
+  // Start activity updates
   useEffect(() => {
-    if (conversationId && token) {
-      connectWebSocket();
-    }
+    if (!conversationId) return;
+
+    // Update activity immediately
+    updateActivity(conversationId).catch((error) => {
+      console.error('Error updating activity:', error);
+    });
+
+    // Then update every 10-15 seconds
+    activityUpdateIntervalRef.current = setInterval(() => {
+      updateActivity(conversationId).catch((error) => {
+        console.error('Error updating activity:', error);
+      });
+    }, ACTIVITY_UPDATE_INTERVAL);
 
     return () => {
-      disconnectWebSocket();
+      if (activityUpdateIntervalRef.current) {
+        clearInterval(activityUpdateIntervalRef.current);
+        activityUpdateIntervalRef.current = null;
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationId, token]);
+  }, [conversationId, updateActivity]);
+
+  // Sync messages on page unload
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const handleBeforeUnload = async () => {
+      try {
+        await syncMessages(conversationId).unwrap();
+      } catch (error) {
+        console.error('Error syncing messages:', error);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Also sync when component unmounts
+      syncMessages(conversationId).catch((error) => {
+        console.error('Error syncing messages on unmount:', error);
+      });
+    };
+  }, [conversationId, syncMessages]);
 
   // Auto-scroll to bottom when new messages arrive
-  // Only scroll if user is near bottom (within 100px) to avoid interrupting reading
   useEffect(() => {
-    // Small delay to ensure DOM is updated
-    const timeout = setTimeout(() => {
-      if (messagesContainerRef.current) {
-        const container = messagesContainerRef.current;
-        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
-
-        // Only auto-scroll if user is near bottom or if it's the initial load (few messages)
-        if (isNearBottom || messages.length <= 10) {
-          scrollToBottom();
-        }
-      } else {
-        scrollToBottom();
-      }
-    }, 100);
-
-    return () => clearTimeout(timeout);
-  }, [messages.length]); // Only trigger on message count change, not on every message update
+    scrollToBottom();
+  }, [messages]);
 
   // Mark messages as read when viewing
   useEffect(() => {
-    if (messages.length > 0 && currentUser && isConnected) {
+    if (messages.length > 0 && currentUser) {
       const unreadMessages = messages.filter(
         (msg) => !msg.is_read && msg.sender_id !== currentUser.id
       );
 
       if (unreadMessages.length > 0) {
-        const messageIds = unreadMessages.map((msg) => msg.id);
-        // Try WebSocket first for real-time updates, fallback to REST API
-        if (!markMessagesAsReadViaWebSocket(messageIds)) {
-          // Fallback: mark each message individually via REST API
-          unreadMessages.forEach((msg) => {
-            markAsRead({ messageId: msg.id, conversationId }).catch((error) => {
-              console.error('Error marking message as read:', error);
-            });
+        // Mark each message as read via REST API
+        unreadMessages.forEach((msg) => {
+          markAsRead({ messageId: msg.id, conversationId }).catch((error) => {
+            console.error('Error marking message as read:', error);
           });
-        }
+        });
       }
     }
-  }, [messages, currentUser, conversationId, markAsRead, isConnected]);
+  }, [messages, currentUser, conversationId, markAsRead]);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -509,79 +175,30 @@ const Conversation = () => {
     const content = messageContent.trim();
     setMessageContent('');
 
-    // Try WebSocket first for instant delivery
-    if (isConnected && sendMessageViaWebSocket(content)) {
-      // Track pending message to handle timeouts and errors
-      setPendingMessages((prev) => new Set(prev).add(content));
+    try {
+      await sendMessage({
+        conversationId,
+        data: { content },
+      }).unwrap();
 
-      // Set timeout to check if message was received
-      // Backend now uses row locking which may cause slight delays
-      const timeout = setTimeout(() => {
-        // Check if message is still pending after timeout
-        setPendingMessages((prev) => {
-          if (prev.has(content)) {
-            // Message not received, might have failed
-            // Refetch to check if it was saved
-            refetchMessages();
+      // Refetch messages to get the latest (includes Redis messages)
+      refetchMessages();
+      scrollToBottom();
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === 'object' && 'data' in error
+          ? (error as { data?: { message?: string; detail?: string } }).data?.message ||
+          (error as { data?: { detail?: string } }).data?.detail
+          : 'Failed to send message';
 
-            // After refetch, check if message exists
-            setTimeout(() => {
-              setPendingMessages((current) => {
-                if (current.has(content)) {
-                  // Still pending, likely failed - restore to input
-                  setMessageContent(content);
-                  toast({
-                    title: 'Message Not Delivered',
-                    description: 'The message may not have been sent. Please try again.',
-                    variant: 'destructive',
-                  });
-                  return new Set(Array.from(current).filter((msg) => msg !== content));
-                }
-                return current;
-              });
-            }, 1000);
+      toast({
+        title: 'Error',
+        description: errorMessage || 'Failed to send message',
+        variant: 'destructive',
+      });
 
-            return new Set(Array.from(prev).filter((msg) => msg !== content));
-          }
-          return prev;
-        });
-      }, MESSAGE_TIMEOUT);
-
-      pendingMessageTimeoutRef.current.set(content, timeout);
-
-      // Message sent via WebSocket
-      // Backend will send it back via 'new_message' event after row lock and save
-      // With the race condition fixes, backend ensures all messages are saved even during concurrent sends
-    } else {
-      // Fallback to REST API if WebSocket is not connected
-      try {
-        await sendMessage({
-          conversationId,
-          data: { content },
-        }).unwrap();
-
-        // Refetch messages to get the latest (backend handles race conditions)
-        // Use a small delay to ensure backend has saved the message
-        setTimeout(() => {
-          refetchMessages();
-          scrollToBottom();
-        }, 300);
-      } catch (error: unknown) {
-        const errorMessage =
-          error && typeof error === 'object' && 'data' in error
-            ? (error as { data?: { message?: string; detail?: string } }).data?.message ||
-            (error as { data?: { detail?: string } }).data?.detail
-            : 'Failed to send message';
-
-        toast({
-          title: 'Error',
-          description: errorMessage || 'Failed to send message',
-          variant: 'destructive',
-        });
-
-        // Restore message content on error
-        setMessageContent(content);
-      }
+      // Restore message content on error
+      setMessageContent(content);
     }
   };
 
@@ -655,22 +272,10 @@ const Conversation = () => {
         <div className="flex items-center gap-3">
           {/* Connection Status */}
           <div className="flex items-center gap-2">
-            {isConnected ? (
-              <Badge variant="default" className="bg-green-500">
-                <Wifi className="w-3 h-3 mr-1" />
-                Connected
-              </Badge>
-            ) : isConnecting ? (
-              <Badge variant="secondary">
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                Connecting...
-              </Badge>
-            ) : (
-              <Badge variant="destructive">
-                <WifiOff className="w-3 h-3 mr-1" />
-                Disconnected
-              </Badge>
-            )}
+            <Badge variant="default" className="bg-green-500">
+              <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+              Live
+            </Badge>
           </div>
           {conversation.listing && (
             <Button
@@ -746,21 +351,6 @@ const Conversation = () => {
                     )}
                   >
                     <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-
-                    {/* Offer Link (if message is related to an offer) */}
-                    {message.offer_id && (
-                      <div className="mt-2 pt-2 border-t border-current/20">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 text-xs p-1"
-                          onClick={() => navigate(ROUTES.CLIENT.OFFERS.DETAILS(message.offer_id!))}
-                        >
-                          <Package className="h-3 w-3 mr-1" />
-                          View Offer #{message.offer_id}
-                        </Button>
-                      </div>
-                    )}
 
                     {/* Attachments */}
                     {message.attachments && message.attachments.length > 0 && (
