@@ -60,6 +60,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import OfferDetailsSkeleton from "@/components/skeletons/OfferDetailsSkeleton";
+import EmptyState from "@/components/common/EmptyState";
 
 const ClientOrderDetailsPage = () => {
   const { t } = useTranslation();
@@ -179,54 +181,18 @@ const ClientOrderDetailsPage = () => {
     isBuyer && ["completed", "processing"].includes(order?.status || "");
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen">
-        <div className="space-y-6 p-6">
-          <Skeleton className="h-32 w-full rounded-2xl" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-xl" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <Skeleton className="h-64 w-full rounded-xl" />
-              <Skeleton className="h-48 w-full rounded-xl" />
-            </div>
-            <div className="space-y-6">
-              <Skeleton className="h-64 w-full rounded-xl" />
-              <Skeleton className="h-48 w-full rounded-xl" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <OfferDetailsSkeleton />;
   }
 
   if (error || !order) {
     return (
-      <div className="min-h-screen">
-        <div className="flex flex-col items-center justify-center py-12 px-6">
-          <div className="flex flex-col items-center gap-4 text-center max-w-md">
-            <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-              <AlertTriangle className="w-10 h-10 text-destructive" />
-            </div>
-            <h3 className="text-2xl font-bold">
-              {t("orders.details.error.title")}
-            </h3>
-            <p className="text-muted-foreground">
-              {t("orders.details.error.description")}
-            </p>
-            <Button
-              onClick={() => navigate(ROUTES.CLIENT.ORDERS.INDEX)}
-              className="mt-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t("orders.details.back_to_orders")}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        variant="error"
+        title={t("orders.details.error.title")}
+        description={t("orders.details.error.description")}
+        actionLabel={t("orders.details.back_to_orders")}
+        onAction={() => navigate(ROUTES.CLIENT.ORDERS.INDEX)}
+      />
     );
   }
 
@@ -254,7 +220,7 @@ const ClientOrderDetailsPage = () => {
         </div>
 
         {/* Premium Header - Subtle Design */}
-        <div className="relative overflow-hidden rounded-xl bg-card border border-border/50 p-6 shadow-sm">
+        <div className="relative overflow-hidden rounded-xl bg-primary/10 border border-border/50 p-6 shadow-sm">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted/50 border border-border">
@@ -359,8 +325,8 @@ const ClientOrderDetailsPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Order Information - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm">
-              <CardHeader className="border-b border-border">
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                     <Package className="h-4 w-4 text-muted-foreground" />
@@ -507,8 +473,8 @@ const ClientOrderDetailsPage = () => {
             </Card>
 
             {/* Listing Information - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm">
-              <CardHeader className="border-b border-border">
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                     <FileText className="h-4 w-4 text-muted-foreground" />
@@ -548,8 +514,8 @@ const ClientOrderDetailsPage = () => {
             </Card>
 
             {/* Buyer & Seller Information - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm">
-              <CardHeader className="border-b border-border">
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                     <User className="h-4 w-4 text-muted-foreground" />
@@ -605,8 +571,8 @@ const ClientOrderDetailsPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Pricing Summary - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm">
-              <CardHeader className="border-b border-border">
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -660,7 +626,7 @@ const ClientOrderDetailsPage = () => {
             {/* Payment Information - Clean Design */}
             {order.payment_method && (
               <Card className="border border-border/50 bg-card shadow-sm">
-                <CardHeader className="border-b border-border">
+                <CardHeader className="border-b border-border bg-secondary/10">
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                       <CreditCard className="h-4 w-4 text-muted-foreground" />
@@ -694,8 +660,8 @@ const ClientOrderDetailsPage = () => {
 
             {/* Actions - Clean Design */}
             {(canCancel || canComplete || canRefund) && (
-              <Card className="border border-border/50 bg-card shadow-sm">
-                <CardHeader className="border-b border-border">
+              <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+                <CardHeader className="border-b border-border bg-blue-500/20">
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                       <Sparkles className="h-4 w-4 text-muted-foreground" />
