@@ -53,8 +53,8 @@ const AllOrdersPage = () => {
   // Build query params
   const queryParams = useMemo(() => {
     const params: OrderFilters = {
-      page,
-      size,
+      skip: (page - 1) * size,
+      limit: size,
     };
     if (statusFilter !== "all") {
       params.status = statusFilter;

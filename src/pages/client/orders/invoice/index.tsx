@@ -326,22 +326,30 @@ const AllInvoice = () => {
             </Button>
           </CustomTooltip>
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(ROUTES.CLIENT.ORDERS.ORDER_DETAILS(invoice.order_id))}
-          title={t("invoices.actions.view_order") || "View Order"}
+        <CustomTooltip
+          content={t("invoices.actions.view_order") || "View Order"}
+          side="top"
         >
-          <Eye className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handleDownloadInvoice(invoice)}
-          title={t("invoices.actions.download") || "Download PDF"}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(ROUTES.CLIENT.ORDERS.ORDER_DETAILS(invoice.order_id))}
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
+        </CustomTooltip>
+        <CustomTooltip
+          content={t("invoices.actions.download") || "Download PDF"}
+          side="top"
         >
-          <Download className="w-4 h-4" />
-        </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleDownloadInvoice(invoice)}
+          >
+            <Download className="w-4 h-4" />
+          </Button>
+        </CustomTooltip>
       </div>
     );
   };

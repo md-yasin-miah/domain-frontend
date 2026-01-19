@@ -56,6 +56,7 @@ import {
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/routes";
 import SupportTicketDetailsModal from "@/pages/component/SupportTicketDetailsModal";
+import { usePagination } from "@/hooks/usePagination";
 
 const SupportPage = () => {
   const { t } = useTranslation();
@@ -69,7 +70,10 @@ const SupportPage = () => {
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
+  });
   // Ticket creation form
   const ticketForm = useForm<TicketCreateFormData>({
     resolver: zodResolver(ticketCreateSchema),
@@ -97,8 +101,8 @@ const SupportPage = () => {
     error: ticketsError,
     refetch,
   } = useGetTicketsQuery({
-    page: 1,
-    limit: 100,
+    skip: (page - 1) * size,
+    limit: size,
   });
 
   // Fetch categories
@@ -192,11 +196,11 @@ const SupportPage = () => {
       console.error({ error });
       const errorMessage =
         error &&
-        typeof error === "object" &&
-        "data" in error &&
-        typeof error.data === "object" &&
-        error.data !== null &&
-        "message" in error.data
+          typeof error === "object" &&
+          "data" in error &&
+          typeof error.data === "object" &&
+          error.data !== null &&
+          "message" in error.data
           ? String(error.data.message)
           : t("support.create.error.server");
       toast({
@@ -228,11 +232,11 @@ const SupportPage = () => {
     } catch (error: unknown) {
       const errorMessage =
         error &&
-        typeof error === "object" &&
-        "data" in error &&
-        typeof error.data === "object" &&
-        error.data !== null &&
-        "message" in error.data
+          typeof error === "object" &&
+          "data" in error &&
+          typeof error.data === "object" &&
+          error.data !== null &&
+          "message" in error.data
           ? String(error.data.message)
           : t("support.create.error.server");
       toast({

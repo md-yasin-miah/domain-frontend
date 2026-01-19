@@ -20,6 +20,7 @@ interface OrderFilters extends PaginationParams {
   buyer_id?: number;
   seller_id?: number;
   status?: string;
+  search?: string;
 }
 
 interface MenuSubItem {

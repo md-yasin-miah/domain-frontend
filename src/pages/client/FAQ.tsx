@@ -12,14 +12,15 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import { usePagination } from '@/hooks/usePagination';
 
 export default function FAQ() {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
   const { data: faqsData, isLoading: loading } = useGetFAQsQuery({
-    page: 1,
-    size: 10
+    limit: 0
   });
 
   const allFaqs = faqsData?.items || [];

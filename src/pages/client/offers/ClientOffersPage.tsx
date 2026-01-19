@@ -58,6 +58,7 @@ import { cn } from "@/lib/utils";
 import { usePagination } from "@/hooks/usePagination";
 import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/lib/routes";
+import CustomTooltip from "@/components/common/CustomTooltip";
 
 type OfferStatus =
   | "pending"
@@ -85,19 +86,14 @@ const ClientOffersPage = () => {
   // Build query params
   const queryParams = useMemo(() => {
     const params: ClientFiltersParams = {
-      page,
-      size,
+      skip: (page - 1) * size,
+      limit: size,
     };
     if (statusFilter !== "all") {
       params.status = statusFilter;
     }
-
-    if (searchTerm) {
-      params.search = searchTerm;
-    }
-
     return params;
-  }, [page, size, statusFilter, searchTerm]);
+  }, [page, size, statusFilter]);
 
   const {
     data: offersData,
@@ -312,59 +308,79 @@ const ClientOffersPage = () => {
     return (
       <div className="flex items-center gap-1">
         {canAccept && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleAccept(offer.id)}
-            disabled={isAccepting}
-            title={t("offers.actions.accept")}
+          <CustomTooltip
+            content={t("offers.actions.accept")}
+            side="top"
           >
-            <Check className="w-4 h-4 text-green-600" />
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleAccept(offer.id)}
+              disabled={isAccepting}
+            >
+              <Check className="w-4 h-4 text-green-600" />
+            </Button>
+          </CustomTooltip>
         )}
         {canReject && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleReject(offer.id)}
-            disabled={isRejecting}
-            title={t("offers.actions.reject")}
+          <CustomTooltip
+            content={t("offers.actions.reject")}
+            side="top"
           >
-            <X className="w-4 h-4 text-red-600" />
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleReject(offer.id)}
+              disabled={isRejecting}
+            >
+              <X className="w-4 h-4 text-red-600" />
+            </Button>
+          </CustomTooltip>
         )}
         {canCounter && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSelectedOffer(offer.id);
-              setCounterDialogOpen(true);
-            }}
-            title={t("offers.actions.counter")}
+          <CustomTooltip
+            content={t("offers.actions.counter")}
+            side="top"
           >
-            <RotateCcw className="w-4 h-4 text-blue-600" />
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSelectedOffer(offer.id);
+                setCounterDialogOpen(true);
+              }}
+            >
+              <RotateCcw className="w-4 h-4 text-blue-600" />
+            </Button>
+          </CustomTooltip>
         )}
         {canWithdraw && (
+          <CustomTooltip
+            content={t("offers.actions.withdraw")}
+            side="top"
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleWithdraw(offer.id)}
+              disabled={isWithdrawing}
+            >
+              <Trash2 className="w-4 h-4 text-gray-600" />
+            </Button>
+          </CustomTooltip>
+        )}
+        <CustomTooltip
+          content={t("offers.actions.view")}
+          side="top"
+        >
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleWithdraw(offer.id)}
-            disabled={isWithdrawing}
-            title={t("offers.actions.withdraw")}
+            onClick={() => navigate(ROUTES.CLIENT.OFFERS.DETAILS(offer.id))}
           >
-            <Trash2 className="w-4 h-4 text-gray-600" />
+            <Eye className="w-4 h-4" />
           </Button>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(ROUTES.CLIENT.OFFERS.DETAILS(offer.id))}
-          title={t("offers.actions.view")}
-        >
-          <Eye className="w-4 h-4" />
-        </Button>
+        </CustomTooltip>
       </div>
     );
   };
