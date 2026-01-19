@@ -31,6 +31,7 @@ import {
 } from '@/store/api/messagingApi';
 import { useAppSelector } from '@/store/hooks';
 import { useToast } from '@/hooks/use-toast';
+import { extractErrorMessage } from '@/lib/errorHandler';
 
 // Polling intervals (in milliseconds)
 const MESSAGE_POLL_INTERVAL = 2500; // Poll messages every 2.5 seconds
@@ -80,7 +81,7 @@ const Conversation = () => {
     if ('items' in messagesData) return messagesData.items;
     return [];
   }, [messagesData]);
-
+  console.log({ messagesData })
   // Get the other participant
   const otherParticipant = React.useMemo(() => {
     if (!conversation || !currentUser) return null;
@@ -185,15 +186,13 @@ const Conversation = () => {
       refetchMessages();
       scrollToBottom();
     } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === 'object' && 'data' in error
-          ? (error as { data?: { message?: string; detail?: string } }).data?.message ||
-          (error as { data?: { detail?: string } }).data?.detail
-          : 'Failed to send message';
+      // Use the error handler utility to properly extract error messages
+      // This handles validation errors (arrays of objects) and other error formats
+      const errorMessage = extractErrorMessage(error) || 'Failed to send message';
 
       toast({
         title: 'Error',
-        description: errorMessage || 'Failed to send message',
+        description: errorMessage,
         variant: 'destructive',
       });
 

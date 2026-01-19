@@ -40,7 +40,10 @@ export const messagingApi = apiSlice.injectEndpoints({
       query: ({ conversationId, data }) => ({
         url: `/messages/conversations/${conversationId}/messages`,
         method: 'POST',
-        body: data,
+        body: {
+          ...data,
+          conversation_id: conversationId, // Backend requires conversation_id in body
+        },
       }),
       invalidatesTags: (result, error, { conversationId }) => [{ type: 'Messaging', id: conversationId }, 'Messaging'],
     }),
