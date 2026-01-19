@@ -242,6 +242,7 @@
       "draft": "Borrador",
       "issued": "Emitido",
       "paid": "Pagado",
+      "sold": "Vendido",
       "overdue": "Vencido"
     }
   },

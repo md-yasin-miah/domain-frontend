@@ -138,3 +138,68 @@ export const isValidationError = (error: any): boolean => {
   );
 };
 
+/**
+ * Sets form field errors from API error response
+ * 
+ * @param form - React Hook Form instance
+ * @param error - API error object
+ * @param fieldMapping - Optional mapping from backend field names to form field names
+ * @param allowedFields - Optional array of allowed form field names (only these will have errors set)
+ * @returns true if field-specific errors were set, false otherwise
+ * 
+ * @example
+ * ```ts
+ * const hasFieldErrors = setFormErrors(form, error, {
+ *   counter_amount: 'amount',
+ *   user_email: 'email'
+ * }, ['amount', 'message']);
+ * 
+ * if (!hasFieldErrors) {
+ *   toast({ title: extractErrorMessage(error) });
+ * }
+ * ```
+ */
+export const setFormErrors = <TFieldValues extends Record<string, any>>(
+  form: {
+    setError: (
+      name: keyof TFieldValues,
+      error: { type?: string; message: string }
+    ) => void;
+  },
+  error: any,
+  fieldMapping?: Record<string, keyof TFieldValues>,
+  allowedFields?: (keyof TFieldValues)[]
+): boolean => {
+  const fieldErrors = extractFieldErrors(error);
+  
+  if (Object.keys(fieldErrors).length === 0) {
+    return false;
+  }
+
+  let hasSetErrors = false;
+
+  Object.entries(fieldErrors).forEach(([backendField, message]) => {
+    // Map backend field name to form field name
+    let formField: keyof TFieldValues;
+    
+    if (fieldMapping && fieldMapping[backendField]) {
+      // Use explicit mapping if provided
+      formField = fieldMapping[backendField];
+    } else {
+      // Try to use backend field name directly, or check if it's in allowed fields
+      formField = backendField as keyof TFieldValues;
+    }
+
+    // Only set error if field is in allowed fields (if provided)
+    if (!allowedFields || allowedFields.includes(formField)) {
+      form.setError(formField, {
+        type: 'server',
+        message: message,
+      });
+      hasSetErrors = true;
+    }
+  });
+
+  return hasSetErrors;
+};
+

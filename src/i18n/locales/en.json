@@ -864,6 +864,7 @@
       "draft": "Draft",
       "issued": "Issued",
       "paid": "Paid",
+      "sold": "Sold",
       "overdue": "Overdue"
     }
   },

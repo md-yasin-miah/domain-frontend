@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Card,
   CardContent,
@@ -29,6 +31,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Search,
   Handshake,
@@ -59,6 +69,8 @@ import { usePagination } from "@/hooks/usePagination";
 import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/lib/routes";
 import CustomTooltip from "@/components/common/CustomTooltip";
+import { extractErrorMessage, setFormErrors } from "@/lib/errorHandler";
+import { offerCounterSchema, type OfferCounterFormData } from "@/schemas/marketplace/offer.schema";
 
 type OfferStatus =
   | "pending"
@@ -69,15 +81,21 @@ type OfferStatus =
 
 const ClientOffersPage = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OfferStatus | "all">("all");
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
   const [counterDialogOpen, setCounterDialogOpen] = useState(false);
-  const [counterAmount, setCounterAmount] = useState("");
-  const [counterMessage, setCounterMessage] = useState("");
+
+  // React Hook Form for counter offer
+  const counterForm = useForm<OfferCounterFormData>({
+    resolver: zodResolver(offerCounterSchema),
+    defaultValues: {
+      amount: undefined,
+      message: "",
+    },
+  });
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
     initialPageSize: 10,
@@ -245,8 +263,8 @@ const ClientOffersPage = () => {
     }
   };
 
-  const handleCounter = async () => {
-    if (!selectedOffer || !counterAmount) {
+  const handleCounter = async (data: OfferCounterFormData) => {
+    if (!selectedOffer) {
       toast({
         title: t("offers.actions.counter_error"),
         description: t("offers.actions.counter_error_desc"),
@@ -259,8 +277,8 @@ const ClientOffersPage = () => {
       await counterOffer({
         id: selectedOffer,
         data: {
-          amount: parseFloat(counterAmount),
-          message: counterMessage || undefined,
+          amount: data.amount,
+          message: data.message || undefined,
         },
       }).unwrap();
       toast({
@@ -268,16 +286,24 @@ const ClientOffersPage = () => {
         description: t("offers.actions.counter_success_desc"),
       });
       setCounterDialogOpen(false);
-      setCounterAmount("");
-      setCounterMessage("");
+      counterForm.reset();
       setSelectedOffer(null); // Clear selected offer to prevent details modal from opening
       refetch();
     } catch (error) {
-      toast({
-        title: error?.data?.detail || t("offers.actions.counter_error"),
-        description: t("offers.actions.counter_error_desc"),
-        variant: "destructive",
-      });
+      // Set form field errors dynamically
+      const hasFieldErrors = setFormErrors<OfferCounterFormData>(
+        counterForm,
+        error
+      );
+
+      // Show general error toast if no field-specific errors were set
+      if (!hasFieldErrors) {
+        const errorMessage = extractErrorMessage(error);
+        toast({
+          title: errorMessage || t("offers.actions.counter_error"),
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -512,8 +538,7 @@ const ClientOffersPage = () => {
           if (!open) {
             // Clear selected offer when closing counter dialog to prevent details modal from opening
             setSelectedOffer(null);
-            setCounterAmount("");
-            setCounterMessage("");
+            counterForm.reset();
           }
         }}
       >
@@ -526,55 +551,80 @@ const ClientOffersPage = () => {
               {t("offers.actions.counter_dialog.description")}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                {t("offers.actions.counter_dialog.amount")}
-              </label>
-              <Input
-                type="number"
-                placeholder={t(
-                  "offers.actions.counter_dialog.amount_placeholder"
+          <Form {...counterForm}>
+            <form onSubmit={counterForm.handleSubmit(handleCounter)} className="space-y-4 py-4">
+              <FormField
+                control={counterForm.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t("offers.actions.counter_dialog.amount")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder={t(
+                          "offers.actions.counter_dialog.amount_placeholder"
+                        )}
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === "" ? undefined : Number(value));
+                        }}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                value={counterAmount}
-                onChange={(e) => setCounterAmount(e.target.value)}
               />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                {t("offers.actions.counter_dialog.message")}
-              </label>
-              <Textarea
-                placeholder={t(
-                  "offers.actions.counter_dialog.message_placeholder"
+              <FormField
+                control={counterForm.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t("offers.actions.counter_dialog.message")}
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder={t(
+                          "offers.actions.counter_dialog.message_placeholder"
+                        )}
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                value={counterMessage}
-                onChange={(e) => setCounterMessage(e.target.value)}
-                rows={4}
               />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setCounterDialogOpen(false)}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              onClick={handleCounter}
-              disabled={isCountering || !counterAmount}
-            >
-              {isCountering ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t("offers.actions.countering")}
-                </>
-              ) : (
-                t("offers.actions.counter_submit")
-              )}
-            </Button>
-          </DialogFooter>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCounterDialogOpen(false)}
+                >
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isCountering}
+                >
+                  {isCountering ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      {t("offers.actions.countering")}
+                    </>
+                  ) : (
+                    t("offers.actions.counter_submit")
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
