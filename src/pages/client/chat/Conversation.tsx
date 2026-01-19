@@ -34,7 +34,8 @@ import { useToast } from '@/hooks/use-toast';
 import { extractErrorMessage } from '@/lib/errorHandler';
 
 // Polling intervals (in milliseconds)
-const MESSAGE_POLL_INTERVAL = 2500; // Poll messages every 2.5 seconds
+const MESSAGE_POLL_INTERVAL = 5000; // Poll messages every 5 seconds (reduced server load)
+const MESSAGE_POLL_INTERVAL_SLOW = 15000; // Slow polling when tab is hidden (15 seconds)
 const ACTIVITY_UPDATE_INTERVAL = 12000; // Update activity every 12 seconds
 
 const Conversation = () => {
@@ -44,6 +45,7 @@ const Conversation = () => {
   const { toast } = useToast();
   const currentUser = useAppSelector((state) => state.auth.user);
   const [messageContent, setMessageContent] = useState('');
+  const [isTabVisible, setIsTabVisible] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const activityUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -57,6 +59,7 @@ const Conversation = () => {
   );
 
   // Fetch all messages with polling enabled
+  // Polling pauses when tab is hidden to reduce server load
   const { data: messagesData, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery(
     {
       conversationId,
@@ -64,8 +67,10 @@ const Conversation = () => {
     },
     {
       skip: !conversationId,
-      // Enable polling for real-time updates
-      pollingInterval: MESSAGE_POLL_INTERVAL,
+      // Adaptive polling: faster when tab is visible, slower when hidden
+      pollingInterval: isTabVisible ? MESSAGE_POLL_INTERVAL : MESSAGE_POLL_INTERVAL_SLOW,
+      // Pause polling when tab is not visible (reduces server load)
+      skipPollingIfUnfocused: true,
     }
   );
 
@@ -81,7 +86,7 @@ const Conversation = () => {
     if ('items' in messagesData) return messagesData.items;
     return [];
   }, [messagesData]);
-  console.log({ messagesData })
+
   // Get the other participant
   const otherParticipant = React.useMemo(() => {
     if (!conversation || !currentUser) return null;
@@ -91,9 +96,23 @@ const Conversation = () => {
     return conversation.participant1;
   }, [conversation, currentUser]);
 
-  // Start activity updates
+  // Track tab visibility to optimize polling
   useEffect(() => {
-    if (!conversationId) return;
+    const handleVisibilityChange = () => {
+      setIsTabVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    setIsTabVisible(!document.hidden);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Start activity updates (only when tab is visible)
+  useEffect(() => {
+    if (!conversationId || !isTabVisible) return;
 
     // Update activity immediately
     updateActivity(conversationId).catch((error) => {
@@ -102,9 +121,11 @@ const Conversation = () => {
 
     // Then update every 10-15 seconds
     activityUpdateIntervalRef.current = setInterval(() => {
-      updateActivity(conversationId).catch((error) => {
-        console.error('Error updating activity:', error);
-      });
+      if (isTabVisible) {
+        updateActivity(conversationId).catch((error) => {
+          console.error('Error updating activity:', error);
+        });
+      }
     }, ACTIVITY_UPDATE_INTERVAL);
 
     return () => {
@@ -113,7 +134,7 @@ const Conversation = () => {
         activityUpdateIntervalRef.current = null;
       }
     };
-  }, [conversationId, updateActivity]);
+  }, [conversationId, updateActivity, isTabVisible]);
 
   // Sync messages on page unload
   useEffect(() => {
