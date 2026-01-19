@@ -1,7 +1,7 @@
 import { apiSlice } from './apiSlice';
 export const invoiceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getInvoices: builder.query<PaginatedResponse<Invoice>, PaginationParams>({
+    getInvoices: builder.query<PaginatedResponse<Invoice>, InvoiceQueryParams>({
       query: (params) => ({
         url: '/invoices',
         method: 'GET',

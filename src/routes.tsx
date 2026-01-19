@@ -67,7 +67,7 @@ import UserManagement from "./pages/admin/UserManagement";
 import ClientAppsPage from "./pages/client/ClientAppsPage";
 import ClientWebsitesPage from "./pages/client/ClientWebsitesPage";
 import ClientAllOrderPage from "./pages/client/orders";
-import ClientInvoicePage from "./pages/client/orders/ClientInvoicePage";
+import ClientInvoicePage from "./pages/client/orders/invoice";
 import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/Details";

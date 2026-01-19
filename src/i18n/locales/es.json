@@ -238,7 +238,11 @@
       "completed": "Completado",
       "cancelled": "Cancelado",
       "refunded": "Reembolsado",
-      "failed": "Fallido"
+      "failed": "Fallido",
+      "draft": "Borrador",
+      "issued": "Emitido",
+      "paid": "Pagado",
+      "overdue": "Vencido"
     }
   },
   "dashboard": {
@@ -732,6 +736,44 @@
         "title": "Orden No Encontrada",
         "description": "La orden que buscas no existe o no tienes permiso para verla."
       }
+    }
+  },
+  "invoices": {
+    "title": "Facturas",
+    "description": "Ver y gestionar todas tus facturas",
+    "search_placeholder": "Buscar por número de factura, ID de orden...",
+    "filter_by_status": "Filtrar por estado",
+    "filter_by_order": "ID de Orden",
+    "filters": {
+      "all_statuses": "Todos los Estados"
+    },
+    "table": {
+      "title": "Facturas",
+      "description": "Gestiona y rastrea todas tus facturas",
+      "invoice_number": "Número de Factura",
+      "order_id": "ID de Orden",
+      "amount": "Monto",
+      "status": "Estado",
+      "issue_date": "Fecha de Emisión",
+      "due_date": "Fecha de Vencimiento",
+      "paid_at": "Pagado En",
+      "created_at": "Fecha de Creación",
+      "actions": "Acciones"
+    },
+    "actions": {
+      "view_order": "Ver Orden",
+      "download": "Descargar PDF"
+    },
+    "download_success": "Factura Descargada",
+    "download_success_desc": "La factura ha sido descargada exitosamente.",
+    "download_error": "Error al Descargar",
+    "download_error_desc": "No se pudo descargar la factura. Por favor, intenta de nuevo.",
+    "empty": {
+      "no_invoices": "No se encontraron facturas"
+    },
+    "error": {
+      "title": "Error al cargar facturas",
+      "description": "Hubo un error al cargar tus facturas. Por favor, intenta de nuevo más tarde."
     }
   },
   "offers": {

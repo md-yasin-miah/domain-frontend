@@ -860,7 +860,11 @@
       "completed": "Completed",
       "cancelled": "Cancelled",
       "refunded": "Refunded",
-      "failed": "Failed"
+      "failed": "Failed",
+      "draft": "Draft",
+      "issued": "Issued",
+      "paid": "Paid",
+      "overdue": "Overdue"
     }
   },
   "faq": {
@@ -1285,6 +1289,44 @@
         "title": "Order Not Found",
         "description": "The order you're looking for doesn't exist or you don't have permission to view it."
       }
+    }
+  },
+  "invoices": {
+    "title": "Invoices",
+    "description": "View and manage all your invoices",
+    "search_placeholder": "Search by invoice number, order ID...",
+    "filter_by_status": "Filter by status",
+    "filter_by_order": "Order ID",
+    "filters": {
+      "all_statuses": "All Statuses"
+    },
+    "table": {
+      "title": "Invoices",
+      "description": "Manage and track all your invoices",
+      "invoice_number": "Invoice Number",
+      "order_id": "Order ID",
+      "amount": "Amount",
+      "status": "Status",
+      "issue_date": "Issue Date",
+      "due_date": "Due Date",
+      "paid_at": "Paid At",
+      "created_at": "Created At",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view_order": "View Order",
+      "download": "Download PDF"
+    },
+    "download_success": "Invoice Downloaded",
+    "download_success_desc": "Invoice has been downloaded successfully.",
+    "download_error": "Download Failed",
+    "download_error_desc": "Failed to download invoice. Please try again.",
+    "empty": {
+      "no_invoices": "No invoices found"
+    },
+    "error": {
+      "title": "Error loading invoices",
+      "description": "There was an error loading your invoices. Please try again later."
     }
   },
   "offers": {

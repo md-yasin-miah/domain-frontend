@@ -15,9 +15,6 @@ interface PaginatedResponse<T> {
 interface PaginationParams {
   skip?: number;
   limit?: number;
-  page?: number;
-  size?: number;
-  search?: string;
 }
 
 // ============ Error Types ============
