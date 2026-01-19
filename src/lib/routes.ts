@@ -22,6 +22,7 @@ export const ROUTES = {
     FAQ: '/client/faq',
     ORDERS: {
       INDEX: '/client/orders',
+      ALL: '/client/orders/all',
       ORDER_DETAILS: (id: number) => `/client/orders/${id}`,
       INVOICES: '/client/orders/invoices',
       PAYMENTS: '/client/orders/payments',

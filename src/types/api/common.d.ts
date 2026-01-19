@@ -22,8 +22,12 @@ interface PaginationParams {
 
 // ============ Error Types ============
 interface ApiError {
+  data?: { detail: string }
+  status?: number;
+}
+interface ApiFormPostError {
   data?: {
-    detail: string | Array<{
+    detail: Array<{
       type: string;
       loc: (string | number)[];
       msg: string;

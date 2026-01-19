@@ -41,22 +41,15 @@ const Details = () => {
     const newStatus = listing.status === 'active' ? 'draft' : 'active';
     try {
       await updateStatus({ id: listing.id, new_status: newStatus }).unwrap();
-      
+
       toast({
         title: 'Success',
         description: `Listing ${newStatus === 'active' ? 'published' : 'unpublished'} successfully`,
       });
     } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === 'object' && 'data' in error
-          ? (error as { data?: { message?: string } }).data?.message
-          : error && typeof error === 'object' && 'message' in error
-          ? (error as { message?: string }).message
-          : 'Failed to update listing status';
-      
       toast({
         title: 'Error',
-        description: errorMessage || 'Failed to update listing status',
+        description: (error as ApiError)?.data?.detail || 'Failed to update listing status',
         variant: 'destructive',
       });
     }

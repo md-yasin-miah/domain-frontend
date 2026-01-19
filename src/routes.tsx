@@ -333,6 +333,10 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
+            element: <Navigate to={ROUTES.CLIENT.ORDERS.ALL} replace />,
+          },
+          {
+            path: getLastPath(ROUTES.CLIENT.ORDERS.ALL),
             element: <ClientAllOrderPage />,
           },
           {

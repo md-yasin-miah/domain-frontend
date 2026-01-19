@@ -224,7 +224,7 @@ const getClientMenuItems = (t: TFunction): MenuItem[] => {
       subItems: [
         {
           title: t('nav.allOrders'),
-          url: ROUTES.CLIENT.ORDERS.INDEX,
+          url: ROUTES.CLIENT.ORDERS.ALL,
           icon: Package,
         },
         {
