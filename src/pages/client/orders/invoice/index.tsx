@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DataTable, type ColumnDef } from "@/components/ui/data-table";
-import { TablePagination } from "@/components/ui/table-pagination";
+import { type ColumnDef } from "@/components/ui/data-table";
+import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import {
   Receipt,
   Search,
@@ -466,32 +466,25 @@ const AllInvoice = () => {
               </div>
             </div>
           ) : (
-            <>
-              <DataTable
-                data={invoicesData?.items || []}
-                columns={columns}
-                isLoading={false}
-                emptyMessage={t("invoices.empty.no_invoices") || "No invoices found"}
-                emptyIcon={
-                  <Receipt className="w-16 h-16 text-muted-foreground" />
-                }
-                getRowId={(row) => String(row.id)}
-                renderActions={renderActions}
-                actionsColumnHeader={t("invoices.table.actions") || "Actions"}
-                enableSorting={true}
-              />
-
-              {/* Pagination */}
-              {invoicesData && invoicesData.pagination && (
-                <TablePagination
-                  pagination={invoicesData.pagination}
-                  pageSize={size}
-                  isLoading={isLoading}
-                  onPageChange={handlePageChange}
-                  onPageSizeChange={handlePageSizeChange}
-                />
-              )}
-            </>
+            <DataTableWithPagination
+              data={invoicesData?.items || []}
+              columns={columns}
+              pagination={invoicesData?.pagination}
+              isLoading={isLoading}
+              emptyMessage={t("invoices.empty.no_invoices") || "No invoices found"}
+              emptyIcon={<Receipt className="w-16 h-16 text-muted-foreground" />}
+              getRowId={(row) => String(row.id)}
+              renderActions={renderActions}
+              actionsColumnHeader={t("invoices.table.actions") || "Actions"}
+              enableSorting={true}
+              pageSize={size}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              error={error}
+              errorTitle={t("invoices.error.title")}
+              errorDescription={t("invoices.error.description")}
+              errorIcon={<Receipt className="w-16 h-16 text-muted-foreground" />}
+            />
           )}
         </CardContent>
       </Card>

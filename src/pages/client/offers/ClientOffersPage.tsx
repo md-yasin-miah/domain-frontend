@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DataTable, type ColumnDef } from "@/components/ui/data-table";
-import { TablePagination } from "@/components/ui/table-pagination";
+import { type ColumnDef } from "@/components/ui/data-table";
+import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import {
   Dialog,
   DialogContent,
@@ -481,32 +481,25 @@ const ClientOffersPage = () => {
               </div>
             </div>
           ) : (
-            <>
-              <DataTable
-                data={offersData?.items || []}
-                columns={columns}
-                isLoading={false}
-                emptyMessage={t("offers.empty.no_offers")}
-                emptyIcon={
-                  <Handshake className="w-16 h-16 text-muted-foreground" />
-                }
-                getRowId={(row) => String(row.id)}
-                renderActions={renderActions}
-                actionsColumnHeader={t("offers.table.actions")}
-                enableSorting={true}
-              />
-
-              {/* Pagination */}
-              {offersData && offersData.pagination && (
-                <TablePagination
-                  pagination={offersData.pagination}
-                  pageSize={size}
-                  isLoading={isLoading}
-                  onPageChange={handlePageChange}
-                  onPageSizeChange={handlePageSizeChange}
-                />
-              )}
-            </>
+            <DataTableWithPagination
+              data={offersData?.items || []}
+              columns={columns}
+              pagination={offersData?.pagination}
+              isLoading={isLoading}
+              emptyMessage={t("offers.empty.no_offers")}
+              emptyIcon={<Handshake className="w-16 h-16 text-muted-foreground" />}
+              getRowId={(row) => String(row.id)}
+              renderActions={renderActions}
+              actionsColumnHeader={t("offers.table.actions")}
+              enableSorting={true}
+              pageSize={size}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              error={error}
+              errorTitle={t("offers.error.title")}
+              errorDescription={t("offers.error.description")}
+              errorIcon={<Handshake className="w-16 h-16 text-muted-foreground" />}
+            />
           )}
         </CardContent>
       </Card>

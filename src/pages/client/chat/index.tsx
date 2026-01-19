@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DataTable, ColumnDef } from '@/components/ui/data-table';
+import { ColumnDef } from '@/components/ui/data-table';
+import { DataTableWithPagination } from '@/components/common/DataTableWithPagination';
+import { usePagination } from '@/hooks/usePagination';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -34,10 +36,20 @@ const ClientChatPage = () => {
   const { toast } = useToast();
   const currentUser = useAppSelector((state) => state.auth.user);
   const [searchTerm, setSearchTerm] = useState('');
-  const { data, isLoading, error } = useGetConversationsQuery({
-    skip: 0,
-    limit: 50,
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
   });
+
+  // Build query params
+  const queryParams = useMemo(() => {
+    return {
+      skip: (page - 1) * size,
+      limit: size,
+    };
+  }, [page, size]);
+
+  const { data, isLoading, error } = useGetConversationsQuery(queryParams);
   const [deleteConversation] = useDeleteConversationMutation();
 
   // Extract conversations from response (handle both array and paginated response)
@@ -46,6 +58,13 @@ const ClientChatPage = () => {
     if (Array.isArray(data)) return data;
     if ('items' in data) return data.items;
     return [];
+  }, [data]);
+
+  // Get pagination data
+  const paginationData = useMemo(() => {
+    if (!data || Array.isArray(data)) return undefined;
+    if ('pagination' in data) return data.pagination;
+    return undefined;
   }, [data]);
 
   // Get the other participant (not the current user)
@@ -216,17 +235,6 @@ const ClientChatPage = () => {
     },
   ];
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <MessageSquare className="w-16 h-16 text-destructive mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Error Loading Conversations</h2>
-        <p className="text-muted-foreground mb-6">
-          Failed to load conversations. Please try again later.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -285,40 +293,52 @@ const ClientChatPage = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable
-        data={filteredConversations}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage="No conversations found. Start a new conversation to get started!"
-        emptyIcon={<MessageSquare className="w-16 h-16" />}
-        enableSorting={true}
-        onRowClick={(row) => navigate(`/client/chat/${row.id}`)}
-        renderActions={(row) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate(`/client/chat/${row.id}`)}>
-                Open Conversation
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive"
-                onClick={(e) => handleDeleteConversation(row.id, e)}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Conversation
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        actionsColumnHeader="Actions"
-      />
+      <Card>
+        <CardContent className="pt-6">
+          <DataTableWithPagination
+            data={filteredConversations}
+            columns={columns}
+            pagination={paginationData}
+            isLoading={isLoading}
+            emptyMessage="No conversations found. Start a new conversation to get started!"
+            emptyIcon={<MessageSquare className="w-16 h-16" />}
+            enableSorting={true}
+            onRowClick={(row) => navigate(`/client/chat/${row.id}`)}
+            renderActions={(row) => (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate(`/client/chat/${row.id}`)}>
+                    Open Conversation
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={(e) => handleDeleteConversation(row.id, e)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Conversation
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            actionsColumnHeader="Actions"
+            pageSize={size}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            error={error}
+            errorTitle="Error Loading Conversations"
+            errorDescription="Failed to load conversations. Please try again later."
+            errorIcon={<MessageSquare className="w-16 h-16 text-destructive" />}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 };

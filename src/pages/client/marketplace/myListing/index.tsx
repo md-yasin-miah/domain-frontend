@@ -1,7 +1,9 @@
 import { useGetMyMarketListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DataTable, ColumnDef } from '@/components/ui/data-table';
+import { ColumnDef } from '@/components/ui/data-table';
+import { DataTableWithPagination } from '@/components/common/DataTableWithPagination';
+import { usePagination } from '@/hooks/usePagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,13 +40,23 @@ const MyListing = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data, isLoading } = useGetMyMarketListingQuery({
-    skip: 0,
-    limit: 50,
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
   });
+
+  // Build query params
+  const queryParams = useMemo(() => {
+    return {
+      skip: (page - 1) * size,
+      limit: size,
+    };
+  }, [page, size]);
+
+  const { data, isLoading, error } = useGetMyMarketListingQuery(queryParams);
   const [updateStatus] = useUpdateMarketplaceListingStatusMutation();
 
-  // Filter data based on search term
+  // Filter data based on search term (client-side filtering for now)
   const filteredData = React.useMemo(() => {
     if (!data?.items) return [];
     if (!searchTerm) return data.items;
@@ -247,46 +260,58 @@ const MyListing = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable
-        data={filteredData}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage="No listings found. Create your first listing to get started!"
-        emptyIcon={<Package className="w-16 h-16" />}
-        enableSorting={true}
-        onRowClick={(row) => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}
-        renderActions={(row) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}>
-                <ExternalLink className="w-4 h-4 mr-2" />
-                View Listing
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => handleStatusToggle(row, e)}>
-                <Power className="w-4 h-4 mr-2" />
-                {row.status === 'active' ? 'Unpublish' : 'Publish'}
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        actionsColumnHeader="Actions"
-      />
+      <Card>
+        <CardContent className="pt-6">
+          <DataTableWithPagination
+            data={filteredData}
+            columns={columns}
+            pagination={data?.pagination}
+            isLoading={isLoading}
+            emptyMessage="No listings found. Create your first listing to get started!"
+            emptyIcon={<Package className="w-16 h-16" />}
+            enableSorting={true}
+            onRowClick={(row) => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}
+            renderActions={(row) => (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View Listing
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => handleStatusToggle(row, e)}>
+                    <Power className="w-4 h-4 mr-2" />
+                    {row.status === 'active' ? 'Unpublish' : 'Publish'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            actionsColumnHeader="Actions"
+            pageSize={size}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            error={error}
+            errorTitle="Error Loading Listings"
+            errorDescription="Failed to load your listings. Please try again later."
+            errorIcon={<Package className="w-16 h-16 text-muted-foreground" />}
+          />
+        </CardContent>
+      </Card>
 
       {/* Create Listing Modal */}
       <CreateListingModal open={isModalOpen} onOpenChange={setIsModalOpen} />
