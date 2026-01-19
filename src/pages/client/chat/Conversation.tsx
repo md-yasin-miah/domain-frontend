@@ -59,11 +59,11 @@ const Conversation = () => {
     { skip: !conversationId }
   );
 
-  // Fetch all messages (using limit=0 to fetch all data)
+  // Fetch all messages (use large limit to fetch all messages)
   const { data: messagesData, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery(
     {
       conversationId,
-      // params: { limit: 0 }, // limit=0 to fetch all messages
+      params: { skip: 0, limit: 1000 }, // Fetch all messages (backend supports up to 1000)
     },
     { skip: !conversationId }
   );
@@ -80,17 +80,41 @@ const Conversation = () => {
   }, [messagesData]);
 
   // Merge API messages with local messages (from WebSocket)
+  // Backend stores messages in order, so we prioritize API messages and merge WebSocket updates
   const messages = React.useMemo(() => {
-    const allMessages = [...apiMessages, ...localMessages];
-    // Remove duplicates by ID and sort by created_at
-    const uniqueMessages = Array.from(
-      new Map(allMessages.map((msg) => [msg.id, msg])).values()
-    );
-    return uniqueMessages.sort((a, b) => {
+    // Create a map of all messages, prioritizing API messages (source of truth)
+    const messageMap = new Map<number, Message>();
+
+    // First, add all API messages (these are the source of truth from backend)
+    apiMessages.forEach((msg) => {
+      messageMap.set(msg.id, msg);
+    });
+
+    // Then, update with any local WebSocket messages that might have newer data
+    // (e.g., read status updates, or messages that haven't been fetched yet)
+    localMessages.forEach((msg) => {
+      const existing = messageMap.get(msg.id);
+      if (existing) {
+        // Merge: keep API message but update with WebSocket data for read status, etc.
+        messageMap.set(msg.id, {
+          ...existing,
+          is_read: msg.is_read ?? existing.is_read,
+          read_at: msg.read_at ?? existing.read_at,
+        });
+      } else {
+        // New message from WebSocket that hasn't been fetched yet
+        messageMap.set(msg.id, msg);
+      }
+    });
+
+    // Convert to array and sort by created_at (backend maintains order)
+    const sortedMessages = Array.from(messageMap.values()).sort((a, b) => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
       return dateA - dateB;
     });
+
+    return sortedMessages;
   }, [apiMessages, localMessages]);
 
   // Get the other participant
@@ -124,7 +148,6 @@ const Conversation = () => {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        setIsConnected(true);
         setIsConnecting(false);
         reconnectAttemptsRef.current = 0;
 
@@ -135,10 +158,8 @@ const Conversation = () => {
           }
         }, PING_INTERVAL);
 
-        toast({
-          title: 'Connected',
-          description: 'Real-time chat is now active',
-        });
+        // Wait for 'connected' message from server before showing toast
+        // The server sends a 'connected' message after authentication
       };
 
       ws.onmessage = (event) => {
@@ -146,18 +167,40 @@ const Conversation = () => {
           const data = JSON.parse(event.data);
 
           if (data.type === 'new_message') {
-            // Add new message to local state
+            // Backend sends message in this format:
+            // { type: 'new_message', conversation_id: number, message: Message }
             const newMessage = data.message;
+
+            // Ensure message has proper structure matching backend response
+            const formattedMessage: Message = {
+              id: newMessage.id,
+              conversation_id: newMessage.conversation_id || conversationId,
+              sender_id: newMessage.sender_id,
+              content: newMessage.content,
+              is_read: newMessage.is_read || false,
+              read_at: newMessage.read_at || null,
+              created_at: newMessage.created_at,
+              sender: newMessage.sender ? {
+                id: newMessage.sender.id,
+                username: newMessage.sender.username,
+                email: newMessage.sender.email,
+              } : null,
+              attachments: newMessage.attachments || [],
+            };
+
             setLocalMessages((prev) => {
               // Check if message already exists
-              if (prev.some((msg) => msg.id === newMessage.id)) {
+              if (prev.some((msg) => msg.id === formattedMessage.id)) {
                 return prev;
               }
-              return [...prev, newMessage];
+              return [...prev, formattedMessage];
             });
+
+            // Refetch messages to ensure consistency with backend
+            refetchMessages();
             scrollToBottom();
           } else if (data.type === 'messages_read') {
-            // Update read status for messages
+            // Backend sends: { type: 'messages_read', conversation_id, message_ids, read_by }
             const messageIds = data.message_ids || [];
             setLocalMessages((prev) =>
               prev.map((msg) =>
@@ -166,10 +209,16 @@ const Conversation = () => {
                   : msg
               )
             );
+            // Also update API messages by refetching
+            refetchMessages();
           } else if (data.type === 'connected') {
-            // Connection confirmed
+            // Connection confirmed by server after authentication
             setIsConnected(true);
             setIsConnecting(false);
+            toast({
+              title: 'Connected',
+              description: 'Real-time chat is now active',
+            });
           } else if (data.type === 'error') {
             toast({
               title: 'WebSocket Error',
@@ -177,7 +226,7 @@ const Conversation = () => {
               variant: 'destructive',
             });
           } else if (data.type === 'pong') {
-            // Heartbeat response
+            // Heartbeat response - no action needed
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
@@ -192,6 +241,30 @@ const Conversation = () => {
       ws.onclose = (event) => {
         setIsConnected(false);
         setIsConnecting(false);
+
+        // Handle specific close codes from backend
+        if (event.code === 4001) {
+          toast({
+            title: 'Authentication Failed',
+            description: 'Please refresh the page and log in again.',
+            variant: 'destructive',
+          });
+          return; // Don't reconnect on auth failure
+        } else if (event.code === 4003) {
+          toast({
+            title: 'Access Denied',
+            description: 'You are not authorized to access this conversation.',
+            variant: 'destructive',
+          });
+          return; // Don't reconnect on authorization failure
+        } else if (event.code === 4004) {
+          toast({
+            title: 'Conversation Not Found',
+            description: 'This conversation no longer exists.',
+            variant: 'destructive',
+          });
+          return; // Don't reconnect if conversation doesn't exist
+        }
 
         // Attempt to reconnect if not a normal closure
         if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
@@ -292,10 +365,13 @@ const Conversation = () => {
 
       if (unreadMessages.length > 0) {
         const messageIds = unreadMessages.map((msg) => msg.id);
-        // Try WebSocket first, fallback to REST API
+        // Try WebSocket first for real-time updates, fallback to REST API
         if (!markMessagesAsReadViaWebSocket(messageIds)) {
+          // Fallback: mark each message individually via REST API
           unreadMessages.forEach((msg) => {
-            markAsRead({ messageId: msg.id, conversationId }).catch(console.error);
+            markAsRead({ messageId: msg.id, conversationId }).catch((error) => {
+              console.error('Error marking message as read:', error);
+            });
           });
         }
       }
@@ -319,10 +395,11 @@ const Conversation = () => {
 
     // Try WebSocket first for instant delivery
     if (isConnected && sendMessageViaWebSocket(content)) {
-      // Message sent via WebSocket, it will appear in real-time
-      scrollToBottom();
+      // Message sent via WebSocket
+      // Backend will send it back via 'new_message' event, so we don't need optimistic update
+      // The message will appear when we receive it from the server
     } else {
-      // Fallback to REST API
+      // Fallback to REST API if WebSocket is not connected
       try {
         await sendMessage({
           conversationId,
@@ -335,7 +412,8 @@ const Conversation = () => {
       } catch (error: unknown) {
         const errorMessage =
           error && typeof error === 'object' && 'data' in error
-            ? (error as { data?: { message?: string } }).data?.message
+            ? (error as { data?: { message?: string; detail?: string } }).data?.message ||
+            (error as { data?: { detail?: string } }).data?.detail
             : 'Failed to send message';
 
         toast({
@@ -343,6 +421,9 @@ const Conversation = () => {
           description: errorMessage || 'Failed to send message',
           variant: 'destructive',
         });
+
+        // Restore message content on error
+        setMessageContent(content);
       }
     }
   };
