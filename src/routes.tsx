@@ -66,12 +66,13 @@ import UserManagement from "./pages/admin/UserManagement";
 // CLient pages here
 import ClientAppsPage from "./pages/client/ClientAppsPage";
 import ClientWebsitesPage from "./pages/client/ClientWebsitesPage";
-import ClientAllOrderPage from "./pages/client/orders/ClientAllOrderPage";
+import ClientAllOrderPage from "./pages/client/orders";
 import ClientInvoicePage from "./pages/client/orders/ClientInvoicePage";
 import ClientPaymentPage from "./pages/client/orders/ClientPaymentPage";
 import ClientEscrowsPage from "./pages/client/orders/ClientEscrowsPage";
 import ClientOrderDetailsPage from "./pages/client/orders/ClientOrderDetailsPage";
-import ClientOffersPage from "./pages/client/ClientOffersPage";
+import ClientOffersPage from "./pages/client/offers/ClientOffersPage";
+import OfferDetails from "./pages/client/offers/OfferDetails";
 import ClientProductsVerificationsPage from "./pages/client/marketplace/productsVerification";
 import ClientProductsDetailsPage from "./pages/client/marketplace/productsVerification/Details";
 import ClientAuctionsPage from "./pages/client/ClientAuctionsPage";
@@ -402,8 +403,17 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: getLastPath(ROUTES.CLIENT.OFFERS),
-        element: <ClientOffersPage />,
+        path: getLastPath(ROUTES.CLIENT.OFFERS.INDEX),
+        children: [
+          {
+            index: true,
+            element: <ClientOffersPage />,
+          },
+          {
+            path: ':id',
+            element: <OfferDetails />,
+          },
+        ],
       },
       {
         path: getLastPath(ROUTES.CLIENT.AUCTIONS),

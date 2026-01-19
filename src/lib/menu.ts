@@ -204,7 +204,7 @@ const getClientMenuItems = (t: TFunction): MenuItem[] => {
     },
     {
       title: t('nav.offers'),
-      url: ROUTES.CLIENT.OFFERS,
+      url: ROUTES.CLIENT.OFFERS.INDEX,
       icon: Handshake,
     },
     {

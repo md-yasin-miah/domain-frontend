@@ -37,7 +37,10 @@ export const ROUTES = {
       DOMAINS: '/client/marketplace/domains',
       WEBSITES: '/client/marketplace/websites'
     },
-    OFFERS: '/client/offers',
+    OFFERS: {
+      INDEX: '/client/offers',
+      DETAILS: (id: number) => `/client/offers/${id}`,
+    },
     PROFILE: '/client/profile',
     PROFILE_SETUP: '/client/profile-setup',
     SAVED_SEARCH: '/client/saved-search',

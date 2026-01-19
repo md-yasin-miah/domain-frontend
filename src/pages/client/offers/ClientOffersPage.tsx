@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -56,6 +57,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePagination } from "@/hooks/usePagination";
 import { useToast } from "@/hooks/use-toast";
+import { ROUTES } from "@/lib/routes";
 
 type OfferStatus =
   | "pending"
@@ -68,6 +70,7 @@ const ClientOffersPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OfferStatus | "all">("all");
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
@@ -239,7 +242,7 @@ const ClientOffersPage = () => {
       refetch();
     } catch (error) {
       toast({
-        title: t("offers.actions.reject_error"),
+        title: error?.data?.detail || t("offers.actions.reject_error"),
         description: t("offers.actions.reject_error_desc"),
         variant: "destructive",
       });
@@ -271,11 +274,11 @@ const ClientOffersPage = () => {
       setCounterDialogOpen(false);
       setCounterAmount("");
       setCounterMessage("");
-      setSelectedOffer(null);
+      setSelectedOffer(null); // Clear selected offer to prevent details modal from opening
       refetch();
     } catch (error) {
       toast({
-        title: t("offers.actions.counter_error"),
+        title: error?.data?.detail || t("offers.actions.counter_error"),
         description: t("offers.actions.counter_error_desc"),
         variant: "destructive",
       });
@@ -292,7 +295,7 @@ const ClientOffersPage = () => {
       refetch();
     } catch (error) {
       toast({
-        title: t("offers.actions.withdraw_error"),
+        title: error?.data?.detail || t("offers.actions.withdraw_error"),
         description: t("offers.actions.withdraw_error_desc"),
         variant: "destructive",
       });
@@ -357,7 +360,7 @@ const ClientOffersPage = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setSelectedOffer(offer.id)}
+          onClick={() => navigate(ROUTES.CLIENT.OFFERS.DETAILS(offer.id))}
           title={t("offers.actions.view")}
         >
           <Eye className="w-4 h-4" />
@@ -366,10 +369,6 @@ const ClientOffersPage = () => {
     );
   };
 
-  // Get selected offer for detail view
-  const selectedOfferData = offersData?.items?.find(
-    (o) => o.id === selectedOffer && !counterDialogOpen
-  );
 
   return (
     <div className="space-y-6">
@@ -497,7 +496,18 @@ const ClientOffersPage = () => {
       </Card>
 
       {/* Counter Offer Dialog */}
-      <Dialog open={counterDialogOpen} onOpenChange={setCounterDialogOpen}>
+      <Dialog
+        open={counterDialogOpen}
+        onOpenChange={(open) => {
+          setCounterDialogOpen(open);
+          if (!open) {
+            // Clear selected offer when closing counter dialog to prevent details modal from opening
+            setSelectedOffer(null);
+            setCounterAmount("");
+            setCounterMessage("");
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -559,129 +569,6 @@ const ClientOffersPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Offer Details Dialog */}
-      {selectedOfferData && !counterDialogOpen && (
-        <Dialog
-          open={!!selectedOffer}
-          onOpenChange={() => setSelectedOffer(null)}
-        >
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {t("offers.details.title")} #{selectedOfferData.id}
-              </DialogTitle>
-              <DialogDescription>
-                {t("offers.details.description")}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.listing")}
-                  </label>
-                  <p className="font-medium">
-                    {selectedOfferData.listing?.title || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.buyer")}
-                  </label>
-                  <p className="font-medium">
-                    {selectedOfferData.buyer?.username ||
-                      selectedOfferData.buyer?.email ||
-                      "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.amount")}
-                  </label>
-                  <p className="font-medium">
-                    {formatCurrency(selectedOfferData.amount)}{" "}
-                    {selectedOfferData.currency}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.listing_price")}
-                  </label>
-                  <p className="font-medium">
-                    {formatCurrency(selectedOfferData.listing?.price || 0)}{" "}
-                    {selectedOfferData.listing?.currency || "USD"}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.status")}
-                  </label>
-                  <Badge
-                    variant={getStatusBadgeVariant(selectedOfferData.status)}
-                    className={cn(
-                      "capitalize",
-                      getStatusColor(selectedOfferData.status),
-                      "text-white block w-fit"
-                    )}
-                  >
-                    {t(`common.status.${selectedOfferData.status}`)}
-                  </Badge>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.expires_at")}
-                  </label>
-                  <p className="font-medium">
-                    {selectedOfferData.expires_at
-                      ? timeFormat(
-                          selectedOfferData.expires_at,
-                          "MM/DD/YYYY HH:mm"
-                        )
-                      : t("offers.table.no_expiry")}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.created_at")}
-                  </label>
-                  <p className="font-medium">
-                    {timeFormat(
-                      selectedOfferData.created_at,
-                      "MM/DD/YYYY HH:mm"
-                    )}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.updated_at")}
-                  </label>
-                  <p className="font-medium">
-                    {timeFormat(
-                      selectedOfferData.updated_at,
-                      "MM/DD/YYYY HH:mm"
-                    )}
-                  </p>
-                </div>
-              </div>
-              {selectedOfferData.message && (
-                <div>
-                  <label className="text-sm text-muted-foreground">
-                    {t("offers.details.message")}
-                  </label>
-                  <p className="font-medium mt-1 whitespace-pre-wrap">
-                    {selectedOfferData.message}
-                  </p>
-                </div>
-              )}
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setSelectedOffer(null)}>
-                {t("common.close")}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };

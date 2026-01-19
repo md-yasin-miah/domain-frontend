@@ -40,7 +40,7 @@ type OrderStatus =
   | "cancelled"
   | "refunded";
 
-const ClientAllOrderPage = () => {
+const AllOrdersPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -72,7 +72,7 @@ const ClientAllOrderPage = () => {
   const columns: ColumnDef<Order>[] = useMemo(() => {
     // Get status label helper
     const getStatusLabel = (status: string) => {
-      return t(`orders.status.${status}`) || status;
+      return t(`common.status.${status}`) || status;
     };
 
     return [
@@ -301,4 +301,4 @@ const ClientAllOrderPage = () => {
   );
 };
 
-export default ClientAllOrderPage;
+export default AllOrdersPage;
