@@ -42,14 +42,17 @@ const Conversation = () => {
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [pendingMessages, setPendingMessages] = useState<Set<string>>(new Set()); // Track pending message content
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const pingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingMessageTimeoutRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const maxReconnectAttempts = 5;
   const PING_INTERVAL = 30000; // 30 seconds
+  const MESSAGE_TIMEOUT = 10000; // 10 seconds to wait for message confirmation
 
   const conversationId = Number(id);
 
@@ -72,6 +75,7 @@ const Conversation = () => {
   const [markAsRead] = useMarkMessageAsReadMutation();
 
   // Extract messages from response
+  // CRITICAL: This is the source of truth from backend, includes messages from ALL users
   const apiMessages = React.useMemo(() => {
     if (!messagesData) return [];
     if (Array.isArray(messagesData)) return messagesData;
@@ -79,38 +83,74 @@ const Conversation = () => {
     return [];
   }, [messagesData]);
 
+  // Effect to clean up localMessages that are now in API (prevents duplicates)
+  // This ensures we don't keep old local messages that are already fetched
+  // BUT preserves messages from both users during concurrent sends
+  React.useEffect(() => {
+    // Only clean up if we have both API messages and local messages
+    const apiMessageIds = new Set(apiMessages.map(m => m.id));
+    setLocalMessages((prev) => {
+      // If no local messages, nothing to clean up
+      if (prev.length === 0) return prev;
+
+      // Keep only messages that aren't in API yet
+      // This preserves messages from both users during concurrent sends
+      const filtered = prev.filter((msg) => !apiMessageIds.has(msg.id));
+
+      // Only update if we actually removed something (avoid unnecessary re-renders)
+      if (filtered.length !== prev.length) {
+        return filtered;
+      }
+      return prev;
+    });
+  }, [apiMessages]); // Only run when apiMessages change (after refetch)
+
   // Merge API messages with local messages (from WebSocket)
-  // Backend stores messages in order, so we prioritize API messages and merge WebSocket updates
+  // Backend stores messages in order with race condition fixes (row locking, duplicate ID detection)
+  // CRITICAL: We must preserve messages from BOTH users during concurrent sends
   const messages = React.useMemo(() => {
     // Create a map of all messages, prioritizing API messages (source of truth)
     const messageMap = new Map<number, Message>();
 
     // First, add all API messages (these are the source of truth from backend)
+    // Backend ensures all messages are saved even during concurrent sends
+    // This includes messages from both user1 and user2
     apiMessages.forEach((msg) => {
       messageMap.set(msg.id, msg);
     });
 
-    // Then, update with any local WebSocket messages that might have newer data
-    // (e.g., read status updates, or messages that haven't been fetched yet)
+    // Then, add/update with any local WebSocket messages
+    // These are messages received via WebSocket that may not be in the API response yet
+    // IMPORTANT: We preserve ALL messages from ALL users (user1 and user2)
     localMessages.forEach((msg) => {
       const existing = messageMap.get(msg.id);
       if (existing) {
-        // Merge: keep API message but update with WebSocket data for read status, etc.
+        // Message exists in API - merge WebSocket updates (read status, etc.)
         messageMap.set(msg.id, {
           ...existing,
           is_read: msg.is_read ?? existing.is_read,
           read_at: msg.read_at ?? existing.read_at,
+          // Preserve sender info from API if available
+          sender: existing.sender || msg.sender,
         });
       } else {
         // New message from WebSocket that hasn't been fetched yet
+        // This is critical for concurrent sends - preserves messages from both users
+        // Backend will save it with proper ID, and it will appear in next API fetch
         messageMap.set(msg.id, msg);
       }
     });
 
     // Convert to array and sort by created_at (backend maintains order)
+    // Backend's duplicate ID detection ensures no ID conflicts
+    // This ensures messages from both users appear in correct order
     const sortedMessages = Array.from(messageMap.values()).sort((a, b) => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
+      // If dates are equal, sort by ID as tiebreaker (backend ensures unique IDs)
+      if (dateA === dateB) {
+        return a.id - b.id;
+      }
       return dateA - dateB;
     });
 
@@ -188,16 +228,38 @@ const Conversation = () => {
               attachments: newMessage.attachments || [],
             };
 
+            // Remove from pending messages if this is a message we sent
+            if (currentUser && formattedMessage.sender_id === currentUser.id) {
+              setPendingMessages((prev) => {
+                const updated = new Set(prev);
+                updated.delete(formattedMessage.content);
+                return updated;
+              });
+
+              // Clear timeout for this message
+              const timeout = pendingMessageTimeoutRef.current.get(formattedMessage.content);
+              if (timeout) {
+                clearTimeout(timeout);
+                pendingMessageTimeoutRef.current.delete(formattedMessage.content);
+              }
+            }
+
             setLocalMessages((prev) => {
-              // Check if message already exists
+              // Check if message already exists (duplicate detection)
               if (prev.some((msg) => msg.id === formattedMessage.id)) {
                 return prev;
               }
+              // Add new message (from any user - user1 or user2)
               return [...prev, formattedMessage];
             });
 
-            // Refetch messages to ensure consistency with backend
-            refetchMessages();
+            // Don't immediately refetch - let the message appear first
+            // Only refetch if we need to sync with backend (after a delay to allow backend to save)
+            // This prevents overwriting messages during concurrent sends
+            setTimeout(() => {
+              refetchMessages();
+            }, 500); // Small delay to allow backend to save and broadcast
+
             scrollToBottom();
           } else if (data.type === 'messages_read') {
             // Backend sends: { type: 'messages_read', conversation_id, message_ids, read_by }
@@ -209,8 +271,11 @@ const Conversation = () => {
                   : msg
               )
             );
-            // Also update API messages by refetching
-            refetchMessages();
+            // Refetch to sync read status, but preserve all messages
+            // Use a delay to avoid race conditions with concurrent message sends
+            setTimeout(() => {
+              refetchMessages();
+            }, 300);
           } else if (data.type === 'connected') {
             // Connection confirmed by server after authentication
             setIsConnected(true);
@@ -220,9 +285,27 @@ const Conversation = () => {
               description: 'Real-time chat is now active',
             });
           } else if (data.type === 'error') {
+            const errorMessage = data.message || 'An error occurred';
+
+            // If error occurred while sending a message, restore it to input
+            if (errorMessage.includes('message') || errorMessage.includes('save')) {
+              // Try to find the pending message and restore it
+              const pendingArray = Array.from(pendingMessages);
+              if (pendingArray.length > 0) {
+                // Restore the most recent pending message
+                const lastPending = pendingArray[pendingArray.length - 1];
+                setMessageContent(lastPending);
+                setPendingMessages((prev) => {
+                  const updated = new Set(prev);
+                  updated.delete(lastPending);
+                  return updated;
+                });
+              }
+            }
+
             toast({
               title: 'WebSocket Error',
-              description: data.message || 'An error occurred',
+              description: errorMessage,
               variant: 'destructive',
             });
           } else if (data.type === 'pong') {
@@ -303,6 +386,10 @@ const Conversation = () => {
       clearInterval(pingIntervalRef.current);
       pingIntervalRef.current = null;
     }
+    // Clear all pending message timeouts
+    pendingMessageTimeoutRef.current.forEach((timeout) => clearTimeout(timeout));
+    pendingMessageTimeoutRef.current.clear();
+
     if (wsRef.current) {
       wsRef.current.close(1000, 'Component unmounting');
       wsRef.current = null;
@@ -395,9 +482,47 @@ const Conversation = () => {
 
     // Try WebSocket first for instant delivery
     if (isConnected && sendMessageViaWebSocket(content)) {
+      // Track pending message to handle timeouts and errors
+      setPendingMessages((prev) => new Set(prev).add(content));
+
+      // Set timeout to check if message was received
+      // Backend now uses row locking which may cause slight delays
+      const timeout = setTimeout(() => {
+        // Check if message is still pending after timeout
+        setPendingMessages((prev) => {
+          if (prev.has(content)) {
+            // Message not received, might have failed
+            // Refetch to check if it was saved
+            refetchMessages();
+
+            // After refetch, check if message exists
+            setTimeout(() => {
+              setPendingMessages((current) => {
+                if (current.has(content)) {
+                  // Still pending, likely failed - restore to input
+                  setMessageContent(content);
+                  toast({
+                    title: 'Message Not Delivered',
+                    description: 'The message may not have been sent. Please try again.',
+                    variant: 'destructive',
+                  });
+                  return new Set(Array.from(current).filter((msg) => msg !== content));
+                }
+                return current;
+              });
+            }, 1000);
+
+            return new Set(Array.from(prev).filter((msg) => msg !== content));
+          }
+          return prev;
+        });
+      }, MESSAGE_TIMEOUT);
+
+      pendingMessageTimeoutRef.current.set(content, timeout);
+
       // Message sent via WebSocket
-      // Backend will send it back via 'new_message' event, so we don't need optimistic update
-      // The message will appear when we receive it from the server
+      // Backend will send it back via 'new_message' event after row lock and save
+      // With the race condition fixes, backend ensures all messages are saved even during concurrent sends
     } else {
       // Fallback to REST API if WebSocket is not connected
       try {
@@ -406,9 +531,12 @@ const Conversation = () => {
           data: { content },
         }).unwrap();
 
-        // Refetch messages to get the latest
-        refetchMessages();
-        scrollToBottom();
+        // Refetch messages to get the latest (backend handles race conditions)
+        // Use a small delay to ensure backend has saved the message
+        setTimeout(() => {
+          refetchMessages();
+          scrollToBottom();
+        }, 300);
       } catch (error: unknown) {
         const errorMessage =
           error && typeof error === 'object' && 'data' in error
