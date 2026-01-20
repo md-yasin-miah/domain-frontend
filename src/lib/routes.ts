@@ -6,13 +6,14 @@ export const ROUTES = {
   APP: {
     MARKETPLACE: '/marketplace',
     CATEGORIES: {
+      ROOT: '/categories',
       DOMAINS: {
-        ROOT: '/marketplace/domains',
-        DETAILS: (id: number) => `/marketplace/domains/${id}`,
+        ROOT: '/categories/domains',
+        DETAILS: (id: number) => `/categories/domains/${id}`,
       },
-      WEBSITES: '/marketplace/websites',
-      APPS: '/marketplace/apps',
-      FBA_STORES: '/marketplace/fba-stores',
+      WEBSITES: '/categories/websites',
+      APPS: '/categories/apps',
+      FBA_STORES: '/categories/fba-stores',
       E_COMMERCE: '/categories/e-commerce',
       SOFTWARE_SAAS: '/categories/software-saas',
       DATABASES: '/categories/databases',

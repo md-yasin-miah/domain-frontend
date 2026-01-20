@@ -104,11 +104,12 @@ export const router = createBrowserRouter([
       // Marketplace routes - Nested
       {
         path: "marketplace",
+        element: <Marketplace />
+      },
+       // Categories routes - Nested
+       {
+        path: "categories",
         children: [
-          {
-            index: true,
-            element: <Marketplace />,
-          },
           {
             path: "domains",
             children: [
@@ -137,6 +138,26 @@ export const router = createBrowserRouter([
           {
             path: "listing/:id",
             element: <ListingDetail />,
+          },
+          {
+            path: "ecommerce",
+            element: <EcommercePage />,
+          },
+          {
+            path: "nfts",
+            element: <NFTsPage />,
+          },
+          {
+            path: "software-saas",
+            element: <SoftwareSaaSPage />,
+          },
+          {
+            path: "databases",
+            element: <DatabasesPage />,
+          },
+          {
+            path: "digital-channels",
+            element: <DigitalChannelsPage />,
           },
         ],
       },
@@ -280,32 +301,7 @@ export const router = createBrowserRouter([
         path: "soporte",
         element: <SupportPage />,
       },
-      // Categories routes - Nested
-      {
-        path: "categories",
-        children: [
-          {
-            path: "ecommerce",
-            element: <EcommercePage />,
-          },
-          {
-            path: "nfts",
-            element: <NFTsPage />,
-          },
-          {
-            path: "software-saas",
-            element: <SoftwareSaaSPage />,
-          },
-          {
-            path: "databases",
-            element: <DatabasesPage />,
-          },
-          {
-            path: "digital-channels",
-            element: <DigitalChannelsPage />,
-          },
-        ],
-      },
+     
     ],
   },
   // Auth routes (no layout)

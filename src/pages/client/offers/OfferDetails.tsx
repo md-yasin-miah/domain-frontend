@@ -215,7 +215,7 @@ const OfferDetails = () => {
 
   // Calculate difference percentage
   const priceDifference = offer.listing?.price
-    ? ((offer.amount - offer.listing.price) / offer.listing.price) * 100
+    ? ((Number(offer.amount) - Number(offer.listing.price)) / Number(offer.listing.price)) * 100
     : 0;
 
   return (
