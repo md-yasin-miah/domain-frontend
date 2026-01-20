@@ -24,8 +24,7 @@ import {
   ExternalLink,
   FileText,
   Sparkles,
-  Clock,
-  Copy
+  Clock
 } from 'lucide-react';
 import { useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
@@ -34,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ReturnBack } from '@/components/common/ReturnBack';
+import { CopyToClipboard } from '@/components/common/CopyToClipboard';
 import { useAuth } from '@/store/hooks/useAuth';
 import MakeOfferModal from './components/MakeOfferModal';
 import { ROUTES } from '@/lib/routes';
@@ -481,9 +481,11 @@ const Details = () => {
                             Domain Name
                           </label>
                         </div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {listing.domain_name}{listing.domain_extension}
-                        </p>
+                        <CopyToClipboard textToCopy={listing.domain_name}>
+                          <p className="text-sm font-semibold text-foreground">
+                            {listing.domain_name}{listing.domain_extension}
+                          </p>
+                        </CopyToClipboard>
                       </div>
                     )}
                     {listing.website_url && (
@@ -764,9 +766,11 @@ const Details = () => {
                         Email
                       </label>
                     </div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {listing.seller.email} <Copy className="w-3.5 h-3.5 ml-auto" />
-                    </p>
+                    <CopyToClipboard textToCopy={listing.seller.email}>
+                      <p className="text-sm font-semibold text-foreground">
+                        {listing.seller.email}
+                      </p>
+                    </CopyToClipboard>
                   </div>
                 </div>
               </CardContent>

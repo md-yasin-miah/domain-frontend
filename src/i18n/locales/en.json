@@ -907,6 +907,8 @@
     "close": "Close",
     "copied": "Copied",
     "copied_to_clipboard": "copied to clipboard",
+    "copy": "Copy",
+    "copy_failed": "Failed to copy to clipboard",
     "pagination": {
       "showing": "Showing",
       "of": "of",

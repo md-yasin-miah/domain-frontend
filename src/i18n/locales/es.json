@@ -213,6 +213,8 @@
     "close": "Cerrar",
     "copied": "Copiado",
     "copied_to_clipboard": "copiado al portapapeles",
+    "copy": "Copiar",
+    "copy_failed": "Error al copiar al portapapeles",
     "pagination": {
       "showing": "Mostrando",
       "of": "de",
