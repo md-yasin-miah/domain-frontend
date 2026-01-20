@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { ROUTES } from "./lib/routes";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
@@ -6,7 +6,8 @@ import AdminLayout from "./components/layout/AdminLayout";
 import ClientLayout from "./components/layout/ClientLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthRedirectHandler } from "./components/auth/AuthRedirectHandler";
-import { Skeleton } from "./components/ui/skeleton";
+import { InitialLoader } from "@/components/common/InitialLoader";
+import LazyComponent from "./components/common/LazyComponent";
 
 // Lazy load all page components for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -84,22 +85,6 @@ const MyListingDetails = lazy(() => import("./pages/client/marketplace/myListing
 const ClientChatPage = lazy(() => import("./pages/client/chat"));
 const Conversation = lazy(() => import("./pages/client/chat/Conversation"));
 
-// Loading fallback component
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="space-y-4 w-full max-w-md p-8">
-      <Skeleton className="h-8 w-3/4" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-5/6" />
-      <Skeleton className="h-64 w-full" />
-    </div>
-  </div>
-);
-
-// Helper to wrap lazy components with Suspense
-const LazyComponent = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<PageLoader />}>{children}</Suspense>
-);
 
 const getLastPath = (route: string) => {
   return route.split("/").pop();

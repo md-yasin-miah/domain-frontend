@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/hooks/useAuth';
 import { usePermission } from '@/hooks/usePermission';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Loader2, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { useGetMyProfileQuery } from '@/store/api/profileApi';
+import { InitialLoader } from '@/components/common/InitialLoader';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -33,14 +34,7 @@ export default function ProtectedRoute({
   const profileCompleted = user?.is_profile_complete ?? null;
 
   if (loading || roleLoading || permissionLoading || (profileLoading && !requireAdmin && location.pathname !== '/client/profile-setup')) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="text-muted-foreground">{t('auth.verifying')}</p>
-        </div>
-      </div>
-    );
+    return <InitialLoader message={t('auth.verifying')} />;
   }
 
   if (!user) {

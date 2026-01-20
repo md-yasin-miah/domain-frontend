@@ -4,7 +4,7 @@ import { store } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setCredentials, logout } from '@/store/slices/authSlice';
 import { useGetCurrentUserQuery } from '@/store/api/authApi';
-import { Loader2 } from 'lucide-react';
+import { InitialLoader } from '@/components/common/InitialLoader';
 
 interface ReduxProviderProps {
   children: ReactNode;
@@ -60,14 +60,7 @@ const AuthInitializer = ({ children }: { children: ReactNode }) => {
 
   // Show loading state while initializing auth (token exists but user not loaded yet)
   if (isInitializing && token && !user && isLoadingUser) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <InitialLoader message={undefined} />;
   }
 
   return <>{children}</>;
