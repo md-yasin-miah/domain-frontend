@@ -241,12 +241,12 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                         <DropdownMenuItem key={item.title} asChild>
                           <Link
                             to={item.url}
-                            className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${isActive
+                            className={`group flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors duration-300 cursor-pointer ${isActive
                               ? 'bg-primary/10 hover:bg-primary/20 text-primary'
                               : 'hover:bg-muted/60'
                               }`}
                           >
-                            <item.icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'
+                            <item.icon className={`w-4 h-4 group-hover:text-primary group-hover:scale-110 transition-all duration-300 ${isActive ? 'text-primary' : 'text-muted-foreground'
                               }`} />
                             <span className={isActive ? 'text-primary font-medium' : ''}>{item.title}</span>
                           </Link>
@@ -260,9 +260,9 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                   <DropdownMenuItem asChild>
                     <button
                       onClick={() => signOut()}
-                      className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      className="group w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer duration-300"
                     >
-                      <LogOut className="w-4 h-4" />
+                      <LogOut className="w-4 h-4 group-hover:text-destructive group-hover:scale-110 transition-all duration-300" />
                       <span>{t('nav.logout')}</span>
                     </button>
                   </DropdownMenuItem>
