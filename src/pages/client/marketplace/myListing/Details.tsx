@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import {
   Eye,
   Heart,
@@ -17,7 +18,14 @@ import {
   AlertCircle,
   CheckCircle2,
   Power,
-  MessageSquare
+  MessageSquare,
+  Loader2,
+  User,
+  ExternalLink,
+  FileText,
+  Sparkles,
+  Clock,
+  Copy
 } from 'lucide-react';
 import { useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
@@ -139,335 +147,660 @@ const Details = () => {
   }
 
   return (
-    <div className="space-y-6 md:p-6 lg:p-8 p-4 container mx-auto">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2">
-        <ReturnBack />
-        <span className="text-muted-foreground">•</span>
-        <span className="text-sm text-muted-foreground">{listing.title}</span>
-      </div>
-
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Package className="w-8 h-8 text-primary" />
+    <div className="min-h-screen container mx-auto">
+      <div className="space-y-6 p-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2">
+          <ReturnBack label="Back to My Listings" />
+          <span className="text-muted-foreground">•</span>
+          <span className="text-sm text-muted-foreground">
             {listing.title}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Listing Details and Management
-          </p>
-        </div>
-        {
-         user && listing.seller_id===user.id &&
-        <div className="flex gap-2">
-          {listing && (
-            <Button
-            variant={listing.status === 'active' ? 'outline' : 'default'}
-            onClick={handleStatusToggle}
-            disabled={isUpdatingStatus}
-            >
-              <Power className="w-4 h-4 mr-2" />
-              {listing.status === 'active' ? 'Unpublish' : 'Publish'}
-            </Button>
-          )}
-          <Button variant="outline">
-            <Edit className="w-4 h-4 mr-2" />
-            Edit Listing
-          </Button>
-          <Button variant="destructive">
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
-          </Button>
-        </div>
-        }
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Listing Info Card */}
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-2xl mb-2">{listing.title}</CardTitle>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="outline">{listing.listing_type.name}</Badge>
-                    <div className="flex items-center gap-2">
-                      <div className={cn('w-2 h-2 rounded-full', getStatusColor(listing.status))} />
-                      <Badge variant={getStatusBadgeVariant(listing.status)}>
-                        {getStatusLabel(listing.status, t)}
-                      </Badge>
-                    </div>
-                    {listing.is_featured && (
-                      <Badge variant="default" className="bg-gradient-to-r from-primary to-secondary">
-                        <Star className="w-3 h-3 mr-1" />
-                        Featured
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-2xl font-bold text-primary">{formatCurrency(listing.price)}</p>
-                  {listing.is_price_negotiable && (
-                    <Badge variant="secondary" className="mt-2">
-                      Price Negotiable
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Description</h4>
-                  <p className="text-muted-foreground">{listing.description}</p>
-                </div>
-                {listing.short_description && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Short Description</h4>
-                    <p className="text-muted-foreground">{listing.short_description}</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Metrics Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-muted/30 rounded-lg">
-                  <Eye className="w-6 h-6 mx-auto mb-2 text-primary" />
-                  <div className="text-2xl font-bold text-primary">{formatNumber(listing.view_count)}</div>
-                  <div className="text-xs text-muted-foreground">Total Views</div>
-                </div>
-                <div className="text-center p-4 bg-muted/30 rounded-lg">
-                  <Heart className="w-6 h-6 mx-auto mb-2 text-red-500" />
-                  <div className="text-2xl font-bold text-red-500">{formatNumber(listing.favorite_count)}</div>
-                  <div className="text-xs text-muted-foreground">Favorites</div>
-                </div>
-                {listing.website_traffic_monthly > 0 && (
-                  <div className="text-center p-4 bg-muted/30 rounded-lg">
-                    <TrendingUp className="w-6 h-6 mx-auto mb-2 text-green-500" />
-                    <div className="text-2xl font-bold text-green-500">{formatNumber(listing.website_traffic_monthly)}</div>
-                    <div className="text-xs text-muted-foreground">Monthly Traffic</div>
-                  </div>
-                )}
-                {listing.domain_authority && (
-                  <div className="text-center p-4 bg-muted/30 rounded-lg">
-                    <Globe className="w-6 h-6 mx-auto mb-2 text-blue-500" />
-                    <div className="text-2xl font-bold text-blue-500">{listing.domain_authority}</div>
-                    <div className="text-xs text-muted-foreground">Domain Authority</div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Domain/Website Details */}
-          {(listing.domain_name || listing.website_url) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Asset Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {listing.domain_name && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Domain Name:</span>
-                      <span className="font-medium">{listing.domain_name}{listing.domain_extension}</span>
-                    </div>
-                  )}
-                  {listing.website_url && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Website URL:</span>
-                      <a href={listing.website_url} target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">
-                        {listing.website_url}
-                      </a>
-                    </div>
-                  )}
-                  {listing.domain_age_years && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Domain Age:</span>
-                      <span className="font-medium">{listing.domain_age_years} years</span>
-                    </div>
-                  )}
-                  {listing.domain_backlinks && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Backlinks:</span>
-                      <span className="font-medium">{formatNumber(listing.domain_backlinks)}</span>
-                    </div>
-                  )}
-                  {listing.website_technology && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Technology:</span>
-                      <span className="font-medium">{listing.website_technology}</span>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Financial Details */}
-          {(listing.website_revenue_monthly || listing.website_profit_monthly) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Financial Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {listing.website_revenue_monthly && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Monthly Revenue:</span>
-                      <span className="font-medium">{formatCurrency(listing.website_revenue_monthly)}</span>
-                    </div>
-                  )}
-                  {listing.website_profit_monthly && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Monthly Profit:</span>
-                      <span className="font-bold text-green-600">{formatCurrency(listing.website_profit_monthly)}</span>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          </span>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Pricing Card */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center mb-4">
-                <div className="text-3xl font-bold text-primary mb-2">{formatCurrency(listing.price)}</div>
-                <p className="text-sm text-muted-foreground">{listing.currency}</p>
+        {/* Premium Header - Subtle Design */}
+        <div className="relative overflow-hidden rounded-xl bg-primary/10 border border-border/50 p-6 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted/50 border border-border">
+                <Package className="h-5 w-5 text-muted-foreground" />
               </div>
-              {/* make offer button */}
-              {/* {user && listing.seller_id !== user.id && ( */}
-                <Button 
-                  className="w-full" 
-                  variant="default"
-                  onClick={handleMakeOffer}
-                >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  {t('offers.create.button') }
-                </Button>
-              {/* // )} */}
-              {
-                user && listing.seller_id===user.id &&
-              <div className="space-y-3">
-                <Button
-                  className="w-full"
-                  variant={listing.status === 'active' ? 'outline' : 'default'}
-                  onClick={handleStatusToggle}
-                  disabled={isUpdatingStatus}
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight mb-1 text-foreground">
+                  {listing.title}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Listing Details and Management
+                </p>
+              </div>
+            </div>
+            {user && listing.seller_id === user.id && (
+              <div className="flex gap-2">
+                {listing && (
+                  <Button
+                    variant={listing.status === 'active' ? 'outline' : 'default'}
+                    onClick={handleStatusToggle}
+                    disabled={isUpdatingStatus}
+                    size="sm"
                   >
-                  <Power className="w-4 h-4 mr-2" />
-                  {listing.status === 'active' ? 'Unpublish' : 'Publish'}
-                </Button>
-                <Button className="w-full" variant="outline">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Update Price
-                </Button>
-                {!listing.is_featured && (
-                  <Button className="w-full bg-gradient-to-r from-primary to-secondary">
-                    <Star className="w-4 h-4 mr-2" />
-                    Feature Listing
+                    {isUpdatingStatus ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                    ) : (
+                      <Power className="w-3.5 h-3.5 mr-2" />
+                    )}
+                    {listing.status === 'active' ? 'Unpublish' : 'Publish'}
                   </Button>
                 )}
+                <Button variant="outline" size="sm">
+                  <Edit className="w-3.5 h-3.5 mr-2" />
+                  Edit Listing
+                </Button>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="w-3.5 h-3.5 mr-2" />
+                  Delete
+                </Button>
               </div>
-              }
+            )}
+          </div>
+        </div>
+
+        {/* Stats Cards - Subtle Design */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Listing Price</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {formatCurrency(listing.price)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{listing.currency}</p>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Dates & Timeline */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Timeline</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <div className="text-muted-foreground">Created</div>
-                  <div className="font-medium">{timeFormat(listing.created_at, 'MMM DD, YYYY')}</div>
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Total Views</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {formatNumber(listing.view_count)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Views</p>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <Eye className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <div className="text-muted-foreground">Last Updated</div>
-                  <div className="font-medium">{timeFormat(listing.updated_at, 'MMM DD, YYYY')}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Favorites</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {formatNumber(listing.favorite_count)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Saved</p>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <Heart className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
-              {listing.expires_at && (
+            </CardContent>
+          </Card>
+
+          <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Status</p>
+                  <Badge
+                    variant={getStatusBadgeVariant(listing.status)}
+                    className={cn(
+                      "capitalize text-xs font-medium px-2 py-0.5 mt-1",
+                      getStatusColor(listing.status),
+                      "text-white border-0"
+                    )}
+                  >
+                    {getStatusLabel(listing.status, t)}
+                  </Badge>
+                </div>
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Listing Information - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <div className="flex-1">
-                    <div className="text-muted-foreground">Expires</div>
-                    <div className="font-medium">{timeFormat(listing.expires_at, 'MMM DD, YYYY')}</div>
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold">Listing Information</CardTitle>
+                    <CardDescription className="text-xs">Complete details about this listing</CardDescription>
                   </div>
                 </div>
-              )}
-              {listing.sold_at && (
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <div className="flex-1">
-                    <div className="text-muted-foreground">Sold On</div>
-                    <div className="font-medium">{timeFormat(listing.sold_at, 'MMM DD, YYYY')}</div>
-                    {listing.sold_price && (
-                      <div className="text-green-600 font-semibold">{formatCurrency(listing.sold_price)}</div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* Listing Type */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Type
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {listing.listing_type.name}
+                    </p>
+                  </div>
+
+                  {/* Status */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Status
+                      </label>
+                    </div>
+                    <Badge
+                      variant={getStatusBadgeVariant(listing.status)}
+                      className={cn(
+                        "capitalize text-xs font-medium px-2 py-0.5",
+                        getStatusColor(listing.status),
+                        "text-white border-0"
+                      )}
+                    >
+                      {getStatusLabel(listing.status, t)}
+                    </Badge>
+                  </div>
+
+                  {/* Price */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Price
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {formatCurrency(listing.price)}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{listing.currency}</p>
+                  </div>
+
+                  {/* Featured */}
+                  {listing.is_featured && (
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Star className="h-3.5 w-3.5 text-muted-foreground" />
+                        <label className="text-xs font-medium text-muted-foreground">
+                          Featured
+                        </label>
+                      </div>
+                      <Badge variant="default" className="bg-gradient-to-r from-primary to-secondary text-xs">
+                        <Star className="w-3 h-3 mr-1" />
+                        Featured Listing
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+
+                <Separator className="my-3" />
+
+                {/* Description */}
+                <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Description
+                    </label>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                      {listing.description}
+                    </p>
+                  </div>
+                </div>
+
+                {listing.short_description && (
+                  <>
+                    <Separator className="my-3" />
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                        <label className="text-xs font-medium text-muted-foreground">
+                          Short Description
+                        </label>
+                      </div>
+                      <p className="text-sm text-foreground leading-relaxed">
+                        {listing.short_description}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {listing.is_price_negotiable && (
+                  <>
+                    <Separator className="my-3" />
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        Price Negotiable
+                      </Badge>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Performance Metrics - Clean Design */}
+            {(listing.website_traffic_monthly > 0 || listing.domain_authority) && (
+              <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+                <CardHeader className="border-b border-border bg-secondary/10">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold">Performance Metrics</CardTitle>
+                      <CardDescription className="text-xs">Key performance indicators</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {listing.website_traffic_monthly > 0 && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Monthly Traffic
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {formatNumber(listing.website_traffic_monthly)}
+                        </p>
+                      </div>
+                    )}
+                    {listing.domain_authority && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Domain Authority
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {listing.domain_authority}
+                        </p>
+                      </div>
                     )}
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
 
-          {/* Seller Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Seller Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Username:</span>
-                  <span className="font-medium">{listing.seller.username}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Email:</span>
-                  <span className="font-medium text-xs">{listing.seller.email}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Asset Details - Clean Design */}
+            {(listing.domain_name || listing.website_url) && (
+              <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+                <CardHeader className="border-b border-border bg-secondary/10">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold">Asset Details</CardTitle>
+                      <CardDescription className="text-xs">Domain and website information</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {listing.domain_name && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Domain Name
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {listing.domain_name}{listing.domain_extension}
+                        </p>
+                      </div>
+                    )}
+                    {listing.website_url && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Website URL
+                          </label>
+                        </div>
+                        <a
+                          href={listing.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-semibold text-primary hover:underline flex items-center gap-1"
+                        >
+                          {listing.website_url}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    )}
+                    {listing.domain_age_years && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Domain Age
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {listing.domain_age_years} years
+                        </p>
+                      </div>
+                    )}
+                    {listing.domain_backlinks && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Backlinks
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {formatNumber(listing.domain_backlinks)}
+                        </p>
+                      </div>
+                    )}
+                    {listing.website_technology && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Package className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Technology
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {listing.website_technology}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                <Eye className="w-4 h-4 mr-2" />
-                View Public Page
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <DollarSign className="w-4 h-4 mr-2" />
-                View Offers
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <TrendingUp className="w-4 h-4 mr-2" />
-                View Analytics
-              </Button>
-            </CardContent>
-          </Card>
+            {/* Financial Information - Clean Design */}
+            {(listing.website_revenue_monthly || listing.website_profit_monthly) && (
+              <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+                <CardHeader className="border-b border-border bg-secondary/10">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold">Financial Information</CardTitle>
+                      <CardDescription className="text-xs">Revenue and profit details</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {listing.website_revenue_monthly && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Monthly Revenue
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {formatCurrency(listing.website_revenue_monthly)}
+                        </p>
+                      </div>
+                    )}
+                    {listing.website_profit_monthly && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-1">
+                          <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">
+                            Monthly Profit
+                          </label>
+                        </div>
+                        <p className="text-sm font-semibold text-green-600">
+                          {formatCurrency(listing.website_profit_monthly)}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Actions - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <Sparkles className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-2">
+                <div className="text-center p-3 rounded-lg bg-muted/30 border border-border mb-3">
+                  <p className="text-xs text-muted-foreground mb-1">Listing Price</p>
+                  <p className="text-2xl font-semibold text-foreground">{formatCurrency(listing.price)}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{listing.currency}</p>
+                </div>
+                {
+                  listing.seller_id !== user?.id && 
+                <Button
+                className="w-full"
+                variant="default"
+                onClick={handleMakeOffer}
+                size="sm"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 mr-2" />
+                  {t('offers.create.button')}
+                </Button>
+                }
+                {user && listing.seller_id === user.id && (
+                  <>
+                    <Button
+                      className="w-full"
+                      variant={listing.status === 'active' ? 'outline' : 'default'}
+                      onClick={handleStatusToggle}
+                      disabled={isUpdatingStatus}
+                      size="sm"
+                    >
+                      {isUpdatingStatus ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      ) : (
+                        <Power className="w-3.5 h-3.5 mr-2" />
+                      )}
+                      {listing.status === 'active' ? 'Unpublish' : 'Publish'}
+                    </Button>
+                    <Button className="w-full" variant="outline" size="sm">
+                      <Edit className="w-3.5 h-3.5 mr-2" />
+                      Update Price
+                    </Button>
+                    {!listing.is_featured && (
+                      <Button className="w-full bg-gradient-to-r from-primary to-secondary" size="sm">
+                        <Star className="w-3.5 h-3.5 mr-2" />
+                        Feature Listing
+                      </Button>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Timeline - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold">Timeline</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Created At
+                    </label>
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">
+                    {timeFormat(listing.created_at, 'MMM DD, YYYY')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {timeFormat(listing.created_at, 'HH:mm')}
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Updated At
+                    </label>
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">
+                    {timeFormat(listing.updated_at, 'MMM DD, YYYY')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {timeFormat(listing.updated_at, 'HH:mm')}
+                  </p>
+                </div>
+                {listing.expires_at && (
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Expires At
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {timeFormat(listing.expires_at, 'MMM DD, YYYY')}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {timeFormat(listing.expires_at, 'HH:mm')}
+                    </p>
+                  </div>
+                )}
+                {listing.sold_at && (
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Sold On
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {timeFormat(listing.sold_at, 'MMM DD, YYYY')}
+                    </p>
+                    {listing.sold_price && (
+                      <p className="text-sm font-semibold text-green-600 mt-0.5">
+                        {formatCurrency(listing.sold_price)}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Seller Information - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold">Seller Information</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Username
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {listing.seller.username}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Email
+                      </label>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {listing.seller.email} <Copy className="w-3.5 h-3.5 ml-auto" />
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Additional Actions - Clean Design */}
+            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/10">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                    <Sparkles className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold">Additional Actions</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-2">
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Eye className="w-3.5 h-3.5 mr-2" />
+                  View Public Page
+                  <ExternalLink className="w-3.5 h-3.5 ml-auto" />
+                </Button>
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <DollarSign className="w-3.5 h-3.5 mr-2" />
+                  View Offers
+                  <ExternalLink className="w-3.5 h-3.5 ml-auto" />
+                </Button>
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <TrendingUp className="w-3.5 h-3.5 mr-2" />
+                  View Analytics
+                  <ExternalLink className="w-3.5 h-3.5 ml-auto" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
