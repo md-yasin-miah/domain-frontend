@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,23 +29,59 @@ import { ReturnBack } from '@/components/common/ReturnBack';
 import { useAuth } from '@/store/hooks/useAuth';
 import MakeOfferModal from './components/MakeOfferModal';
 import { ROUTES } from '@/lib/routes';
+import { useGetProfileCompletionQuery } from '@/store/api/profileApi';
 
 const Details = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  console.log({user});
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: listing, isLoading, error } = useGetMarketplaceListingQuery(Number(id));
   const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateMarketplaceListingStatusMutation();
   const [makeOfferModalOpen, setMakeOfferModalOpen] = useState(false);
   const navigate = useNavigate();
+  
+  // Check profile completion if user is logged in
+  const { data: profileCompletion, isLoading: profileCompletionLoading } = useGetProfileCompletionQuery(undefined, {
+    skip: !user,
+  });
+
+  // Check if we should open the offer modal automatically (from URL param)
+  useEffect(() => {
+    const openOffer = searchParams.get('openOffer');
+    if (openOffer === 'true' && user && listing && !profileCompletionLoading) {
+      // Check if profile is complete
+      if (profileCompletion?.is_complete) {
+        // Profile is complete, open modal
+        setMakeOfferModalOpen(true);
+        // Remove the query param
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.delete('openOffer');
+        setSearchParams(newSearchParams, { replace: true });
+      } else if (profileCompletion?.is_complete === false) {
+        // Profile is not complete, redirect to profile setup with return URL
+        const returnUrl = `${window.location.pathname}?openOffer=true`;
+        navigate(`${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`, { replace: true });
+      }
+    }
+  }, [user, listing, profileCompletion, profileCompletionLoading, searchParams, setSearchParams, navigate]);
+
   // Handle make offer
   const handleMakeOffer = () => {
     if (!user) {
-      navigate(`${ROUTES.AUTH.INDEX}?tab=login`);
-    }else{
-      setMakeOfferModalOpen(true);
+      // Store the current URL with openOffer flag for redirect after login
+      const returnUrl = `${window.location.pathname}?openOffer=true`;
+      navigate(`${ROUTES.AUTH.INDEX}?tab=login&returnUrl=${encodeURIComponent(returnUrl)}`);
+    } else {
+      // Check if profile is complete
+      if (profileCompletion?.is_complete) {
+        setMakeOfferModalOpen(true);
+      } else {
+        // Profile is not complete, redirect to profile setup with return URL
+        const returnUrl = `${window.location.pathname}?openOffer=true`;
+        navigate(`${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`);
+      }
     }
   };
 

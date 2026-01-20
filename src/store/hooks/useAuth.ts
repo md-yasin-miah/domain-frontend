@@ -113,14 +113,7 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    try {
-      await logoutMutation().unwrap();
-    } catch (error) {
-      // Continue with logout even if API call fails
-      console.error('Logout API error:', error);
-    } finally {
-      dispatch(logout());
-    }
+    dispatch(logout());
     return { error: null };
   };
 

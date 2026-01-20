@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import { profileSetupSchema, type ProfileSetupFormData } from "@/schemas/user/pr
 export default function ProfileSetup() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { user } = useAuth();
   const [updateProfile, { isLoading: isUpdating }] = useUpdateClientProfileMutation();
@@ -100,7 +101,13 @@ export default function ProfileSetup() {
         description: t('profile.setup.success_desc'),
       });
 
-      navigate("/client/dashboard");
+      // Check for return URL, otherwise redirect to dashboard
+      const returnUrl = searchParams.get('returnUrl');
+      if (returnUrl) {
+        navigate(decodeURIComponent(returnUrl), { replace: true });
+      } else {
+        navigate("/client/dashboard", { replace: true });
+      }
     } catch (error: unknown) {
       // Set form field errors dynamically
       const hasFieldErrors = setFormErrors<ProfileSetupFormData>(

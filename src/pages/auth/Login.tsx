@@ -96,7 +96,7 @@ export default function Login() {
       const signInResult = await signIn(data.email, data.password);
       const { error, user: signedInUser, profileCompletion } = signInResult as {
         error: { message: string } | null;
-        user: any;
+        user: { roles?: (string | { name: string })[] } | null;
         profileCompletion?: { completion_percentage: number; is_complete: boolean; missing_fields: string[] } | null;
       };
 
@@ -111,12 +111,25 @@ export default function Login() {
         description: t('auth.login_page.login_success'),
       });
 
+      // Check for return URL
+      const returnUrl = searchParams.get('returnUrl');
+
       // Check profile completion first
       const completionPercentage = profileCompletion?.completion_percentage ?? 100;
 
-      // If profile is not complete (less than 100%), redirect to profile setup
+      // If profile is not complete (less than 100%), redirect to profile setup with return URL
       if (completionPercentage < 100) {
-        navigate('/client/profile-setup', { replace: true });
+        if (returnUrl) {
+          navigate(`/client/profile-setup?returnUrl=${encodeURIComponent(returnUrl)}`, { replace: true });
+        } else {
+          navigate('/client/profile-setup', { replace: true });
+        }
+        return;
+      }
+
+      // Profile is complete, check if we have a return URL
+      if (returnUrl) {
+        navigate(decodeURIComponent(returnUrl), { replace: true });
         return;
       }
 

@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { UserResponse } from '../api/types';
 
 interface AuthState {
   user: UserResponse | null;
@@ -95,14 +94,14 @@ const authSlice = createSlice({
     updateUser: (state, action: PayloadAction<Partial<UserResponse>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
-        state.isAdmin = state.user.roles?.some((r) => r.name === 'Admin') || false;
+        state.isAdmin = state.user.roles?.some((r: string) => r.toLowerCase() === 'admin') || false;
         // User data is not stored in localStorage for security
       }
     },
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
       try {
-      localStorage.setItem('auth_token', action.payload);
+        localStorage.setItem('auth_token', action.payload);
       } catch (error) {
         console.error('Failed to store token in localStorage:', error);
       }

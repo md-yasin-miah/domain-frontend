@@ -50,7 +50,7 @@ const getAppMenuItems = (t: TFunction): MenuItem[] => {
       subItems: [
         {
           title: t('categories.domains'),
-          url: ROUTES.APP.CATEGORIES.DOMAINS,
+          url: ROUTES.APP.CATEGORIES.DOMAINS.ROOT,
           icon: Server,
           description: t('categories.domains_desc'),
         },
