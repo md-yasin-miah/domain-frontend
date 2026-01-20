@@ -307,6 +307,62 @@
     "premium_collection": "Colección Premium",
     "from_premium": "Desde dominios premium hasta negocios completos en línea"
   },
+  "marketplace_domains": {
+    "hero": {
+      "title": "Dominios Premium en Español",
+      "subtitle": "Descubre dominios .com, .io y otras extensiones premium para tu negocio. Amplia selección de dominios verificados con precios competitivos en el mercado global.",
+      "bullets": {
+        "secure_transfer": "Transferencia segura",
+        "verified_domains": "Dominios verificados",
+        "real_valuations": "Valoraciones reales"
+      }
+    },
+    "search": {
+      "placeholder": "Buscar dominios... ej: tecnología, marketing, finanzas"
+    },
+    "quick_filters": {
+      "under_5000": "Menos de $5,000",
+      "premium": "Premium",
+      "short": "Cortos (≤ 10 letras)"
+    },
+    "categories": {
+      "title": "Explorar por Categoría",
+      "count": "{{count}} dominios",
+      "items": {
+        "technology": "Tecnología",
+        "business": "Negocios",
+        "finance": "Finanzas",
+        "health": "Salud",
+        "education": "Educación",
+        "entertainment": "Entretenimiento"
+      }
+    },
+    "featured": {
+      "title": "Dominios Destacados",
+      "view_all": "Ver todos"
+    },
+    "labels": {
+      "no_category": "Sin categoría",
+      "length": "Longitud",
+      "length_value": "{{count}} caracteres",
+      "registrar": "Registrar",
+      "expires": "Expira",
+      "unknown": "Desconocido"
+    },
+    "actions": {
+      "view_details": "Ver Detalles",
+      "make_offer": "Hacer Oferta"
+    },
+    "empty": {
+      "title": "No hay dominios disponibles",
+      "description": "Vuelve pronto para ver nuevos dominios premium."
+    },
+    "stats": {
+      "domains_available": "Dominios disponibles",
+      "in_transactions": "En transacciones",
+      "active_users": "Usuarios activos"
+    }
+  },
   "profile": {
     "client": {
       "title": "Perfil del Cliente",

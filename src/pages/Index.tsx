@@ -218,7 +218,7 @@ const Index = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-slide-up">
             <Link
-              to={ROUTES.APP.CATEGORIES.DOMAINS}
+              to={ROUTES.APP.CATEGORIES.DOMAINS.ROOT}
               className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
             >
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">

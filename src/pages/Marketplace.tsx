@@ -52,7 +52,7 @@ const Marketplace = () => {
       name: t("categories.domains"),
       icon: Globe,
       count: 247,
-      path: ROUTES.APP.CATEGORIES.DOMAINS,
+      path: ROUTES.APP.CATEGORIES.DOMAINS.ROOT,
     },
     {
       id: "sitios",
@@ -302,12 +302,10 @@ const Marketplace = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category) => (
+              <Link to={category.path}>
               <Card
                 key={category.id}
                 className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 hover:border-primary/20 cursor-pointer"
-                onClick={() =>
-                  category.path && (window.location.href = category.path)
-                }
               >
                 <CardContent className="p-8">
                   <div className="flex items-center justify-between mb-6">
@@ -331,6 +329,7 @@ const Marketplace = () => {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         </div>

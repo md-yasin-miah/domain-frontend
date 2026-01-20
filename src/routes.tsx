@@ -6,7 +6,7 @@ import ClientLayout from "./components/layout/ClientLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
-import DomainsPage from "./pages/marketplace/Domains";
+import DomainsPage from "./pages/marketplace/domains";
 import WebsitesPage from "./pages/marketplace/WebsitesPage";
 import NotFound from "./pages/NotFound";
 import Terminos from "./pages/legal/Terminos";
@@ -111,7 +111,16 @@ export const router = createBrowserRouter([
           },
           {
             path: "domains",
-            element: <DomainsPage />,
+            children: [
+              {
+                index: true,
+                element: <DomainsPage />,
+              },
+              {
+                path: ":id",
+                element: <MyListingDetails />,
+              },
+            ],
           },
           {
             path: "websites",

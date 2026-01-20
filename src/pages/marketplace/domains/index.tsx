@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 import {
   Search,
   Filter,
@@ -25,46 +26,47 @@ import {
   useIncrementViews,
 } from "@/store/hooks/useMarketplace";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ROUTES } from "@/lib/routes";
+import { Link } from "react-router-dom";
 
 const DomainsPage = () => {
+  const { t } = useTranslation();
   const { data: domains, isLoading: domainsLoading } = useMarketplaceDomains();
   const { data: stats } = useMarketplaceStats();
   const incrementViews = useIncrementViews();
 
   const categories = [
-    { name: "Tecnología", count: 47, color: "bg-primary" },
-    { name: "Negocios", count: 89, color: "bg-primary/80" },
-    { name: "Finanzas", count: 34, color: "bg-secondary" },
-    { name: "Salud", count: 23, color: "bg-primary/90" },
-    { name: "Educación", count: 56, color: "bg-secondary/80" },
-    { name: "Entretenimiento", count: 78, color: "bg-primary/70" },
+    { key: "technology", count: 47, color: "bg-primary" },
+    { key: "business", count: 89, color: "bg-primary/80" },
+    { key: "finance", count: 34, color: "bg-secondary" },
+    { key: "health", count: 23, color: "bg-primary/90" },
+    { key: "education", count: 56, color: "bg-secondary/80" },
+    { key: "entertainment", count: 78, color: "bg-primary/70" },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="md:p-6 lg:p-8 p-4 container mx-auto space-y-8">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-8 border">
         <div className="max-w-4xl">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Dominios Premium en Español
+            {t("marketplace_domains.hero.title")}
           </h1>
           <p className="text-xl text-muted-foreground mb-6">
-            Descubre dominios .com, .io y otras extensiones premium para tu
-            negocio. Amplia selección de dominios verificados con precios
-            competitivos en el mercado global.
+            {t("marketplace_domains.hero.subtitle")}
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
-              Transferencia segura
+              {t("marketplace_domains.hero.bullets.secure_transfer")}
             </div>
             <div className="flex items-center gap-2">
               <Award className="h-4 w-4 text-yellow-500" />
-              Dominios verificados
+              {t("marketplace_domains.hero.bullets.verified_domains")}
             </div>
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-blue-500" />
-              Valoraciones reales
+              {t("marketplace_domains.hero.bullets.real_valuations")}
             </div>
           </div>
         </div>
@@ -76,16 +78,16 @@ const DomainsPage = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar dominios... ej: tecnologia, marketing, finanzas"
+              placeholder={t("marketplace_domains.search.placeholder")}
               className="pl-10 h-12"
             />
           </div>
           <div className="flex gap-2">
             <Button variant="outline" className="flex items-center gap-2 h-12">
               <Filter className="h-4 w-4" />
-              Filtros
+              {t("common.filter")}
             </Button>
-            <Button className="h-12 px-8">Buscar</Button>
+            <Button className="h-12 px-8">{t("common.search")}</Button>
           </div>
         </div>
 
@@ -107,30 +109,32 @@ const DomainsPage = () => {
             variant="secondary"
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
           >
-            Menos de $5,000
+            {t("marketplace_domains.quick_filters.under_5000")}
           </Badge>
           <Badge
             variant="secondary"
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
           >
-            Premium
+            {t("marketplace_domains.quick_filters.premium")}
           </Badge>
           <Badge
             variant="secondary"
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
           >
-            Cortos (≤ 10 letras)
+            {t("marketplace_domains.quick_filters.short")}
           </Badge>
         </div>
       </div>
 
       {/* Categories */}
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Explorar por Categoría</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          {t("marketplace_domains.categories.title")}
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((category) => (
             <Card
-              key={category.name}
+              key={category.key}
               className="hover:shadow-md transition-shadow cursor-pointer group"
             >
               <CardContent className="p-4 text-center">
@@ -139,9 +143,13 @@ const DomainsPage = () => {
                 >
                   <Globe className="h-6 w-6 text-primary-foreground" />
                 </div>
-                <h3 className="font-medium text-sm">{category.name}</h3>
+                <h3 className="font-medium text-sm">
+                  {t(`marketplace_domains.categories.items.${category.key}`)}
+                </h3>
                 <p className="text-xs text-muted-foreground">
-                  {category.count} dominios
+                  {t("marketplace_domains.categories.count", {
+                    count: category.count,
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -152,9 +160,11 @@ const DomainsPage = () => {
       {/* Featured Domains */}
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Dominios Destacados</h2>
+          <h2 className="text-2xl font-semibold">
+            {t("marketplace_domains.featured.title")}
+          </h2>
           <Button variant="outline" className="flex items-center gap-2">
-            Ver todos
+            {t("marketplace_domains.featured.view_all")}
             <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
@@ -192,15 +202,24 @@ const DomainsPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {domains && domains.length > 0 ? (
               domains.map((domain) => {
-                const domainData = (domain.domain_data as any) || {};
+                const domainData = (domain.domain_data as Record<string, unknown>) || {};
                 const displayDomain =
-                  domain.title || domainData.domain || "domain.com";
+                  domain.title ||
+                  (typeof domainData.domain === "string" ? domainData.domain : "") ||
+                  "domain.com";
                 const extension =
-                  domainData.extension ||
+                  (typeof domainData.extension === "string"
+                    ? domainData.extension
+                    : "") ||
                   displayDomain.split(".").pop() ||
                   ".com";
-                const registrar = domainData.registrar || "Unknown";
-                const expires = domainData.expires || "2025-12-31";
+                const registrar =
+                  (typeof domainData.registrar === "string"
+                    ? domainData.registrar
+                    : "") || t("marketplace_domains.labels.unknown");
+                const expires =
+                  (typeof domainData.expires === "string" ? domainData.expires : "") ||
+                  "2025-12-31";
                 const length = displayDomain.length;
 
                 return (
@@ -221,7 +240,7 @@ const DomainsPage = () => {
                           <div className="flex items-center gap-2 mt-2">
                             <Badge variant="outline">
                               {domain.marketplace_categories?.name ||
-                                "Sin categoría"}
+                                t("marketplace_domains.labels.no_category")}
                             </Badge>
                             <Badge variant="secondary" className="text-xs">
                               {extension}
@@ -245,13 +264,17 @@ const DomainsPage = () => {
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">
-                            Longitud:
+                            {t("marketplace_domains.labels.length")}:
                           </span>
-                          <p className="font-medium">{length} caracteres</p>
+                          <p className="font-medium">
+                            {t("marketplace_domains.labels.length_value", {
+                              count: length,
+                            })}
+                          </p>
                         </div>
                         <div>
                           <span className="text-muted-foreground">
-                            Registrar:
+                            {t("marketplace_domains.labels.registrar")}:
                           </span>
                           <p className="font-medium">{registrar}</p>
                         </div>
@@ -259,15 +282,17 @@ const DomainsPage = () => {
 
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Calendar className="h-4 w-4" />
-                        Expira: {expires}
+                        {t("marketplace_domains.labels.expires")}: {expires}
                       </div>
 
                       <div className="flex gap-2 pt-2">
-                        <Button className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground">
-                          Ver Detalles
-                        </Button>
+                        <Link to={ROUTES.APP.CATEGORIES.DOMAINS.DETAILS(domain.id)}>
+                          <Button className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground">
+                            {t("marketplace_domains.actions.view_details")}
+                          </Button>
+                        </Link>
                         <Button variant="outline" className="flex-1">
-                          Hacer Oferta
+                          {t("marketplace_domains.actions.make_offer")}
                         </Button>
                       </div>
                     </CardContent>
@@ -278,10 +303,10 @@ const DomainsPage = () => {
               <div className="col-span-full text-center py-12">
                 <Globe className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  No hay dominios disponibles
+                  {t("marketplace_domains.empty.title")}
                 </h3>
                 <p className="text-muted-foreground">
-                  Vuelve pronto para ver nuevos dominios premium.
+                  {t("marketplace_domains.empty.description")}
                 </p>
               </div>
             )}
@@ -296,15 +321,21 @@ const DomainsPage = () => {
             <div className="text-3xl font-bold text-primary mb-2">
               {stats?.domains.toLocaleString() || "0"}
             </div>
-            <div className="text-muted-foreground">Dominios disponibles</div>
+            <div className="text-muted-foreground">
+              {t("marketplace_domains.stats.domains_available")}
+            </div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-green-600 mb-2">$1.2M</div>
-            <div className="text-muted-foreground">En transacciones</div>
+            <div className="text-muted-foreground">
+              {t("marketplace_domains.stats.in_transactions")}
+            </div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-blue-600 mb-2">15,432</div>
-            <div className="text-muted-foreground">Usuarios activos</div>
+            <div className="text-muted-foreground">
+              {t("marketplace_domains.stats.active_users")}
+            </div>
           </div>
         </div>
       </div>

@@ -60,7 +60,6 @@ interface MarketplaceListing {
   listing_type: MarketplaceListingType,
   is_favorited: boolean
 
-
   // self added asper UI design
   is_auto_renew: boolean,
   dns_records: string,

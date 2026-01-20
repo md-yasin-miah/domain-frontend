@@ -20,7 +20,7 @@ import {
   AlertTriangle,
   Server,
 } from "lucide-react";
-import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
+import { useGetMyMarketListingQuery } from "@/store/api/marketplaceApi";
 import { useTranslation } from "react-i18next";
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from "@/lib/utils";
@@ -29,7 +29,7 @@ import { getStatusColor, getStatusLabel, timeFormat } from "@/lib/helperFun";
 const ClientDomainsPage = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: domainsData, isLoading } = useGetMarketplaceListingsQuery({
+  const { data: domainsData, isLoading } = useGetMyMarketListingQuery({
     listing_type_id: 1,
   });
 

@@ -20,7 +20,7 @@ import {
   Users,
   Download,
 } from "lucide-react";
-import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
+import { useGetMyMarketListingQuery } from "@/store/api/marketplaceApi";
 import { useTranslation } from "react-i18next";
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ import {
 const ClientAppsPage = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: appsData, isLoading } = useGetMarketplaceListingsQuery({
+  const { data: appsData, isLoading } = useGetMyMarketListingQuery({
     listing_type_id: 3,
   });
 

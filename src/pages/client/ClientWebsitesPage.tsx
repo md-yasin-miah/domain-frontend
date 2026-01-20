@@ -19,7 +19,7 @@ import {
   Monitor,
   BarChart3,
 } from "lucide-react";
-import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
+import { useGetMyMarketListingQuery } from "@/store/api/marketplaceApi";
 import { useTranslation } from "react-i18next";
 import { DomainsPageSkeleton } from "@/components/skeletons/DomainsPageSkeleton";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ import { Link } from "react-router-dom";
 const ClientWebsitesPage = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: websitesData, isLoading } = useGetMarketplaceListingsQuery({
+  const { data: websitesData, isLoading } = useGetMyMarketListingQuery({
     listing_type_id: 2,
   });
 

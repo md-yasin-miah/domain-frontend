@@ -1,10 +1,8 @@
-import React from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useParams } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  ArrowLeft,
   Eye,
   Heart,
   Edit,
@@ -23,13 +21,14 @@ import { useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutatio
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { ROUTES } from '@/lib/routes';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { ReturnBack } from '@/components/common/ReturnBack';
+import { useAuth } from '@/store/hooks/useAuth';
 
 const Details = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+    const { user } = useAuth();
   const { t } = useTranslation();
   const { toast } = useToast();
   const { data: listing, isLoading, error } = useGetMarketplaceListingQuery(Number(id));
@@ -83,25 +82,16 @@ const Details = () => {
         <p className="text-muted-foreground mb-6">
           The listing you're looking for doesn't exist or has been removed.
         </p>
-        <Button onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS)}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to My Listings
-        </Button>
+        <ReturnBack />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:p-6 lg:p-8 p-4 container mx-auto">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2">
-        <Link
-          to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to My Listings
-        </Link>
+        <ReturnBack />
         <span className="text-muted-foreground">•</span>
         <span className="text-sm text-muted-foreground">{listing.title}</span>
       </div>
@@ -117,12 +107,14 @@ const Details = () => {
             Listing Details and Management
           </p>
         </div>
+        {
+         user && listing.seller_id===user.id &&
         <div className="flex gap-2">
           {listing && (
             <Button
-              variant={listing.status === 'active' ? 'outline' : 'default'}
-              onClick={handleStatusToggle}
-              disabled={isUpdatingStatus}
+            variant={listing.status === 'active' ? 'outline' : 'default'}
+            onClick={handleStatusToggle}
+            disabled={isUpdatingStatus}
             >
               <Power className="w-4 h-4 mr-2" />
               {listing.status === 'active' ? 'Unpublish' : 'Publish'}
@@ -137,6 +129,7 @@ const Details = () => {
             Delete
           </Button>
         </div>
+        }
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -303,13 +296,15 @@ const Details = () => {
                 <div className="text-3xl font-bold text-primary mb-2">{formatCurrency(listing.price)}</div>
                 <p className="text-sm text-muted-foreground">{listing.currency}</p>
               </div>
+              {
+                user && listing.seller_id===user.id &&
               <div className="space-y-3">
                 <Button
                   className="w-full"
                   variant={listing.status === 'active' ? 'outline' : 'default'}
                   onClick={handleStatusToggle}
                   disabled={isUpdatingStatus}
-                >
+                  >
                   <Power className="w-4 h-4 mr-2" />
                   {listing.status === 'active' ? 'Unpublish' : 'Publish'}
                 </Button>
@@ -324,6 +319,7 @@ const Details = () => {
                   </Button>
                 )}
               </div>
+              }
             </CardContent>
           </Card>
 

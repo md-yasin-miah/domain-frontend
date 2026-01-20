@@ -1,5 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AdminSidebar } from './AdminSidebar';
+import { AdminSidebar } from './components/AdminSidebar';
 import { cn } from '@/lib/utils';
 
 interface AdminLayoutProps {

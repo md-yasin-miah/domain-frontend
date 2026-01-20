@@ -189,6 +189,62 @@
     "premium_collection": "Premium Collection",
     "from_premium": "From premium domains to complete online businesses"
   },
+  "marketplace_domains": {
+    "hero": {
+      "title": "Premium Spanish Domains",
+      "subtitle": "Discover premium .com, .io and other extensions for your business. A wide selection of verified domains with competitive prices in the global market.",
+      "bullets": {
+        "secure_transfer": "Secure transfer",
+        "verified_domains": "Verified domains",
+        "real_valuations": "Real valuations"
+      }
+    },
+    "search": {
+      "placeholder": "Search domains... e.g. technology, marketing, finance"
+    },
+    "quick_filters": {
+      "under_5000": "Under $5,000",
+      "premium": "Premium",
+      "short": "Short (≤ 10 letters)"
+    },
+    "categories": {
+      "title": "Browse by Category",
+      "count": "{{count}} domains",
+      "items": {
+        "technology": "Technology",
+        "business": "Business",
+        "finance": "Finance",
+        "health": "Health",
+        "education": "Education",
+        "entertainment": "Entertainment"
+      }
+    },
+    "featured": {
+      "title": "Featured Domains",
+      "view_all": "View all"
+    },
+    "labels": {
+      "no_category": "No category",
+      "length": "Length",
+      "length_value": "{{count}} characters",
+      "registrar": "Registrar",
+      "expires": "Expires",
+      "unknown": "Unknown"
+    },
+    "actions": {
+      "view_details": "View Details",
+      "make_offer": "Make Offer"
+    },
+    "empty": {
+      "title": "No domains available",
+      "description": "Come back soon to see new premium domains."
+    },
+    "stats": {
+      "domains_available": "Domains available",
+      "in_transactions": "In transactions",
+      "active_users": "Active users"
+    }
+  },
   "admin": {
     "user_management": {
       "title": "User Management",

@@ -3,7 +3,10 @@ export const ROUTES = {
   APP: {
     MARKETPLACE: '/marketplace',
     CATEGORIES: {
-      DOMAINS: '/marketplace/domains',
+      DOMAINS: {
+        ROOT: '/marketplace/domains',
+        DETAILS: (id: number) => `/marketplace/domains/${id}`,
+      },
       WEBSITES: '/marketplace/websites',
       APPS: '/marketplace/apps',
       FBA_STORES: '/marketplace/fba-stores',

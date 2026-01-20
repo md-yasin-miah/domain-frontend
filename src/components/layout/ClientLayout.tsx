@@ -1,6 +1,6 @@
 import LiveChat from "@/components/LiveChat";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
+import { Footer } from "./components/Footer";
+import { Header } from "./components/Header";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useTranslation } from "react-i18next";
 import { getClientMenuItems, getClientServices } from "@/lib/menu";
