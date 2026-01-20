@@ -45,7 +45,6 @@ import {
   Loader2,
   Check,
   X,
-  MessageSquare,
   RotateCcw,
   Trash2,
   Eye,
@@ -80,6 +79,7 @@ type OfferStatus =
   | "withdrawn";
 
 const ClientOffersPage = () => {
+  const { user } = useAuth();
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -326,10 +326,10 @@ const ClientOffersPage = () => {
 
   // Render actions for each row
   const renderActions = (offer: Offer) => {
-    const canAccept = offer.status === "pending";
-    const canReject = offer.status === "pending";
-    const canCounter = offer.status === "pending";
-    const canWithdraw = offer.status === "pending";
+    const canAccept = offer.status !== "accepted" && user?.id !== offer.buyer_id;
+    const canReject = offer.status !== "accepted";
+    const canCounter = offer.status !== "accepted";
+    const canWithdraw = offer.status !== "accepted" && user?.id === offer.buyer_id;
 
     return (
       <div className="flex items-center gap-1">

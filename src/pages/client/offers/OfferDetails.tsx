@@ -208,10 +208,10 @@ const OfferDetails = () => {
     );
   }
 
-  const canAccept = offer.status === "pending";
-  const canReject = offer.status === "pending";
-  const canCounter = offer.status === "pending";
-  const canWithdraw = offer.status === "pending";
+  const canAccept = offer.status !== "accepted" && user?.id !== offer.buyer_id;
+  const canReject = offer.status !== "accepted";
+  const canCounter = offer.status !== "accepted";
+  const canWithdraw = offer.status !== "accepted" && user?.id === offer.buyer_id;
 
   // Calculate difference percentage
   const priceDifference = offer.listing?.price
@@ -258,6 +258,7 @@ const OfferDetails = () => {
                   onClick={handleAccept}
                   disabled={isAccepting}
                   size="sm"
+                  className="bg-green-500 hover:bg-green-600"
                 >
                   {isAccepting ? (
                     <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
@@ -500,10 +501,7 @@ const OfferDetails = () => {
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground">
-                      {timeFormat(offer.created_at, "MMM DD, YYYY")}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {timeFormat(offer.created_at, "HH:mm")}
+                      {timeFormat(offer.created_at, "HH:mm - MMM DD, YYYY")}
                     </p>
                   </div>
 
@@ -515,10 +513,7 @@ const OfferDetails = () => {
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground">
-                      {timeFormat(offer.updated_at, "MMM DD, YYYY")}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {timeFormat(offer.updated_at, "HH:mm")}
+                      {timeFormat(offer.updated_at, "HH:mm - MMM DD, YYYY")}
                     </p>
                   </div>
                 </div>
@@ -560,29 +555,33 @@ const OfferDetails = () => {
               </CardHeader>
               <CardContent className="p-4 space-y-2">
                 {offer.listing && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() =>
-                      navigate(`/marketplace/${offer.listing?.slug}`)
-                    }
-                    size="sm"
-                  >
-                    <Package className="w-3.5 h-3.5 mr-2" />
-                    View Listing
-                    <ExternalLink className="w-3.5 h-3.5 ml-auto" />
-                  </Button>
+                  <div>
+                    <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        size="sm"
+                        >
+                        <Package className="w-3.5 h-3.5 mr-2" />
+                        View Listing
+                        <ExternalLink className="w-3.5 h-3.5 ml-auto" />
+                      </Button>
+                    </Link>
+                  </div>
                 )}
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => navigate(ROUTES.CLIENT.CHAT.ROOT)}
-                  size="sm"
-                >
-                  <MessageSquare className="w-3.5 h-3.5 mr-2" />
-                  Open Chat
-                  <ExternalLink className="w-3.5 h-3.5 ml-auto" />
-                </Button>
+                <div>
+                  <Link to={ROUTES.CLIENT.CHAT.ROOT}>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      size="sm"
+                      >
+                      <MessageSquare className="w-3.5 h-3.5 mr-2" />
+                      Open Chat
+                      <ExternalLink className="w-3.5 h-3.5 ml-auto" />
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
 
