@@ -1,11 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type {
-  Escrow,
-  EscrowReleaseRequest,
-  EscrowRefundRequest,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export const escrowApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

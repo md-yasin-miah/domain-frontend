@@ -1,10 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type {
-  Payment,
-  PaymentCreateRequest,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export const paymentsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
