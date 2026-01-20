@@ -1,8 +1,8 @@
-import { pdf } from "@react-pdf/renderer";
 import React from "react";
 
 /**
  * Generates and downloads a PDF document using @react-pdf/renderer
+ * Lazy loads react-pdf only when this function is called to reduce initial bundle size
  * @param document - The React PDF Document component
  * @param filename - The filename for the downloaded PDF
  */
@@ -11,6 +11,8 @@ export const generatePDF = async (
   filename: string = "document.pdf"
 ): Promise<void> => {
   try {
+    // Dynamically import react-pdf only when generating PDF (saves ~860KB from initial bundle)
+    const { pdf } = await import("@react-pdf/renderer");
     const blob = await pdf(document).toBlob();
     const url = URL.createObjectURL(blob);
     const link = window.document.createElement("a");

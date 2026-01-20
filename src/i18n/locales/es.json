@@ -245,7 +245,8 @@
       "issued": "Emitido",
       "paid": "Pagado",
       "sold": "Vendido",
-      "overdue": "Vencido"
+      "overdue": "Vencido",
+      "sent": "Enviado"
     }
   },
   "dashboard": {

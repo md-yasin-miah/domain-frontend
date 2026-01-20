@@ -66,8 +66,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import OfferDetailsSkeleton from "@/components/skeletons/OfferDetailsSkeleton";
 import EmptyState from "@/components/common/EmptyState";
-import InvoicePDF from "@/components/invoice/InvoicePDF";
 import { generatePDF } from "@/lib/pdfUtils";
+
+// Lazy load InvoicePDF to avoid bundling react-pdf until needed
+const loadInvoicePDF = async () => {
+  const module = await import("@/components/invoice/InvoicePDF");
+  return module.default;
+};
 
 const ClientOrderDetailsPage = () => {
   const { t } = useTranslation();
@@ -224,7 +229,8 @@ const ClientOrderDetailsPage = () => {
         existingInvoice?.invoice_number || `INV-${order.order_number}`;
       const filename = `Invoice-${invoiceNumber}-${order.order_number}.pdf`;
 
-      // Generate PDF using react-pdf
+      // Generate PDF using react-pdf (lazy loaded)
+      const InvoicePDF = await loadInvoicePDF();
       await generatePDF(
         <InvoicePDF order={order} invoice={existingInvoice || undefined} />,
         filename

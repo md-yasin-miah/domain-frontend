@@ -939,7 +939,8 @@
       "issued": "Issued",
       "paid": "Paid",
       "sold": "Sold",
-      "overdue": "Overdue"
+      "overdue": "Overdue",
+      "sent": "Sent"
     }
   },
   "faq": {

@@ -272,7 +272,7 @@ const ClientOffersPage = () => {
     const { canAccept, canReject, canCounter, canWithdraw } = getOfferPermissions(offer.status, user.id, offer.buyer_id);
 
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 justify-center">
         {canAccept && (
           <CustomTooltip
             content={t("offers.actions.accept")}

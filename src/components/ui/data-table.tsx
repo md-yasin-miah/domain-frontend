@@ -316,7 +316,7 @@ export function DataTable<TData = any>({
             {columns.map((column, index) => renderHeader(column, index))}
             {renderActions && (
               <TableHead
-                className={cn('text-right', actionsColumnClassName)}
+                className={cn('text-center', actionsColumnClassName)}
               >
                 {actionsColumnHeader}
               </TableHead>

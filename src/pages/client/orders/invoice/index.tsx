@@ -46,8 +46,13 @@ import { cn } from "@/lib/utils";
 import { usePagination } from "@/hooks/usePagination";
 import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/lib/routes";
-import InvoicePDF from "@/components/invoice/InvoicePDF";
 import { generatePDF } from "@/lib/pdfUtils";
+
+// Lazy load InvoicePDF to avoid bundling react-pdf until needed
+const loadInvoicePDF = async () => {
+  const module = await import("@/components/invoice/InvoicePDF");
+  return module.default;
+};
 import { ordersApi } from "@/store/api/ordersApi";
 import { store } from "@/store/index";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -158,6 +163,8 @@ const AllInvoice = () => {
 
       const filename = `Invoice-${invoice.invoice_number}-${invoice.order_id}.pdf`;
 
+      // Lazy load InvoicePDF component (includes react-pdf)
+      const InvoicePDF = await loadInvoicePDF();
       await generatePDF(
         <InvoicePDF order={order} invoice={invoice} />,
         filename

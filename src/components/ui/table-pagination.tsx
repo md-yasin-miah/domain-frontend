@@ -38,9 +38,9 @@ export function TablePagination({
   translationKey = 'common.pagination',
 }: TablePaginationProps) {
   const { t } = useTranslation();
-
-  const { total, page: currentPage, total_pages, has_next, has_previous } = pagination;
-
+console.log({pagination})
+  const { total, page, total_pages, has_next, has_previous } = pagination;
+  const currentPage = page + 1;
   // Don't render if pagination data is invalid
   if (!pagination || total_pages <= 1) {
     return null;
@@ -89,7 +89,7 @@ export function TablePagination({
 
   const pageNumbers = getPageNumbers();
   const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(currentPage * pageSize, total);
+  const endItem = currentPage * pageSize;
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= total_pages && newPage !== currentPage) {
@@ -104,7 +104,7 @@ export function TablePagination({
       <div className="flex items-center gap-4">
         {showInfo && (
           <div className="text-sm text-muted-foreground">
-            {t(`${translationKey}.showing`, { defaultValue: 'Showing' })} {startItem} - {endItem}{' '}
+            {t(`${translationKey}.showing`, { defaultValue: 'Showing' })} {startItem} to {endItem}{' '}
             {t(`${translationKey}.of`, { defaultValue: 'of' })} {total}
           </div>
         )}
