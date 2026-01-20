@@ -79,7 +79,7 @@ const OfferDetails = lazy(() => import("./pages/client/offers/OfferDetails"));
 const ClientProductsVerificationsPage = lazy(() => import("./pages/client/marketplace/productsVerification"));
 const ClientProductsDetailsPage = lazy(() => import("./pages/client/marketplace/productsVerification/Details"));
 const ClientAuctionsPage = lazy(() => import("./pages/client/ClientAuctionsPage"));
-const ClientSavedSearchPage = lazy(() => import("./pages/client/ClientSavedSearchPage"));
+const ClientSavedSearchPage = lazy(() => import("./pages/client/savedSearch"));
 const MyListing = lazy(() => import("./pages/client/marketplace/myListing"));
 const MyListingDetails = lazy(() => import("./pages/client/marketplace/myListing/Details"));
 const ClientChatPage = lazy(() => import("./pages/client/chat"));
@@ -110,8 +110,8 @@ export const router = createBrowserRouter([
         path: "marketplace",
         element: <LazyComponent><Marketplace /></LazyComponent>
       },
-       // Categories routes - Nested
-       {
+      // Categories routes - Nested
+      {
         path: "categories",
         children: [
           {
@@ -305,7 +305,7 @@ export const router = createBrowserRouter([
         path: "soporte",
         element: <LazyComponent><SupportPage /></LazyComponent>,
       },
-     
+
     ],
   },
   // Auth routes (no layout)
@@ -588,4 +588,3 @@ export const router = createBrowserRouter([
     element: <LazyComponent><NotFound /></LazyComponent>,
   },
 ]);
-  
