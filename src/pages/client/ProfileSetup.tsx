@@ -35,12 +35,17 @@ export default function ProfileSetup() {
     resolver: zodResolver(profileSetupSchema),
     defaultValues: {
       full_name: "",
-      address: "",
+      address_line1: "",
+      address_line2: "",
+      city: "",
+      state: "",
+      country: "",
+      postal_code: "",
       email: user?.email || "",
       phone_number: "",
       company_name: "",
-      company_address: "",
-      company_details: "",
+      website: "",
+      bio: "",
     },
   });
 
@@ -66,10 +71,15 @@ export default function ProfileSetup() {
         first_name: first_name || undefined,
         last_name: last_name || undefined,
         phone: data.phone_number || undefined,
-        address_line1: data.address || undefined,
-        address_line2: data.company_address || undefined,
+        address_line1: data.address_line1 || undefined,
+        address_line2: data.address_line2 || undefined,
+        city: data.city || undefined,
+        state: data.state || undefined,
+        country: data.country || undefined,
+        postal_code: data.postal_code || undefined,
         company_name: data.company_name || undefined,
-        bio: data.company_details || undefined,
+        website: data.website || undefined,
+        bio: data.bio || undefined,
       };
 
       // Try to update first, if profile doesn't exist, create it
@@ -97,7 +107,7 @@ export default function ProfileSetup() {
         form,
         error,
         undefined,
-        ['full_name', 'address', 'phone_number', 'company_name', 'company_address', 'company_details']
+        ['full_name', 'address_line1', 'address_line2', 'city', 'state', 'country', 'postal_code', 'phone_number', 'company_name', 'website', 'bio']
       );
 
       // Show general error toast if no field-specific errors were set
@@ -148,7 +158,7 @@ export default function ProfileSetup() {
 
                 <FormField
                   control={form.control}
-                  name="address"
+                  name="address_line1"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -164,6 +174,105 @@ export default function ProfileSetup() {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="address_line2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.address_line2')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('profile.setup.address_line2_placeholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t('profile.setup.city')} *
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('profile.setup.city_placeholder')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t('profile.setup.state')}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('profile.setup.state_placeholder')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t('profile.setup.country')} *
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('profile.setup.country_placeholder')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="postal_code"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t('profile.setup.postal_code')} *
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('profile.setup.postal_code_placeholder')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -230,15 +339,16 @@ export default function ProfileSetup() {
 
                 <FormField
                   control={form.control}
-                  name="company_address"
+                  name="website"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        {t('profile.setup.company_address')}
+                        {t('profile.setup.website')}
                       </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={t('profile.setup.company_address_placeholder')}
+                          type="url"
+                          placeholder={t('profile.setup.website_placeholder')}
                           {...field}
                         />
                       </FormControl>
@@ -249,15 +359,15 @@ export default function ProfileSetup() {
 
                 <FormField
                   control={form.control}
-                  name="company_details"
+                  name="bio"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        {t('profile.setup.company_details')}
+                        {t('profile.setup.bio')}
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={t('profile.setup.company_details_placeholder')}
+                          placeholder={t('profile.setup.bio_placeholder')}
                           rows={4}
                           {...field}
                         />
