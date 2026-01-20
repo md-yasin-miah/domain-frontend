@@ -1,5 +1,8 @@
 export const ROUTES = {
   ROOT: '/',
+  AUTH: {
+    INDEX: '/auth',
+  },
   APP: {
     MARKETPLACE: '/marketplace',
     CATEGORIES: {

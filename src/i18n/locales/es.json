@@ -414,6 +414,31 @@
       "success_update_desc": "Perfil actualizado correctamente",
       "error_update": "Error",
       "error_update_desc": "Error al actualizar el perfil"
+    },
+    "setup": {
+      "title": "Completa Tu Perfil",
+      "description": "Por favor completa tus datos para comenzar con tu panel de control",
+      "personal_info": "Información Personal",
+      "company_info": "Información de la Empresa (Opcional)",
+      "full_name": "Nombre Completo",
+      "full_name_placeholder": "Ingresa tu nombre completo",
+      "address": "Dirección",
+      "address_placeholder": "Ingresa tu dirección",
+      "email": "Correo Electrónico",
+      "phone_number": "Número de Teléfono",
+      "phone_number_placeholder": "Ingresa tu número de teléfono",
+      "company_name": "Nombre de la Empresa",
+      "company_name_placeholder": "Ingresa el nombre de la empresa (opcional)",
+      "company_address": "Dirección de la Empresa",
+      "company_address_placeholder": "Ingresa la dirección de la empresa (opcional)",
+      "company_details": "Detalles de la Empresa",
+      "company_details_placeholder": "Ingresa los detalles de la empresa (opcional)",
+      "saving": "Guardando...",
+      "complete_profile": "Completar Perfil",
+      "success": "Éxito",
+      "success_desc": "¡Tu perfil ha sido configurado exitosamente!",
+      "error": "Error",
+      "error_desc": "Error al guardar el perfil"
     }
   },
   "domains": {
@@ -884,6 +909,29 @@
         "amount_placeholder": "Ingresa el monto de contraoferta",
         "message": "Mensaje (Opcional)",
         "message_placeholder": "Agrega un mensaje a tu contraoferta..."
+      }
+    },
+    "create": {
+      "title": "Hacer una Oferta",
+      "description": "Envía una oferta para este listado",
+      "button": "Hacer Oferta",
+      "amount": "Monto de la Oferta",
+      "amount_placeholder": "Ingresa el monto de tu oferta",
+      "currency": "Moneda",
+      "currency_placeholder": "Selecciona la moneda",
+      "message": "Mensaje",
+      "message_placeholder": "Agrega un mensaje a tu oferta",
+      "expires_at": "Fecha de Expiración (Opcional)",
+      "expires_at_placeholder": "Selecciona la fecha de expiración",
+      "submit": "Enviar Oferta",
+      "submitting": "Enviando...",
+      "success": {
+        "title": "Oferta Creada",
+        "description": "Tu oferta ha sido enviada exitosamente."
+      },
+      "error": {
+        "title": "Error",
+        "description": "No se pudo crear la oferta. Por favor, intenta de nuevo."
       }
     },
     "empty": {

@@ -1,4 +1,5 @@
-import { useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +16,8 @@ import {
   Package,
   AlertCircle,
   CheckCircle2,
-  Power
+  Power,
+  MessageSquare
 } from 'lucide-react';
 import { useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
@@ -25,14 +27,27 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ReturnBack } from '@/components/common/ReturnBack';
 import { useAuth } from '@/store/hooks/useAuth';
+import MakeOfferModal from './components/MakeOfferModal';
+import { ROUTES } from '@/lib/routes';
 
 const Details = () => {
-    const { id } = useParams<{ id: string }>();
-    const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  console.log({user});
   const { t } = useTranslation();
   const { toast } = useToast();
   const { data: listing, isLoading, error } = useGetMarketplaceListingQuery(Number(id));
   const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateMarketplaceListingStatusMutation();
+  const [makeOfferModalOpen, setMakeOfferModalOpen] = useState(false);
+  const navigate = useNavigate();
+  // Handle make offer
+  const handleMakeOffer = () => {
+    if (!user) {
+      navigate(`${ROUTES.AUTH.INDEX}?tab=login`);
+    }else{
+      setMakeOfferModalOpen(true);
+    }
+  };
 
   // Handle status toggle
   const handleStatusToggle = async () => {
@@ -296,6 +311,17 @@ const Details = () => {
                 <div className="text-3xl font-bold text-primary mb-2">{formatCurrency(listing.price)}</div>
                 <p className="text-sm text-muted-foreground">{listing.currency}</p>
               </div>
+              {/* make offer button */}
+              {/* {user && listing.seller_id !== user.id && ( */}
+                <Button 
+                  className="w-full" 
+                  variant="default"
+                  onClick={handleMakeOffer}
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  {t('offers.create.button') }
+                </Button>
+              {/* // )} */}
               {
                 user && listing.seller_id===user.id &&
               <div className="space-y-3">
@@ -408,6 +434,16 @@ const Details = () => {
           </Card>
         </div>
       </div>
+
+      {/* Make Offer Modal */}
+      {listing && (
+        <MakeOfferModal
+          open={makeOfferModalOpen}
+          onOpenChange={setMakeOfferModalOpen}
+          listing={listing}
+          onSuccess={() => setMakeOfferModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

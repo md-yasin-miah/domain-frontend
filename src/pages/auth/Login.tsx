@@ -14,13 +14,19 @@ import { Loader2, ArrowLeft, LogIn, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/store/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Login() {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState('login');
+  const activeTab = searchParams.get("tab") as "login" | "signup" || "login";
+  const setActiveTab = (tab: "login" | "signup") => {
+    searchParams.set("tab", tab);
+    setSearchParams(searchParams);
+  };
   const navigate = useNavigate();
   const { signIn, signUp, user, loading } = useAuth();
   const { primaryRole } = useUserRole();

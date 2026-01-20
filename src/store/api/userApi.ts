@@ -106,21 +106,21 @@ export const userApi = apiSlice.injectEndpoints({
       providesTags: (result, error, userId) => [{ type: 'User', id: Number(userId) }],
     }),
     // Client profile mutations
-    updateClientProfile: builder.mutation<any, any>({
+    updateClientProfile: builder.mutation<ClientProfile, ProfileCreateRequest>({
       query: (data) => ({
         url: '/profile/me',
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['User', 'Auth'],
     }),
-    createClientProfile: builder.mutation<any, any>({
+    createClientProfile: builder.mutation<ClientProfile, ProfileCreateRequest>({
       query: (data) => ({
         url: '/profile/me',
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['User', 'Auth'],
     }),
   }),
 });

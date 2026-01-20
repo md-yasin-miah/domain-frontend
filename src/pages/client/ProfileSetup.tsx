@@ -1,54 +1,89 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/store/hooks/useAuth";
-import { useUpdateClientProfileMutation } from "@/store/api/userApi";
+import { useUpdateClientProfileMutation, useCreateClientProfileMutation } from "@/store/api/userApi";
+import { extractErrorMessage, setFormErrors } from "@/lib/errorHandler";
+import { profileSetupSchema, type ProfileSetupFormData } from "@/schemas/user/profileSetup.schema";
 
 export default function ProfileSetup() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [updateProfile, { isLoading: loading }] = useUpdateClientProfileMutation();
-  const [formData, setFormData] = useState({
-    full_name: "",
-    address: "",
-    email: user?.email || "",
-    phone_number: "",
-    company_name: "",
-    company_address: "",
-    company_details: "",
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateClientProfileMutation();
+  const [createProfile, { isLoading: isCreating }] = useCreateClientProfileMutation();
+  const loading = isUpdating || isCreating;
+
+  const form = useForm<ProfileSetupFormData>({
+    resolver: zodResolver(profileSetupSchema),
+    defaultValues: {
+      full_name: "",
+      address: "",
+      email: user?.email || "",
+      phone_number: "",
+      company_name: "",
+      company_address: "",
+      company_details: "",
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // Update email when user loads
+  useEffect(() => {
+    if (user?.email) {
+      form.setValue('email', user.email);
+    }
+  }, [user?.email, form]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
+  const onSubmit = async (data: ProfileSetupFormData) => {
     if (!user) return;
 
     try {
-      await updateProfile({
-        userId: user.id,
-        profileData: {
-          full_name: formData.full_name,
-          address: formData.address,
-          phone_number: formData.phone_number,
-          company_name: formData.company_name || undefined,
-          company_address: formData.company_address || undefined,
-          company_details: formData.company_details || undefined,
-          profile_completed: true,
-        },
-      }).unwrap();
+      // Map form data to backend API structure
+      // Split full_name into first_name and last_name
+      const nameParts = data.full_name.trim().split(/\s+/);
+      const first_name = nameParts[0] || '';
+      const last_name = nameParts.slice(1).join(' ') || '';
+
+      // Map to backend ProfileCreateRequest structure
+      const profileData = {
+        first_name: first_name || undefined,
+        last_name: last_name || undefined,
+        phone: data.phone_number || undefined,
+        address_line1: data.address || undefined,
+        address_line2: data.company_address || undefined,
+        company_name: data.company_name || undefined,
+        bio: data.company_details || undefined,
+      };
+
+      // Try to update first, if profile doesn't exist, create it
+      try {
+        await updateProfile(profileData).unwrap();
+      } catch (updateError: unknown) {
+        // If profile doesn't exist (404), create it instead
+        const error = updateError as { status?: number };
+        if (error?.status === 404) {
+          await createProfile(profileData).unwrap();
+        } else {
+          throw updateError;
+        }
+      }
 
       toast({
         title: t('profile.setup.success'),
@@ -56,13 +91,24 @@ export default function ProfileSetup() {
       });
 
       navigate("/client/dashboard");
-    } catch (error: any) {
-      console.error('Profile setup error:', error);
-      toast({
-        title: t('profile.setup.error'),
-        description: error.data || error.message || t('profile.setup.error_desc'),
-        variant: "destructive",
-      });
+    } catch (error: unknown) {
+      // Set form field errors dynamically
+      const hasFieldErrors = setFormErrors<ProfileSetupFormData>(
+        form,
+        error,
+        undefined,
+        ['full_name', 'address', 'phone_number', 'company_name', 'company_address', 'company_details']
+      );
+
+      // Show general error toast if no field-specific errors were set
+      if (!hasFieldErrors) {
+        const errorMessage = extractErrorMessage(error);
+        toast({
+          title: t('profile.setup.error'),
+          description: errorMessage || t('profile.setup.error_desc'),
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -76,96 +122,164 @@ export default function ProfileSetup() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">{t('profile.setup.personal_info')}</h3>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">{t('profile.setup.personal_info')}</h3>
 
-              <div className="space-y-2">
-                <Label htmlFor="full_name">{t('profile.setup.full_name')} *</Label>
-                <Input
-                  id="full_name"
+                <FormField
+                  control={form.control}
                   name="full_name"
-                  value={formData.full_name}
-                  onChange={handleChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.full_name')} *
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('profile.setup.full_name_placeholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="address">{t('profile.setup.address')} *</Label>
-                <Input
-                  id="address"
+                <FormField
+                  control={form.control}
                   name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.address')} *
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('profile.setup.address_placeholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('profile.setup.email')} *</Label>
-                <Input
-                  id="email"
+                <FormField
+                  control={form.control}
                   name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.email')} *
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          readOnly
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone_number">{t('profile.setup.phone_number')} *</Label>
-                <Input
-                  id="phone_number"
+                <FormField
+                  control={form.control}
                   name="phone_number"
-                  type="tel"
-                  value={formData.phone_number}
-                  onChange={handleChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.phone_number')} *
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          placeholder={t('profile.setup.phone_number_placeholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-            </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">{t('profile.setup.company_info')}</h3>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">{t('profile.setup.company_info')}</h3>
 
-              <div className="space-y-2">
-                <Label htmlFor="company_name">{t('profile.setup.company_name')}</Label>
-                <Input
-                  id="company_name"
+                <FormField
+                  control={form.control}
                   name="company_name"
-                  value={formData.company_name}
-                  onChange={handleChange}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.company_name')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('profile.setup.company_name_placeholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="company_address">{t('profile.setup.company_address')}</Label>
-                <Input
-                  id="company_address"
+                <FormField
+                  control={form.control}
                   name="company_address"
-                  value={formData.company_address}
-                  onChange={handleChange}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.company_address')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('profile.setup.company_address_placeholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="company_details">{t('profile.setup.company_details')}</Label>
-                <Textarea
-                  id="company_details"
+                <FormField
+                  control={form.control}
                   name="company_details"
-                  value={formData.company_details}
-                  onChange={handleChange}
-                  rows={4}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('profile.setup.company_details')}
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t('profile.setup.company_details_placeholder')}
+                          rows={4}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-            </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? t('profile.setup.saving') : t('profile.setup.complete_profile')}
-            </Button>
-          </form>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t('profile.setup.saving')}
+                  </>
+                ) : (
+                  t('profile.setup.complete_profile')
+                )}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

@@ -772,12 +772,18 @@
       "personal_info": "Personal Information",
       "company_info": "Company Information (Optional)",
       "full_name": "Full Name",
+      "full_name_placeholder": "Enter your full name",
       "address": "Address",
+      "address_placeholder": "Enter your address",
       "email": "Email Address",
       "phone_number": "Phone Number",
+      "phone_number_placeholder": "Enter your phone number",
       "company_name": "Company Name",
+      "company_name_placeholder": "Enter company name (optional)",
       "company_address": "Company Address",
+      "company_address_placeholder": "Enter company address (optional)",
       "company_details": "Company Details",
+      "company_details_placeholder": "Enter company details (optional)",
       "saving": "Saving...",
       "complete_profile": "Complete Profile",
       "success": "Success",
@@ -1437,6 +1443,29 @@
         "amount_placeholder": "Enter counter amount",
         "message": "Message (Optional)",
         "message_placeholder": "Add a message to your counter offer..."
+      }
+    },
+    "create": {
+      "title": "Make an Offer",
+      "description": "Submit an offer for this listing",
+      "button": "Make Offer",
+      "amount": "Offer Amount",
+      "amount_placeholder": "Enter your offer amount",
+      "currency": "Currency",
+      "currency_placeholder": "Select currency",
+      "message": "Message",
+      "message_placeholder": "Add a message to your offer",
+      "expires_at": "Expiration Date (Optional)",
+      "expires_at_placeholder": "Select expiration date",
+      "submit": "Submit Offer",
+      "submitting": "Submitting...",
+      "success": {
+        "title": "Offer Created",
+        "description": "Your offer has been submitted successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to create offer. Please try again."
       }
     },
     "empty": {
