@@ -9,10 +9,20 @@ interface Payment {
   amount: number;
   currency: string;
   payment_method: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
   transaction_id: string | null;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' | 'partially_refunded';
   paid_at: string | null;
+  processed_at: string | null;
+  refunded_at: string | null;
+  refund_amount: number | null;
+  refund_reason: string | null;
   created_at: string;
+  updated_at: string;
+  order?: {
+    id: number;
+    order_number: string;
+    status: string;
+  } | null;
 }
 
 interface PaymentCreateRequest {
@@ -20,6 +30,18 @@ interface PaymentCreateRequest {
   amount: number;
   currency: string;
   payment_method: string;
+  transaction_id?: string;
+  additional_metadata?: Record<string, any>;
+}
+
+interface PaymentUpdateRequest {
+  status?: string;
+  transaction_id?: string;
+  provider_response?: Record<string, any>;
+  refund_amount?: number;
+  refund_reason?: string;
+  refund_transaction_id?: string;
+  additional_metadata?: Record<string, any>;
 }
 
 interface PaymentIntentResponse {

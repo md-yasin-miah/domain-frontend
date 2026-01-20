@@ -2,7 +2,7 @@ import { apiSlice } from './apiSlice';
 
 export const escrowApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getEscrows: builder.query<PaginatedResponse<Escrow> | Escrow[], PaginationParams>({
+    getEscrows: builder.query<PaginatedResponse<Escrow>, PaginationParams>({
       query: (params) => ({
         url: '/escrow',
         method: 'GET',

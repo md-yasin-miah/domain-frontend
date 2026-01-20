@@ -785,6 +785,16 @@
       "seller_amount": "Monto del Vendedor",
       "payment_method": "Método de Pago",
       "transaction_id": "ID de Transacción",
+      "payment_number": "Número de Pago",
+      "payment_details_desc": "Método de pago y detalles de transacción",
+      "amount": "Cantidad",
+      "escrow_information": "Información de Depósito",
+      "escrow_details_desc": "Detalles y estado de la transacción de depósito",
+      "escrow_number": "Número de Depósito",
+      "escrow_amount": "Cantidad del Depósito",
+      "held_at": "Retenido En",
+      "released_at": "Liberado En",
+      "refunded_at": "Reembolsado En",
       "cancel_order": "Cancelar Orden",
       "complete_order": "Completar Orden",
       "request_refund": "Solicitar Reembolso",
@@ -1056,6 +1066,117 @@
         "domain_name_required": "El nombre del dominio es requerido",
         "website_url_required": "La URL del sitio web es requerida"
       }
+    }
+  },
+  "payments": {
+    "title": "Pagos",
+    "description": "Ver y gestionar todos tus pagos",
+    "table": {
+      "title": "Pagos",
+      "description": "Gestionar y rastrear todos tus pagos",
+      "payment_number": "Número de Pago",
+      "order": "Pedido",
+      "amount": "Cantidad",
+      "payment_method": "Método de Pago",
+      "status": "Estado",
+      "paid_at": "Pagado En",
+      "created_at": "Creado En"
+    },
+    "actions": {
+      "view_order": "Ver Pedido"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "completed": "Completado",
+      "failed": "Fallido",
+      "refunded": "Reembolsado",
+      "partially_refunded": "Parcialmente Reembolsado"
+    },
+    "filters": {
+      "title": "Filtros",
+      "description": "Filtrar pagos por estado, pedido o método de pago",
+      "search_placeholder": "Buscar por número de pago, número de pedido...",
+      "status": "Estado",
+      "order_id_placeholder": "ID de Pedido",
+      "payment_method": "Método de Pago"
+    },
+    "empty": {
+      "title": "No se Encontraron Pagos",
+      "description": "Aún no tienes ningún pago."
+    },
+    "error": {
+      "title": "Error al cargar pagos",
+      "description": "Hubo un error al cargar tus pagos. Por favor, inténtalo de nuevo más tarde."
+    }
+  },
+  "escrows": {
+    "title": "Depósitos en Garantía",
+    "description": "Ver y gestionar todas tus transacciones de depósito en garantía",
+    "table": {
+      "title": "Depósitos en Garantía",
+      "description": "Gestionar y rastrear todas tus transacciones de depósito en garantía",
+      "escrow_number": "Número de Depósito",
+      "order": "Pedido",
+      "amount": "Cantidad",
+      "platform_fee": "Tarifa de Plataforma",
+      "seller_amount": "Cantidad del Vendedor",
+      "parties": "Partes",
+      "buyer": "Comprador",
+      "seller": "Vendedor",
+      "status": "Estado",
+      "held_at": "Retenido En",
+      "released_at": "Liberado En"
+    },
+    "actions": {
+      "view_order": "Ver Pedido",
+      "release": "Liberar Depósito",
+      "refund": "Reembolsar Depósito",
+      "release_success": "Depósito Liberado",
+      "release_success_desc": "Los fondos del depósito han sido liberados al vendedor exitosamente.",
+      "release_error": "Error al Liberar",
+      "release_error_desc": "Error al liberar el depósito. Por favor, inténtalo de nuevo.",
+      "refund_success": "Depósito Reembolsado",
+      "refund_success_desc": "Los fondos del depósito han sido reembolsados al comprador exitosamente.",
+      "refund_error": "Error al Reembolsar",
+      "refund_error_desc": "Error al reembolsar el depósito. Por favor, inténtalo de nuevo."
+    },
+    "status": {
+      "pending": "Pendiente",
+      "released": "Liberado",
+      "refunded": "Reembolsado",
+      "disputed": "En Disputa"
+    },
+    "filters": {
+      "title": "Filtros",
+      "description": "Filtrar depósitos por estado o pedido",
+      "search_placeholder": "Buscar por número de depósito, número de pedido...",
+      "status": "Estado",
+      "order_id_placeholder": "ID de Pedido"
+    },
+    "dialogs": {
+      "release": {
+        "title": "Liberar Depósito",
+        "description": "Liberar fondos del depósito al vendedor. Esta acción no se puede deshacer.",
+        "amount": "Cantidad a Liberar",
+        "reason": "Razón de Liberación",
+        "reason_placeholder": "Ingresa la razón para liberar el depósito..."
+      },
+      "refund": {
+        "title": "Reembolsar Depósito",
+        "description": "Reembolsar fondos del depósito al comprador. Esta acción no se puede deshacer.",
+        "amount": "Cantidad a Reembolsar",
+        "reason": "Razón de Reembolso",
+        "reason_placeholder": "Ingresa la razón para reembolsar el depósito..."
+      }
+    },
+    "empty": {
+      "title": "No se Encontraron Depósitos",
+      "description": "Aún no tienes ninguna transacción de depósito en garantía."
+    },
+    "error": {
+      "title": "Error al cargar depósitos",
+      "description": "Hubo un error al cargar tus depósitos. Por favor, inténtalo de nuevo más tarde."
     }
   }
 }

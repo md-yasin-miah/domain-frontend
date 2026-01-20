@@ -2,7 +2,7 @@ import { apiSlice } from './apiSlice';
 
 export const paymentsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPayments: builder.query<PaginatedResponse<Payment> | Payment[], PaginationParams>({
+    getPayments: builder.query<PaginatedResponse<Payment>, PaginationParams>({
       query: (params) => ({
         url: '/payments',
         method: 'GET',

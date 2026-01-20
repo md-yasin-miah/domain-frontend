@@ -30,6 +30,7 @@ import {
   Receipt,
   Download,
   File,
+  Shield,
 } from "lucide-react";
 import {
   useGetOrderQuery,
@@ -41,6 +42,13 @@ import {
   useCreateInvoiceMutation,
   useGetInvoiceByOrderQuery,
 } from "@/store/api/invoiceApi";
+import {
+  useGetPaymentByOrderQuery,
+  useCreatePaymentMutation,
+} from "@/store/api/paymentsApi";
+import {
+  useGetEscrowByOrderQuery,
+} from "@/store/api/escrowApi";
 import { useAuth } from "@/store/hooks/useAuth";
 import {
   formatCurrency,
@@ -109,6 +117,26 @@ const ClientOrderDetailsPage = () => {
   } = useGetInvoiceByOrderQuery(orderId, {
     skip: !orderId || isNaN(orderId),
   });
+
+  // Get payment for this order
+  const {
+    data: payment,
+    isLoading: isLoadingPayment,
+    refetch: refetchPayment,
+  } = useGetPaymentByOrderQuery(orderId, {
+    skip: !orderId || isNaN(orderId),
+  });
+
+  // Get escrow for this order
+  const {
+    data: escrow,
+    isLoading: isLoadingEscrow,
+    refetch: refetchEscrow,
+  } = useGetEscrowByOrderQuery(orderId, {
+    skip: !orderId || isNaN(orderId),
+  });
+
+  const [createPayment, { isLoading: isCreatingPayment }] = useCreatePaymentMutation();
 
   // Get status label
   const getStatusLabel = (status: string) => {
@@ -709,8 +737,14 @@ const ClientOrderDetailsPage = () => {
               </CardContent>
             </Card>
 
-            {/* Payment Information - Clean Design */}
-            {order.payment_method && (
+            {/* Payment Information */}
+            {isLoadingPayment ? (
+              <Card className="border border-border/50 bg-card shadow-sm">
+                <CardContent className="p-4">
+                  <Skeleton className="h-20 w-full" />
+                </CardContent>
+              </Card>
+            ) : payment ? (
               <Card className="border border-border/50 bg-card shadow-sm">
                 <CardHeader className="border-b border-border bg-secondary/10">
                   <div className="flex items-center gap-2">
@@ -719,7 +753,76 @@ const ClientOrderDetailsPage = () => {
                     </div>
                     <div>
                       <CardTitle className="text-lg font-semibold">{t("orders.details.payment_information")}</CardTitle>
-                      <CardDescription className="text-xs">Payment method and transaction details</CardDescription>
+                      <CardDescription className="text-xs">{t("orders.details.payment_details_desc")}</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.payment_number")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">{payment.payment_number}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.payment_method")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground capitalize">{payment.payment_method}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.amount")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">
+                        {formatCurrency(payment.amount)} {payment.currency}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("common.status.status")}
+                      </label>
+                      <Badge
+                        variant={getStatusBadgeVariant(payment.status)}
+                        className={cn("capitalize", getStatusColor(payment.status))}
+                      >
+                        {getStatusLabel(payment.status)}
+                      </Badge>
+                    </div>
+                    {payment.transaction_id && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                          {t("orders.details.transaction_id")}
+                        </label>
+                        <p className="text-sm font-semibold text-foreground">
+                          {payment.transaction_id}
+                        </p>
+                      </div>
+                    )}
+                    {payment.paid_at && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                          {t("orders.details.paid_at")}
+                        </label>
+                        <p className="text-sm font-semibold text-foreground">
+                          {timeFormat(payment.paid_at, "MMM DD, YYYY HH:mm")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : order.payment_method ? (
+              <Card className="border border-border/50 bg-card shadow-sm">
+                <CardHeader className="border-b border-border bg-secondary/10">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold">{t("orders.details.payment_information")}</CardTitle>
+                      <CardDescription className="text-xs">{t("orders.details.payment_details_desc")}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -742,7 +845,103 @@ const ClientOrderDetailsPage = () => {
                   )}
                 </CardContent>
               </Card>
-            )}
+            ) : null}
+
+            {/* Escrow Information */}
+            {isLoadingEscrow ? (
+              <Card className="border border-border/50 bg-card shadow-sm">
+                <CardContent className="p-4">
+                  <Skeleton className="h-20 w-full" />
+                </CardContent>
+              </Card>
+            ) : escrow ? (
+              <Card className="border border-border/50 bg-card shadow-sm">
+                <CardHeader className="border-b border-border bg-secondary/10">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <Shield className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold">{t("orders.details.escrow_information")}</CardTitle>
+                      <CardDescription className="text-xs">{t("orders.details.escrow_details_desc")}</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.escrow_number")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">{escrow.escrow_number}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("common.status.status")}
+                      </label>
+                      <Badge
+                        variant={getStatusBadgeVariant(escrow.status)}
+                        className={cn("capitalize", getStatusColor(escrow.status))}
+                      >
+                        {getStatusLabel(escrow.status)}
+                      </Badge>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.escrow_amount")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">
+                        {formatCurrency(escrow.amount)} {escrow.currency}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.platform_fee")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">
+                        {formatCurrency(escrow.platform_fee)} {escrow.currency}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.seller_amount")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">
+                        {formatCurrency(escrow.seller_amount)} {escrow.currency}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        {t("orders.details.held_at")}
+                      </label>
+                      <p className="text-sm font-semibold text-foreground">
+                        {timeFormat(escrow.held_at, "MMM DD, YYYY")}
+                      </p>
+                    </div>
+                    {escrow.released_at && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                          {t("orders.details.released_at")}
+                        </label>
+                        <p className="text-sm font-semibold text-foreground">
+                          {timeFormat(escrow.released_at, "MMM DD, YYYY HH:mm")}
+                        </p>
+                      </div>
+                    )}
+                    {escrow.refunded_at && (
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                          {t("orders.details.refunded_at")}
+                        </label>
+                        <p className="text-sm font-semibold text-foreground">
+                          {timeFormat(escrow.refunded_at, "MMM DD, YYYY HH:mm")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null}
 
             {/* Actions - Clean Design */}
             {(canCancel || canComplete || canRefund) && (

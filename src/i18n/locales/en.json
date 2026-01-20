@@ -1319,6 +1319,16 @@
       "seller_amount": "Seller Amount",
       "payment_method": "Payment Method",
       "transaction_id": "Transaction ID",
+      "payment_number": "Payment Number",
+      "payment_details_desc": "Payment method and transaction details",
+      "amount": "Amount",
+      "escrow_information": "Escrow Information",
+      "escrow_details_desc": "Escrow transaction details and status",
+      "escrow_number": "Escrow Number",
+      "escrow_amount": "Escrow Amount",
+      "held_at": "Held At",
+      "released_at": "Released At",
+      "refunded_at": "Refunded At",
       "cancel_order": "Cancel Order",
       "complete_order": "Complete Order",
       "request_refund": "Request Refund",
@@ -1404,6 +1414,117 @@
     "error": {
       "title": "Error loading invoices",
       "description": "There was an error loading your invoices. Please try again later."
+    }
+  },
+  "payments": {
+    "title": "Payments",
+    "description": "View and manage all your payments",
+    "table": {
+      "title": "Payments",
+      "description": "Manage and track all your payments",
+      "payment_number": "Payment Number",
+      "order": "Order",
+      "amount": "Amount",
+      "payment_method": "Payment Method",
+      "status": "Status",
+      "paid_at": "Paid At",
+      "created_at": "Created At"
+    },
+    "actions": {
+      "view_order": "View Order"
+    },
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "partially_refunded": "Partially Refunded"
+    },
+    "filters": {
+      "title": "Filters",
+      "description": "Filter payments by status, order, or payment method",
+      "search_placeholder": "Search by payment number, order number...",
+      "status": "Status",
+      "order_id_placeholder": "Order ID",
+      "payment_method": "Payment Method"
+    },
+    "empty": {
+      "title": "No Payments Found",
+      "description": "You don't have any payments yet."
+    },
+    "error": {
+      "title": "Error loading payments",
+      "description": "There was an error loading your payments. Please try again later."
+    }
+  },
+  "escrows": {
+    "title": "Escrows",
+    "description": "View and manage all your escrow transactions",
+    "table": {
+      "title": "Escrows",
+      "description": "Manage and track all your escrow transactions",
+      "escrow_number": "Escrow Number",
+      "order": "Order",
+      "amount": "Amount",
+      "platform_fee": "Platform Fee",
+      "seller_amount": "Seller Amount",
+      "parties": "Parties",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "status": "Status",
+      "held_at": "Held At",
+      "released_at": "Released At"
+    },
+    "actions": {
+      "view_order": "View Order",
+      "release": "Release Escrow",
+      "refund": "Refund Escrow",
+      "release_success": "Escrow Released",
+      "release_success_desc": "Escrow funds have been released to the seller successfully.",
+      "release_error": "Release Failed",
+      "release_error_desc": "Failed to release escrow. Please try again.",
+      "refund_success": "Escrow Refunded",
+      "refund_success_desc": "Escrow funds have been refunded to the buyer successfully.",
+      "refund_error": "Refund Failed",
+      "refund_error_desc": "Failed to refund escrow. Please try again."
+    },
+    "status": {
+      "pending": "Pending",
+      "released": "Released",
+      "refunded": "Refunded",
+      "disputed": "Disputed"
+    },
+    "filters": {
+      "title": "Filters",
+      "description": "Filter escrows by status or order",
+      "search_placeholder": "Search by escrow number, order number...",
+      "status": "Status",
+      "order_id_placeholder": "Order ID"
+    },
+    "dialogs": {
+      "release": {
+        "title": "Release Escrow",
+        "description": "Release escrow funds to the seller. This action cannot be undone.",
+        "amount": "Amount to Release",
+        "reason": "Release Reason",
+        "reason_placeholder": "Enter reason for releasing escrow..."
+      },
+      "refund": {
+        "title": "Refund Escrow",
+        "description": "Refund escrow funds to the buyer. This action cannot be undone.",
+        "amount": "Amount to Refund",
+        "reason": "Refund Reason",
+        "reason_placeholder": "Enter reason for refunding escrow..."
+      }
+    },
+    "empty": {
+      "title": "No Escrows Found",
+      "description": "You don't have any escrow transactions yet."
+    },
+    "error": {
+      "title": "Error loading escrows",
+      "description": "There was an error loading your escrows. Please try again later."
     }
   },
   "offers": {
