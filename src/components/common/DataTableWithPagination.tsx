@@ -89,7 +89,7 @@ export function DataTableWithPagination<TData = unknown>({
       <DataTable
         data={data}
         columns={columns}
-        isLoading={false}
+        isLoading={isLoading}
         emptyMessage={emptyMessage}
         emptyIcon={emptyIcon}
         getRowId={getRowId}
