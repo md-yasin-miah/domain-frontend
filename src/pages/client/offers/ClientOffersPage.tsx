@@ -49,14 +49,10 @@ import {
   Trash2,
   Eye,
 } from "lucide-react";
-import {
-  useGetOffersQuery,
-  useAcceptOfferMutation,
-  useRejectOfferMutation,
-  useCounterOfferMutation,
-  useWithdrawOfferMutation,
-} from "@/store/api/offersApi";
+import { useGetOffersQuery } from "@/store/api/offersApi";
 import { useAuth } from "@/store/hooks/useAuth";
+import { useOfferActions } from "@/pages/client/offers/hooks/useOfferActions";
+import { getOfferPermissions } from "@/utils/offerPermissions";
 import {
   formatCurrency,
   timeFormat,
@@ -68,7 +64,6 @@ import { usePagination } from "@/hooks/usePagination";
 import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/lib/routes";
 import CustomTooltip from "@/components/common/CustomTooltip";
-import { extractErrorMessage, setFormErrors } from "@/lib/errorHandler";
 import { offerCounterSchema, type OfferCounterFormData } from "@/schemas/marketplace/offer.schema";
 
 type OfferStatus =
@@ -120,11 +115,18 @@ const ClientOffersPage = () => {
     refetch,
   } = useGetOffersQuery(queryParams);
 
-  const [acceptOffer, { isLoading: isAccepting }] = useAcceptOfferMutation();
-  const [rejectOffer, { isLoading: isRejecting }] = useRejectOfferMutation();
-  const [counterOffer, { isLoading: isCountering }] = useCounterOfferMutation();
-  const [withdrawOffer, { isLoading: isWithdrawing }] =
-    useWithdrawOfferMutation();
+  const {
+    handleAccept,
+    handleReject,
+    handleCounter,
+    handleWithdraw,
+    isAccepting,
+    isRejecting,
+    isCountering,
+    isWithdrawing,
+  } = useOfferActions({
+    onSuccess: () => refetch(),
+  });
 
   // Define table columns
   const columns: ColumnDef<Offer>[] = useMemo(() => {
@@ -229,41 +231,15 @@ const ClientOffersPage = () => {
   }, [t]);
 
   // Handle offer actions
-  const handleAccept = async (offerId: number) => {
-    try {
-      await acceptOffer(offerId).unwrap();
-      toast({
-        title: t("offers.actions.accept_success"),
-        description: t("offers.actions.accept_success_desc"),
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        title: t("offers.actions.accept_error"),
-        description: t("offers.actions.accept_error_desc"),
-        variant: "destructive",
-      });
-    }
+  const onAccept = (offerId: number) => {
+    handleAccept(offerId, refetch);
   };
 
-  const handleReject = async (offerId: number) => {
-    try {
-      await rejectOffer(offerId).unwrap();
-      toast({
-        title: t("offers.actions.reject_success"),
-        description: t("offers.actions.reject_success_desc"),
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        title: error?.data?.detail || t("offers.actions.reject_error"),
-        description: t("offers.actions.reject_error_desc"),
-        variant: "destructive",
-      });
-    }
+  const onReject = (offerId: number) => {
+    handleReject(offerId, refetch);
   };
 
-  const handleCounter = async (data: OfferCounterFormData) => {
+  const onCounter = async (data: OfferCounterFormData) => {
     if (!selectedOffer) {
       toast({
         title: t("offers.actions.counter_error"),
@@ -273,63 +249,27 @@ const ClientOffersPage = () => {
       return;
     }
 
-    try {
-      await counterOffer({
-        id: selectedOffer,
-        data: {
-          amount: data.amount,
-          message: data.message || undefined,
+    await handleCounter(
+      selectedOffer,
+      data,
+      {
+        refetch,
+        form: counterForm,
+        onSuccess: () => {
+          setCounterDialogOpen(false);
+          setSelectedOffer(null);
         },
-      }).unwrap();
-      toast({
-        title: t("offers.actions.counter_success"),
-        description: t("offers.actions.counter_success_desc"),
-      });
-      setCounterDialogOpen(false);
-      counterForm.reset();
-      setSelectedOffer(null); // Clear selected offer to prevent details modal from opening
-      refetch();
-    } catch (error) {
-      // Set form field errors dynamically
-      const hasFieldErrors = setFormErrors<OfferCounterFormData>(
-        counterForm,
-        error
-      );
-
-      // Show general error toast if no field-specific errors were set
-      if (!hasFieldErrors) {
-        const errorMessage = extractErrorMessage(error);
-        toast({
-          title: errorMessage || t("offers.actions.counter_error"),
-          variant: "destructive",
-        });
       }
-    }
+    );
   };
 
-  const handleWithdraw = async (offerId: number) => {
-    try {
-      await withdrawOffer(offerId).unwrap();
-      toast({
-        title: t("offers.actions.withdraw_success"),
-        description: t("offers.actions.withdraw_success_desc"),
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        title: error?.data?.detail || t("offers.actions.withdraw_error"),
-        description: t("offers.actions.withdraw_error_desc"),
-        variant: "destructive",
-      });
-    }
+  const onWithdraw = (offerId: number) => {
+    handleWithdraw(offerId, refetch);
   };
 
   // Render actions for each row
   const renderActions = (offer: Offer) => {
-    const canAccept = offer.status !== "accepted" && user?.id !== offer.buyer_id;
-    const canReject = offer.status !== "accepted";
-    const canCounter = offer.status !== "accepted";
-    const canWithdraw = offer.status !== "accepted" && user?.id === offer.buyer_id;
+    const { canAccept, canReject, canCounter, canWithdraw } = getOfferPermissions(offer.status, user.id, offer.buyer_id);
 
     return (
       <div className="flex items-center gap-1">
@@ -341,7 +281,7 @@ const ClientOffersPage = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleAccept(offer.id)}
+              onClick={() => onAccept(offer.id)}
               disabled={isAccepting}
             >
               <Check className="w-4 h-4 text-green-600" />
@@ -356,7 +296,7 @@ const ClientOffersPage = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleReject(offer.id)}
+              onClick={() => onReject(offer.id)}
               disabled={isRejecting}
             >
               <X className="w-4 h-4 text-red-600" />
@@ -388,7 +328,7 @@ const ClientOffersPage = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleWithdraw(offer.id)}
+              onClick={() => onWithdraw(offer.id)}
               disabled={isWithdrawing}
             >
               <Trash2 className="w-4 h-4 text-gray-600" />
@@ -552,7 +492,7 @@ const ClientOffersPage = () => {
             </DialogDescription>
           </DialogHeader>
           <Form {...counterForm}>
-            <form onSubmit={counterForm.handleSubmit(handleCounter)} className="space-y-4 py-4">
+            <form onSubmit={counterForm.handleSubmit(onCounter)} className="space-y-4 py-4">
               <FormField
                 control={counterForm.control}
                 name="amount"

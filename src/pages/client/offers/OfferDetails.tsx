@@ -31,14 +31,10 @@ import {
   MessageSquare,
   ExternalLink,
 } from "lucide-react";
-import {
-  useGetOfferQuery,
-  useAcceptOfferMutation,
-  useRejectOfferMutation,
-  useCounterOfferMutation,
-  useWithdrawOfferMutation,
-} from "@/store/api/offersApi";
+import { useGetOfferQuery } from "@/store/api/offersApi";
 import { useAuth } from "@/store/hooks/useAuth";
+import { useOfferActions } from "@/pages/client/offers/hooks/useOfferActions";
+import { getOfferPermissions } from "@/utils/offerPermissions";
 import {
   formatCurrency,
   timeFormat,
@@ -79,11 +75,18 @@ const OfferDetails = () => {
     skip: !offerId || isNaN(offerId),
   });
 
-  const [acceptOffer, { isLoading: isAccepting }] = useAcceptOfferMutation();
-  const [rejectOffer, { isLoading: isRejecting }] = useRejectOfferMutation();
-  const [counterOffer, { isLoading: isCountering }] = useCounterOfferMutation();
-  const [withdrawOffer, { isLoading: isWithdrawing }] =
-    useWithdrawOfferMutation();
+  const {
+    handleAccept,
+    handleReject,
+    handleCounter,
+    handleWithdraw,
+    isAccepting,
+    isRejecting,
+    isCountering,
+    isWithdrawing,
+  } = useOfferActions({
+    onSuccess: () => refetch(),
+  });
 
   const [counterDialogOpen, setCounterDialogOpen] = useState(false);
   const [counterAmount, setCounterAmount] = useState("");
@@ -95,48 +98,19 @@ const OfferDetails = () => {
   };
 
   // Handle accept offer
-  const handleAccept = async () => {
+  const onAccept = () => {
     if (!offer) return;
-
-    try {
-      await acceptOffer(offer.id).unwrap();
-      toast({
-        title: t("offers.actions.accept_success"),
-        description: t("offers.actions.accept_success_desc"),
-      });
-      refetch();
-    } catch (error) {
-      console.log({error});
-      toast({
-        title: t("offers.actions.accept_error"),
-        description: error?.data?.detail || t("offers.actions.accept_error_desc"),
-        variant: "destructive",
-      });
-    }
+    handleAccept(offer.id, refetch);
   };
 
   // Handle reject offer
-  const handleReject = async () => {
+  const onReject = () => {
     if (!offer) return;
-
-    try {
-      await rejectOffer(offer.id).unwrap();
-      toast({
-        title: t("offers.actions.reject_success"),
-        description: t("offers.actions.reject_success_desc"),
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        title: error?.data?.detail || t("offers.actions.reject_error"),
-        description: t("offers.actions.reject_error_desc"),
-        variant: "destructive",
-      });
-    }
+    handleReject(offer.id, refetch);
   };
 
   // Handle counter offer
-  const handleCounter = async () => {
+  const onCounter = async () => {
     if (!offer || !counterAmount) {
       toast({
         title: t("offers.actions.counter_error"),
@@ -146,49 +120,27 @@ const OfferDetails = () => {
       return;
     }
 
-    try {
-      await counterOffer({
-        id: offer.id,
-        data: {
-          amount: parseFloat(counterAmount),
-          message: counterMessage || undefined,
+    await handleCounter(
+      offer.id,
+      {
+        amount: parseFloat(counterAmount),
+        message: counterMessage || undefined,
+      },
+      {
+        refetch,
+        onSuccess: () => {
+          setCounterDialogOpen(false);
+          setCounterAmount("");
+          setCounterMessage("");
         },
-      }).unwrap();
-      toast({
-        title: t("offers.actions.counter_success"),
-        description: t("offers.actions.counter_success_desc"),
-      });
-      setCounterDialogOpen(false);
-      setCounterAmount("");
-      setCounterMessage("");
-      refetch();
-    } catch (error) {
-      toast({
-        title: error?.data?.detail || t("offers.actions.counter_error"),
-        description: t("offers.actions.counter_error_desc"),
-        variant: "destructive",
-      });
-    }
+      }
+    );
   };
 
   // Handle withdraw offer
-  const handleWithdraw = async () => {
+  const onWithdraw = () => {
     if (!offer) return;
-
-    try {
-      await withdrawOffer(offer.id).unwrap();
-      toast({
-        title: t("offers.actions.withdraw_success"),
-        description: t("offers.actions.withdraw_success_desc"),
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        title: error?.data?.detail || t("offers.actions.withdraw_error"),
-        description: t("offers.actions.withdraw_error_desc"),
-        variant: "destructive",
-      });
-    }
+    handleWithdraw(offer.id, refetch);
   };
 
   // Loading state
@@ -209,10 +161,7 @@ const OfferDetails = () => {
     );
   }
 
-  const canAccept = offer.status !== "accepted" && user?.id !== offer.buyer_id;
-  const canReject = offer.status !== "accepted";
-  const canCounter = offer.status !== "accepted";
-  const canWithdraw = offer.status !== "accepted" && user?.id === offer.buyer_id;
+  const { canAccept, canReject, canCounter, canWithdraw } = getOfferPermissions(offer.status, user.id, offer.buyer_id);
 
   // Calculate difference percentage
   const priceDifference = offer.listing?.price
@@ -256,7 +205,7 @@ const OfferDetails = () => {
             <div className="flex gap-2">
               {canAccept && (
                 <Button
-                  onClick={handleAccept}
+                  onClick={onAccept}
                   disabled={isAccepting}
                   size="sm"
                   className="bg-green-500 hover:bg-green-600"
@@ -272,7 +221,7 @@ const OfferDetails = () => {
               {canReject && (
                 <Button
                   variant="destructive"
-                  onClick={handleReject}
+                  onClick={onReject}
                   disabled={isRejecting}
                   size="sm"
                 >
@@ -297,7 +246,7 @@ const OfferDetails = () => {
               {canWithdraw && (
                 <Button
                   variant="outline"
-                  onClick={handleWithdraw}
+                  onClick={onWithdraw}
                   disabled={isWithdrawing}
                   size="sm"
                 >
@@ -689,7 +638,7 @@ const OfferDetails = () => {
                 {t("common.cancel")}
               </Button>
               <Button
-                onClick={handleCounter}
+                onClick={onCounter}
                 disabled={isCountering || !counterAmount}
               >
                 {isCountering ? (
