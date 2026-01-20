@@ -90,10 +90,6 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
                 alt="ADOMINIOZ"
                 className="h-10 w-auto transition-transform group-hover:scale-105"
               />
-              {/* Tagline below logo */}
-              <span className="text-xs text-muted-foreground font-medium mt-1 hidden sm:block">
-                {t('common.digital_commerce_future')}
-              </span>
             </Link>
           </div>
 

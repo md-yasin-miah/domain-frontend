@@ -4,10 +4,10 @@ import { logout, setCredentials, setToken, setRefreshToken, setError } from '@/s
 import {
   useLoginMutation,
   useRegisterMutation,
-  useLogoutMutation,
   useGetCurrentUserQuery,
   authApi
 } from '@/store/api/authApi';
+import { apiSlice } from '@/store/api/apiSlice';
 import { profileApi } from '@/store/api/profileApi';
 import { extractErrorMessage } from '@/lib/errorHandler';
 
@@ -20,7 +20,6 @@ export const useAuth = () => {
   const authState = useAppSelector((state) => state.auth);
   const [loginMutation, { isLoading: loginLoading }] = useLoginMutation();
   const [registerMutation, { isLoading: signupLoading }] = useRegisterMutation();
-  const [logoutMutation] = useLogoutMutation();
   const { data: currentUser } = useGetCurrentUserQuery(undefined, {
     skip: !authState.token,
   });
@@ -41,14 +40,30 @@ export const useAuth = () => {
       }
 
       // Verify tokens are in store and localStorage
-      await Promise.resolve();
+      // Use a small delay to ensure Redux state is updated
+      await new Promise(resolve => setTimeout(resolve, 0));
 
       const token = store.getState().auth.token;
       const storedToken = localStorage.getItem('auth_token');
       const storedRefreshToken = localStorage.getItem('refresh_token');
 
-      if (!token || !storedToken) {
-        throw new Error('Token was not set in store after login');
+      // Verify token was set - check both Redux state and localStorage
+      if (!loginResult.access_token) {
+        throw new Error('No access token received from login response');
+      }
+
+      if (!token || token !== loginResult.access_token) {
+        // Token mismatch - try to read directly from localStorage as fallback
+        const fallbackToken = localStorage.getItem('auth_token');
+        if (!fallbackToken || fallbackToken !== loginResult.access_token) {
+          throw new Error('Token was not set in store after login');
+        }
+        // If localStorage has the token but Redux doesn't, dispatch again
+        dispatch(setToken(loginResult.access_token));
+      }
+
+      if (!storedToken || storedToken !== loginResult.access_token) {
+        throw new Error('Token was not stored in localStorage after login');
       }
 
       if (loginResult.refresh_token && !storedRefreshToken) {
@@ -113,7 +128,13 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
+    // Clear local state and storage
     dispatch(logout());
+
+    // Clear any cached API data by resetting the API state
+    // This ensures no stale data remains after logout
+    dispatch(apiSlice.util.resetApiState());
+
     return { error: null };
   };
 
