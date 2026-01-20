@@ -106,9 +106,10 @@ const OfferDetails = () => {
       });
       refetch();
     } catch (error) {
+      console.log({error});
       toast({
         title: t("offers.actions.accept_error"),
-        description: t("offers.actions.accept_error_desc"),
+        description: error?.data?.detail || t("offers.actions.accept_error_desc"),
         variant: "destructive",
       });
     }
