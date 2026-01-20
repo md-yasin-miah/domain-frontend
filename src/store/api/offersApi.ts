@@ -1,3 +1,4 @@
+import { OfferCounterFormData } from '@/schemas/marketplace/offer.schema';
 import { apiSlice } from './apiSlice';
 
 export const offersApi = apiSlice.injectEndpoints({
@@ -15,7 +16,7 @@ export const offersApi = apiSlice.injectEndpoints({
         url: `/offers/${id}`,
         method: 'GET',
       }),
-      providesTags: ({id}) => [{ type: 'Offer', id }],
+      providesTags: ({ id }) => [{ type: 'Offer', id }],
     }),
     createOffer: builder.mutation<Offer, OfferCreateRequest>({
       query: (data) => ({
@@ -31,22 +32,22 @@ export const offersApi = apiSlice.injectEndpoints({
         url: `/offers/${id}/accept`,
         method: 'POST',
       }),
-      invalidatesTags: ({id}) => [{ type: 'Offer', id }, 'Offer'],
+      invalidatesTags: (result, error, id) => [{ type: 'Offer', id }, 'Offer'],
     }),
     rejectOffer: builder.mutation<Offer, number>({
       query: (id) => ({
         url: `/offers/${id}/reject`,
         method: 'POST',
       }),
-      invalidatesTags: ({id}) => [{ type: 'Offer', id }, 'Offer'],
+      invalidatesTags: (result, error, id) => [{ type: 'Offer', id }, 'Offer'],
     }),
-    counterOffer: builder.mutation<Offer, { id: number; data: OfferCounterRequest }>({
+    counterOffer: builder.mutation<Offer, { id: number; data: OfferCounterFormData }>({
       query: ({ id, data }) => ({
         url: `/offers/${id}/counter`,
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ({ id }) => [{ type: 'Offer', id }, 'Offer'],
+      invalidatesTags: (result, error, { id }) => [{ type: 'Offer', id }, 'Offer'],
     }),
     updateOffer: builder.mutation<Offer, { id: number; data: Partial<OfferCreateRequest> }>({
       query: ({ id, data }) => ({
@@ -54,7 +55,7 @@ export const offersApi = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ({ id }) => [{ type: 'Offer', id }, 'Offer'],
+      invalidatesTags: (result, error, { id }) => [{ type: 'Offer', id }, 'Offer'],
     }),
     withdrawOffer: builder.mutation<void, number>({
       query: (id) => ({

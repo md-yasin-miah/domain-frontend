@@ -34,6 +34,7 @@ export const useOfferActions = (options: UseOfferActionsOptions = {}) => {
       refetch?.();
       onSuccess?.();
     } catch (error: unknown) {
+      console.error({ error });
       const errorMessage = extractErrorMessage(error);
       toast({
         title: t("offers.actions.accept_error"),

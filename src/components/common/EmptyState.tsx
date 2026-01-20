@@ -42,7 +42,7 @@ const EmptyState = ({
   const iconBgColor = iconBgColors[variant];
 
   return (
-    <div className={cn("min-h-screen", className)}>
+    <div className={cn("min-h-fit", className)}>
       <div className="flex flex-col items-center justify-center py-12 px-6">
         <div className={cn("flex flex-col items-center gap-4 text-center", maxWidth)}>
           <div
