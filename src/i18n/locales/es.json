@@ -111,7 +111,7 @@
       "Auditoría técnica por nuestros expertos"
     ]
   },
-  "payments": {
+  "payment_methods": {
     "title": "Métodos de Pago",
     "subtitle": "Acepta pagos tradicionales y criptomonedas con las mejores tasas del mercado",
     "crypto": "Criptomonedas",
@@ -246,7 +246,8 @@
       "paid": "Pagado",
       "sold": "Vendido",
       "overdue": "Vencido",
-      "sent": "Enviado"
+      "sent": "Enviado",
+      "payment_pending": "Pago Pendiente"
     }
   },
   "dashboard": {
@@ -836,7 +837,30 @@
       "refund_dialog": {
         "title": "Solicitar Reembolso",
         "description": "¿Estás seguro de que deseas solicitar un reembolso para esta orden?"
-      }
+      },
+      "make_payment": "Realizar Pago"
+    },
+    "payment": {
+      "title": "Realizar Pago",
+      "description": "Completa el pago para la orden {{orderNumber}}",
+      "order_number": "Número de Orden",
+      "total": "Monto Total",
+      "card_details": "Detalles de la Tarjeta",
+      "card_info": "Tu información de tarjeta está segura y encriptada",
+      "pay_now": "Pagar {amount} {currency}",
+      "creating": "Creando Intención de Pago...",
+      "processing": "Procesando Pago...",
+      "processing_desc": "Tu pago está siendo procesado. Por favor espera...",
+      "success": "Pago Exitoso",
+      "success_desc": "Tu pago ha sido procesado exitosamente.",
+      "error": "Error en el Pago",
+      "error_creating_intent": "Error al Crear Intención de Pago",
+      "config_error": "Error de Configuración",
+      "config_error_desc": "La clave pública de Stripe no está configurada.",
+      "load_error": "Error al Cargar Stripe",
+      "load_error_desc": "No se pudo cargar Stripe.js. Por favor, actualiza la página.",
+      "no_methods": "No Hay Métodos de Pago Disponibles",
+      "no_methods_desc": "Por favor, contacta con soporte."
     }
   },
   "invoices": {

@@ -12,12 +12,6 @@ interface OfferPermissions {
   canWithdraw: boolean;
 }
 
-/**
- * Calculate permissions for offer actions based on offer status and user role
- * @param offer - The offer object
- * @param userId - The current user's ID
- * @returns Object with permission flags
- */
 export const getOfferPermissions = (
   offerStatus: "pending" | "accepted" | "rejected" | "countered" | "withdrawn",
   userId: number,

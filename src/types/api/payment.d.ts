@@ -54,3 +54,14 @@ interface PaymentIntentStatus {
   payment_intent_id: string | null;
 }
 
+interface PaymentMethod {
+  id: string;
+  name: string;
+  display_name: string;
+  description: string;
+  enabled: boolean;
+  supported_currencies: string[];
+  icon: string;
+  requires_redirect: boolean;
+}
+

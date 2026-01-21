@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, startTransition } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -46,6 +46,7 @@ import {
   useGetPaymentByOrderQuery,
   useCreatePaymentMutation,
 } from "@/store/api/paymentsApi";
+import PaymentDialog from "@/components/payment/PaymentDialog";
 import {
   useGetEscrowByOrderQuery,
 } from "@/store/api/escrowApi";
@@ -94,6 +95,7 @@ const ClientOrderDetailsPage = () => {
     data: order,
     isLoading,
     error,
+    refetch: refetchOrder,
   } = useGetOrderQuery(orderId, {
     skip: !orderId || isNaN(orderId),
   });
@@ -108,6 +110,7 @@ const ClientOrderDetailsPage = () => {
 
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showRefundDialog, setShowRefundDialog] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Check if invoice already exists for this order
@@ -293,6 +296,10 @@ const ClientOrderDetailsPage = () => {
   const canComplete = isSeller && order?.status === "processing";
   const canRefund =
     isBuyer && ["completed", "processing"].includes(order?.status || "");
+  const canMakePayment =
+    isBuyer &&
+    (order?.status === "pending" || order?.status === "payment_pending") &&
+    !payment;
 
   if (isLoading) {
     return <OfferDetailsSkeleton />;
@@ -791,7 +798,7 @@ const ClientOrderDetailsPage = () => {
                       </Badge>
                     </div>
                     {payment.transaction_id && (
-                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border col-span-2">
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">
                           {t("orders.details.transaction_id")}
                         </label>
@@ -801,7 +808,7 @@ const ClientOrderDetailsPage = () => {
                       </div>
                     )}
                     {payment.paid_at && (
-                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                      <div className="p-3 rounded-lg bg-muted/30 border border-border col-span-2">
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">
                           {t("orders.details.paid_at")}
                         </label>
@@ -1003,6 +1010,21 @@ const ClientOrderDetailsPage = () => {
                       {t("orders.details.request_refund")}
                     </Button>
                   )}
+                  {canMakePayment && (
+                    <Button
+                      variant="default"
+                      className="w-full bg-primary hover:bg-primary/90"
+                      onClick={() => {
+                        startTransition(() => {
+                          setShowPaymentDialog(true);
+                        });
+                      }}
+                      size="sm"
+                    >
+                      <CreditCard className="w-3.5 h-3.5 mr-2" />
+                      {t("orders.details.make_payment") || "Make Payment"}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -1140,6 +1162,23 @@ const ClientOrderDetailsPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Payment Dialog */}
+      {order && (
+        <PaymentDialog
+          open={showPaymentDialog}
+          onOpenChange={setShowPaymentDialog}
+          orderId={order.id}
+          amount={Number(order.final_price)}
+          currency={order.currency}
+          orderNumber={order.order_number}
+          onSuccess={() => {
+            refetchOrder();
+            refetchPayment();
+            refetchEscrow();
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -111,7 +111,7 @@
       "Technical audit by our experts"
     ]
   },
-  "payments": {
+  "payment_methods": {
     "title": "Payment Methods",
     "subtitle": "Accept traditional payments and cryptocurrencies with the best market rates",
     "crypto": "Cryptocurrencies",
@@ -941,7 +941,8 @@
       "paid": "Paid",
       "sold": "Sold",
       "overdue": "Overdue",
-      "sent": "Sent"
+      "sent": "Sent",
+      "payment_pending": "Payment Pending"
     }
   },
   "faq": {
@@ -1371,7 +1372,30 @@
       "refund_dialog": {
         "title": "Request Refund",
         "description": "Are you sure you want to request a refund for this order?"
-      }
+      },
+      "make_payment": "Make Payment"
+    },
+    "payment": {
+      "title": "Make Payment",
+      "description": "Complete payment for order {{orderNumber}}",
+      "order_number": "Order Number",
+      "total": "Total Amount",
+      "card_details": "Card Details",
+      "card_info": "Your card information is secure and encrypted",
+      "pay_now": "Pay {{amount}}",
+      "creating": "Creating Payment Intent...",
+      "processing": "Processing Payment...",
+      "processing_desc": "Your payment is being processed. Please wait...",
+      "success": "Payment Successful",
+      "success_desc": "Your payment has been processed successfully.",
+      "error": "Payment Failed",
+      "error_creating_intent": "Error Creating Payment Intent",
+      "config_error": "Configuration Error",
+      "config_error_desc": "Stripe publishable key is not configured.",
+      "load_error": "Error Loading Stripe",
+      "load_error_desc": "Failed to load Stripe.js. Please refresh the page.",
+      "no_methods": "No Payment Methods Available",
+      "no_methods_desc": "Please contact support."
     }
   },
   "invoices": {

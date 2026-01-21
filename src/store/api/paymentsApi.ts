@@ -40,6 +40,12 @@ export const paymentsApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, orderId) => [{ type: 'Invoice', id: orderId }],
     }),
+    getPaymentMethods: builder.query<{ payment_methods: PaymentMethod[] }, undefined>({
+      query: () => ({
+        url: '/payments/methods',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
@@ -49,5 +55,6 @@ export const {
   useCreatePaymentMutation,
   useUpdatePaymentMutation,
   useGetPaymentByOrderQuery,
+  useGetPaymentMethodsQuery,
 } = paymentsApi;
 
