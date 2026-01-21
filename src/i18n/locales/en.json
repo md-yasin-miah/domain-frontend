@@ -944,7 +944,8 @@
       "sold": "Sold",
       "overdue": "Overdue",
       "sent": "Sent",
-      "payment_pending": "Payment Pending"
+      "payment_pending": "Payment Pending",
+      "payment_received": "Payment Received"
     }
   },
   "faq": {

@@ -249,7 +249,8 @@
       "sold": "Vendido",
       "overdue": "Vencido",
       "sent": "Enviado",
-      "payment_pending": "Pago Pendiente"
+      "payment_pending": "Pago Pendiente",
+      "payment_received": "Pago Recibido"
     }
   },
   "dashboard": {

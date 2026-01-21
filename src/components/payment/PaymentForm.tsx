@@ -38,28 +38,41 @@ const PaymentForm = ({
     skip: !orderId || !clientSecret,
   });
 
-  // Create payment intent when component mounts
+  // Create payment intent when component mounts (only once per orderId)
   useEffect(() => {
+    // Only create if we don't already have a client secret
+    if (clientSecret || isCreatingIntent) return;
+
+    let isMounted = true;
+
     const createIntent = async () => {
       try {
         const result = await createPaymentIntent(orderId).unwrap();
-        startTransition(() => {
-          setClientSecret(result.client_secret);
-        });
-      } catch (error) {
-        startTransition(() => {
-          toast({
-            title: t('orders.payment.error_creating_intent') || 'Error',
-            description: extractErrorMessage(error),
-            variant: 'destructive',
+        if (isMounted) {
+          startTransition(() => {
+            setClientSecret(result.client_secret);
           });
-        });
+        }
+      } catch (error) {
+        if (isMounted) {
+          startTransition(() => {
+            toast({
+              title: t('orders.payment.error_creating_intent') || 'Error',
+              description: extractErrorMessage(error),
+              variant: 'destructive',
+            });
+          });
+        }
       }
     };
 
     createIntent();
+
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [orderId]);
 
   // Check payment status periodically
   useEffect(() => {
