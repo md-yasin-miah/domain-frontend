@@ -894,6 +894,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "create": "Create",
+    "processing": "Processing",
     "update": "Update",
     "search": "Search",
     "filter": "Filter",
@@ -1525,6 +1526,115 @@
     "error": {
       "title": "Error loading escrows",
       "description": "There was an error loading your escrows. Please try again later."
+    }
+  },
+  "savedSearches": {
+    "title": "Saved Searches",
+    "description": "Save and manage your search filters for quick access",
+    "table": {
+      "title": "Saved Searches",
+      "description": "Manage and reuse your saved search filters",
+      "name": "Name",
+      "listing_type": "Listing Type",
+      "filters": "Filters",
+      "price": "Price",
+      "search_text": "Search Text",
+      "no_filters": "No filters",
+      "created_at": "Created At"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "filters": {
+      "title": "Filters",
+      "description": "Filter saved searches by status",
+      "search_placeholder": "Search by name or search text...",
+      "status": "Status"
+    },
+    "actions": {
+      "create": "Create Saved Search",
+      "edit": "Edit",
+      "delete": "Delete",
+      "use": "Use Search",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "create_success": "Saved Search Created",
+      "create_success_desc": "Your saved search has been created successfully.",
+      "create_error": "Create Failed",
+      "create_error_desc": "Failed to create saved search. Please try again.",
+      "update_success": "Saved Search Updated",
+      "update_success_desc": "Your saved search has been updated successfully.",
+      "update_error": "Update Failed",
+      "update_error_desc": "Failed to update saved search. Please try again.",
+      "delete_success": "Saved Search Deleted",
+      "delete_success_desc": "Your saved search has been deleted successfully.",
+      "delete_error": "Delete Failed",
+      "delete_error_desc": "Failed to delete saved search. Please try again.",
+      "toggle_success": "Status Updated",
+      "toggle_error": "Update Failed",
+      "toggle_error_desc": "Failed to update saved search status. Please try again.",
+      "activated": "Saved search has been activated.",
+      "deactivated": "Saved search has been deactivated."
+    },
+    "dialogs": {
+      "create": {
+        "title": "Create Saved Search",
+        "description": "Save your search filters for quick access later"
+      },
+      "edit": {
+        "title": "Edit Saved Search",
+        "description": "Update your saved search filters"
+      },
+      "delete": {
+        "title": "Delete Saved Search",
+        "description": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+      }
+    },
+    "form": {
+      "basic_info": "Basic Information",
+      "listing_filters": "Listing Filters",
+      "price_filters": "Price Filters",
+      "domain_filters": "Domain Filters",
+      "traffic_revenue_filters": "Traffic & Revenue Filters",
+      "name": "Name",
+      "name_placeholder": "Enter a name for this search",
+      "search_text": "Search Text",
+      "search_text_placeholder": "Enter keywords to search",
+      "search_text_description": "Search for specific keywords in listing titles and descriptions",
+      "listing_type": "Listing Type",
+      "listing_type_placeholder": "Select listing type",
+      "status": "Status",
+      "status_placeholder": "Select status",
+      "min_price": "Min Price",
+      "min_price_placeholder": "Minimum price",
+      "max_price": "Max Price",
+      "max_price_placeholder": "Maximum price",
+      "currency": "Currency",
+      "currency_placeholder": "Select currency",
+      "domain_extension": "Domain Extension",
+      "domain_extension_placeholder": "e.g., .com, .net, .org",
+      "domain_extension_description": "Filter by domain extension (e.g., .com, .net)",
+      "min_domain_age": "Min Domain Age",
+      "min_domain_age_placeholder": "Minimum age in years",
+      "max_domain_age": "Max Domain Age",
+      "max_domain_age_placeholder": "Maximum age in years",
+      "min_traffic": "Min Traffic",
+      "min_traffic_placeholder": "Minimum monthly traffic",
+      "max_traffic": "Max Traffic",
+      "max_traffic_placeholder": "Maximum monthly traffic",
+      "min_revenue": "Min Revenue",
+      "min_revenue_placeholder": "Minimum monthly revenue",
+      "max_revenue": "Max Revenue",
+      "max_revenue_placeholder": "Maximum monthly revenue"
+    },
+    "empty": {
+      "title": "No Saved Searches Found",
+      "description": "Create your first saved search to quickly access your favorite filters."
+    },
+    "error": {
+      "title": "Error loading saved searches",
+      "description": "There was an error loading your saved searches. Please try again later."
     }
   },
   "offers": {

@@ -1178,5 +1178,114 @@
       "title": "Error al cargar depósitos",
       "description": "Hubo un error al cargar tus depósitos. Por favor, inténtalo de nuevo más tarde."
     }
+  },
+  "savedSearches": {
+    "title": "Búsquedas Guardadas",
+    "description": "Guarda y gestiona tus filtros de búsqueda para acceso rápido",
+    "table": {
+      "title": "Búsquedas Guardadas",
+      "description": "Gestiona y reutiliza tus filtros de búsqueda guardados",
+      "name": "Nombre",
+      "listing_type": "Tipo de Listado",
+      "filters": "Filtros",
+      "price": "Precio",
+      "search_text": "Texto de Búsqueda",
+      "no_filters": "Sin filtros",
+      "created_at": "Creado En"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "filters": {
+      "title": "Filtros",
+      "description": "Filtrar búsquedas guardadas por estado",
+      "search_placeholder": "Buscar por nombre o texto de búsqueda...",
+      "status": "Estado"
+    },
+    "actions": {
+      "create": "Crear Búsqueda Guardada",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "use": "Usar Búsqueda",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "create_success": "Búsqueda Guardada Creada",
+      "create_success_desc": "Tu búsqueda guardada ha sido creada exitosamente.",
+      "create_error": "Error al Crear",
+      "create_error_desc": "Error al crear búsqueda guardada. Por favor, inténtalo de nuevo.",
+      "update_success": "Búsqueda Guardada Actualizada",
+      "update_success_desc": "Tu búsqueda guardada ha sido actualizada exitosamente.",
+      "update_error": "Error al Actualizar",
+      "update_error_desc": "Error al actualizar búsqueda guardada. Por favor, inténtalo de nuevo.",
+      "delete_success": "Búsqueda Guardada Eliminada",
+      "delete_success_desc": "Tu búsqueda guardada ha sido eliminada exitosamente.",
+      "delete_error": "Error al Eliminar",
+      "delete_error_desc": "Error al eliminar búsqueda guardada. Por favor, inténtalo de nuevo.",
+      "toggle_success": "Estado Actualizado",
+      "toggle_error": "Error al Actualizar",
+      "toggle_error_desc": "Error al actualizar el estado de la búsqueda guardada. Por favor, inténtalo de nuevo.",
+      "activated": "La búsqueda guardada ha sido activada.",
+      "deactivated": "La búsqueda guardada ha sido desactivada."
+    },
+    "dialogs": {
+      "create": {
+        "title": "Crear Búsqueda Guardada",
+        "description": "Guarda tus filtros de búsqueda para acceso rápido más tarde"
+      },
+      "edit": {
+        "title": "Editar Búsqueda Guardada",
+        "description": "Actualiza tus filtros de búsqueda guardados"
+      },
+      "delete": {
+        "title": "Eliminar Búsqueda Guardada",
+        "description": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esta acción no se puede deshacer."
+      }
+    },
+    "form": {
+      "basic_info": "Información Básica",
+      "listing_filters": "Filtros de Listado",
+      "price_filters": "Filtros de Precio",
+      "domain_filters": "Filtros de Dominio",
+      "traffic_revenue_filters": "Filtros de Tráfico e Ingresos",
+      "name": "Nombre",
+      "name_placeholder": "Ingresa un nombre para esta búsqueda",
+      "search_text": "Texto de Búsqueda",
+      "search_text_placeholder": "Ingresa palabras clave para buscar",
+      "search_text_description": "Buscar palabras clave específicas en títulos y descripciones de listados",
+      "listing_type": "Tipo de Listado",
+      "listing_type_placeholder": "Selecciona tipo de listado",
+      "status": "Estado",
+      "status_placeholder": "Selecciona estado",
+      "min_price": "Precio Mínimo",
+      "min_price_placeholder": "Precio mínimo",
+      "max_price": "Precio Máximo",
+      "max_price_placeholder": "Precio máximo",
+      "currency": "Moneda",
+      "currency_placeholder": "Selecciona moneda",
+      "domain_extension": "Extensión de Dominio",
+      "domain_extension_placeholder": "ej., .com, .net, .org",
+      "domain_extension_description": "Filtrar por extensión de dominio (ej., .com, .net)",
+      "min_domain_age": "Edad Mínima del Dominio",
+      "min_domain_age_placeholder": "Edad mínima en años",
+      "max_domain_age": "Edad Máxima del Dominio",
+      "max_domain_age_placeholder": "Edad máxima en años",
+      "min_traffic": "Tráfico Mínimo",
+      "min_traffic_placeholder": "Tráfico mensual mínimo",
+      "max_traffic": "Tráfico Máximo",
+      "max_traffic_placeholder": "Tráfico mensual máximo",
+      "min_revenue": "Ingresos Mínimos",
+      "min_revenue_placeholder": "Ingresos mensuales mínimos",
+      "max_revenue": "Ingresos Máximos",
+      "max_revenue_placeholder": "Ingresos mensuales máximos"
+    },
+    "empty": {
+      "title": "No se Encontraron Búsquedas Guardadas",
+      "description": "Crea tu primera búsqueda guardada para acceder rápidamente a tus filtros favoritos."
+    },
+    "error": {
+      "title": "Error al cargar búsquedas guardadas",
+      "description": "Hubo un error al cargar tus búsquedas guardadas. Por favor, inténtalo de nuevo más tarde."
+    }
   }
 }

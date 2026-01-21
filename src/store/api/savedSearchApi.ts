@@ -1,40 +1,21 @@
 import { apiSlice } from './apiSlice';
 
-export interface SavedSearch {
-  id: number;
-  user_id: number;
-  name: string;
-  search_params: Record<string, any>;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SavedSearchCreateRequest {
-  name: string;
-  search_params: Record<string, any>;
-}
-
-export interface SavedSearchUpdateRequest {
-  name?: string;
-  search_params?: Record<string, any>;
-}
-
 export const savedSearchesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getSavedSearches: builder.query<PaginatedResponse<SavedSearch> | SavedSearch[], PaginationParams>({
+    getSavedSearches: builder.query<SavedSearch[] | PaginatedResponse<SavedSearch>, SavedSearchFilters>({
       query: (params) => ({
         url: '/saved-searches',
         method: 'GET',
         params,
       }),
-      providesTags: ['User'],
+      providesTags: ['SavedSearch'],
     }),
     getSavedSearch: builder.query<SavedSearch, number>({
       query: (id) => ({
         url: `/saved-searches/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'User', id }],
+      providesTags: (result, error, id) => [{ type: 'SavedSearch', id }],
     }),
     createSavedSearch: builder.mutation<SavedSearch, SavedSearchCreateRequest>({
       query: (data) => ({
@@ -42,7 +23,7 @@ export const savedSearchesApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['SavedSearch'],
     }),
     updateSavedSearch: builder.mutation<SavedSearch, { id: number; data: SavedSearchUpdateRequest }>({
       query: ({ id, data }) => ({
@@ -50,14 +31,14 @@ export const savedSearchesApi = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }, 'User'],
+      invalidatesTags: (result, error, { id }) => [{ type: 'SavedSearch', id }, 'SavedSearch'],
     }),
     deleteSavedSearch: builder.mutation<void, number>({
       query: (id) => ({
         url: `/saved-searches/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['SavedSearch'],
     }),
   }),
 });

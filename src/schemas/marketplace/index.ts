@@ -14,4 +14,8 @@ export {
   type OfferCounterFormData,
 } from './offer.schema';
 export { orderCreateSchema, type OrderCreateFormData } from './order.schema';
+export {
+  savedSearchSchema,
+  type SavedSearchFormData,
+} from './savedSearch.schema';
 
