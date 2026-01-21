@@ -899,6 +899,7 @@
     "search": "Search",
     "filter": "Filter",
     "all": "All",
+    "actions": "Actions",
     "required": "Required",
     "optional": "Optional",
     "no_results": "No results found",
@@ -910,6 +911,7 @@
     "copied_to_clipboard": "copied to clipboard",
     "copy": "Copy",
     "copy_failed": "Failed to copy to clipboard",
+    "not_available": "Not Available",
     "pagination": {
       "showing": "Showing",
       "of": "of",

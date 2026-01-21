@@ -204,6 +204,7 @@
     "search": "Buscar",
     "filter": "Filtrar",
     "all": "Todos",
+    "actions": "Acciones",
     "required": "Requerido",
     "optional": "Opcional",
     "no_results": "No se encontraron resultados",
@@ -215,6 +216,7 @@
     "copied_to_clipboard": "copiado al portapapeles",
     "copy": "Copiar",
     "copy_failed": "Error al copiar al portapapeles",
+    "not_available": "No disponible",
     "pagination": {
       "showing": "Mostrando",
       "of": "de",

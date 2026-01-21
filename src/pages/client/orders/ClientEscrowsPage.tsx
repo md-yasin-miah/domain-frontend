@@ -34,8 +34,9 @@ import {
   RefreshCw,
   User,
   Unlock,
-  ArrowLeftRight,
+  ArrowLeftRight
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   useGetEscrowsQuery,
   useReleaseEscrowMutation,
@@ -236,14 +237,16 @@ const ClientEscrowsPage = () => {
       accessorKey: "order",
       header: t("escrows.table.order"),
       cell: ({ row }) => {
-        const order = row.order;
+        const order_id = row.order_id;
         return (
           <div className="flex items-center gap-2">
-            {order ? (
-              <>
-                <Package className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{order.order_number}</span>
-              </>
+            {order_id ? (
+              <Link to={ROUTES.CLIENT.ORDERS.ORDER_DETAILS(order_id)}>
+                <Badge variant="outline">
+                  <Package className="h-4 w-4 mr-1 text-muted-foreground" />
+                  <span className="text-sm">{order_id}</span>
+                </Badge>
+              </Link>
             ) : (
               <span className="text-sm text-muted-foreground">
                 {t("common.not_available")}
