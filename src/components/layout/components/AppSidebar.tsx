@@ -27,6 +27,8 @@ import { Button } from '@/components/ui/button';
 export interface MenuSubItem {
   title: string;
   url: string;
+  icon?: LucideIcon;
+  description?: string;
 }
 
 export interface MenuItem {

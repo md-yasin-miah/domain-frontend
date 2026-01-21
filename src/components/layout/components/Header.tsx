@@ -30,14 +30,16 @@ import {
   MessageSquare,
   LucideIcon,
 } from 'lucide-react';
+import { MenuItem } from './AppSidebar';
 
 interface HeaderProps {
   menuItems: MenuItem[];
   userServices?: MenuItem[];
   showDashboard?: boolean;
+  leftSlot?: React.ReactNode;
 }
 
-export function Header({ menuItems, userServices, showDashboard = true }: HeaderProps) {
+export function Header({ menuItems, userServices, showDashboard = true, leftSlot }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const location = useLocation();
@@ -83,7 +85,8 @@ export function Header({ menuItems, userServices, showDashboard = true }: Header
       <header className="sticky top-0 h-16 flex items-center bg-background/95 backdrop-blur-xl border-b border-border/40 z-50 px-4 lg:px-6 shadow-sm">
         <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
           {/* Logo Section - Enhanced */}
-          <div className="flex items-center shrink-0">
+          <div className="flex items-center shrink-0 gap-4">
+            {leftSlot}
             <Link to="/" className="flex flex-col items-start hover:opacity-80 transition-opacity group">
               <img
                 src="/uploads/logo-full.png"
