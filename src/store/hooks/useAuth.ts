@@ -20,9 +20,6 @@ export const useAuth = () => {
   const authState = useAppSelector((state) => state.auth);
   const [loginMutation, { isLoading: loginLoading }] = useLoginMutation();
   const [registerMutation, { isLoading: signupLoading }] = useRegisterMutation();
-  const { data: currentUser } = useGetCurrentUserQuery(undefined, {
-    skip: !authState.token,
-  });
 
   const signIn = async (email: string, password: string) => {
     try {

@@ -10,6 +10,7 @@ import { useCreatePaymentIntentMutation, useGetPaymentIntentStatusQuery } from '
 import { useGetPaymentMethodsQuery } from '@/store/api/paymentsApi';
 import { extractErrorMessage } from '@/lib/errorHandler';
 import { formatCurrency } from '@/lib/helperFun';
+import { useAuth } from '@/store/hooks/useAuth';
 
 interface PaymentDialogProps {
   open: boolean;
@@ -37,6 +38,7 @@ const PaymentForm = ({
   onSuccess?: () => void;
   onClose: () => void;
 }) => {
+  const { user } = useAuth();
   const { t } = useTranslation();
   const { toast } = useToast();
   const stripe = useStripe();
@@ -127,8 +129,8 @@ const PaymentForm = ({
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: 'Buyer',
-            email: '',
+            name: user.username,
+            email: user.email,
           },
         },
       });

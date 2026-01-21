@@ -21,7 +21,6 @@ import { type ColumnDef } from "@/components/ui/data-table";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import { Search, Package, Loader2, Eye, FileText } from "lucide-react";
 import { useGetOrdersQuery } from "@/store/api/ordersApi";
-import { useAuth } from "@/store/hooks/useAuth";
 import {
   formatCurrency,
   timeFormat,
@@ -42,7 +41,6 @@ type OrderStatus =
 
 const AllOrdersPage = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
@@ -244,25 +242,25 @@ const AllOrdersPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-            <DataTableWithPagination
-              data={ordersData?.items || []}
-              columns={columns}
-              pagination={ordersData?.pagination}
-              isLoading={isLoading}
-              emptyMessage={t("orders.empty.no_orders")}
-              emptyIcon={<Package className="w-16 h-16 text-muted-foreground" />}
-              getRowId={(row) => String(row.id)}
-              renderActions={renderActions}
-              actionsColumnHeader={t("orders.table.actions")}
-              enableSorting={true}
-              pageSize={size}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              error={error}
-              errorTitle={t("orders.error.title")}
-              errorDescription={t("orders.error.description")}
-              errorIcon={<Package className="w-16 h-16 text-muted-foreground" />}
-            />
+          <DataTableWithPagination
+            data={ordersData?.items || []}
+            columns={columns}
+            pagination={ordersData?.pagination}
+            isLoading={isLoading}
+            emptyMessage={t("orders.empty.no_orders")}
+            emptyIcon={<Package className="w-16 h-16 text-muted-foreground" />}
+            getRowId={(row) => String(row.id)}
+            renderActions={renderActions}
+            actionsColumnHeader={t("orders.table.actions")}
+            enableSorting={true}
+            pageSize={size}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            error={error}
+            errorTitle={t("orders.error.title")}
+            errorDescription={t("orders.error.description")}
+            errorIcon={<Package className="w-16 h-16 text-muted-foreground" />}
+          />
         </CardContent>
       </Card>
     </div>
