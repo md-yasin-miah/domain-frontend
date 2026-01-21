@@ -1,17 +1,8 @@
 import { apiSlice } from './apiSlice';
-import type {
-  Auction,
-  Bid,
-  BidCreateRequest,
-  AuctionCreateRequest,
-  AuctionUpdateRequest,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export const auctionsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getAuctions: builder.query<PaginatedResponse<Auction> | Auction[], PaginationParams>({
+    getAuctions: builder.query<PaginatedResponse<Auction> | Auction[], AuctionFilters>({
       query: (params) => ({
         url: '/auctions',
         method: 'GET',
@@ -26,12 +17,13 @@ export const auctionsApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: 'Domain', id }],
     }),
-    getBids: builder.query<PaginatedResponse<Bid> | Bid[], number>({
-      query: (auctionId) => ({
+    getBids: builder.query<PaginatedResponse<Bid> | Bid[], { auctionId: number; skip?: number; limit?: number }>({
+      query: ({ auctionId, skip, limit }) => ({
         url: `/auctions/${auctionId}/bids`,
         method: 'GET',
+        params: { skip, limit },
       }),
-      providesTags: (result, error, auctionId) => [{ type: 'Domain', id: auctionId }],
+      providesTags: (result, error, { auctionId }) => [{ type: 'Domain', id: auctionId }],
     }),
     placeBid: builder.mutation<Bid, { auctionId: number; data: BidCreateRequest }>({
       query: ({ auctionId, data }) => ({
@@ -39,7 +31,10 @@ export const auctionsApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: (result, error, { auctionId }) => [{ type: 'Domain', id: auctionId }, 'Domain'],
+      invalidatesTags: (result, error, { auctionId }) => [
+        { type: 'Domain', id: auctionId },
+        'Domain',
+      ],
     }),
     createAuction: builder.mutation<Auction, AuctionCreateRequest>({
       query: (data) => ({
@@ -57,19 +52,15 @@ export const auctionsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
     }),
-    deleteAuction: builder.mutation<void, number>({
-      query: (id) => ({
-        url: `/auctions/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['Domain'],
-    }),
     withdrawBid: builder.mutation<void, { auctionId: number; bidId: number }>({
       query: ({ auctionId, bidId }) => ({
         url: `/auctions/${auctionId}/bids/${bidId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, { auctionId }) => [{ type: 'Domain', id: auctionId }, 'Domain'],
+      invalidatesTags: (result, error, { auctionId }) => [
+        { type: 'Domain', id: auctionId },
+        'Domain',
+      ],
     }),
   }),
 });
@@ -81,7 +72,6 @@ export const {
   usePlaceBidMutation,
   useCreateAuctionMutation,
   useUpdateAuctionMutation,
-  useDeleteAuctionMutation,
   useWithdrawBidMutation,
 } = auctionsApi;
 

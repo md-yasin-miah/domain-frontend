@@ -6,7 +6,6 @@ import AdminLayout from "./components/layout/AdminLayout";
 import ClientLayout from "./components/layout/ClientLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthRedirectHandler } from "./components/auth/AuthRedirectHandler";
-import { InitialLoader } from "@/components/common/InitialLoader";
 import LazyComponent from "./components/common/LazyComponent";
 
 // Lazy load all page components for code splitting
@@ -78,7 +77,7 @@ const ClientOffersPage = lazy(() => import("./pages/client/offers/ClientOffersPa
 const OfferDetails = lazy(() => import("./pages/client/offers/OfferDetails"));
 const ClientProductsVerificationsPage = lazy(() => import("./pages/client/marketplace/productsVerification"));
 const ClientProductsDetailsPage = lazy(() => import("./pages/client/marketplace/productsVerification/Details"));
-const ClientAuctionsPage = lazy(() => import("./pages/client/ClientAuctionsPage"));
+const ClientAuctionsPage = lazy(() => import("./pages/client/auctions"));
 const ClientSavedSearchPage = lazy(() => import("./pages/client/savedSearch"));
 const MyListing = lazy(() => import("./pages/client/marketplace/myListing"));
 const MyListingDetails = lazy(() => import("./pages/client/marketplace/myListing/Details"));

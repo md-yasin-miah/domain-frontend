@@ -9,7 +9,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 // ============ Types ============
 
@@ -283,19 +284,6 @@ export function DataTable<TData = any>({
       </TableCell>
     );
   };
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className={cn('flex items-center justify-center py-12', className)}>
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">Loading data...</p>
-        </div>
-      </div>
-    );
-  }
-
   // Empty state
   if (sortedData.length === 0) {
     return (
@@ -324,45 +312,86 @@ export function DataTable<TData = any>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedData.map((row) => {
-            const rowId = getRowId(row);
-            const isSelected = selectedRowIds.has(rowId);
-
-            return (
-              <TableRow
-                key={rowId}
-                data-state={isSelected ? 'selected' : undefined}
-                className={cn({
-                  'bg-muted/50': isSelected,
-                  'cursor-pointer': onRowClick,
-                })}
-                onClick={() => onRowClick?.(row)}
-              >
+          {isLoading ? (
+            // Skeleton loading rows
+            Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={`skeleton-${index}`}>
                 {enableRowSelection && (
-                  <TableCell
-                    className="w-12"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={(e) => handleRowSelect(rowId, e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
+                  <TableCell className="w-12">
+                    <Skeleton className="h-4 w-4 rounded" />
                   </TableCell>
                 )}
-                {columns.map((column, index) => renderCell(row, column, index))}
+                {columns.map((column, colIndex) => {
+                  const columnId = column.id || String(colIndex);
+                  // Vary skeleton widths for more realistic appearance
+                  const widthVariants = ['w-full', 'w-3/4', 'w-1/2', 'w-2/3', 'w-4/5'];
+                  const widthClass = widthVariants[index % widthVariants.length];
+                  
+                  return (
+                    <TableCell
+                      key={columnId}
+                      className={cn(column.className, column.cellClassName)}
+                      style={{
+                        minWidth: column.minWidth,
+                        maxWidth: column.maxWidth,
+                      }}
+                    >
+                      <Skeleton className={cn('h-4', widthClass)} />
+                    </TableCell>
+                  );
+                })}
                 {renderActions && (
                   <TableCell
                     className={cn('text-right', actionsColumnClassName)}
-                    onClick={(e) => e.stopPropagation()}
                   >
-                    {renderActions(row)}
+                    <div className="flex items-center justify-end gap-1">
+                      <Skeleton className="h-8 w-8 rounded" />
+                      <Skeleton className="h-8 w-8 rounded" />
+                    </div>
                   </TableCell>
                 )}
               </TableRow>
-            );
-          })}
+            ))
+          ) : (
+            sortedData.map((row) => {
+              const rowId = getRowId(row);
+              const isSelected = selectedRowIds.has(rowId);
+              return (
+                <TableRow
+                  key={rowId}
+                  data-state={isSelected ? 'selected' : undefined}
+                  className={cn({
+                    'bg-muted/50': isSelected,
+                    'cursor-pointer': onRowClick,
+                  })}
+                  onClick={() => onRowClick?.(row)}
+                >
+                  {enableRowSelection && (
+                    <TableCell
+                      className="w-12"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) => handleRowSelect(rowId, e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                    </TableCell>
+                  )}
+                  {columns.map((column, index) => renderCell(row, column, index))}
+                  {renderActions && (
+                    <TableCell
+                      className={cn('text-right', actionsColumnClassName)}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {renderActions(row)}
+                    </TableCell>
+                  )}
+                </TableRow>
+              );
+            })
+          )}
         </TableBody>
       </Table>
     </div>

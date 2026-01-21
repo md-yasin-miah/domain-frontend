@@ -1822,5 +1822,41 @@
         "website_url_required": "Website URL is required"
       }
     }
+  },
+  "auctions": {
+    "all_auctions": "All Auctions",
+    "description": "View and manage all auctions",
+    "search_placeholder": "Search by listing title...",
+    "filter_by_status": "Filter by status",
+    "status": {
+      "active": "Active",
+      "upcoming": "Upcoming",
+      "ended": "Ended"
+    },
+    "table": {
+      "listing": "Listing",
+      "listing_id": "Listing ID",
+      "listing_deleted": "Listing Deleted",
+      "starting_price": "Starting Price",
+      "current_bid": "Current Bid",
+      "no_bids": "No Bids",
+      "bid_count": "Bid Count",
+      "current_bidder": "Current Bidder",
+      "no_bidder": "No Bidder",
+      "ends_at": "Ends At",
+      "hours_left": "hours left",
+      "status": "Status",
+      "total_auctions": "total auctions"
+    },
+    "actions": {
+      "view": "View Details"
+    },
+    "empty": {
+      "no_auctions": "No auctions found"
+    },
+    "error": {
+      "title": "Error loading auctions",
+      "description": "There was an error loading auctions. Please try again later."
+    }
   }
 }

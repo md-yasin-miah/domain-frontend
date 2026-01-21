@@ -1287,5 +1287,41 @@
       "title": "Error al cargar búsquedas guardadas",
       "description": "Hubo un error al cargar tus búsquedas guardadas. Por favor, inténtalo de nuevo más tarde."
     }
+  },
+  "auctions": {
+    "all_auctions": "Todas las Subastas",
+    "description": "Ver y gestionar todas las subastas",
+    "search_placeholder": "Buscar por título de listado...",
+    "filter_by_status": "Filtrar por estado",
+    "status": {
+      "active": "Activa",
+      "upcoming": "Próxima",
+      "ended": "Finalizada"
+    },
+    "table": {
+      "listing": "Listado",
+      "listing_id": "ID del Listado",
+      "listing_deleted": "Listado Eliminado",
+      "starting_price": "Precio Inicial",
+      "current_bid": "Oferta Actual",
+      "no_bids": "Sin Ofertas",
+      "bid_count": "Número de Ofertas",
+      "current_bidder": "Ofertante Actual",
+      "no_bidder": "Sin Ofertante",
+      "ends_at": "Termina En",
+      "hours_left": "horas restantes",
+      "status": "Estado",
+      "total_auctions": "subastas totales"
+    },
+    "actions": {
+      "view": "Ver Detalles"
+    },
+    "empty": {
+      "no_auctions": "No se encontraron subastas"
+    },
+    "error": {
+      "title": "Error al cargar subastas",
+      "description": "Hubo un error al cargar las subastas. Por favor, inténtalo de nuevo más tarde."
+    }
   }
 }

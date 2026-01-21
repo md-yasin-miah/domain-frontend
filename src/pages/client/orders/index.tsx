@@ -244,30 +244,6 @@ const AllOrdersPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex flex-col items-center gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  {t("common.loading")}
-                </p>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <Package className="w-16 h-16 text-muted-foreground" />
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    {t("orders.error.title")}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {t("orders.error.description")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
             <DataTableWithPagination
               data={ordersData?.items || []}
               columns={columns}
@@ -287,7 +263,6 @@ const AllOrdersPage = () => {
               errorDescription={t("orders.error.description")}
               errorIcon={<Package className="w-16 h-16 text-muted-foreground" />}
             />
-          )}
         </CardContent>
       </Card>
     </div>

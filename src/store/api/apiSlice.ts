@@ -58,6 +58,8 @@ export const apiSlice = createApi({
     'MarketplaceListing',
     'MyMarketplaceListing',
     'Blog',
+    'Auction',
+    'Bid',
     'FAQ',
     'Role',
     'Permission',
