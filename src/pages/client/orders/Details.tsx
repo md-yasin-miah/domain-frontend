@@ -1164,7 +1164,7 @@ const ClientOrderDetailsPage = () => {
       </AlertDialog>
 
       {/* Payment Dialog */}
-      {order && (
+      {order && showPaymentDialog && (
         <PaymentDialog
           open={showPaymentDialog}
           onOpenChange={setShowPaymentDialog}
