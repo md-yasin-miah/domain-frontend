@@ -21,28 +21,33 @@ export const formatNumber = (value: number | string | null | undefined): string 
 
 export const getStatusColor = (status: string) => {
   const statusColor = () => {
-  switch (status) {
-    case 'resolved':
-    case 'accepted':
-    case 'verified':
-    case 'active':return 'bg-green-500';
-    case 'failed': 
-    case 'rejected': 
-    case 'inactive':
-    case 'expired': return 'bg-red-500';
-    case 'in_progress': 
-    case 'pending': return 'bg-yellow-500';
-    case 'open': 
-    case 'countered': return 'bg-blue-500';
-    case 'closed': 
-    case 'withdrawn': return 'bg-gray-500';
-    default: return 'bg-gray-500';
+    switch (status) {
+      case 'resolved':
+      case 'accepted':
+      case 'verified':
+      case 'completed':
+      case 'payment_received':
+      case 'paid':
+      case 'open':
+      case 'active': return 'bg-green-500/10 text-green-500 border-green-500';
+      case 'failed':
+      case 'rejected':
+      case 'inactive':
+      case 'cancelled':
+      case 'expired': return 'bg-red-500/10 text-red-500 border-red-500';
+      case 'sent':
+      case 'in_progress':
+      case 'pending': return 'bg-yellow-500/10 text-yellow-600 border-yellow-600';
+      case 'countered': return 'bg-blue-500/10 text-blue-500 border-blue-500';
+      case 'closed':
+      case 'withdrawn': return 'bg-gray-500/10 text-gray-500 border-gray-500';
+      default: return 'bg-gray-500';
+    }
   }
-}
-return "text-white " + statusColor();
+  return "text-white " + statusColor();
 };
 
-export const getStatusLabel = (status: string,t: TFunction) => {
+export const getStatusLabel = (status: string, t: TFunction) => {
   return t(`common.status.${status}`) || status;
 };
 export const timeFormat = (date: string, format: string = 'MM/DD/YYYY') => {
@@ -53,6 +58,9 @@ export const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case 'completed':
     case 'accepted':
+    case 'payment_received':
+    case 'open':
+    case 'active':
     case 'verified': return 'default';
     case 'processing': return 'secondary';
     case 'pending': return 'outline';

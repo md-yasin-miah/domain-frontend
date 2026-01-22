@@ -33,31 +33,11 @@ const PaymentDialog = ({
   orderNumber,
   onSuccess,
 }: PaymentDialogProps) => {
+  const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
   const { t } = useTranslation();
-  const { toast } = useToast();
-  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+  const stripePromise = loadStripe(stripePublishableKey);
 
-  const { data: paymentMethods } = useGetPaymentMethodsQuery(undefined, { skip: !open });
-
-  // Initialize Stripe promise
-  useEffect(() => {
-    if (!open) return;
-
-    const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-    if (!stripePublishableKey) {
-      startTransition(() => {
-        toast({
-          title: t('orders.payment.config_error') || 'Configuration Error',
-          description: t('orders.payment.config_error_desc') || 'Stripe publishable key is not configured.',
-          variant: 'destructive',
-        });
-      });
-      return;
-    }
-
-    const promise = loadStripe(stripePublishableKey);
-    setStripePromise(promise);
-  }, [open, toast, t]);
+  const { data: paymentMethods } = useGetPaymentMethodsQuery(undefined);
 
   const handleClose = () => {
     startTransition(() => {

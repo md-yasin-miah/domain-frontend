@@ -25,8 +25,9 @@ import { useAuth } from "@/store/hooks/useAuth";
 import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
 import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
 import { useGetTicketsQuery } from "@/store/api/supportApi";
-import { getStatusColor } from "@/lib/helperFun";
+import { getStatusBadgeVariant, getStatusColor, getStatusLabel } from "@/lib/helperFun";
 import { ROUTES } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 
 interface ClientDomain {
   id: string;
@@ -75,26 +76,10 @@ export default function ClientDashboard() {
 
   const loading = domainsLoading || invoicesLoading || ticketsLoading;
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "active":
-      case "paid":
-      case "closed":
-        return "default";
-      case "pending":
-      case "open":
-        return "secondary";
-      case "inactive":
-      case "overdue":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
 
   const totalDuePayment = (invoices?.items || [])
     .filter((inv: Invoice) => inv.status === "issued")
-    .reduce((sum, inv) => sum + Number(inv.amount), 0);
+    .reduce((sum, inv) => sum + Number(inv.total_amount), 0);
 
   if (loading) {
     return (
@@ -224,20 +209,18 @@ export default function ClientDashboard() {
                           <p className="text-xs text-muted-foreground">
                             {domain.expires_at
                               ? `${t(
-                                  "client_dashboard.recent_domains.expires"
-                                )}: ${new Date(
-                                  domain.expires_at
-                                ).toLocaleDateString()}`
+                                "client_dashboard.recent_domains.expires"
+                              )}: ${new Date(
+                                domain.expires_at
+                              ).toLocaleDateString()}`
                               : t("client_dashboard.recent_domains.no_expiry")}
                           </p>
                         </div>
                         <Badge
-                          variant={getStatusBadgeVariant(domain.status)}
-                          className={`text-xs ${getStatusColor(
-                            domain.status
-                          )} text-white capitalize`}
+                          variant="outline"
+                          className={cn("capitalize", getStatusColor(domain.status))}
                         >
-                          {domain.status?.replace(/_|-/g, " ")}
+                          {getStatusLabel(domain.status, t)}
                         </Badge>
                       </div>
                     </Link>
@@ -281,12 +264,10 @@ export default function ClientDashboard() {
                             </p>
                           </div>
                           <Badge
-                            variant={getStatusBadgeVariant(ticket.status)}
-                            className={`text-xs ${getStatusColor(
-                              ticket.status
-                            )} text-white capitalize`}
+                            variant="outline"
+                            className={cn("capitalize", getStatusColor(ticket.status))}
                           >
-                            {ticket.status?.replace(/_|-/g, " ")}
+                            {getStatusLabel(ticket.status, t)}
                           </Badge>
                         </div>
                       </Link>
@@ -331,13 +312,13 @@ export default function ClientDashboard() {
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-sm">
-                          ${invoice?.amount}
+                          ${invoice?.total_amount}
                         </p>
                         <Badge
-                          variant={getStatusBadgeVariant(invoice.status)}
-                          className="text-xs"
+                          variant="outline"
+                          className={cn("capitalize", getStatusColor(invoice.status))}
                         >
-                          {invoice.status}
+                          {getStatusLabel(invoice.status, t)}
                         </Badge>
                       </div>
                     </div>

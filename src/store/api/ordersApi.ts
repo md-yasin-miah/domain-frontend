@@ -45,12 +45,6 @@ export const ordersApi = apiSlice.injectEndpoints({
         url: `/orders/${orderId}/payment-intent`,
         method: 'POST',
       }),
-      extraOptions: {
-        throttle: (args: { orderId: number }) => ({
-          time: 5000,
-          key: args.orderId,
-        }),
-      },
       invalidatesTags: (result, error, orderId) => [{ type: 'Invoice', id: orderId }],
     }),
     getPaymentIntentStatus: builder.query<PaymentIntentStatus, number>({

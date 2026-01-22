@@ -36,47 +36,37 @@ const PaymentForm = ({
   const [createPaymentIntent, { isLoading: isCreatingIntent }] = useCreatePaymentIntentMutation();
   const { data: paymentStatus, refetch: refetchStatus } = useGetPaymentIntentStatusQuery(orderId, {
     skip: !orderId || !clientSecret,
+    refetchOnMountOrArgChange: false,
   });
 
   // Create payment intent when component mounts (only once per orderId)
   useEffect(() => {
     // Only create if we don't already have a client secret
     if (clientSecret || isCreatingIntent) return;
-
-    let isMounted = true;
-
     const createIntent = async () => {
       try {
         const result = await createPaymentIntent(orderId).unwrap();
-        if (isMounted) {
-          startTransition(() => {
-            setClientSecret(result.client_secret);
-          });
-        }
+        setClientSecret(result.client_secret);
       } catch (error) {
-        if (isMounted) {
-          startTransition(() => {
-            toast({
-              title: t('orders.payment.error_creating_intent') || 'Error',
-              description: extractErrorMessage(error),
-              variant: 'destructive',
-            });
-          });
-        }
+        toast({
+          title: t('orders.payment.error_creating_intent') || 'Error',
+          description: extractErrorMessage(error),
+          variant: 'destructive',
+        });
       }
     };
-
     createIntent();
-
-    return () => {
-      isMounted = false;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
+  }, []);
 
-  // Check payment status periodically
+  // Check payment status periodically (only after payment is submitted and while processing)
   useEffect(() => {
-    if (!clientSecret) return;
+    // Only poll if:
+    // 1. Payment has been submitted (isProcessing)
+    // 2. We have a client secret
+    // 3. Payment status is not yet succeeded or failed
+    if (!clientSecret || !isProcessing) return;
+    if (paymentStatus?.status === 'succeeded' || paymentStatus?.status === 'failed') return;
 
     const interval = setInterval(() => {
       refetchStatus();
@@ -84,7 +74,7 @@ const PaymentForm = ({
 
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clientSecret]);
+  }, [clientSecret, isProcessing, paymentStatus?.status]);
 
   // Handle payment success
   useEffect(() => {

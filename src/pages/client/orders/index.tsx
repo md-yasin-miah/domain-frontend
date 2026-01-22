@@ -142,7 +142,7 @@ const AllOrdersPage = () => {
         header: t("common.status.status"),
         cell: ({ row }) => (
           <Badge
-            variant={getStatusBadgeVariant(row.status)}
+            variant="outline"
             className={cn("capitalize", getStatusColor(row.status))}
           >
             {getStatusLabel(row.status)}

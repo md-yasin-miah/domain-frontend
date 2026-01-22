@@ -358,12 +358,8 @@ const ClientOrderDetailsPage = () => {
             </div>
             <div className="flex items-center gap-3">
               <Badge
-                variant={getStatusBadgeVariant(order.status)}
-                className={cn(
-                  "text-xs font-medium px-3 py-1 capitalize",
-                  getStatusColor(order.status),
-                  "text-white border-0"
-                )}
+                variant="outline"
+                className={cn("capitalize", getStatusColor(order.status))}
               >
                 {getStatusLabel(order.status)}
               </Badge>
@@ -791,7 +787,7 @@ const ClientOrderDetailsPage = () => {
                         {t("common.status.status")}
                       </label>
                       <Badge
-                        variant={getStatusBadgeVariant(payment.status)}
+                        variant="outline"
                         className={cn("capitalize", getStatusColor(payment.status))}
                       >
                         {getStatusLabel(payment.status)}
@@ -1060,19 +1056,10 @@ const ClientOrderDetailsPage = () => {
                       {existingInvoice.invoice_number}
                     </p>
                     <Badge
-                      variant={
-                        existingInvoice.status === "paid"
-                          ? "default"
-                          : existingInvoice.status === "issued"
-                            ? "secondary"
-                            : "outline"
-                      }
-                      className={cn(
-                        "text-xs",
-                        existingInvoice.status === "paid" && "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30"
-                      )}
+                      variant="outline"
+                      className={cn("capitalize", getStatusColor(existingInvoice.status))}
                     >
-                      {existingInvoice.status}
+                      {getStatusLabel(existingInvoice.status)}
                     </Badge>
                   </div>
                 ) : (
