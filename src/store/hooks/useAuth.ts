@@ -1,15 +1,15 @@
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { store } from '@/store';
-import { logout, setCredentials, setToken, setRefreshToken, setError } from '@/store/slices/authSlice';
+import { setCredentials, setToken, setRefreshToken, setError } from '@/store/slices/authSlice';
 import {
   useLoginMutation,
   useRegisterMutation,
   useGetCurrentUserQuery,
   authApi
 } from '@/store/api/authApi';
-import { apiSlice } from '@/store/api/apiSlice';
 import { profileApi } from '@/store/api/profileApi';
 import { extractErrorMessage } from '@/lib/errorHandler';
+import { performLogout } from '@/store/utils/authUtils';
 
 /**
  * Custom hook to replace the old AuthContext
@@ -125,12 +125,8 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    // Clear local state and storage
-    dispatch(logout());
-
-    // Clear any cached API data by resetting the API state
-    // This ensures no stale data remains after logout
-    dispatch(apiSlice.util.resetApiState());
+    // Use shared logout utility
+    performLogout(dispatch);
 
     return { error: null };
   };
