@@ -40,12 +40,11 @@ export const ordersApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Invoice', id }, 'Invoice'],
     }),
-    createPaymentIntent: builder.mutation<PaymentIntentResponse, number>({
+    createPaymentIntent: builder.query<PaymentIntentResponse, number>({
       query: (orderId) => ({
         url: `/orders/${orderId}/payment-intent`,
         method: 'POST',
       }),
-      invalidatesTags: (result, error, orderId) => [{ type: 'Invoice', id: orderId }],
     }),
     getPaymentIntentStatus: builder.query<PaymentIntentStatus, number>({
       query: (orderId) => ({
@@ -100,7 +99,7 @@ export const {
   useUpdateOrderMutation,
   useCancelOrderMutation,
   useCompleteOrderMutation,
-  useCreatePaymentIntentMutation,
+  useCreatePaymentIntentQuery,
   useGetPaymentIntentStatusQuery,
   useConfirmPaymentMutation,
   useCancelPaymentIntentMutation,

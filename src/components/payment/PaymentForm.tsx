@@ -8,7 +8,7 @@ import { Loader2, CreditCard } from 'lucide-react';
 import { formatCurrency } from '@/lib/helperFun';
 import { extractErrorMessage } from '@/lib/errorHandler';
 import { useState, useEffect, startTransition } from 'react';
-import { useCreatePaymentIntentMutation, useGetPaymentIntentStatusQuery } from '@/store/api/ordersApi';
+import { useCreatePaymentIntentQuery, useGetPaymentIntentStatusQuery } from '@/store/api/ordersApi';
 
 const PaymentForm = ({
   orderId,
@@ -31,33 +31,14 @@ const PaymentForm = ({
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-  const [createPaymentIntent, { isLoading: isCreatingIntent }] = useCreatePaymentIntentMutation();
-  const { data: paymentStatus, refetch: refetchStatus } = useGetPaymentIntentStatusQuery(orderId, {
-    skip: !orderId || !clientSecret,
+  const { data: paymentIntent, isLoading: isCreatingIntent } = useCreatePaymentIntentQuery(orderId, {
     refetchOnMountOrArgChange: false,
   });
-
-  // Create payment intent when component mounts (only once per orderId)
-  useEffect(() => {
-    // Only create if we don't already have a client secret
-    if (clientSecret || isCreatingIntent) return;
-    const createIntent = async () => {
-      try {
-        const result = await createPaymentIntent(orderId).unwrap();
-        setClientSecret(result.client_secret);
-      } catch (error) {
-        toast({
-          title: t('orders.payment.error_creating_intent') || 'Error',
-          description: extractErrorMessage(error),
-          variant: 'destructive',
-        });
-      }
-    };
-    createIntent();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const clientSecret = paymentIntent?.client_secret;
+  const { data: paymentStatus, refetch: refetchStatus } = useGetPaymentIntentStatusQuery(orderId, {
+    skip: !orderId || !clientSecret
+  });
 
   // Check payment status periodically (only after payment is submitted and while processing)
   useEffect(() => {
@@ -85,7 +66,6 @@ const PaymentForm = ({
           description: t('orders.payment.success_desc') || 'Your payment has been processed successfully.',
         });
         onSuccess?.();
-        setClientSecret(null);
         setIsProcessing(false);
         onClose();
       });

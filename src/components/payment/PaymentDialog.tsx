@@ -1,16 +1,10 @@
-import { useState, useEffect, startTransition } from 'react';
+import { startTransition } from 'react';
 import { useTranslation } from 'react-i18next';
-import { loadStripe, Stripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Loader2, CreditCard, AlertCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useCreatePaymentIntentMutation, useGetPaymentIntentStatusQuery } from '@/store/api/ordersApi';
+import { CreditCard, AlertCircle } from 'lucide-react';
 import { useGetPaymentMethodsQuery } from '@/store/api/paymentsApi';
-import { extractErrorMessage } from '@/lib/errorHandler';
-import { formatCurrency } from '@/lib/helperFun';
-import { useAuth } from '@/store/hooks/useAuth';
 import PaymentForm from './PaymentForm';
 
 interface PaymentDialogProps {
