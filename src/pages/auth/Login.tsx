@@ -1,20 +1,33 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, ArrowLeft, LogIn, UserPlus, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/store/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { useUserRole } from '@/hooks/useUserRole';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useTranslation } from "react-i18next";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, ArrowLeft, LogIn, UserPlus, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/store/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useSearchParams } from "react-router-dom";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -22,7 +35,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const activeTab = searchParams.get("tab") as "login" | "signup" || "login";
+  const activeTab = (searchParams.get("tab") as "login" | "signup") || "login";
   const setActiveTab = (tab: "login" | "signup") => {
     searchParams.set("tab", tab);
     setSearchParams(searchParams);
@@ -33,13 +46,13 @@ export default function Login() {
   const { toast } = useToast();
 
   const loginSchema = z.object({
-    email: z.string().email(t('auth.login_page.invalid_email')),
-    password: z.string().min(6, t('auth.login_page.password_min_length')),
+    email: z.string().email(t("auth.login_page.invalid_email")),
+    password: z.string().min(6, t("auth.login_page.password_min_length")),
   });
 
   const signupSchema = z.object({
-    email: z.string().email(t('auth.login_page.invalid_email')),
-    password: z.string().min(6, t('auth.login_page.password_min_length')),
+    email: z.string().email(t("auth.login_page.invalid_email")),
+    password: z.string().min(6, t("auth.login_page.password_min_length")),
   });
 
   type LoginFormData = z.infer<typeof loginSchema>;
@@ -48,38 +61,41 @@ export default function Login() {
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
   const signupForm = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
   // Helper function to redirect based on role
-  const redirectBasedOnRole = useCallback((role: string) => {
-    const normalizedRole = role.toLowerCase();
-    switch (normalizedRole) {
-      case 'admin':
-        navigate('/admin/dashboard', { replace: true });
-        break;
-      case 'support':
-        navigate('/support/dashboard', { replace: true });
-        break;
-      case 'accounts':
-        navigate('/accounts/dashboard', { replace: true });
-        break;
-      case 'customer':
-      default:
-        navigate('/client/dashboard', { replace: true });
-        break;
-    }
-  }, [navigate]);
+  const redirectBasedOnRole = useCallback(
+    (role: string) => {
+      const normalizedRole = role.toLowerCase();
+      switch (normalizedRole) {
+        case "admin":
+          navigate("/admin/dashboard", { replace: true });
+          break;
+        case "support":
+          navigate("/support/dashboard", { replace: true });
+          break;
+        case "accounts":
+          navigate("/accounts/dashboard", { replace: true });
+          break;
+        case "customer":
+        default:
+          navigate("/client/dashboard", { replace: true });
+          break;
+      }
+    },
+    [navigate],
+  );
 
   // Redirect authenticated users away from login page
   useEffect(() => {
@@ -94,35 +110,47 @@ export default function Login() {
 
     try {
       const signInResult = await signIn(data.email, data.password);
-      const { error, user: signedInUser, profileCompletion } = signInResult as {
+      const {
+        error,
+        user: signedInUser,
+        profileCompletion,
+      } = signInResult as {
         error: { message: string } | null;
         user: { roles?: (string | { name: string })[] } | null;
-        profileCompletion?: { completion_percentage: number; is_complete: boolean; missing_fields: string[] } | null;
+        profileCompletion?: {
+          completion_percentage: number;
+          is_complete: boolean;
+          missing_fields: string[];
+        } | null;
       };
 
       if (error) {
         // Error message is already extracted and formatted by useAuth hook
-        setError(error.message || t('auth.login_page.unexpected_error'));
+        setError(error.message || t("auth.login_page.unexpected_error"));
         return;
       }
 
       toast({
-        title: t('auth.login_page.welcome_back'),
-        description: t('auth.login_page.login_success'),
+        title: t("auth.login_page.welcome_back"),
+        description: t("auth.login_page.login_success"),
       });
 
       // Check for return URL
-      const returnUrl = searchParams.get('returnUrl');
+      const returnUrl = searchParams.get("returnUrl");
 
       // Check profile completion first
-      const completionPercentage = profileCompletion?.completion_percentage ?? 100;
+      const completionPercentage =
+        profileCompletion?.completion_percentage ?? 100;
 
       // If profile is not complete (less than 100%), redirect to profile setup with return URL
       if (completionPercentage < 100) {
         if (returnUrl) {
-          navigate(`/client/profile-setup?returnUrl=${encodeURIComponent(returnUrl)}`, { replace: true });
+          navigate(
+            `/client/profile-setup?returnUrl=${encodeURIComponent(returnUrl)}`,
+            { replace: true },
+          );
         } else {
-          navigate('/client/profile-setup', { replace: true });
+          navigate("/client/profile-setup", { replace: true });
         }
         return;
       }
@@ -138,36 +166,41 @@ export default function Login() {
         // Handle both formats: array of strings ["admin"] or array of objects [{name: "admin"}]
         const roles = signedInUser.roles;
         const roleNames = roles.map((r: string | { name: string }) =>
-          typeof r === 'string' ? r.toLowerCase() : (r?.name || '').toLowerCase()
+          typeof r === "string"
+            ? r.toLowerCase()
+            : (r?.name || "").toLowerCase(),
         );
 
         // Prioritize admin role
-        const adminRole = roleNames.find((r: string) => r === 'admin');
-        const primaryRole = adminRole || roleNames[0] || 'customer';
+        const adminRole = roleNames.find((r: string) => r === "admin");
+        const primaryRole = adminRole || roleNames[0] || "customer";
 
         switch (primaryRole) {
-          case 'admin':
-            navigate('/admin/dashboard', { replace: true });
+          case "admin":
+            navigate("/admin/dashboard", { replace: true });
             break;
-          case 'support':
-            navigate('/support/dashboard', { replace: true });
+          case "support":
+            navigate("/support/dashboard", { replace: true });
             break;
-          case 'accounts':
-            navigate('/accounts/dashboard', { replace: true });
+          case "accounts":
+            navigate("/accounts/dashboard", { replace: true });
             break;
-          case 'customer':
+          case "customer":
           default:
-            navigate('/client/dashboard', { replace: true });
+            navigate("/client/dashboard", { replace: true });
             break;
         }
       } else {
         // Fallback: if no roles, go to client dashboard
-        navigate('/client/dashboard', { replace: true });
+        navigate("/client/dashboard", { replace: true });
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : t('auth.login_page.unexpected_error');
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : t("auth.login_page.unexpected_error");
       setError(errorMessage);
-      console.error('Login error:', err);
+      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -183,33 +216,55 @@ export default function Login() {
       if (error) {
         // Error message is already extracted and formatted by useAuth hook
         // Check for specific cases that need special handling
-        if (error.message?.toLowerCase().includes('already registered') ||
-          error.message?.toLowerCase().includes('user already exists')) {
-          setActiveTab('login');
-          loginForm.setValue('email', data.email);
+        if (
+          error.message?.toLowerCase().includes("already registered") ||
+          error.message?.toLowerCase().includes("user already exists")
+        ) {
+          setActiveTab("login");
+          loginForm.setValue("email", data.email);
         }
-        setError(error.message || t('auth.login_page.unexpected_error'));
+        setError(error.message || t("auth.login_page.unexpected_error"));
         return;
       }
 
       toast({
-        title: t('auth.login_page.account_created'),
-        description: t('auth.login_page.account_created_desc'),
+        title: t("auth.login_page.account_created"),
+        description: t("auth.login_page.account_created_desc"),
       });
 
       // Switch to login tab
-      setActiveTab('login');
-      loginForm.setValue('email', data.email);
+      setActiveTab("login");
+      loginForm.setValue("email", data.email);
       signupForm.reset();
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : t('auth.login_page.unexpected_error');
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : t("auth.login_page.unexpected_error");
       setError(errorMessage);
-      console.error('Signup error:', err);
+      console.error("Signup error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const mockUser = [
+    {
+      label: "Admin",
+      value: "admin@domainmarket.com",
+      password: "admin123",
+    },
+    {
+      label: "Seller",
+      value: "john@example.com",
+      password: "password123",
+    },
+    {
+      label: "Buyer",
+      value: "jane@example.com",
+      password: "password123",
+    },
+  ];
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -220,31 +275,37 @@ export default function Login() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t('auth.login_page.back_to_home')}
+            {t("auth.login_page.back_to_home")}
           </Link>
           <h1 className="text-3xl font-bold">Adominioz</h1>
           <p className="text-muted-foreground">
-            {t('Login and Register to access your personal dashboard')}
+            {t("Login and Register to access your personal dashboard")}
           </p>
         </div>
 
         <Card className="border-2">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl text-center">{t('auth.login_page.welcome')}</CardTitle>
+            <CardTitle className="text-2xl text-center">
+              {t("auth.login_page.welcome")}
+            </CardTitle>
             <CardDescription className="text-center">
-              {t('auth.login_page.subtitle')}
+              {t("auth.login_page.subtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login" className="flex items-center gap-2">
                   <LogIn className="h-4 w-4" />
-                  {t('auth.login_page.login')}
+                  {t("auth.login_page.login")}
                 </TabsTrigger>
                 <TabsTrigger value="signup" className="flex items-center gap-2">
                   <UserPlus className="h-4 w-4" />
-                  {t('auth.login_page.signup')}
+                  {t("auth.login_page.signup")}
                 </TabsTrigger>
               </TabsList>
 
@@ -256,17 +317,22 @@ export default function Login() {
 
               <TabsContent value="login" className="space-y-4 mt-0">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                  <form
+                    onSubmit={loginForm.handleSubmit(handleLogin)}
+                    className="space-y-4"
+                  >
                     <FormField
                       control={loginForm.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('auth.login_page.email')}</FormLabel>
+                          <FormLabel>{t("auth.login_page.email")}</FormLabel>
                           <FormControl>
                             <Input
                               type="email"
-                              placeholder={t('auth.login_page.email_placeholder')}
+                              placeholder={t(
+                                "auth.login_page.email_placeholder",
+                              )}
                               {...field}
                             />
                           </FormControl>
@@ -280,12 +346,14 @@ export default function Login() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('auth.login_page.password')}</FormLabel>
+                          <FormLabel>{t("auth.login_page.password")}</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Input
                                 type={showPassword ? "text" : "password"}
-                                placeholder={t('auth.login_page.password_placeholder')}
+                                placeholder={t(
+                                  "auth.login_page.password_placeholder",
+                                )}
                                 {...field}
                               />
                               <Button
@@ -308,16 +376,20 @@ export default function Login() {
                       )}
                     />
 
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t('auth.login_page.signing_in')}
+                          {t("auth.login_page.signing_in")}
                         </>
                       ) : (
                         <>
                           <LogIn className="mr-2 h-4 w-4" />
-                          {t('auth.login_page.login')}
+                          {t("auth.login_page.login")}
                         </>
                       )}
                     </Button>
@@ -327,17 +399,22 @@ export default function Login() {
 
               <TabsContent value="signup" className="space-y-4 mt-0">
                 <Form {...signupForm}>
-                  <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4">
+                  <form
+                    onSubmit={signupForm.handleSubmit(handleSignup)}
+                    className="space-y-4"
+                  >
                     <FormField
                       control={signupForm.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('auth.login_page.email')}</FormLabel>
+                          <FormLabel>{t("auth.login_page.email")}</FormLabel>
                           <FormControl>
                             <Input
                               type="email"
-                              placeholder={t('auth.login_page.email_placeholder')}
+                              placeholder={t(
+                                "auth.login_page.email_placeholder",
+                              )}
                               {...field}
                             />
                           </FormControl>
@@ -351,12 +428,14 @@ export default function Login() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('auth.login_page.password')}</FormLabel>
+                          <FormLabel>{t("auth.login_page.password")}</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Input
                                 type={showPassword ? "text" : "password"}
-                                placeholder={t('auth.login_page.password_placeholder')}
+                                placeholder={t(
+                                  "auth.login_page.password_placeholder",
+                                )}
                                 {...field}
                               />
                               <Button
@@ -379,16 +458,20 @@ export default function Login() {
                       )}
                     />
 
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t('auth.login_page.creating_account')}
+                          {t("auth.login_page.creating_account")}
                         </>
                       ) : (
                         <>
                           <UserPlus className="mr-2 h-4 w-4" />
-                          {t('auth.login_page.create_account')}
+                          {t("auth.login_page.create_account")}
                         </>
                       )}
                     </Button>
@@ -399,18 +482,39 @@ export default function Login() {
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
               <p>
-                {t('auth.login_page.terms_accept')}{' '}
+                {t("auth.login_page.terms_accept")}{" "}
                 <Link to="/terminos" className="text-primary hover:underline">
-                  {t('auth.login_page.terms_of_service')}
-                </Link>{' '}
-                {t('auth.login_page.and')}{' '}
+                  {t("auth.login_page.terms_of_service")}
+                </Link>{" "}
+                {t("auth.login_page.and")}{" "}
                 <Link to="/privacidad" className="text-primary hover:underline">
-                  {t('auth.login_page.privacy_policy')}
+                  {t("auth.login_page.privacy_policy")}
                 </Link>
               </p>
             </div>
           </CardContent>
         </Card>
+        {import.meta.env.DEV && (
+          <div className="space-y-2 bg-primary/5 p-10 rounded-md">
+            <h5 className="text-center text-md font-semibold">
+              Login as different user
+            </h5>
+            {mockUser.map((user) => (
+              <Button
+                key={user.value}
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  loginForm.setValue("email", user.value);
+                  loginForm.setValue("password", user.password);
+                }}
+              >
+                {user.label}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
