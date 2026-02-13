@@ -251,7 +251,7 @@ export default function Login() {
   const mockUser = [
     {
       label: "Admin",
-      value: "admin@domainmarket.com",
+      value: "admin@example.com",
       password: "admin123",
     },
     {
@@ -494,7 +494,7 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-        {import.meta.env.DEV && (
+        {/* {import.meta.env.DEV && ( */}
           <div className="space-y-2 bg-primary/5 p-10 rounded-md">
             <h5 className="text-center text-md font-semibold">
               Login as different user
@@ -514,7 +514,7 @@ export default function Login() {
               </Button>
             ))}
           </div>
-        )}
+        {/* // )} */}
       </div>
     </div>
   );
