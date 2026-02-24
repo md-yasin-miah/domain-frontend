@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     react()
   ].filter(Boolean),
   server: {
-    port: 8080,
+    port: 3000,
   },
   resolve: {
     alias: {

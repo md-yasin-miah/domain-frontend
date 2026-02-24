@@ -64,7 +64,7 @@ interface ReviewCreateRequest {
 interface FAQCreateRequest {
   question: string;
   answer: string;
-  category?: string;
+  category_id?: number | null;
   order?: number;
   is_active?: boolean;
 }

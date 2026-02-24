@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { mockData, mockAuth } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,7 +19,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  X,
   Check,
   XCircle,
 } from "lucide-react";
@@ -53,88 +51,168 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-  category: string | null;
-  order_index: number;
-  is_published: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  useGetFAQsQuery,
+  useCreateFAQMutation,
+  useUpdateFAQMutation,
+  useDeleteFAQMutation,
+} from "@/store/api/faqApi";
+import { useGetFAQCategoriesQuery } from "@/store/api/categoryApi";
 
 interface FAQFormData {
   question: string;
   answer: string;
-  category: string;
-  order_index: number;
-  is_published: boolean;
+  category_id: number | null;
+  order: number;
+  is_active: boolean;
+}
+
+const DEFAULT_FORM: FAQFormData = {
+  question: "",
+  answer: "",
+  category_id: null,
+  order: 0,
+  is_active: true,
+};
+
+interface FAQFormProps {
+  formData: FAQFormData;
+  onChange: (data: FAQFormData) => void;
+  categories: Category[];
+}
+
+function FAQForm({ formData, onChange, categories }: FAQFormProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="question">
+          {t("admin.faq.form.question")} *
+        </Label>
+        <Input
+          id="question"
+          value={formData.question}
+          onChange={(e) => onChange({ ...formData, question: e.target.value })}
+          placeholder={t("admin.faq.form.question_placeholder")}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="answer">
+          {t("admin.faq.form.answer")} *
+        </Label>
+        <Textarea
+          id="answer"
+          value={formData.answer}
+          onChange={(e) => onChange({ ...formData, answer: e.target.value })}
+          placeholder={t("admin.faq.form.answer_placeholder")}
+          rows={6}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="category">{t("admin.faq.form.category")}</Label>
+        <Select
+          value={formData.category_id ? String(formData.category_id) : "none"}
+          onValueChange={(val) =>
+            onChange({
+              ...formData,
+              category_id: val === "none" ? null : Number(val),
+            })
+          }
+        >
+          <SelectTrigger id="category">
+            <SelectValue placeholder={t("admin.faq.form.category_placeholder")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">
+              {t("admin.faq.form.no_category") || "No category"}
+            </SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={String(cat.id)}>
+                {cat.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="order">{t("admin.faq.form.order_index")}</Label>
+        <Input
+          id="order"
+          type="number"
+          value={formData.order}
+          onChange={(e) =>
+            onChange({ ...formData, order: parseInt(e.target.value) || 0 })
+          }
+        />
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="is_active"
+          checked={formData.is_active}
+          onCheckedChange={(checked) =>
+            onChange({ ...formData, is_active: checked })
+          }
+        />
+        <Label htmlFor="is_active">{t("admin.faq.form.is_published")}</Label>
+      </div>
+    </div>
+  );
 }
 
 export default function FAQManager() {
   const { t } = useTranslation();
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [faqToDelete, setFaqToDelete] = useState<FAQ | null>(null);
   const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
-  const [formLoading, setFormLoading] = useState(false);
-  const { toast } = useToast();
+  const [formData, setFormData] = useState<FAQFormData>(DEFAULT_FORM);
 
-  const [formData, setFormData] = useState<FAQFormData>({
-    question: "",
-    answer: "",
-    category: "",
-    order_index: 0,
-    is_published: true,
-  });
+  // RTK Query hooks
+  const { data: faqsData, isLoading } = useGetFAQsQuery({ skip: 0, limit: 100 });
+  const { data: categoriesData } = useGetFAQCategoriesQuery({ skip: 0, limit: 100 });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const [createFAQ, { isLoading: isCreating }] = useCreateFAQMutation();
+  const [updateFAQ, { isLoading: isUpdating }] = useUpdateFAQMutation();
+  const [deleteFAQ, { isLoading: isDeleting }] = useDeleteFAQMutation();
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      // Admins can view all FAQs (including unpublished)
-      const { data, error } = await supabase
-        .from("faqs")
-        .select("*")
-        .order("order_index", { ascending: true })
-        .order("created_at", { ascending: false });
+  const faqs: FAQ[] = Array.isArray(faqsData)
+    ? faqsData
+    : (faqsData?.items ?? []);
 
-      if (error) throw error;
-      setFaqs(data || []);
-    } catch (error: any) {
-      console.error("Error fetching FAQs:", error);
-      toast({
-        title: t("admin.faq.errors.fetch_error"),
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const categories: Category[] = Array.isArray(categoriesData)
+    ? categoriesData
+    : (categoriesData?.items ?? []);
+
+  const filteredFAQs = faqs.filter(
+    (faq) =>
+      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (faq.category?.name ?? "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const resetForm = () => {
-    setFormData({
-      question: "",
-      answer: "",
-      category: "",
-      order_index: 0,
-      is_published: true,
-    });
+    setFormData(DEFAULT_FORM);
     setEditingFAQ(null);
   };
 
   const handleCreate = async () => {
-    if (!formData.question || !formData.answer) {
+    if (!formData.question.trim() || !formData.answer.trim()) {
       toast({
         title: t("admin.faq.errors.required_fields"),
         variant: "destructive",
@@ -143,23 +221,13 @@ export default function FAQManager() {
     }
 
     try {
-      setFormLoading(true);
-
-      const { data, error } = await supabase.functions.invoke("create-faq", {
-        body: {
-          question: formData.question,
-          answer: formData.answer,
-          category: formData.category || null,
-          order_index: formData.order_index || 0,
-          is_published: formData.is_published,
-        },
-      });
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || t("admin.faq.errors.create_error"));
-      }
+      await createFAQ({
+        question: formData.question,
+        answer: formData.answer,
+        category_id: formData.category_id ?? undefined,
+        order: formData.order,
+        is_active: formData.is_active,
+      }).unwrap();
 
       toast({
         title: t("admin.faq.messages.create_success"),
@@ -168,16 +236,13 @@ export default function FAQManager() {
 
       setShowCreateDialog(false);
       resetForm();
-      fetchData();
-    } catch (error: any) {
-      console.error("Error creating FAQ:", error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t("admin.faq.errors.create_error");
       toast({
         title: t("admin.faq.errors.create_error"),
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
-    } finally {
-      setFormLoading(false);
     }
   };
 
@@ -186,15 +251,15 @@ export default function FAQManager() {
     setFormData({
       question: faq.question,
       answer: faq.answer,
-      category: faq.category || "",
-      order_index: faq.order_index,
-      is_published: faq.is_published,
+      category_id: faq.category_id ?? null,
+      order: faq.order,
+      is_active: faq.is_active,
     });
     setShowEditDialog(true);
   };
 
   const handleUpdate = async () => {
-    if (!editingFAQ || !formData.question || !formData.answer) {
+    if (!editingFAQ || !formData.question.trim() || !formData.answer.trim()) {
       toast({
         title: t("admin.faq.errors.required_fields"),
         variant: "destructive",
@@ -203,24 +268,16 @@ export default function FAQManager() {
     }
 
     try {
-      setFormLoading(true);
-
-      const { data, error } = await supabase.functions.invoke("update-faq", {
-        body: {
-          id: editingFAQ.id,
+      await updateFAQ({
+        id: editingFAQ.id,
+        data: {
           question: formData.question,
           answer: formData.answer,
-          category: formData.category || null,
-          order_index: formData.order_index || 0,
-          is_published: formData.is_published,
+          category_id: formData.category_id ?? undefined,
+          order: formData.order,
+          is_active: formData.is_active,
         },
-      });
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || t("admin.faq.errors.update_error"));
-      }
+      }).unwrap();
 
       toast({
         title: t("admin.faq.messages.update_success"),
@@ -229,16 +286,13 @@ export default function FAQManager() {
 
       setShowEditDialog(false);
       resetForm();
-      fetchData();
-    } catch (error: any) {
-      console.error("Error updating FAQ:", error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t("admin.faq.errors.update_error");
       toast({
         title: t("admin.faq.errors.update_error"),
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
-    } finally {
-      setFormLoading(false);
     }
   };
 
@@ -246,19 +300,7 @@ export default function FAQManager() {
     if (!faqToDelete) return;
 
     try {
-      setFormLoading(true);
-
-      const { data, error } = await supabase.functions.invoke("delete-faq", {
-        body: {
-          id: faqToDelete.id,
-        },
-      });
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || t("admin.faq.errors.delete_error"));
-      }
+      await deleteFAQ(faqToDelete.id).unwrap();
 
       toast({
         title: t("admin.faq.messages.delete_success"),
@@ -267,30 +309,15 @@ export default function FAQManager() {
 
       setShowDeleteDialog(false);
       setFaqToDelete(null);
-      fetchData();
-    } catch (error: any) {
-      console.error("Error deleting FAQ:", error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t("admin.faq.errors.delete_error");
       toast({
         title: t("admin.faq.errors.delete_error"),
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
-    } finally {
-      setFormLoading(false);
     }
   };
-
-  const filteredFAQs = faqs.filter(
-    (faq) =>
-      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (faq.category &&
-        faq.category.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  const categories = Array.from(
-    new Set(faqs.map((faq) => faq.category).filter(Boolean))
-  ) as string[];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -304,92 +331,28 @@ export default function FAQManager() {
               </CardTitle>
               <CardDescription>{t("admin.faq.description")}</CardDescription>
             </div>
-            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+
+            <Dialog
+              open={showCreateDialog}
+              onOpenChange={(open) => {
+                setShowCreateDialog(open);
+                if (!open) resetForm();
+              }}
+            >
               <DialogTrigger asChild>
-                <Button onClick={() => resetForm()}>
+                <Button onClick={resetForm}>
                   <Plus className="h-4 w-4 mr-2" />
                   {t("admin.faq.create_faq")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>
-                    {t("admin.faq.create_dialog.title")}
-                  </DialogTitle>
+                  <DialogTitle>{t("admin.faq.create_dialog.title")}</DialogTitle>
                   <DialogDescription>
                     {t("admin.faq.create_dialog.description")}
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="question">
-                      {t("admin.faq.form.question")} *
-                    </Label>
-                    <Input
-                      id="question"
-                      value={formData.question}
-                      onChange={(e) =>
-                        setFormData({ ...formData, question: e.target.value })
-                      }
-                      placeholder={t("admin.faq.form.question_placeholder")}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="answer">
-                      {t("admin.faq.form.answer")} *
-                    </Label>
-                    <Textarea
-                      id="answer"
-                      value={formData.answer}
-                      onChange={(e) =>
-                        setFormData({ ...formData, answer: e.target.value })
-                      }
-                      placeholder={t("admin.faq.form.answer_placeholder")}
-                      rows={6}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="category">
-                      {t("admin.faq.form.category")}
-                    </Label>
-                    <Input
-                      id="category"
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({ ...formData, category: e.target.value })
-                      }
-                      placeholder={t("admin.faq.form.category_placeholder")}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="order_index">
-                      {t("admin.faq.form.order_index")}
-                    </Label>
-                    <Input
-                      id="order_index"
-                      type="number"
-                      value={formData.order_index}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          order_index: parseInt(e.target.value) || 0,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="is_published"
-                      checked={formData.is_published}
-                      onCheckedChange={(checked) =>
-                        setFormData({ ...formData, is_published: checked })
-                      }
-                    />
-                    <Label htmlFor="is_published">
-                      {t("admin.faq.form.is_published")}
-                    </Label>
-                  </div>
-                </div>
+                <FAQForm formData={formData} onChange={setFormData} categories={categories} />
                 <DialogFooter>
                   <Button
                     variant="outline"
@@ -397,8 +360,8 @@ export default function FAQManager() {
                   >
                     {t("common.cancel")}
                   </Button>
-                  <Button onClick={handleCreate} disabled={formLoading}>
-                    {formLoading ? (
+                  <Button onClick={handleCreate} disabled={isCreating}>
+                    {isCreating ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         {t("common.loading")}
@@ -412,29 +375,26 @@ export default function FAQManager() {
             </Dialog>
           </div>
         </CardHeader>
+
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder={t("admin.faq.search_placeholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder={t("admin.faq.search_placeholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
-            {loading ? (
+            {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             ) : filteredFAQs.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                {searchTerm
-                  ? t("admin.faq.no_results")
-                  : t("admin.faq.no_faqs")}
+                {searchTerm ? t("admin.faq.no_results") : t("admin.faq.no_faqs")}
               </div>
             ) : (
               <Table>
@@ -458,14 +418,14 @@ export default function FAQManager() {
                       </TableCell>
                       <TableCell>
                         {faq.category ? (
-                          <Badge variant="outline">{faq.category}</Badge>
+                          <Badge variant="outline">{faq.category.name}</Badge>
                         ) : (
                           <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
-                      <TableCell>{faq.order_index}</TableCell>
+                      <TableCell>{faq.order}</TableCell>
                       <TableCell>
-                        {faq.is_published ? (
+                        {faq.is_active ? (
                           <Badge className="bg-green-500">
                             <Check className="h-3 w-3 mr-1" />
                             {t("admin.faq.published")}
@@ -508,7 +468,13 @@ export default function FAQManager() {
       </Card>
 
       {/* Edit Dialog */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+      <Dialog
+        open={showEditDialog}
+        onOpenChange={(open) => {
+          setShowEditDialog(open);
+          if (!open) resetForm();
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t("admin.faq.edit_dialog.title")}</DialogTitle>
@@ -516,82 +482,13 @@ export default function FAQManager() {
               {t("admin.faq.edit_dialog.description")}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-question">
-                {t("admin.faq.form.question")} *
-              </Label>
-              <Input
-                id="edit-question"
-                value={formData.question}
-                onChange={(e) =>
-                  setFormData({ ...formData, question: e.target.value })
-                }
-                placeholder={t("admin.faq.form.question_placeholder")}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-answer">
-                {t("admin.faq.form.answer")} *
-              </Label>
-              <Textarea
-                id="edit-answer"
-                value={formData.answer}
-                onChange={(e) =>
-                  setFormData({ ...formData, answer: e.target.value })
-                }
-                placeholder={t("admin.faq.form.answer_placeholder")}
-                rows={6}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-category">
-                {t("admin.faq.form.category")}
-              </Label>
-              <Input
-                id="edit-category"
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                placeholder={t("admin.faq.form.category_placeholder")}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-order_index">
-                {t("admin.faq.form.order_index")}
-              </Label>
-              <Input
-                id="edit-order_index"
-                type="number"
-                value={formData.order_index}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    order_index: parseInt(e.target.value) || 0,
-                  })
-                }
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="edit-is_published"
-                checked={formData.is_published}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_published: checked })
-                }
-              />
-              <Label htmlFor="edit-is_published">
-                {t("admin.faq.form.is_published")}
-              </Label>
-            </div>
-          </div>
+          <FAQForm formData={formData} onChange={setFormData} categories={categories} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditDialog(false)}>
               {t("common.cancel")}
             </Button>
-            <Button onClick={handleUpdate} disabled={formLoading}>
-              {formLoading ? (
+            <Button onClick={handleUpdate} disabled={isUpdating}>
+              {isUpdating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   {t("common.loading")}
@@ -604,7 +501,7 @@ export default function FAQManager() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Dialog */}
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -625,9 +522,9 @@ export default function FAQManager() {
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={formLoading}
+              disabled={isDeleting}
             >
-              {formLoading ? (
+              {isDeleting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   {t("common.loading")}
