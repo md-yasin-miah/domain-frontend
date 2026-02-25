@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Plus, Trash2, Edit2, Save, X, Loader2, Search, KeyRound } from 'lucide-react';
+import { Shield, Plus, Trash2, Edit2, Save, X, Loader2, Search, KeyRound, Eye, Link2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  useGetEndpointPermissionsQuery,
+  useCreateEndpointPermissionMutation,
+  useUpdateEndpointPermissionMutation,
+  useDeleteEndpointPermissionMutation,
+  type EndpointPermission,
+} from '@/store/api/endpointPermissionsApi';
+
+const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'] as const;
 
 const PERMISSION_CATEGORY_ORDER = [
   'user_management',
@@ -69,8 +85,21 @@ export default function RolesPermissions() {
   const [deleteRoleOpen, setDeleteRoleOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<RoleResponse | null>(null);
 
-  const [mainTab, setMainTab] = useState<'roles' | 'permissions'>('roles');
+  const [mainTab, setMainTab] = useState<'roles' | 'permissions' | 'endpoint_permissions'>('roles');
   const [showCreatePermissionDialog, setShowCreatePermissionDialog] = useState(false);
+  const [epModalOpen, setEpModalOpen] = useState(false);
+  const [epModalMode, setEpModalMode] = useState<'create' | 'view' | 'edit'>('create');
+  const [selectedEp, setSelectedEp] = useState<EndpointPermission | null>(null);
+  const [epFormData, setEpFormData] = useState({
+    method: 'GET',
+    path_pattern: '',
+    description: '',
+    is_active: true,
+    requires_auth: true,
+    permission_id: 0,
+  });
+  const [epToDelete, setEpToDelete] = useState<EndpointPermission | null>(null);
+  const [deleteEpOpen, setDeleteEpOpen] = useState(false);
   const [newPermission, setNewPermission] = useState({ name: '', description: '' });
   const [editingPermission, setEditingPermission] = useState<PermissionResponse | null>(null);
   const [permissionToDelete, setPermissionToDelete] = useState<PermissionResponse | null>(null);
@@ -95,8 +124,24 @@ export default function RolesPermissions() {
   const [updatePermission, { isLoading: isUpdatingPermission }] = useUpdatePermissionMutation();
   const [deletePermission, { isLoading: isDeletingPermission }] = useDeletePermissionMutation();
 
-  const loading = rolesLoading || permissionsLoading;
-  const error = rolesError || permissionsError;
+  const {
+    data: epData = [],
+    isLoading: epLoading,
+    error: epError,
+    refetch: refetchEp,
+  } = useGetEndpointPermissionsQuery(
+    {},
+    { skip: mainTab !== 'endpoint_permissions' }
+  );
+  const [createEp, { isLoading: isCreatingEp }] = useCreateEndpointPermissionMutation();
+  const [updateEp, { isLoading: isUpdatingEp }] = useUpdateEndpointPermissionMutation();
+  const [deleteEp, { isLoading: isDeletingEp }] = useDeleteEndpointPermissionMutation();
+
+  const loading =
+    rolesLoading ||
+    permissionsLoading ||
+    (mainTab === 'endpoint_permissions' ? epLoading : false);
+  const error = rolesError || permissionsError || epError;
 
   useEffect(() => {
     if (rolesData.length > 0 && !selectedRole) {
@@ -369,6 +414,130 @@ export default function RolesPermissions() {
     }
   };
 
+  const openEpModal = (mode: 'create' | 'view' | 'edit', item?: EndpointPermission) => {
+    setEpModalMode(mode);
+    if (mode === 'create') {
+      setSelectedEp(null);
+      setEpFormData({
+        method: 'GET',
+        path_pattern: '',
+        description: '',
+        is_active: true,
+        requires_auth: true,
+        permission_id: permissionsData[0]?.id ?? 0,
+      });
+    } else if (item) {
+      setSelectedEp(item);
+      setEpFormData({
+        method: item.method,
+        path_pattern: item.path_pattern,
+        description: item.description ?? '',
+        is_active: item.is_active,
+        requires_auth: item.requires_auth,
+        permission_id: item.permission_id,
+      });
+    }
+    setEpModalOpen(true);
+  };
+
+  const handleCreateEp = async () => {
+    if (!epFormData.path_pattern.trim()) {
+      toast({
+        title: t('admin.roles_permissions.ep_errors.create_error'),
+        description: 'Path pattern is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+    if (!epFormData.permission_id) {
+      toast({
+        title: t('admin.roles_permissions.ep_errors.create_error'),
+        description: 'Permission is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+    try {
+      await createEp({
+        method: epFormData.method,
+        path_pattern: epFormData.path_pattern.trim(),
+        description: epFormData.description.trim() || null,
+        is_active: epFormData.is_active,
+        requires_auth: epFormData.requires_auth,
+        permission_id: epFormData.permission_id,
+      }).unwrap();
+      setEpModalOpen(false);
+      refetchEp();
+      toast({
+        title: t('admin.roles_permissions.ep_created'),
+      });
+    } catch (err: unknown) {
+      toast({
+        title: t('admin.roles_permissions.ep_errors.create_error'),
+        description: extractErrorMessage(err),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleUpdateEp = async () => {
+    if (!selectedEp) return;
+    if (!epFormData.path_pattern.trim()) {
+      toast({
+        title: t('admin.roles_permissions.ep_errors.update_error'),
+        description: 'Path pattern is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+    try {
+      await updateEp({
+        id: selectedEp.id,
+        data: {
+          method: epFormData.method,
+          path_pattern: epFormData.path_pattern.trim(),
+          description: epFormData.description.trim() || null,
+          is_active: epFormData.is_active,
+          requires_auth: epFormData.requires_auth,
+          permission_id: epFormData.permission_id,
+        },
+      }).unwrap();
+      setEpModalOpen(false);
+      setSelectedEp(null);
+      refetchEp();
+      toast({
+        title: t('admin.roles_permissions.ep_updated'),
+      });
+    } catch (err: unknown) {
+      toast({
+        title: t('admin.roles_permissions.ep_errors.update_error'),
+        description: extractErrorMessage(err),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteEpConfirm = async () => {
+    if (!epToDelete) return;
+    try {
+      await deleteEp(epToDelete.id).unwrap();
+      setDeleteEpOpen(false);
+      setEpToDelete(null);
+      refetchEp();
+      toast({
+        title: t('admin.roles_permissions.ep_deleted'),
+      });
+    } catch (err: unknown) {
+      toast({
+        title: t('admin.roles_permissions.ep_errors.delete_error'),
+        description: extractErrorMessage(err),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const epList = Array.isArray(epData) ? epData : [];
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-6">
@@ -379,8 +548,8 @@ export default function RolesPermissions() {
         <p className="text-muted-foreground mt-2">{t('admin.roles_permissions.description')}</p>
       </div>
 
-      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'roles' | 'permissions')}>
-        <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'roles' | 'permissions' | 'endpoint_permissions')}>
+        <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6">
           <TabsTrigger value="roles" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
             {t('admin.roles_permissions.roles_tab')}
@@ -388,6 +557,10 @@ export default function RolesPermissions() {
           <TabsTrigger value="permissions" className="flex items-center gap-2">
             <KeyRound className="h-4 w-4" />
             {t('admin.roles_permissions.permissions_tab')}
+          </TabsTrigger>
+          <TabsTrigger value="endpoint_permissions" className="flex items-center gap-2">
+            <Link2 className="h-4 w-4" />
+            {t('admin.roles_permissions.endpoint_permissions_tab')}
           </TabsTrigger>
         </TabsList>
 
@@ -804,7 +977,295 @@ export default function RolesPermissions() {
             </Card>
           )}
         </TabsContent>
+
+        {/* ENDPOINT PERMISSIONS TAB */}
+        <TabsContent value="endpoint_permissions" className="space-y-6">
+          <div className="flex justify-end">
+            <Button onClick={() => openEpModal('create')}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t('admin.roles_permissions.ep_add')}
+            </Button>
+          </div>
+
+          {mainTab === 'endpoint_permissions' && epLoading ? (
+            <Card>
+              <CardContent className="flex items-center justify-center py-16">
+                <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+              </CardContent>
+            </Card>
+          ) : epList.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <Link2 className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-4">{t('admin.roles_permissions.no_ep')}</p>
+                <Button onClick={() => openEpModal('create')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('admin.roles_permissions.ep_add')}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('admin.roles_permissions.endpoint_permissions_tab')}</CardTitle>
+                <CardDescription>
+                  {epList.length} mapping{epList.length !== 1 ? 's' : ''}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-muted/50">
+                        <th className="h-10 px-4 text-left font-medium">Method</th>
+                        <th className="h-10 px-4 text-left font-medium">Path</th>
+                        <th className="h-10 px-4 text-left font-medium">Permission</th>
+                        <th className="h-10 px-4 text-left font-medium">Auth</th>
+                        <th className="h-10 px-4 text-left font-medium">Active</th>
+                        <th className="h-10 px-4 text-right font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {epList.map((ep) => (
+                        <tr key={ep.id} className="border-b last:border-0">
+                          <td className="px-4 py-3">
+                            <Badge variant="outline">{ep.method}</Badge>
+                          </td>
+                          <td className="px-4 py-3 font-mono text-xs">{ep.path_pattern}</td>
+                          <td className="px-4 py-3">
+                            {ep.permission ? ep.permission.name : `ID ${ep.permission_id}`}
+                          </td>
+                          <td className="px-4 py-3">{ep.requires_auth ? 'Yes' : 'No'}</td>
+                          <td className="px-4 py-3">{ep.is_active ? 'Yes' : 'No'}</td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => openEpModal('view', ep)}
+                                aria-label={t('admin.roles_permissions.edit')}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => openEpModal('edit', ep)}
+                                aria-label={t('admin.roles_permissions.edit')}
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  setEpToDelete(ep);
+                                  setDeleteEpOpen(true);
+                                }}
+                                disabled={isDeletingEp}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
       </Tabs>
+
+      {/* Endpoint Permission Modal (Add / View / Edit) */}
+      <Dialog open={epModalOpen} onOpenChange={setEpModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {epModalMode === 'create'
+                ? t('admin.roles_permissions.ep_create_title')
+                : epModalMode === 'view'
+                  ? t('admin.roles_permissions.ep_view_title')
+                  : t('admin.roles_permissions.ep_edit_title')}
+            </DialogTitle>
+            <DialogDescription>{t('admin.roles_permissions.ep_modal_description')}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{t('admin.roles_permissions.ep_method')}</Label>
+                <Select
+                  value={epFormData.method}
+                  onValueChange={(v) => setEpFormData((prev) => ({ ...prev, method: v }))}
+                  disabled={epModalMode === 'view'}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HTTP_METHODS.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>{t('admin.roles_permissions.ep_permission')}</Label>
+                <Select
+                  value={epFormData.permission_id ? String(epFormData.permission_id) : ''}
+                  onValueChange={(v) => setEpFormData((prev) => ({ ...prev, permission_id: Number(v) }))}
+                  disabled={epModalMode === 'view'}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('admin.roles_permissions.ep_permission_placeholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {permissionsData.map((p) => (
+                      <SelectItem key={p.id} value={String(p.id)}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>{t('admin.roles_permissions.ep_path_pattern')}</Label>
+              <Input
+                value={epFormData.path_pattern}
+                onChange={(e) => setEpFormData((prev) => ({ ...prev, path_pattern: e.target.value }))}
+                placeholder={t('admin.roles_permissions.ep_path_placeholder')}
+                readOnly={epModalMode === 'view'}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('admin.roles_permissions.ep_description')}</Label>
+              <Textarea
+                value={epFormData.description}
+                onChange={(e) => setEpFormData((prev) => ({ ...prev, description: e.target.value }))}
+                placeholder={t('admin.roles_permissions.ep_description_placeholder')}
+                rows={2}
+                readOnly={epModalMode === 'view'}
+              />
+            </div>
+            {epModalMode !== 'view' && (
+              <div className="flex gap-6">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="ep-is-active"
+                    checked={epFormData.is_active}
+                    onCheckedChange={(v) => setEpFormData((prev) => ({ ...prev, is_active: v === true }))}
+                  />
+                  <Label htmlFor="ep-is-active">{t('admin.roles_permissions.ep_is_active')}</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="ep-requires-auth"
+                    checked={epFormData.requires_auth}
+                    onCheckedChange={(v) => setEpFormData((prev) => ({ ...prev, requires_auth: v === true }))}
+                  />
+                  <Label htmlFor="ep-requires-auth">{t('admin.roles_permissions.ep_requires_auth')}</Label>
+                </div>
+              </div>
+            )}
+            {epModalMode === 'view' && (
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>
+                  <span className="font-medium">Active:</span> {epFormData.is_active ? 'Yes' : 'No'}
+                </p>
+                <p>
+                  <span className="font-medium">Requires auth:</span> {epFormData.requires_auth ? 'Yes' : 'No'}
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            {epModalMode === 'view' ? (
+              <>
+                <Button variant="outline" onClick={() => setEpModalOpen(false)}>
+                  {t('common.close')}
+                </Button>
+                <Button onClick={() => setEpModalMode('edit')}>
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  {t('admin.roles_permissions.edit')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setEpModalOpen(false)}>
+                  {t('admin.roles_permissions.cancel')}
+                </Button>
+                {epModalMode === 'create' ? (
+                  <Button onClick={handleCreateEp} disabled={isCreatingEp}>
+                    {isCreatingEp ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t('admin.roles_permissions.creating')}
+                      </>
+                    ) : (
+                      t('admin.roles_permissions.ep_add')
+                    )}
+                  </Button>
+                ) : (
+                  <Button onClick={handleUpdateEp} disabled={isUpdatingEp}>
+                    {isUpdatingEp ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t('admin.roles_permissions.save')}
+                      </>
+                    ) : (
+                      t('admin.roles_permissions.save')
+                    )}
+                  </Button>
+                )}
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Endpoint Permission Confirmation */}
+      <AlertDialog open={deleteEpOpen} onOpenChange={setDeleteEpOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('admin.roles_permissions.ep_delete_confirm_title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('admin.roles_permissions.ep_delete_confirm')}
+              {epToDelete && (
+                <div className="mt-3 p-3 rounded-md bg-muted font-mono text-sm">
+                  {epToDelete.method} {epToDelete.path_pattern}
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setEpToDelete(null)}>
+              {t('admin.roles_permissions.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteEpConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeletingEp}
+            >
+              {isDeletingEp ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('admin.roles_permissions.deleting')}
+                </>
+              ) : (
+                t('admin.roles_permissions.delete')
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Role Confirmation */}
       <AlertDialog open={deleteRoleOpen} onOpenChange={setDeleteRoleOpen}>

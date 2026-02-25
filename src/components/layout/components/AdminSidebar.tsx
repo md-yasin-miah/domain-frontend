@@ -27,26 +27,26 @@ const adminMenuItems: MenuItem[] = [
     icon: Shield,
     url: "/admin/roles-and-permissions",
   },
-  {
-    title: "Configuration",
-    icon: Settings,
-    url: "/admin/config",
-  },
-  {
-    title: "Advanced Settings",
-    icon: Settings,
-    url: "/admin/advanced-settings",
-  },
-  {
-    title: "SEO Settings",
-    icon: TrendingUp,
-    url: "/admin/seo-settings",
-  },
-  {
-    title: "Backup & Restore",
-    icon: Save,
-    url: "/admin/backup-settings",
-  },
+  // {
+  //   title: "Configuration",
+  //   icon: Settings,
+  //   url: "/admin/config",
+  // },
+  // {
+  //   title: "Advanced Settings",
+  //   icon: Settings,
+  //   url: "/admin/advanced-settings",
+  // },
+  // {
+  //   title: "SEO Settings",
+  //   icon: TrendingUp,
+  //   url: "/admin/seo-settings",
+  // },
+  // {
+  //   title: "Backup & Restore",
+  //   icon: Save,
+  //   url: "/admin/backup-settings",
+  // },
   {
     title: "Blog Manager",
     icon: FileText,
