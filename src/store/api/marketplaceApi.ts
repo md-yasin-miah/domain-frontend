@@ -29,12 +29,25 @@ export const marketplaceApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['MyMarketplaceListing'],
     }),
-    getMarketplaceListing: builder.query<MarketplaceListing, number>({
-      query: (id) => ({
-        url: `/marketplace/listings/${id}`,
-        method: 'GET',
-      }),
-      providesTags: (result, error, id) => [{ type: 'Domain', id }],
+    getMarketplaceListing: builder.query<
+      MarketplaceListing,
+      number | { id: number; increment_view?: boolean }
+    >({
+      query: (arg) => {
+        const id = typeof arg === 'number' ? arg : arg.id;
+        const params =
+          typeof arg === 'object' && arg.increment_view === false
+            ? { increment_view: false }
+            : {};
+        return {
+          url: `/marketplace/listings/${id}`,
+          method: 'GET',
+          params,
+        };
+      },
+      providesTags: (result, error, arg) => [
+        { type: 'Domain', id: typeof arg === 'number' ? arg : arg.id },
+      ],
     }),
     createMarketplaceListing: builder.mutation<MarketplaceListing, ListingCreateRequest>({
       query: (data) => ({
@@ -42,7 +55,7 @@ export const marketplaceApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ['MarketplaceListing', 'MyMarketplaceListing'],
     }),
     updateMarketplaceListing: builder.mutation<MarketplaceListing, { id: number; data: ListingUpdateRequest }>({
       query: ({ id, data }) => ({
@@ -50,14 +63,18 @@ export const marketplaceApi = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Domain', id },
+        'MarketplaceListing',
+        'MyMarketplaceListing',
+      ],
     }),
     deleteMarketplaceListing: builder.mutation<void, number>({
       query: (id) => ({
         url: `/marketplace/listings/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ['MarketplaceListing', 'MyMarketplaceListing'],
     }),
     getMarketplaceListingBySlug: builder.query<MarketplaceListing, string>({
       query: (slug) => ({
@@ -80,7 +97,7 @@ export const marketplaceApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Domain', id }, 'Domain'],
     }),
-    updateMarketplaceListingStatus: builder.mutation<MarketplaceListing, { id: number; new_status: 'active' | 'draft' }>({
+    updateMarketplaceListingStatus: builder.mutation<MarketplaceListing, { id: number; new_status: 'draft' | 'active' | 'pending' | 'sold' }>({
       query: ({ id, new_status }) => ({
         url: `/marketplace/listings/${id}/status`,
         method: 'PATCH',

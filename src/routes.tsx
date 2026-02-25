@@ -23,13 +23,19 @@ const ProteccionDatos = lazy(() => import("./pages/legal/ProteccionDatos"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const SellerDashboard = lazy(() => import("./pages/admin/SellerDashboard"));
 const BuyerDashboard = lazy(() => import("./pages/admin/BuyerDashboard"));
-const SuperAdminDashboard = lazy(() => import("./pages/admin/SuperAdminDashboard"));
+const SuperAdminDashboard = lazy(
+  () => import("./pages/admin/SuperAdminDashboard"),
+);
 const Apps = lazy(() => import("./pages/marketplace/Apps"));
 const FBA = lazy(() => import("./pages/marketplace/FBA"));
-const ClientDomainsPage = lazy(() => import("./pages/client/ClientDomainsPage"));
+const ClientDomainsPage = lazy(
+  () => import("./pages/client/ClientDomainsPage"),
+);
 const Facturas = lazy(() => import("./pages/client/Facturas"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
-const GestionListados = lazy(() => import("./pages/admin/GestionListados"));
+const ListingsManagement = lazy(() => import("./pages/admin/ListingsManagement"));
+const ListingCreateEdit = lazy(() => import("./pages/admin/ListingCreateEdit"));
+const AdminListingDetail = lazy(() => import("./pages/admin/ListingDetail"));
 const AdminConfig = lazy(() => import("./pages/admin/AdminConfig"));
 const AdminUsuarios = lazy(() => import("./pages/admin/AdminUsuarios"));
 const MarketplaceAdmin = lazy(() => import("./pages/admin/MarketplaceAdmin"));
@@ -46,9 +52,13 @@ const Blog = lazy(() => import("./pages/resources/Blog"));
 const BlogPostDetail = lazy(() => import("./pages/resources/BlogPostDetail"));
 const EcommercePage = lazy(() => import("./pages/categories/EcommercePage"));
 const NFTsPage = lazy(() => import("./pages/categories/NFTsPage"));
-const SoftwareSaaSPage = lazy(() => import("./pages/categories/SoftwareSaaSPage"));
+const SoftwareSaaSPage = lazy(
+  () => import("./pages/categories/SoftwareSaaSPage"),
+);
 const DatabasesPage = lazy(() => import("./pages/categories/DatabasesPage"));
-const DigitalChannelsPage = lazy(() => import("./pages/categories/DigitalChannelsPage"));
+const DigitalChannelsPage = lazy(
+  () => import("./pages/categories/DigitalChannelsPage"),
+);
 const SuperAdminPanel = lazy(() => import("./pages/admin/SuperAdminPanel"));
 const ListingDetail = lazy(() => import("./pages/marketplace/ListingDetail"));
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
@@ -59,31 +69,46 @@ const AdvancedSettings = lazy(() => import("./pages/admin/AdvancedSettings"));
 const SEOSettings = lazy(() => import("./pages/admin/SEOSettings"));
 const BackupSettings = lazy(() => import("./pages/admin/BackupSettings"));
 const BlogManager = lazy(() => import("./pages/admin/BlogManager"));
-const BlogPostCreateEdit = lazy(() => import("./pages/admin/BlogPostCreateEdit"));
+const BlogPostCreateEdit = lazy(
+  () => import("./pages/admin/BlogPostCreateEdit"),
+);
 const BlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
-const BlogCommentManagement = lazy(() => import("./pages/admin/BlogCommentManagement"));
-const BlogSEOManagement = lazy(() => import("./pages/admin/BlogSEOManagement"));
 const FAQManager = lazy(() => import("./pages/admin/FAQManager"));
 const RolesPermissions = lazy(() => import("./pages/admin/RolesPermissions"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const ClientAppsPage = lazy(() => import("./pages/client/ClientAppsPage"));
-const ClientWebsitesPage = lazy(() => import("./pages/client/ClientWebsitesPage"));
+const ClientWebsitesPage = lazy(
+  () => import("./pages/client/ClientWebsitesPage"),
+);
 const ClientAllOrderPage = lazy(() => import("./pages/client/orders"));
 const ClientInvoicePage = lazy(() => import("./pages/client/orders/invoice"));
-const ClientPaymentPage = lazy(() => import("./pages/client/orders/ClientPaymentPage"));
-const ClientEscrowsPage = lazy(() => import("./pages/client/orders/ClientEscrowsPage"));
-const ClientOrderDetailsPage = lazy(() => import("./pages/client/orders/Details"));
-const ClientOffersPage = lazy(() => import("./pages/client/offers/ClientOffersPage"));
+const ClientPaymentPage = lazy(
+  () => import("./pages/client/orders/ClientPaymentPage"),
+);
+const ClientEscrowsPage = lazy(
+  () => import("./pages/client/orders/ClientEscrowsPage"),
+);
+const ClientOrderDetailsPage = lazy(
+  () => import("./pages/client/orders/Details"),
+);
+const ClientOffersPage = lazy(
+  () => import("./pages/client/offers/ClientOffersPage"),
+);
 const OfferDetails = lazy(() => import("./pages/client/offers/OfferDetails"));
-const ClientProductsVerificationsPage = lazy(() => import("./pages/client/marketplace/productsVerification"));
-const ClientProductsDetailsPage = lazy(() => import("./pages/client/marketplace/productsVerification/Details"));
+const ClientProductsVerificationsPage = lazy(
+  () => import("./pages/client/marketplace/productsVerification"),
+);
+const ClientProductsDetailsPage = lazy(
+  () => import("./pages/client/marketplace/productsVerification/Details"),
+);
 const ClientAuctionsPage = lazy(() => import("./pages/client/auctions"));
 const ClientSavedSearchPage = lazy(() => import("./pages/client/savedSearch"));
 const MyListing = lazy(() => import("./pages/client/marketplace/myListing"));
-const MyListingDetails = lazy(() => import("./pages/client/marketplace/myListing/Details"));
+const MyListingDetails = lazy(
+  () => import("./pages/client/marketplace/myListing/Details"),
+);
 const ClientChatPage = lazy(() => import("./pages/client/chat"));
 const Conversation = lazy(() => import("./pages/client/chat/Conversation"));
-
 
 const getLastPath = (route: string) => {
   return route.split("/").pop();
@@ -102,12 +127,20 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <LazyComponent><Index /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <Index />
+          </LazyComponent>
+        ),
       },
       // Marketplace routes - Nested
       {
         path: "marketplace",
-        element: <LazyComponent><Marketplace /></LazyComponent>
+        element: (
+          <LazyComponent>
+            <Marketplace />
+          </LazyComponent>
+        ),
       },
       // Categories routes - Nested
       {
@@ -118,49 +151,93 @@ export const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <LazyComponent><DomainsPage /></LazyComponent>,
+                element: (
+                  <LazyComponent>
+                    <DomainsPage />
+                  </LazyComponent>
+                ),
               },
               {
                 path: ":id",
-                element: <LazyComponent><MyListingDetails /></LazyComponent>,
+                element: (
+                  <LazyComponent>
+                    <MyListingDetails />
+                  </LazyComponent>
+                ),
               },
             ],
           },
           {
             path: "websites",
-            element: <LazyComponent><WebsitesPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <WebsitesPage />
+              </LazyComponent>
+            ),
           },
           {
             path: "apps",
-            element: <LazyComponent><Apps /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Apps />
+              </LazyComponent>
+            ),
           },
           {
             path: "fba-stores",
-            element: <LazyComponent><FBA /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <FBA />
+              </LazyComponent>
+            ),
           },
           {
             path: "listing/:id",
-            element: <LazyComponent><ListingDetail /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ListingDetail />
+              </LazyComponent>
+            ),
           },
           {
             path: "ecommerce",
-            element: <LazyComponent><EcommercePage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <EcommercePage />
+              </LazyComponent>
+            ),
           },
           {
             path: "nfts",
-            element: <LazyComponent><NFTsPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <NFTsPage />
+              </LazyComponent>
+            ),
           },
           {
             path: "software-saas",
-            element: <LazyComponent><SoftwareSaaSPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <SoftwareSaaSPage />
+              </LazyComponent>
+            ),
           },
           {
             path: "databases",
-            element: <LazyComponent><DatabasesPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <DatabasesPage />
+              </LazyComponent>
+            ),
           },
           {
             path: "digital-channels",
-            element: <LazyComponent><DigitalChannelsPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <DigitalChannelsPage />
+              </LazyComponent>
+            ),
           },
         ],
       },
@@ -170,54 +247,102 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "terminos",
-            element: <LazyComponent><Terminos /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Terminos />
+              </LazyComponent>
+            ),
           },
           {
             path: "privacidad",
-            element: <LazyComponent><Privacidad /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Privacidad />
+              </LazyComponent>
+            ),
           },
           {
             path: "aml",
-            element: <LazyComponent><AML /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <AML />
+              </LazyComponent>
+            ),
           },
           {
             path: "cookies",
-            element: <LazyComponent><Cookies /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Cookies />
+              </LazyComponent>
+            ),
           },
           {
             path: "aviso-legal",
-            element: <LazyComponent><AvisoLegal /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <AvisoLegal />
+              </LazyComponent>
+            ),
           },
           {
             path: "proteccion-datos",
-            element: <LazyComponent><ProteccionDatos /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ProteccionDatos />
+              </LazyComponent>
+            ),
           },
         ],
       },
       // Legacy legal routes for backward compatibility
       {
         path: "terminos",
-        element: <LazyComponent><Terminos /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <Terminos />
+          </LazyComponent>
+        ),
       },
       {
         path: "privacidad",
-        element: <LazyComponent><Privacidad /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <Privacidad />
+          </LazyComponent>
+        ),
       },
       {
         path: "aml",
-        element: <LazyComponent><AML /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <AML />
+          </LazyComponent>
+        ),
       },
       {
         path: "cookies",
-        element: <LazyComponent><Cookies /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <Cookies />
+          </LazyComponent>
+        ),
       },
       {
         path: "aviso-legal",
-        element: <LazyComponent><AvisoLegal /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <AvisoLegal />
+          </LazyComponent>
+        ),
       },
       {
         path: "proteccion-datos",
-        element: <LazyComponent><ProteccionDatos /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <ProteccionDatos />
+          </LazyComponent>
+        ),
       },
       // Services routes - Nested
       {
@@ -225,23 +350,43 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "valuations",
-            element: <LazyComponent><Valuations /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Valuations />
+              </LazyComponent>
+            ),
           },
           {
             path: "trends",
-            element: <LazyComponent><Trends /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Trends />
+              </LazyComponent>
+            ),
           },
           {
             path: "premium-trends",
-            element: <LazyComponent><PremiumTrends /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <PremiumTrends />
+              </LazyComponent>
+            ),
           },
           {
             path: "brokers",
-            element: <LazyComponent><Brokers /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Brokers />
+              </LazyComponent>
+            ),
           },
           {
             path: "referrals",
-            element: <LazyComponent><ReferralProgram /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ReferralProgram />
+              </LazyComponent>
+            ),
           },
         ],
       },
@@ -254,25 +399,45 @@ export const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <LazyComponent><Guides /></LazyComponent>,
+                element: (
+                  <LazyComponent>
+                    <Guides />
+                  </LazyComponent>
+                ),
               },
               {
                 path: ":slug",
-                element: <LazyComponent><GuideDetail /></LazyComponent>,
+                element: (
+                  <LazyComponent>
+                    <GuideDetail />
+                  </LazyComponent>
+                ),
               },
               {
                 path: "category/:category",
-                element: <LazyComponent><GuideCategory /></LazyComponent>,
+                element: (
+                  <LazyComponent>
+                    <GuideCategory />
+                  </LazyComponent>
+                ),
               },
             ],
           },
           {
             path: "help",
-            element: <LazyComponent><HelpCenter /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <HelpCenter />
+              </LazyComponent>
+            ),
           },
           {
             path: "blog",
-            element: <LazyComponent><Blog /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Blog />
+              </LazyComponent>
+            ),
           },
         ],
       },
@@ -282,11 +447,19 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <LazyComponent><Blog /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Blog />
+              </LazyComponent>
+            ),
           },
           {
             path: ":slug",
-            element: <LazyComponent><BlogPostDetail /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <BlogPostDetail />
+              </LazyComponent>
+            ),
           },
         ],
       },
@@ -296,15 +469,22 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "soporte",
-            element: <LazyComponent><SupportPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <SupportPage />
+              </LazyComponent>
+            ),
           },
         ],
       },
       {
         path: "soporte",
-        element: <LazyComponent><SupportPage /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <SupportPage />
+          </LazyComponent>
+        ),
       },
-
     ],
   },
   // Auth routes (no layout)
@@ -334,7 +514,11 @@ export const router = createBrowserRouter([
       },
       {
         path: getLastPath(ROUTES.CLIENT.DASHBOARD),
-        element: <LazyComponent><ClientDashboard /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <ClientDashboard />
+          </LazyComponent>
+        ),
       },
       {
         path: getLastPath(ROUTES.CLIENT.ORDERS.INDEX),
@@ -345,23 +529,43 @@ export const router = createBrowserRouter([
           },
           {
             path: getLastPath(ROUTES.CLIENT.ORDERS.ALL),
-            element: <LazyComponent><ClientAllOrderPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientAllOrderPage />
+              </LazyComponent>
+            ),
           },
           {
             path: ":id",
-            element: <LazyComponent><ClientOrderDetailsPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientOrderDetailsPage />
+              </LazyComponent>
+            ),
           },
           {
             path: getLastPath(ROUTES.CLIENT.ORDERS.INVOICES),
-            element: <LazyComponent><ClientInvoicePage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientInvoicePage />
+              </LazyComponent>
+            ),
           },
           {
             path: getLastPath(ROUTES.CLIENT.ORDERS.PAYMENTS),
-            element: <LazyComponent><ClientPaymentPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientPaymentPage />
+              </LazyComponent>
+            ),
           },
           {
             path: getLastPath(ROUTES.CLIENT.ORDERS.ESCROWS),
-            element: <LazyComponent><ClientEscrowsPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientEscrowsPage />
+              </LazyComponent>
+            ),
           },
         ],
       },
@@ -371,7 +575,10 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: (
-              <Navigate to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION} replace />
+              <Navigate
+                to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}
+                replace
+              />
             ),
           },
           {
@@ -379,11 +586,19 @@ export const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <LazyComponent><ClientProductsVerificationsPage /></LazyComponent>,
+                element: (
+                  <LazyComponent>
+                    <ClientProductsVerificationsPage />
+                  </LazyComponent>
+                ),
               },
               {
                 path: ":id",
-                element: <LazyComponent><ClientProductsDetailsPage /></LazyComponent>,
+                element: (
+                  <LazyComponent>
+                    <ClientProductsDetailsPage />
+                  </LazyComponent>
+                ),
               },
             ],
           },
@@ -392,25 +607,45 @@ export const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <LazyComponent><MyListing /></LazyComponent>
+                element: (
+                  <LazyComponent>
+                    <MyListing />
+                  </LazyComponent>
+                ),
               },
               {
                 path: ":id",
-                element: <LazyComponent><MyListingDetails /></LazyComponent>
+                element: (
+                  <LazyComponent>
+                    <MyListingDetails />
+                  </LazyComponent>
+                ),
               },
             ],
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.APPS),
-            element: <LazyComponent><ClientAppsPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientAppsPage />
+              </LazyComponent>
+            ),
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.DOMAINS),
-            element: <LazyComponent><ClientDomainsPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientDomainsPage />
+              </LazyComponent>
+            ),
           },
           {
             path: getLastPath(ROUTES.CLIENT.MARKETPLACE.WEBSITES),
-            element: <LazyComponent><ClientWebsitesPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientWebsitesPage />
+              </LazyComponent>
+            ),
           },
         ],
       },
@@ -419,54 +654,98 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <LazyComponent><ClientOffersPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientOffersPage />
+              </LazyComponent>
+            ),
           },
           {
-            path: ':id',
-            element: <LazyComponent><OfferDetails /></LazyComponent>,
+            path: ":id",
+            element: (
+              <LazyComponent>
+                <OfferDetails />
+              </LazyComponent>
+            ),
           },
         ],
       },
       {
         path: getLastPath(ROUTES.CLIENT.AUCTIONS),
-        element: <LazyComponent><ClientAuctionsPage /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <ClientAuctionsPage />
+          </LazyComponent>
+        ),
       },
       {
         path: getLastPath(ROUTES.CLIENT.SAVED_SEARCH),
-        element: <LazyComponent><ClientSavedSearchPage /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <ClientSavedSearchPage />
+          </LazyComponent>
+        ),
       },
       {
         path: getLastPath(ROUTES.CLIENT.PROFILE),
-        element: <LazyComponent><ClientProfile /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <ClientProfile />
+          </LazyComponent>
+        ),
       },
       {
         path: getLastPath(ROUTES.CLIENT.PROFILE_SETUP),
-        element: <LazyComponent><ProfileSetup /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <ProfileSetup />
+          </LazyComponent>
+        ),
       },
       {
         path: getLastPath(ROUTES.CLIENT.FACTURAS),
-        element: <LazyComponent><Facturas /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <Facturas />
+          </LazyComponent>
+        ),
       },
       {
         path: getLastPath(ROUTES.CLIENT.SUPPORT),
-        element: <LazyComponent><SupportPage /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <SupportPage />
+          </LazyComponent>
+        ),
       },
       {
         path: getLastPath(ROUTES.CLIENT.CHAT.ROOT),
         children: [
           {
             index: true,
-            element: <LazyComponent><ClientChatPage /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <ClientChatPage />
+              </LazyComponent>
+            ),
           },
           {
             path: ":id",
-            element: <LazyComponent><Conversation /></LazyComponent>,
+            element: (
+              <LazyComponent>
+                <Conversation />
+              </LazyComponent>
+            ),
           },
         ],
       },
       {
         path: getLastPath(ROUTES.CLIENT.FAQ),
-        element: <LazyComponent><FAQ /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <FAQ />
+          </LazyComponent>
+        ),
       },
     ],
   },
@@ -497,93 +776,202 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <LazyComponent><SuperAdminDashboard /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <SuperAdminDashboard />
+          </LazyComponent>
+        ),
       },
       {
         path: "dashboard",
-        element: <LazyComponent><SuperAdminDashboard /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <SuperAdminDashboard />
+          </LazyComponent>
+        ),
       },
       {
         path: "roles-and-permissions",
-        element: <LazyComponent><RolesPermissions /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <RolesPermissions />
+          </LazyComponent>
+        ),
       },
       {
         path: "users",
-        element: <LazyComponent><UserManagement /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <UserManagement />
+          </LazyComponent>
+        ),
       },
       {
         path: "seller",
-        element: <LazyComponent><SellerDashboard /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <SellerDashboard />
+          </LazyComponent>
+        ),
       },
       {
         path: "buyer",
-        element: <LazyComponent><BuyerDashboard /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <BuyerDashboard />
+          </LazyComponent>
+        ),
       },
       {
         path: "config",
-        element: <LazyComponent><AdminConfig /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <AdminConfig />
+          </LazyComponent>
+        ),
       },
       {
         path: "usuarios",
-        element: <LazyComponent><AdminUsuarios /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <AdminUsuarios />
+          </LazyComponent>
+        ),
       },
       {
         path: "marketplace",
-        element: <LazyComponent><MarketplaceAdmin /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <MarketplaceAdmin />
+          </LazyComponent>
+        ),
       },
       {
-        path: "listados",
-        element: <LazyComponent><GestionListados /></LazyComponent>,
-      },
-      {
-        path: "gestion-listados",
-        element: <LazyComponent><GestionListados /></LazyComponent>,
+        path: "listings-management",
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: (
+              <LazyComponent>
+                <ListingsManagement />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "create",
+            element: (
+              <LazyComponent>
+                <ListingCreateEdit />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "edit/:id",
+            element: (
+              <LazyComponent>
+                <ListingCreateEdit />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "view/:id",
+            element: (
+              <LazyComponent>
+                <AdminListingDetail />
+              </LazyComponent>
+            ),
+          },
+        ],
       },
       {
         path: "advanced-settings",
-        element: <LazyComponent><AdvancedSettings /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <AdvancedSettings />
+          </LazyComponent>
+        ),
       },
       {
         path: "seo-settings",
-        element: <LazyComponent><SEOSettings /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <SEOSettings />
+          </LazyComponent>
+        ),
       },
       {
         path: "backup-settings",
-        element: <LazyComponent><BackupSettings /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <BackupSettings />
+          </LazyComponent>
+        ),
       },
       {
         path: "blog-manager",
-        element: <LazyComponent><BlogManager /></LazyComponent>,
-      },
-      {
-        path: "blog-manager/create",
-        element: <LazyComponent><BlogPostCreateEdit /></LazyComponent>,
-      },
-      {
-        path: "blog-manager/edit/:id",
-        element: <LazyComponent><BlogPostCreateEdit /></LazyComponent>,
-      },
-      {
-        path: "blog-manager/categories",
-        element: <LazyComponent><BlogCategories /></LazyComponent>,
-      },
-      {
-        path: "blog-manager/comments",
-        element: <LazyComponent><BlogCommentManagement /></LazyComponent>,
-      },
-      {
-        path: "blog-manager/seo",
-        element: <LazyComponent><BlogSEOManagement /></LazyComponent>,
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            path: "all-posts",
+            element: (
+              <LazyComponent>
+                <BlogManager />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "listings",
+            element: (
+              <LazyComponent>
+                <BlogManager />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "create",
+            element: (
+              <LazyComponent>
+                <BlogPostCreateEdit />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "edit/:id",
+            element: (
+              <LazyComponent>
+                <BlogPostCreateEdit />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "categories",
+            element: (
+              <LazyComponent>
+                <BlogCategories />
+              </LazyComponent>
+            ),
+          },
+        ],
       },
       {
         path: "faq-manager",
-        element: <LazyComponent><FAQManager /></LazyComponent>,
+        element: (
+          <LazyComponent>
+            <FAQManager />
+          </LazyComponent>
+        ),
       },
     ],
   },
   // Catch all
   {
     path: "*",
-    element: <LazyComponent><NotFound /></LazyComponent>,
+    element: (
+      <LazyComponent>
+        <NotFound />
+      </LazyComponent>
+    ),
   },
 ]);

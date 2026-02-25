@@ -1,5 +1,5 @@
 interface MarketplaceListingFilters extends PaginationParams {
-  status?: 'draft' | 'active' | 'sold' | 'expired' | 'suspended';
+  status?: 'draft' | 'active' | 'pending' | 'sold' | 'expired' | 'suspended';
   listing_type_id?: number;
   seller_id?: number;
   min_price?: number;
@@ -36,7 +36,7 @@ interface MarketplaceListing {
   website_revenue_monthly: number | string,
   website_profit_monthly: number | string,
   website_technology: string,
-  status: 'draft' | 'active' | 'sold' | 'expired' | 'suspended',
+  status: 'draft' | 'active' | 'pending' | 'sold' | 'expired' | 'suspended',
   is_featured: boolean,
   primary_image_url: string,
   image_urls: string[] | null,
@@ -58,7 +58,8 @@ interface MarketplaceListing {
     email: string
   },
   listing_type: MarketplaceListingType,
-  is_favorited: boolean
+  is_favorited: boolean,
+  public_url?: string | null;
 
   // self added asper UI design
   is_auto_renew: boolean,
@@ -67,13 +68,31 @@ interface MarketplaceListing {
 
 interface ListingCreateRequest {
   title: string;
+  slug?: string;
   description: string;
+  short_description?: string;
   listing_type_id: number;
   price: number;
-  currency: string;
+  currency?: string;
+  is_price_negotiable?: boolean;
   domain_name?: string;
+  domain_extension?: string;
+  domain_age_years?: number;
+  domain_authority?: number;
+  domain_backlinks?: number;
   website_url?: string;
-  status?: 'draft' | 'active';
+  website_traffic_monthly?: number;
+  website_revenue_monthly?: number;
+  website_profit_monthly?: number;
+  website_technology?: string;
+  status?: 'draft' | 'active' | 'pending' | 'sold';
+  is_featured?: boolean;
+  primary_image_url?: string;
+  image_urls?: string[];
+  meta_title?: string;
+  meta_description?: string;
+  additional_metadata?: Record<string, unknown>;
+  expires_at?: string | null;
 }
 
 type ListingUpdateRequest = Partial<ListingCreateRequest>;
