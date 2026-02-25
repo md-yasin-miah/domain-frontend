@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Settings,
   FileText,
-  ShoppingCart,
   HelpCircle,
   List,
   TrendingUp,
@@ -54,7 +53,6 @@ const adminMenuItems: MenuItem[] = [
     url: "/admin/blog-manager",
     subItems: [
       { title: "All Posts", url: "/admin/blog-manager/all-posts" },
-      { title: "Listings", url: "/admin/blog-manager/listings" },
       { title: "Categories", url: "/admin/blog-manager/categories" },
     ],
   },
@@ -62,11 +60,6 @@ const adminMenuItems: MenuItem[] = [
     title: "FAQ Manager",
     icon: HelpCircle,
     url: "/admin/faq-manager",
-  },
-  {
-    title: "Marketplace Admin",
-    icon: ShoppingCart,
-    url: "/admin/marketplace",
   },
   {
     title: "Listings Management",

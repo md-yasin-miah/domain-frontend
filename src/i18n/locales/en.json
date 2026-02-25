@@ -532,6 +532,7 @@
       "no_results": "No posts match your search criteria.",
       "published": "Published",
       "unpublished": "Unpublished",
+      "archived": "Archived",
       "featured": "Featured",
       "edit_post": "Edit Post",
       "edit_post_desc": "Update the blog post information",
@@ -614,6 +615,10 @@
           "title": "Create Category",
           "description": "Add a new blog category",
           "create": "Create"
+        },
+        "view_dialog": {
+          "title": "View Category",
+          "description": "Category details"
         },
         "edit_dialog": {
           "title": "Edit Category",

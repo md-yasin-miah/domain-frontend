@@ -70,6 +70,25 @@ interface FAQCreateRequest {
 }
 
 // ============ Blog Types ============
+interface BlogPostAuthor {
+  id: number;
+  username: string;
+  email: string;
+}
+
+interface BlogPostCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  is_active?: boolean;
+  order?: number;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 interface BlogPost {
   id: number;
   title: string;
@@ -77,10 +96,15 @@ interface BlogPost {
   content: string;
   excerpt: string | null;
   author_id: number;
-  featured_image: string | null;
+  author?: BlogPostAuthor | null;
+  category_id: number | null;
+  category?: BlogPostCategory | null;
   meta_title: string | null;
   meta_description: string | null;
-  status: 'draft' | 'published';
+  meta_keywords: string | null;
+  og_image: string | null;
+  status: 'draft' | 'published' | 'archived';
+  is_featured: boolean;
   published_at: string | null;
   view_count: number;
   created_at: string;
@@ -89,12 +113,17 @@ interface BlogPost {
 
 interface BlogPostCreateRequest {
   title: string;
+  slug?: string;
   content: string;
   excerpt?: string;
-  featured_image?: string;
   meta_title?: string;
   meta_description?: string;
-  status?: 'draft' | 'published';
+  meta_keywords?: string;
+  og_image?: string;
+  status?: 'draft' | 'published' | 'archived';
+  is_featured?: boolean;
+  category_id?: number | null;
+  published_at?: string | null;
 }
 
 // ============ Dispute Types ============

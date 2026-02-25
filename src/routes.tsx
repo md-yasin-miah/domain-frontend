@@ -38,7 +38,6 @@ const ListingCreateEdit = lazy(() => import("./pages/admin/ListingCreateEdit"));
 const AdminListingDetail = lazy(() => import("./pages/admin/ListingDetail"));
 const AdminConfig = lazy(() => import("./pages/admin/AdminConfig"));
 const AdminUsuarios = lazy(() => import("./pages/admin/AdminUsuarios"));
-const MarketplaceAdmin = lazy(() => import("./pages/admin/MarketplaceAdmin"));
 const Valuations = lazy(() => import("./pages/services/Valuations"));
 const Trends = lazy(() => import("./pages/services/Trends"));
 const PremiumTrends = lazy(() => import("./pages/services/PremiumTrends"));
@@ -839,14 +838,6 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "marketplace",
-        element: (
-          <LazyComponent>
-            <MarketplaceAdmin />
-          </LazyComponent>
-        ),
-      },
-      {
         path: "listings-management",
         element: <Outlet />,
         children: [
@@ -913,37 +904,34 @@ export const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           {
-            index: true,
             path: "all-posts",
-            element: (
-              <LazyComponent>
-                <BlogManager />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "listings",
-            element: (
-              <LazyComponent>
-                <BlogManager />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "create",
-            element: (
-              <LazyComponent>
-                <BlogPostCreateEdit />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "edit/:id",
-            element: (
-              <LazyComponent>
-                <BlogPostCreateEdit />
-              </LazyComponent>
-            ),
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: (
+                  <LazyComponent>
+                    <BlogManager />
+                  </LazyComponent>
+                ),
+              },
+              {
+                path: "create",
+                element: (
+                  <LazyComponent>
+                    <BlogPostCreateEdit />
+                  </LazyComponent>
+                ),
+              },
+              {
+                path: "edit/:id",
+                element: (
+                  <LazyComponent>
+                    <BlogPostCreateEdit />
+                  </LazyComponent>
+                ),
+              },
+            ],
           },
           {
             path: "categories",

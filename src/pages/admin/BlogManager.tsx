@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { mockData, mockAuth } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,167 +44,67 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Link } from "react-router-dom";
-
-interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  content: string;
-  featured_image: string | null;
-  category_id: string | null;
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  tags: string[];
-  author_id: string;
-  author?: {
-    email: string;
-    profile?: {
-      full_name: string;
-    };
-  };
-  is_published: boolean;
-  is_featured: boolean;
-  published_at: string | null;
-  view_count: number;
-  created_at: string;
-}
-
-interface BlogCategory {
-  id: string;
-  name: string;
-  slug: string;
-}
+import {
+  useGetBlogPostsQuery,
+  useDeleteBlogPostMutation,
+} from "@/store/api/blogApi";
 
 export default function BlogManager() {
   const { t } = useTranslation();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [categories, setCategories] = useState<BlogCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [postToDelete, setPostToDelete] = useState<BlogPost | null>(null);
-  const [formLoading, setFormLoading] = useState(false);
-  const { toast } = useToast();
 
-  useEffect(() => {
-    fetchData();
-    fetchCategories();
-  }, []);
+  const { data, isLoading, error, refetch } = useGetBlogPostsQuery({
+    skip: 0,
+    limit: 100,
+  });
+  const [deletePost, { isLoading: isDeleting }] = useDeleteBlogPostMutation();
 
-  const fetchCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("blog_categories")
-        .select("*")
-        .order("name");
+  const posts: BlogPost[] = useMemo(() => {
+    if (!data) return [];
+    return Array.isArray(data) ? data : (data as { items: BlogPost[] }).items;
+  }, [data]);
 
-      if (error) throw error;
-      setCategories(data || []);
-    } catch (error: any) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select(
-          `
-          *,
-          category:blog_categories(id, name, slug)
-        `
-        )
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      // Fetch author profiles separately
-      const postsWithAuthors = await Promise.all(
-        (data || []).map(async (post) => {
-          const { data: profile } = await supabase
-            .from("client_profiles")
-            .select("full_name, email")
-            .eq("user_id", post.author_id)
-            .single();
-
-          return {
-            ...post,
-            author: {
-              email: profile?.email || undefined,
-              profile: profile ? { full_name: profile.full_name } : undefined,
-            },
-          };
-        })
-      );
-
-      setPosts(postsWithAuthors);
-    } catch (error: any) {
-      console.error("Error fetching blog posts:", error);
-      toast({
-        title: t("admin.blog.errors.fetch_error"),
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredPosts = useMemo(
+    () =>
+      posts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
+      ),
+    [posts, searchTerm]
+  );
 
   const handleDelete = async () => {
     if (!postToDelete) return;
-
     try {
-      setFormLoading(true);
-
-      const { data, error } = await supabase.functions.invoke(
-        "delete-blog-post",
-        {
-          body: {
-            id: postToDelete.id,
-          },
-        }
-      );
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || t("admin.blog.errors.delete_error"));
-      }
-
+      await deletePost(postToDelete.id).unwrap();
       toast({
         title: t("admin.blog.messages.delete_success"),
         description: t("admin.blog.messages.delete_success_desc"),
       });
-
       setShowDeleteDialog(false);
       setPostToDelete(null);
-      fetchData();
-    } catch (error: any) {
-      console.error("Error deleting blog post:", error);
+      refetch();
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "data" in err
+          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+          : String(err);
       toast({
         title: t("admin.blog.errors.delete_error"),
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
-    } finally {
-      setFormLoading(false);
     }
   };
 
-  const filteredPosts = posts.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.tags.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-  );
+  const errorMessage =
+    error && typeof error === "object" && "data" in error
+      ? String((error as { data?: { detail?: string } }).data?.detail ?? (error as unknown as Error).message)
+      : error ? String(error) : null;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -220,7 +119,7 @@ export default function BlogManager() {
               <CardDescription>{t("admin.blog.description")}</CardDescription>
             </div>
             <Button asChild>
-              <Link to="/admin/blog-manager/create">
+              <Link to="/admin/blog-manager/all-posts/create">
                 <Plus className="h-4 w-4 mr-2" />
                 {t("admin.blog.create_post")}
               </Link>
@@ -284,7 +183,11 @@ export default function BlogManager() {
               </div>
             </div>
 
-            {loading ? (
+            {errorMessage ? (
+              <div className="text-center py-8 text-destructive">
+                {t("admin.blog.errors.fetch_error")}: {errorMessage}
+              </div>
+            ) : isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
@@ -326,17 +229,22 @@ export default function BlogManager() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {post.author?.profile?.full_name ||
+                          {post.author?.username ||
                             post.author?.email ||
                             "Unknown"}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col gap-1">
-                          {post.is_published ? (
+                          {post.status === "published" ? (
                             <Badge className="bg-green-500">
                               <Check className="h-3 w-3 mr-1" />
                               {t("admin.blog.published")}
+                            </Badge>
+                          ) : post.status === "archived" ? (
+                            <Badge variant="secondary">
+                              <XCircle className="h-3 w-3 mr-1" />
+                              {t("admin.blog.archived")}
                             </Badge>
                           ) : (
                             <Badge variant="secondary">
@@ -351,10 +259,10 @@ export default function BlogManager() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>{post.view_count || 0}</TableCell>
+                      <TableCell>{post.view_count ?? 0}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {post.is_published && (
+                          {post.status === "published" && (
                             <Button variant="ghost" size="sm" asChild>
                               <Link to={`/blog/${post.slug}`} target="_blank">
                                 <Eye className="h-4 w-4" />
@@ -362,7 +270,7 @@ export default function BlogManager() {
                             </Button>
                           )}
                           <Button variant="ghost" size="sm" asChild>
-                            <Link to={`/admin/blog-manager/edit/${post.id}`}>
+                            <Link to={`/admin/blog-manager/all-posts/edit/${post.id}`}>
                               <Edit className="h-4 w-4" />
                             </Link>
                           </Button>
@@ -387,7 +295,6 @@ export default function BlogManager() {
         </CardContent>
       </Card>
 
-      {/* Delete Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -408,9 +315,9 @@ export default function BlogManager() {
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={formLoading}
+              disabled={isDeleting}
             >
-              {formLoading ? (
+              {isDeleting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   {t("common.loading")}
