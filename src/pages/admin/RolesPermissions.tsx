@@ -7,12 +7,19 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Plus, Trash2, Edit2, Save, X, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Shield, Plus, Trash2, Edit2, Save, X, Loader2, Search, KeyRound } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import {
   useListRolesQuery,
   useListPermissionsQuery,
@@ -21,7 +28,9 @@ import {
   useDeleteRoleMutation,
   useAssignPermissionsToRoleMutation,
   useRemovePermissionFromRoleMutation,
-  useGetRolePermissionsQuery,
+  useCreatePermissionMutation,
+  useUpdatePermissionMutation,
+  useDeletePermissionMutation,
   type RoleResponse,
   type PermissionResponse,
 } from '@/store/api/rolesPermissionsApi';
@@ -37,43 +46,65 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Extended Permission type with category for grouping
-interface PermissionWithCategory extends PermissionResponse {
-  category?: string;
-}
+const PERMISSION_CATEGORY_ORDER = [
+  'user_management',
+  'domain_management',
+  'bidding_management',
+  'order_management',
+  'support_management',
+  'financial_management',
+  'system_management',
+  'other',
+];
 
 export default function RolesPermissions() {
   const { t } = useTranslation();
   const { toast } = useToast();
 
-  // RTK Query hooks
-  const { data: rolesData = [], isLoading: rolesLoading, error: rolesError } = useListRolesQuery({});
-  const { data: permissionsData = [], isLoading: permissionsLoading, error: permissionsError } = useListPermissionsQuery({});
-  const [createRole, { isLoading: isCreating }] = useCreateRoleMutation();
-  const [updateRole, { isLoading: isUpdating }] = useUpdateRoleMutation();
-  const [deleteRole, { isLoading: isDeleting }] = useDeleteRoleMutation();
-  const [assignPermissions, { isLoading: isAssigning }] = useAssignPermissionsToRoleMutation();
-  const [removePermission, { isLoading: isRemoving }] = useRemovePermissionFromRoleMutation();
-
-  // Local state
+  const [roleSearch, setRoleSearch] = useState('');
   const [selectedRole, setSelectedRole] = useState<number | null>(null);
   const [editingRole, setEditingRole] = useState<RoleResponse | null>(null);
   const [newRole, setNewRole] = useState({ name: '', description: '' });
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [roleToDelete, setRoleToDelete] = useState<{ id: number; isSystemRole: boolean } | null>(null);
+  const [showCreateRoleDialog, setShowCreateRoleDialog] = useState(false);
+  const [deleteRoleOpen, setDeleteRoleOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<RoleResponse | null>(null);
+
+  const [mainTab, setMainTab] = useState<'roles' | 'permissions'>('roles');
+  const [showCreatePermissionDialog, setShowCreatePermissionDialog] = useState(false);
+  const [newPermission, setNewPermission] = useState({ name: '', description: '' });
+  const [editingPermission, setEditingPermission] = useState<PermissionResponse | null>(null);
+  const [permissionToDelete, setPermissionToDelete] = useState<PermissionResponse | null>(null);
+  const [deletePermissionOpen, setDeletePermissionOpen] = useState(false);
+
+  const { data: rolesData = [], isLoading: rolesLoading, error: rolesError, refetch: refetchRoles } = useListRolesQuery({
+    search: roleSearch || undefined,
+  });
+  const {
+    data: permissionsData = [],
+    isLoading: permissionsLoading,
+    error: permissionsError,
+    refetch: refetchPermissions,
+  } = useListPermissionsQuery({});
+
+  const [createRole, { isLoading: isCreatingRole }] = useCreateRoleMutation();
+  const [updateRole, { isLoading: isUpdatingRole }] = useUpdateRoleMutation();
+  const [deleteRole, { isLoading: isDeletingRole }] = useDeleteRoleMutation();
+  const [assignPermissions, { isLoading: isAssigning }] = useAssignPermissionsToRoleMutation();
+  const [removePermission, { isLoading: isRemoving }] = useRemovePermissionFromRoleMutation();
+  const [createPermission, { isLoading: isCreatingPermission }] = useCreatePermissionMutation();
+  const [updatePermission, { isLoading: isUpdatingPermission }] = useUpdatePermissionMutation();
+  const [deletePermission, { isLoading: isDeletingPermission }] = useDeletePermissionMutation();
 
   const loading = rolesLoading || permissionsLoading;
   const error = rolesError || permissionsError;
 
-  // Set initial selected role
   useEffect(() => {
     if (rolesData.length > 0 && !selectedRole) {
       setSelectedRole(rolesData[0].id);
     }
+    if (rolesData.length === 0) setSelectedRole(null);
   }, [rolesData, selectedRole]);
 
-  // Show error toast if there's an error
   useEffect(() => {
     if (error) {
       toast({
@@ -84,24 +115,50 @@ export default function RolesPermissions() {
     }
   }, [error, toast, t]);
 
-  // Create permission name to ID mapping
   const permissionNameToId = useMemo(() => {
     const map = new Map<string, number>();
-    permissionsData.forEach(perm => {
-      map.set(perm.name, perm.id);
-    });
+    permissionsData.forEach((perm) => map.set(perm.name, perm.id));
     return map;
   }, [permissionsData]);
 
-  // Check if role has permission (by permission name)
-  const hasPermission = (role: RoleResponse, permissionName: string): boolean => {
-    return role.permissions.includes(permissionName);
-  };
+  const hasPermission = (role: RoleResponse, permissionName: string) =>
+    role.permissions.includes(permissionName);
+  const getPermissionId = (name: string) => permissionNameToId.get(name) ?? null;
 
-  // Get permission ID by name
-  const getPermissionId = (permissionName: string): number | null => {
-    return permissionNameToId.get(permissionName) || null;
-  };
+  const groupedPermissions = useMemo(() => {
+    const grouped: Record<string, PermissionResponse[]> = {};
+    permissionsData.forEach((perm) => {
+      const parts = perm.name.split('.');
+      const category = parts.length > 1 ? parts[0] : 'other';
+      if (!grouped[category]) grouped[category] = [];
+      grouped[category].push(perm);
+    });
+    Object.keys(grouped).forEach((cat) => grouped[cat].sort((a, b) => a.name.localeCompare(b.name)));
+    return grouped;
+  }, [permissionsData]);
+
+  const sortedCategoryKeys = useMemo(() => {
+    const keys = Object.keys(groupedPermissions);
+    return [...keys].sort(
+      (a, b) =>
+        (PERMISSION_CATEGORY_ORDER.indexOf(a) === -1 ? 999 : PERMISSION_CATEGORY_ORDER.indexOf(a)) -
+        (PERMISSION_CATEGORY_ORDER.indexOf(b) === -1 ? 999 : PERMISSION_CATEGORY_ORDER.indexOf(b))
+    );
+  }, [groupedPermissions]);
+
+  const categoryNames: Record<string, string> = useMemo(
+    () => ({
+      user_management: t('admin.roles_permissions.categories.user_management'),
+      domain_management: t('admin.roles_permissions.categories.domain_management'),
+      bidding_management: t('admin.roles_permissions.categories.bidding_management'),
+      order_management: t('admin.roles_permissions.categories.order_management'),
+      support_management: t('admin.roles_permissions.categories.support_management'),
+      financial_management: t('admin.roles_permissions.categories.financial_management'),
+      system_management: t('admin.roles_permissions.categories.system_management'),
+      other: t('admin.roles_permissions.categories.other'),
+    }),
+    [t]
+  );
 
   const togglePermission = async (role: RoleResponse, permissionName: string) => {
     const permissionId = getPermissionId(permissionName);
@@ -113,43 +170,31 @@ export default function RolesPermissions() {
       });
       return;
     }
-
     const exists = hasPermission(role, permissionName);
-
     try {
       if (exists) {
-        // Remove permission
-        await removePermission({
-          roleId: role.id,
-          permissionId,
-        }).unwrap();
-
+        await removePermission({ roleId: role.id, permissionId }).unwrap();
         toast({
           title: t('admin.roles_permissions.permission_removed'),
           description: t('admin.roles_permissions.permission_removed_desc'),
         });
       } else {
-        // Get current permissions and add the new one
-        const currentPermissionIds = role.permissions
-          .map(name => getPermissionId(name))
+        const currentIds = role.permissions
+          .map(getPermissionId)
           .filter((id): id is number => id !== null);
-
-        const updatedPermissionIds = [...currentPermissionIds, permissionId];
-
         await assignPermissions({
           roleId: role.id,
-          data: { permission_ids: updatedPermissionIds },
+          data: { permission_ids: [...currentIds, permissionId] },
         }).unwrap();
-
         toast({
           title: t('admin.roles_permissions.permission_assigned'),
           description: t('admin.roles_permissions.permission_assigned_desc'),
         });
       }
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.permission_toggle_error'),
-        description: extractErrorMessage(error),
+        description: extractErrorMessage(err),
         variant: 'destructive',
       });
     }
@@ -159,29 +204,26 @@ export default function RolesPermissions() {
     if (!newRole.name.trim()) {
       toast({
         title: t('admin.roles_permissions.errors.role_name_required'),
-        description: t('admin.roles_permissions.errors.role_name_required'),
         variant: 'destructive',
       });
       return;
     }
-
     try {
       await createRole({
         name: newRole.name.trim(),
         description: newRole.description.trim() || null,
       }).unwrap();
-
       setNewRole({ name: '', description: '' });
-      setShowCreateDialog(false);
-
+      setShowCreateRoleDialog(false);
+      refetchRoles();
       toast({
         title: t('admin.roles_permissions.role_created'),
         description: t('admin.roles_permissions.role_created_desc'),
       });
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.create_error'),
-        description: extractErrorMessage(error),
+        description: extractErrorMessage(err),
         variant: 'destructive',
       });
     }
@@ -189,7 +231,6 @@ export default function RolesPermissions() {
 
   const handleUpdateRole = async () => {
     if (!editingRole) return;
-
     try {
       await updateRole({
         roleId: editingRole.id,
@@ -198,25 +239,26 @@ export default function RolesPermissions() {
           description: editingRole.description || null,
         },
       }).unwrap();
-
       setEditingRole(null);
-
+      refetchRoles();
       toast({
         title: t('admin.roles_permissions.role_updated'),
         description: t('admin.roles_permissions.role_updated_desc'),
       });
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.update_error'),
-        description: extractErrorMessage(error),
+        description: extractErrorMessage(err),
         variant: 'destructive',
       });
     }
   };
 
-  const handleDeleteClick = (role: RoleResponse) => {
-    const isSystemRole = role.name.toLowerCase() === 'admin' || role.name.toLowerCase() === 'user';
-    if (isSystemRole) {
+  const isSystemRole = (role: RoleResponse) =>
+    role.name.toLowerCase() === 'admin' || role.name.toLowerCase() === 'user';
+
+  const handleDeleteRoleClick = (role: RoleResponse) => {
+    if (isSystemRole(role)) {
       toast({
         title: t('admin.roles_permissions.cannot_delete_system'),
         description: t('admin.roles_permissions.cannot_delete_system_desc'),
@@ -224,109 +266,151 @@ export default function RolesPermissions() {
       });
       return;
     }
-
-    setRoleToDelete({ id: role.id, isSystemRole });
-    setDeleteConfirmOpen(true);
+    setRoleToDelete(role);
+    setDeleteRoleOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteRoleConfirm = async () => {
     if (!roleToDelete) return;
-
     try {
       await deleteRole(roleToDelete.id).unwrap();
-
       if (selectedRole === roleToDelete.id) {
-        const remainingRoles = rolesData.filter(r => r.id !== roleToDelete.id);
-        setSelectedRole(remainingRoles.length > 0 ? remainingRoles[0].id : null);
+        const remaining = rolesData.filter((r) => r.id !== roleToDelete.id);
+        setSelectedRole(remaining.length > 0 ? remaining[0].id : null);
       }
-
-      setDeleteConfirmOpen(false);
+      setDeleteRoleOpen(false);
       setRoleToDelete(null);
-
+      refetchRoles();
       toast({
         title: t('admin.roles_permissions.role_deleted'),
         description: t('admin.roles_permissions.role_deleted_desc'),
       });
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       toast({
         title: t('admin.roles_permissions.errors.delete_error'),
-        description: extractErrorMessage(error),
+        description: extractErrorMessage(err),
         variant: 'destructive',
       });
     }
   };
 
-  // Group permissions by category (if category exists in permission name or use 'other')
-  // Since API doesn't return category, we'll group by prefix in permission name
-  const groupedPermissions = useMemo(() => {
-    const grouped: Record<string, PermissionResponse[]> = {};
-    permissionsData.forEach(perm => {
-      // Extract category from permission name (e.g., "user_management.create" -> "user_management")
-      const parts = perm.name.split('.');
-      const category = parts.length > 1 ? parts[0] : 'other';
-
-      if (!grouped[category]) {
-        grouped[category] = [];
-      }
-      grouped[category].push(perm);
-    });
-
-    // Sort permissions within each category
-    Object.keys(grouped).forEach(category => {
-      grouped[category].sort((a, b) => a.name.localeCompare(b.name));
-    });
-
-    return grouped;
-  }, [permissionsData]);
-
-  const categoryNames: Record<string, string> = {
-    user_management: t('admin.roles_permissions.categories.user_management'),
-    domain_management: t('admin.roles_permissions.categories.domain_management'),
-    bidding_management: t('admin.roles_permissions.categories.bidding_management'),
-    order_management: t('admin.roles_permissions.categories.order_management'),
-    support_management: t('admin.roles_permissions.categories.support_management'),
-    financial_management: t('admin.roles_permissions.categories.financial_management'),
-    system_management: t('admin.roles_permissions.categories.system_management'),
-    other: t('admin.roles_permissions.categories.other', { defaultValue: 'Other' }),
+  const handleCreatePermission = async () => {
+    if (!newPermission.name.trim()) {
+      toast({
+        title: t('admin.roles_permissions.errors.permission_name_required'),
+        variant: 'destructive',
+      });
+      return;
+    }
+    try {
+      await createPermission({
+        name: newPermission.name.trim(),
+        description: newPermission.description.trim() || null,
+      }).unwrap();
+      setNewPermission({ name: '', description: '' });
+      setShowCreatePermissionDialog(false);
+      refetchPermissions();
+      toast({
+        title: t('admin.roles_permissions.permission_created'),
+        description: t('admin.roles_permissions.permission_created_desc'),
+      });
+    } catch (err: unknown) {
+      toast({
+        title: t('admin.roles_permissions.errors.create_permission_error'),
+        description: extractErrorMessage(err),
+        variant: 'destructive',
+      });
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">{t('admin.roles_permissions.loading')}</p>
-        </div>
-      </div>
-    );
-  }
+  const handleUpdatePermission = async () => {
+    if (!editingPermission) return;
+    try {
+      await updatePermission({
+        permissionId: editingPermission.id,
+        data: {
+          name: editingPermission.name.trim(),
+          description: editingPermission.description ?? null,
+        },
+      }).unwrap();
+      setEditingPermission(null);
+      refetchPermissions();
+      toast({
+        title: t('admin.roles_permissions.permission_updated'),
+        description: t('admin.roles_permissions.permission_updated_desc'),
+      });
+    } catch (err: unknown) {
+      toast({
+        title: t('admin.roles_permissions.errors.update_permission_error'),
+        description: extractErrorMessage(err),
+        variant: 'destructive',
+      });
+    }
+  };
 
-  const selectedRoleData = rolesData.find(r => r.id === selectedRole);
-  const isSystemRole = (role: RoleResponse) => role.name.toLowerCase() === 'admin' || role.name.toLowerCase() === 'user';
+  const handleDeletePermissionConfirm = async () => {
+    if (!permissionToDelete) return;
+    try {
+      await deletePermission(permissionToDelete.id).unwrap();
+      setDeletePermissionOpen(false);
+      setPermissionToDelete(null);
+      refetchPermissions();
+      refetchRoles();
+      toast({
+        title: t('admin.roles_permissions.permission_deleted'),
+        description: t('admin.roles_permissions.permission_deleted_desc'),
+      });
+    } catch (err: unknown) {
+      toast({
+        title: t('admin.roles_permissions.errors.delete_permission_error'),
+        description: extractErrorMessage(err),
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Shield className="h-8 w-8" />
-              {t('admin.roles_permissions.title')}
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              {t('admin.roles_permissions.description')}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <LanguageSwitcher />
-            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Shield className="h-8 w-8" />
+          {t('admin.roles_permissions.title')}
+        </h1>
+        <p className="text-muted-foreground mt-2">{t('admin.roles_permissions.description')}</p>
+      </div>
+
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'roles' | 'permissions')}>
+        <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+          <TabsTrigger value="roles" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            {t('admin.roles_permissions.roles_tab')}
+          </TabsTrigger>
+          <TabsTrigger value="permissions" className="flex items-center gap-2">
+            <KeyRound className="h-4 w-4" />
+            {t('admin.roles_permissions.permissions_tab')}
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ROLES TAB */}
+        <TabsContent value="roles" className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('admin.roles_permissions.search_roles_placeholder')}
+                value={roleSearch}
+                onChange={(e) => setRoleSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Dialog open={showCreateRoleDialog} onOpenChange={setShowCreateRoleDialog}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   {t('admin.roles_permissions.create_role')}
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>{t('admin.roles_permissions.create_new_role')}</DialogTitle>
                   <DialogDescription>
@@ -334,182 +418,406 @@ export default function RolesPermissions() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">{t('admin.roles_permissions.role_name')}</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="role-name">{t('admin.roles_permissions.role_name')}</Label>
                     <Input
-                      id="name"
+                      id="role-name"
                       value={newRole.name}
-                      onChange={e => setNewRole(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) => setNewRole((prev) => ({ ...prev, name: e.target.value }))}
                       placeholder={t('admin.roles_permissions.role_name_placeholder')}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="description">{t('admin.roles_permissions.role_description')}</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="role-desc">{t('admin.roles_permissions.role_description')}</Label>
                     <Textarea
-                      id="description"
+                      id="role-desc"
                       value={newRole.description}
-                      onChange={e => setNewRole(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e) => setNewRole((prev) => ({ ...prev, description: e.target.value }))}
                       placeholder={t('admin.roles_permissions.role_description_placeholder')}
+                      rows={3}
                     />
                   </div>
-                  <Button onClick={handleCreateRole} className="w-full" disabled={isCreating}>
-                    {isCreating ? (
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowCreateRoleDialog(false)}>
+                    {t('admin.roles_permissions.cancel')}
+                  </Button>
+                  <Button onClick={handleCreateRole} disabled={isCreatingRole}>
+                    {isCreatingRole ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        {t('admin.roles_permissions.creating', { defaultValue: 'Creating...' })}
+                        {t('admin.roles_permissions.creating')}
                       </>
                     ) : (
                       t('admin.roles_permissions.create_role')
                     )}
                   </Button>
-                </div>
+                </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
-        </div>
-      </div>
 
-      <Tabs value={selectedRole?.toString() || undefined} onValueChange={(value) => setSelectedRole(Number(value))}>
-        <TabsList className="grid grid-cols-2 lg:grid-cols-4 gap-2 h-auto">
-          {rolesData.map(role => (
-            <TabsTrigger key={role.id} value={role.id.toString()} className="flex items-center gap-2">
-              {role.name}
-              {isSystemRole(role) && (
-                <Badge variant="secondary" className="text-xs">
-                  {t('admin.roles_permissions.system')}
-                </Badge>
-              )}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {rolesData.map(role => (
-          <TabsContent key={role.id} value={role.id.toString()} className="mt-6">
+          {loading ? (
             <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    {editingRole?.id === role.id ? (
-                      <div className="space-y-4">
-                        <Input
-                          value={editingRole.name}
-                          onChange={e =>
-                            setEditingRole(prev => prev ? { ...prev, name: e.target.value } : null)
-                          }
-                          disabled={isSystemRole(role)}
-                        />
-                        <Textarea
-                          value={editingRole.description || ''}
-                          onChange={e =>
-                            setEditingRole(prev => prev ? { ...prev, description: e.target.value } : null)
-                          }
-                        />
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={handleUpdateRole} disabled={isUpdating}>
-                            {isUpdating ? (
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            ) : (
-                              <Save className="h-4 w-4 mr-2" />
-                            )}
-                            {t('admin.roles_permissions.save')}
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => setEditingRole(null)}>
-                            <X className="h-4 w-4 mr-2" />
-                            {t('admin.roles_permissions.cancel')}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <CardTitle>{role.name}</CardTitle>
-                        <CardDescription>{role.description}</CardDescription>
-                      </>
-                    )}
-                  </div>
-                  {!editingRole && (
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingRole(role)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      {!isSystemRole(role) && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteClick(role)}
-                          disabled={isDeleting}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  <div className="space-y-6">
-                    {Object.entries(groupedPermissions).map(([category, perms]) => (
-                      <div key={category}>
-                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                          {categoryNames[category] || category}
-                          <Badge variant="outline">
-                            {perms.filter(p => hasPermission(role, p.name)).length}/{perms.length}
-                          </Badge>
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {perms.map(permission => (
-                            <div
-                              key={permission.id}
-                              className="flex items-start space-x-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                            >
-                              <Checkbox
-                                id={`${role.id}-${permission.id}`}
-                                checked={hasPermission(role, permission.name)}
-                                onCheckedChange={() => togglePermission(role, permission.name)}
-                                disabled={role.name.toLowerCase() === 'admin' || isAssigning || isRemoving}
-                              />
-                              <div className="flex-1">
-                                <Label
-                                  htmlFor={`${role.id}-${permission.id}`}
-                                  className="text-sm font-medium cursor-pointer"
-                                >
-                                  {permission.name}
-                                </Label>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {permission.description || 'No description'}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-                {role.name === 'Admin' && (
-                  <div className="mt-4 p-3 bg-primary/10 rounded-lg">
-                    <p className="text-sm text-primary font-medium">
-                      {t('admin.roles_permissions.admin_full_access')}
-                    </p>
-                  </div>
-                )}
+              <CardContent className="flex items-center justify-center py-16">
+                <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
               </CardContent>
             </Card>
-          </TabsContent>
-        ))}
+          ) : rolesData.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <Shield className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-4">{t('admin.roles_permissions.no_roles')}</p>
+                <Button onClick={() => setShowCreateRoleDialog(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('admin.roles_permissions.create_role')}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Tabs
+              value={selectedRole?.toString() ?? ''}
+              onValueChange={(v) => setSelectedRole(Number(v))}
+            >
+              <TabsList className="flex flex-wrap h-auto gap-2 mb-4">
+                {rolesData.map((role) => (
+                  <TabsTrigger key={role.id} value={role.id.toString()} className="flex items-center gap-2">
+                    {role.name}
+                    {isSystemRole(role) && (
+                      <Badge variant="secondary" className="text-xs">
+                        {t('admin.roles_permissions.system')}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              {rolesData.map((role) => (
+                <TabsContent key={role.id} value={role.id.toString()} className="mt-0">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          {editingRole?.id === role.id ? (
+                            <div className="space-y-4">
+                              <Input
+                                value={editingRole.name}
+                                onChange={(e) =>
+                                  setEditingRole((prev) => (prev ? { ...prev, name: e.target.value } : null))
+                                }
+                                disabled={isSystemRole(role)}
+                                placeholder={t('admin.roles_permissions.role_name_placeholder')}
+                              />
+                              <Textarea
+                                value={editingRole.description ?? ''}
+                                onChange={(e) =>
+                                  setEditingRole((prev) => (prev ? { ...prev, description: e.target.value } : null))
+                                }
+                                placeholder={t('admin.roles_permissions.role_description_placeholder')}
+                                rows={3}
+                              />
+                              <div className="flex gap-2">
+                                <Button size="sm" onClick={handleUpdateRole} disabled={isUpdatingRole}>
+                                  {isUpdatingRole ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <Save className="h-4 w-4 mr-2" />
+                                  )}
+                                  {t('admin.roles_permissions.save')}
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => setEditingRole(null)}>
+                                  <X className="h-4 w-4 mr-2" />
+                                  {t('admin.roles_permissions.cancel')}
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <CardTitle className="capitalize">{role.name}</CardTitle>
+                              <CardDescription>
+                                {role.description || t('admin.roles_permissions.role_description_placeholder')}
+                              </CardDescription>
+                            </>
+                          )}
+                        </div>
+                        {!editingRole && (
+                          <div className="flex gap-2 shrink-0">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingRole(role)}
+                              aria-label={t('admin.roles_permissions.edit')}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            {!isSystemRole(role) && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleDeleteRoleClick(role)}
+                                disabled={isDeletingRole}
+                                aria-label={t('admin.roles_permissions.delete')}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-[500px] pr-4">
+                        <div className="space-y-6">
+                          {sortedCategoryKeys.map((category) => {
+                            const perms = groupedPermissions[category];
+                            if (!perms?.length) return null;
+                            return (
+                              <div key={category}>
+                                <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                                  {categoryNames[category] ?? category}
+                                  <Badge variant="outline" className="text-xs">
+                                    {perms.filter((p) => hasPermission(role, p.name)).length}/{perms.length}
+                                  </Badge>
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  {perms.map((permission) => (
+                                    <div
+                                      key={permission.id}
+                                      className="flex items-start gap-3 rounded-lg border p-3 bg-card hover:bg-accent/30 transition-colors"
+                                    >
+                                      <Checkbox
+                                        id={`${role.id}-${permission.id}`}
+                                        checked={hasPermission(role, permission.name)}
+                                        onCheckedChange={() => togglePermission(role, permission.name)}
+                                        disabled={
+                                          role.name.toLowerCase() === 'admin' || isAssigning || isRemoving
+                                        }
+                                      />
+                                      <div className="flex-1 min-w-0">
+                                        <Label
+                                          htmlFor={`${role.id}-${permission.id}`}
+                                          className="text-sm font-medium cursor-pointer leading-tight"
+                                        >
+                                          {permission.name}
+                                        </Label>
+                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                          {permission.description || t('admin.roles_permissions.permission_description_placeholder')}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </ScrollArea>
+                      {role.name.toLowerCase() === 'admin' && (
+                        <div className="mt-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
+                          <p className="text-sm text-primary font-medium">
+                            {t('admin.roles_permissions.admin_full_access')}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
+        </TabsContent>
+
+        {/* PERMISSIONS TAB */}
+        <TabsContent value="permissions" className="space-y-6">
+          <div className="flex justify-end">
+            <Dialog open={showCreatePermissionDialog} onOpenChange={setShowCreatePermissionDialog}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('admin.roles_permissions.create_permission')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>{t('admin.roles_permissions.create_new_permission')}</DialogTitle>
+                  <DialogDescription>
+                    {t('admin.roles_permissions.create_permission_description')}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="perm-name">{t('admin.roles_permissions.permission_name')}</Label>
+                    <Input
+                      id="perm-name"
+                      value={newPermission.name}
+                      onChange={(e) => setNewPermission((prev) => ({ ...prev, name: e.target.value }))}
+                      placeholder={t('admin.roles_permissions.permission_name_placeholder')}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="perm-desc">{t('admin.roles_permissions.permission_description')}</Label>
+                    <Textarea
+                      id="perm-desc"
+                      value={newPermission.description}
+                      onChange={(e) => setNewPermission((prev) => ({ ...prev, description: e.target.value }))}
+                      placeholder={t('admin.roles_permissions.permission_description_placeholder')}
+                      rows={3}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowCreatePermissionDialog(false)}>
+                    {t('admin.roles_permissions.cancel')}
+                  </Button>
+                  <Button onClick={handleCreatePermission} disabled={isCreatingPermission}>
+                    {isCreatingPermission ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t('admin.roles_permissions.creating')}
+                      </>
+                    ) : (
+                      t('admin.roles_permissions.create_permission')
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {permissionsLoading ? (
+            <Card>
+              <CardContent className="flex items-center justify-center py-16">
+                <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+              </CardContent>
+            </Card>
+          ) : permissionsData.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <KeyRound className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-4">{t('admin.roles_permissions.no_permissions')}</p>
+                <Button onClick={() => setShowCreatePermissionDialog(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('admin.roles_permissions.create_permission')}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('admin.roles_permissions.permissions_tab')}</CardTitle>
+                <CardDescription>
+                  {permissionsData.length} {t('admin.roles_permissions.permissions_tab').toLowerCase()}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[500px] pr-4">
+                  <div className="space-y-6">
+                    {sortedCategoryKeys.map((category) => {
+                      const perms = groupedPermissions[category];
+                      if (!perms?.length) return null;
+                      return (
+                        <div key={category}>
+                          <h3 className="text-sm font-semibold mb-3">
+                            {categoryNames[category] ?? category}
+                          </h3>
+                          <div className="space-y-2">
+                            {perms.map((permission) => (
+                              <div
+                                key={permission.id}
+                                className="flex items-center justify-between gap-4 rounded-lg border p-3 bg-card"
+                              >
+                                {editingPermission?.id === permission.id ? (
+                                  <>
+                                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      <Input
+                                        value={editingPermission.name}
+                                        onChange={(e) =>
+                                          setEditingPermission((prev) =>
+                                            prev ? { ...prev, name: e.target.value } : null
+                                          )
+                                        }
+                                        placeholder={t('admin.roles_permissions.permission_name_placeholder')}
+                                      />
+                                      <Input
+                                        value={editingPermission.description ?? ''}
+                                        onChange={(e) =>
+                                          setEditingPermission((prev) =>
+                                            prev ? { ...prev, description: e.target.value } : null
+                                          )
+                                        }
+                                        placeholder={t('admin.roles_permissions.permission_description_placeholder')}
+                                      />
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <Button size="sm" onClick={handleUpdatePermission} disabled={isUpdatingPermission}>
+                                        {isUpdatingPermission ? (
+                                          <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                          <Save className="h-4 w-4" />
+                                        )}
+                                      </Button>
+                                      <Button size="sm" variant="ghost" onClick={() => setEditingPermission(null)}>
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="min-w-0">
+                                      <p className="font-medium text-sm">{permission.name}</p>
+                                      <p className="text-xs text-muted-foreground mt-0.5">
+                                        {permission.description || '—'}
+                                      </p>
+                                    </div>
+                                    <div className="flex gap-2 shrink-0">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setEditingPermission(permission)}
+                                      >
+                                        <Edit2 className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="text-destructive hover:text-destructive"
+                                        onClick={() => {
+                                          setPermissionToDelete(permission);
+                                          setDeletePermissionOpen(true);
+                                        }}
+                                        disabled={isDeletingPermission}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
       </Tabs>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      {/* Delete Role Confirmation */}
+      <AlertDialog open={deleteRoleOpen} onOpenChange={setDeleteRoleOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('admin.roles_permissions.delete_confirm_title', { defaultValue: 'Delete Role' })}</AlertDialogTitle>
+            <AlertDialogTitle>{t('admin.roles_permissions.delete_confirm_title')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('admin.roles_permissions.delete_confirm')}
+              {roleToDelete && (
+                <div className="mt-3 p-3 rounded-md bg-muted">
+                  <strong>{roleToDelete.name}</strong>
+                </div>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -517,17 +825,55 @@ export default function RolesPermissions() {
               {t('admin.roles_permissions.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteConfirm}
+              onClick={handleDeleteRoleConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={isDeleting}
+              disabled={isDeletingRole}
             >
-              {isDeleting ? (
+              {isDeletingRole ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t('admin.roles_permissions.deleting', { defaultValue: 'Deleting...' })}
+                  {t('admin.roles_permissions.deleting')}
                 </>
               ) : (
-                t('admin.roles_permissions.delete', { defaultValue: 'Delete' })
+                t('admin.roles_permissions.delete')
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Permission Confirmation */}
+      <AlertDialog open={deletePermissionOpen} onOpenChange={setDeletePermissionOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('admin.roles_permissions.delete_permission_confirm_title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('admin.roles_permissions.delete_permission_confirm')}
+              {permissionToDelete && (
+                <div className="mt-3 p-3 rounded-md bg-muted">
+                  <strong>{permissionToDelete.name}</strong>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPermissionToDelete(null)}>
+              {t('admin.roles_permissions.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePermissionConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeletingPermission}
+            >
+              {isDeletingPermission ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('admin.roles_permissions.deleting')}
+                </>
+              ) : (
+                t('admin.roles_permissions.delete')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
