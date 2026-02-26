@@ -5,6 +5,9 @@ interface MarketplaceListingFilters extends PaginationParams {
   min_price?: number;
   max_price?: number;
   search?: string;
+  is_featured?: boolean;
+  sort_by?: 'price' | 'created_at' | 'view_count' | 'favorite_count';
+  sort_order?: 'asc' | 'desc';
 }
 interface MarketplaceListingType {
   id: number,
