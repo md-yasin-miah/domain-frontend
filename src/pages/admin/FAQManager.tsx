@@ -119,13 +119,15 @@ function FAQForm({ formData, onChange, categories }: FAQFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="category">{t("admin.faq.form.category")}</Label>
+        <Label htmlFor="category">
+          {t("admin.faq.form.category")} *
+        </Label>
         <Select
-          value={formData.category_id ? String(formData.category_id) : "none"}
+          value={formData.category_id ? String(formData.category_id) : ""}
           onValueChange={(val) =>
             onChange({
               ...formData,
-              category_id: val === "none" ? null : Number(val),
+              category_id: val ? Number(val) : null,
             })
           }
         >
@@ -133,9 +135,6 @@ function FAQForm({ formData, onChange, categories }: FAQFormProps) {
             <SelectValue placeholder={t("admin.faq.form.category_placeholder")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">
-              {t("admin.faq.form.no_category") || "No category"}
-            </SelectItem>
             {categories.map((cat) => (
               <SelectItem key={cat.id} value={String(cat.id)}>
                 {cat.name}
@@ -212,7 +211,7 @@ export default function FAQManager() {
   };
 
   const handleCreate = async () => {
-    if (!formData.question.trim() || !formData.answer.trim()) {
+    if (!formData.question.trim() || !formData.answer.trim() || !formData.category_id) {
       toast({
         title: t("admin.faq.errors.required_fields"),
         variant: "destructive",
@@ -224,7 +223,7 @@ export default function FAQManager() {
       await createFAQ({
         question: formData.question,
         answer: formData.answer,
-        category_id: formData.category_id ?? undefined,
+        category_id: formData.category_id!,
         order: formData.order,
         is_active: formData.is_active,
       }).unwrap();
@@ -259,7 +258,7 @@ export default function FAQManager() {
   };
 
   const handleUpdate = async () => {
-    if (!editingFAQ || !formData.question.trim() || !formData.answer.trim()) {
+    if (!editingFAQ || !formData.question.trim() || !formData.answer.trim() || !formData.category_id) {
       toast({
         title: t("admin.faq.errors.required_fields"),
         variant: "destructive",
@@ -273,7 +272,7 @@ export default function FAQManager() {
         data: {
           question: formData.question,
           answer: formData.answer,
-          category_id: formData.category_id ?? undefined,
+          category_id: formData.category_id!,
           order: formData.order,
           is_active: formData.is_active,
         },

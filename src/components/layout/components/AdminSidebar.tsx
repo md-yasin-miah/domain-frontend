@@ -2,69 +2,72 @@ import {
   Shield,
   Users,
   LayoutDashboard,
-  Settings,
   FileText,
   HelpCircle,
   List,
-  TrendingUp,
-  Save,
+  MessageSquare,
+  FolderTree,
+  Handshake,
+  ShoppingCart,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
+import { ROUTES } from "@/lib/routes";
 
 const adminMenuItems: MenuItem[] = [
   {
     title: "Dashboard",
     icon: LayoutDashboard,
-    url: "/admin/dashboard",
+    url: ROUTES.ADMIN.DASHBOARD,
   },
   {
     title: "User Management",
     icon: Users,
-    url: "/admin/users",
+    url: ROUTES.ADMIN.USERS,
   },
-  {
-    title: "Roles & Permissions",
-    icon: Shield,
-    url: "/admin/roles-and-permissions",
-  },
-  // {
-  //   title: "Configuration",
-  //   icon: Settings,
-  //   url: "/admin/config",
-  // },
-  // {
-  //   title: "Advanced Settings",
-  //   icon: Settings,
-  //   url: "/admin/advanced-settings",
-  // },
-  // {
-  //   title: "SEO Settings",
-  //   icon: TrendingUp,
-  //   url: "/admin/seo-settings",
-  // },
-  // {
-  //   title: "Backup & Restore",
-  //   icon: Save,
-  //   url: "/admin/backup-settings",
-  // },
   {
     title: "Blog Manager",
     icon: FileText,
-    url: "/admin/blog-manager",
+    url: ROUTES.ADMIN.BLOG_MANAGER,
+  },
+  {
+    title: "Order Management",
+    icon: ShoppingCart,
+    url: ROUTES.ADMIN.ORDERS.LIST,
+  },
+  {
+    title: "Listings Management",
+    icon: List,
+    url: ROUTES.ADMIN.LISTINGS_MANAGEMENT,
+  },
+  {
+    title: "Offers",
+    icon: Handshake,
+    url: ROUTES.ADMIN.OFFERS,
+  },
+  {
+    title: "Categories",
+    icon: FolderTree,
+    url: ROUTES.ADMIN.CATEGORIES.SUPPORT,
     subItems: [
-      { title: "All Posts", url: "/admin/blog-manager/all-posts" },
-      { title: "Categories", url: "/admin/blog-manager/categories" },
+      { title: "Support", url: ROUTES.ADMIN.CATEGORIES.SUPPORT },
+      { title: "FAQ", url: ROUTES.ADMIN.CATEGORIES.FAQ },
+      { title: "Blog", url: ROUTES.ADMIN.CATEGORIES.BLOG },
     ],
   },
   {
     title: "FAQ Manager",
     icon: HelpCircle,
-    url: "/admin/faq-manager",
+    url: ROUTES.ADMIN.FAQ_MANAGER,
   },
   {
-    title: "Listings Management",
-    icon: List,
-    url: "/admin/listings-management",
+    title: "Roles & Permissions",
+    icon: Shield,
+    url: ROUTES.ADMIN.ROLES_PERMISSIONS,
+  },
+  {
+    title: "Support",
+    icon: MessageSquare,
+    url: ROUTES.ADMIN.SUPPORT,
   },
 ];
 

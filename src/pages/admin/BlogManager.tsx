@@ -44,6 +44,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Link } from "react-router-dom";
+import { ROUTES } from "@/lib/routes";
 import {
   useGetBlogPostsQuery,
   useDeleteBlogPostMutation,
@@ -119,7 +120,7 @@ export default function BlogManager() {
               <CardDescription>{t("admin.blog.description")}</CardDescription>
             </div>
             <Button asChild>
-              <Link to="/admin/blog-manager/all-posts/create">
+              <Link to={`${ROUTES.ADMIN.BLOG_MANAGER}/create`}>
                 <Plus className="h-4 w-4 mr-2" />
                 {t("admin.blog.create_post")}
               </Link>
@@ -131,7 +132,7 @@ export default function BlogManager() {
             {/* Quick Links */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Button variant="outline" asChild className="h-auto p-4">
-                <Link to="/admin/blog-manager/categories">
+                <Link to={ROUTES.ADMIN.CATEGORIES.BLOG}>
                   <FolderTree className="h-5 w-5 mr-2" />
                   <div className="text-left">
                     <div className="font-semibold">
@@ -270,7 +271,7 @@ export default function BlogManager() {
                             </Button>
                           )}
                           <Button variant="ghost" size="sm" asChild>
-                            <Link to={`/admin/blog-manager/all-posts/edit/${post.id}`}>
+                            <Link to={`${ROUTES.ADMIN.BLOG_MANAGER}/edit/${post.id}`}>
                               <Edit className="h-4 w-4" />
                             </Link>
                           </Button>

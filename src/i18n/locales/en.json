@@ -246,6 +246,68 @@
     }
   },
   "admin": {
+    "offers": {
+      "title": "Offers",
+      "description": "View and manage all marketplace offers."
+    },
+    "orders": {
+      "title": "Order Management",
+      "description": "View and manage all marketplace orders.",
+      "all_orders": "All Orders",
+      "manage_orders": "Manage orders",
+      "total": "total",
+      "empty": "No orders found.",
+      "back_to_list": "Back to orders",
+      "back_to_order": "Back to order",
+      "order_view": "Order details",
+      "change_status": "Change status",
+      "status_updated": "Order status updated.",
+      "status_update_error": "Failed to update status.",
+      "page_info": "Showing {{from}}–{{to}} of {{total}}",
+      "related_sections": "Related sections",
+      "related_sections_desc": "Invoice, payment, and escrow for this order",
+      "view_order": "View order",
+      "invoice": "Invoice",
+      "invoice_view": "Invoice",
+      "invoice_number": "Invoice number",
+      "view_invoice": "View invoice",
+      "no_invoice": "No invoice for this order yet.",
+      "download_invoice": "Download PDF",
+      "issued_at": "Issued at",
+      "total_amount": "Total amount",
+      "subtotal": "Subtotal",
+      "paid_at": "Paid at",
+      "payment": "Payment",
+      "payment_view": "Payment",
+      "payment_number": "Payment number",
+      "payment_id": "Payment ID",
+      "view_payment": "View payment",
+      "no_payment": "No payment record for this order yet.",
+      "amount": "Amount",
+      "payment_method": "Payment method",
+      "transaction_id": "Transaction ID",
+      "processed_at": "Processed at",
+      "created_at": "Created at",
+      "escrow": "Escrow",
+      "escrow_view": "Escrow",
+      "escrow_number": "Escrow number",
+      "view_escrow": "View escrow",
+      "no_escrow": "No escrow for this order yet.",
+      "escrow_amount": "Amount",
+      "seller_amount": "Seller amount",
+      "held_at": "Held at",
+      "released_at": "Released at",
+      "refunded_at": "Refunded at",
+      "for_order": "For order"
+    },
+    "categories": {
+      "support_title": "Support Categories",
+      "support_description": "Manage support ticket categories",
+      "faq_title": "FAQ Categories",
+      "faq_description": "Manage FAQ categories",
+      "blog_title": "Blog Categories",
+      "blog_description": "Manage blog post categories"
+    },
     "user_management": {
       "title": "User Management",
       "description": "Manage users and their role assignments",
@@ -281,7 +343,8 @@
         "select_role": "Select role",
         "required_fields": "Please fill in all required fields",
         "create": "Create User",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "username": "Username"
       },
       "edit_dialog": {
         "title": "Edit User",
@@ -437,6 +500,7 @@
         "title": "Create New FAQ",
         "description": "Add a new frequently asked question and answer",
         "create": "Create FAQ"
+
       },
       "edit_dialog": {
         "title": "Edit FAQ",
@@ -453,7 +517,7 @@
         "answer": "Answer",
         "answer_placeholder": "Enter the answer...",
         "category": "Category",
-        "category_placeholder": "e.g., General, Billing, Technical",
+        "category_placeholder": "Select a category",
         "order_index": "Order",
         "is_published": "Published"
       },
@@ -1073,7 +1137,8 @@
       "showing": "Showing",
       "of": "of",
       "previous": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "per_page": "Per page"
     },
     "status": {
       "status": "Status",
@@ -1102,7 +1167,9 @@
       "overdue": "Overdue",
       "sent": "Sent",
       "payment_pending": "Payment Pending",
-      "payment_received": "Payment Received"
+      "payment_received": "Payment Received",
+      "disputed": "Disputed",
+      "confirm": "Confirm"
     }
   },
   "faq": {
@@ -1458,6 +1525,7 @@
       "title": "Order Details",
       "back_to_orders": "Back to Orders",
       "order_information": "Order Information",
+      "order_information_desc": "Complete order details and timeline",
       "listing_information": "Listing Information",
       "parties_information": "Parties Information",
       "pricing_summary": "Pricing Summary",
@@ -1492,6 +1560,7 @@
       "released_at": "Released At",
       "refunded_at": "Refunded At",
       "cancel_order": "Cancel Order",
+      "cancel_confirm": "Are you sure you want to cancel this order? This action cannot be undone.",
       "complete_order": "Complete Order",
       "request_refund": "Request Refund",
       "cancel_success": "Order Cancelled",

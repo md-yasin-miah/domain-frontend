@@ -38,7 +38,6 @@ export function TablePagination({
   translationKey = 'common.pagination',
 }: TablePaginationProps) {
   const { t } = useTranslation();
-console.log({pagination})
   const { total, page, total_pages, has_next, has_previous } = pagination;
   const currentPage = page + 1;
   // Don't render if pagination data is invalid

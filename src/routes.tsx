@@ -72,7 +72,16 @@ const BlogPostCreateEdit = lazy(
   () => import("./pages/admin/BlogPostCreateEdit"),
 );
 const BlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
+const AdminSupportCategories = lazy(() => import("./pages/admin/AdminSupportCategories"));
+const AdminFAQCategories = lazy(() => import("./pages/admin/AdminFAQCategories"));
 const FAQManager = lazy(() => import("./pages/admin/FAQManager"));
+const AdminSupportTickets = lazy(() => import("./pages/admin/AdminSupportTickets"));
+const AdminOffersPage = lazy(() => import("./pages/admin/AdminOffersPage"));
+const AdminOrdersPage = lazy(() => import("./pages/admin/AdminOrdersPage"));
+const AdminOrderDetailPage = lazy(() => import("./pages/admin/orders/AdminOrderDetailPage"));
+const AdminOrderInvoicePage = lazy(() => import("./pages/admin/orders/AdminOrderInvoicePage"));
+const AdminOrderPaymentPage = lazy(() => import("./pages/admin/orders/AdminOrderPaymentPage"));
+const AdminOrderEscrowPage = lazy(() => import("./pages/admin/orders/AdminOrderEscrowPage"));
 const RolesPermissions = lazy(() => import("./pages/admin/RolesPermissions"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const ClientAppsPage = lazy(() => import("./pages/client/ClientAppsPage"));
@@ -904,37 +913,57 @@ export const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           {
-            path: "all-posts",
-            element: <Outlet />,
-            children: [
-              {
-                index: true,
-                element: (
-                  <LazyComponent>
-                    <BlogManager />
-                  </LazyComponent>
-                ),
-              },
-              {
-                path: "create",
-                element: (
-                  <LazyComponent>
-                    <BlogPostCreateEdit />
-                  </LazyComponent>
-                ),
-              },
-              {
-                path: "edit/:id",
-                element: (
-                  <LazyComponent>
-                    <BlogPostCreateEdit />
-                  </LazyComponent>
-                ),
-              },
-            ],
+            index: true,
+            element: (
+              <LazyComponent>
+                <BlogManager />
+              </LazyComponent>
+            ),
           },
           {
-            path: "categories",
+            path: "create",
+            element: (
+              <LazyComponent>
+                <BlogPostCreateEdit />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "edit/:id",
+            element: (
+              <LazyComponent>
+                <BlogPostCreateEdit />
+              </LazyComponent>
+            ),
+          },
+        ],
+      },
+      {
+        path: "categories",
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={ROUTES.ADMIN.CATEGORIES.SUPPORT} replace />,
+          },
+          {
+            path: "support",
+            element: (
+              <LazyComponent>
+                <AdminSupportCategories />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "faq",
+            element: (
+              <LazyComponent>
+                <AdminFAQCategories />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "blog",
             element: (
               <LazyComponent>
                 <BlogCategories />
@@ -950,6 +979,68 @@ export const router = createBrowserRouter([
             <FAQManager />
           </LazyComponent>
         ),
+      },
+      {
+        path: "support",
+        element: (
+          <LazyComponent>
+            <AdminSupportTickets />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "offers",
+        element: (
+          <LazyComponent>
+            <AdminOffersPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "orders",
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: (
+              <LazyComponent>
+                <AdminOrdersPage />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: ":id",
+            element: (
+              <LazyComponent>
+                <AdminOrderDetailPage />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: ":id/invoices",
+            element: (
+              <LazyComponent>
+                <AdminOrderInvoicePage />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: ":id/payments",
+            element: (
+              <LazyComponent>
+                <AdminOrderPaymentPage />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: ":id/escrows",
+            element: (
+              <LazyComponent>
+                <AdminOrderEscrowPage />
+              </LazyComponent>
+            ),
+          },
+        ],
       },
     ],
   },

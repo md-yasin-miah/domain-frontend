@@ -2,7 +2,7 @@ import { apiSlice } from './apiSlice';
 
 export const supportApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getTickets: builder.query<PaginatedResponse<SupportTicket>, PaginationParams>({
+    getTickets: builder.query<PaginatedResponse<SupportTicket>, SupportTicketFilters>({
       query: (params) => ({
         url: '/support/tickets',
         method: 'GET',
@@ -25,7 +25,7 @@ export const supportApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Ticket'],
     }),
-    updateTicket: builder.mutation<SupportTicket, { id: number; data: Partial<TicketCreateRequest> }>({
+    updateTicket: builder.mutation<SupportTicket, { id: number; data: TicketUpdateRequest }>({
       query: ({ id, data }) => ({
         url: `/support/tickets/${id}`,
         method: 'PUT',

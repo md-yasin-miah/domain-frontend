@@ -82,7 +82,7 @@ export function Header({ menuItems, userServices, showDashboard = true, leftSlot
   return (
     <>
       {/* Enhanced Header with Professional Design */}
-      <header className="sticky top-0 h-16 flex items-center bg-background/95 backdrop-blur-xl border-b border-border/40 z-50 px-4 lg:px-6 shadow-sm">
+      <header className="sticky top-0 z-50 h-16 flex items-center bg-background/95 backdrop-blur-xl border-b border-border/40 px-4 lg:px-6 shadow-sm">
         <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
           {/* Logo Section - Enhanced */}
           <div className="flex items-center shrink-0 gap-4">

@@ -59,4 +59,27 @@ export const ROUTES = {
     },
     REVIEWS: '/client/reviews',
   },
+  ADMIN: {
+    ROOT: "/admin",
+    DASHBOARD: "/admin/dashboard",
+    USERS: "/admin/users",
+    ROLES_PERMISSIONS: "/admin/roles-and-permissions",
+    BLOG_MANAGER: "/admin/blog-manager",
+    FAQ_MANAGER: "/admin/faq-manager",
+    LISTINGS_MANAGEMENT: "/admin/listings-management",
+    ORDERS: {
+      LIST: "/admin/orders",
+      DETAILS: (id: number) => `/admin/orders/${id}`,
+      INVOICES:(id: number) => `/admin/orders/${id}/invoices`,
+      PAYMENTS:(id: number) => `/admin/orders/${id}/payments`,
+      ESCROWS:(id: number) => `/admin/orders/${id}/escrows`,
+    },
+    SUPPORT: "/admin/support",
+    OFFERS: "/admin/offers",
+    CATEGORIES: {
+      SUPPORT: "/admin/categories/support",
+      FAQ: "/admin/categories/faq",
+      BLOG: "/admin/categories/blog"
+    },
+  },
 }; 

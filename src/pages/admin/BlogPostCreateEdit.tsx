@@ -19,6 +19,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '@/lib/routes';
 
 interface BlogCategory {
   id: string;
@@ -118,7 +119,7 @@ export default function BlogPostCreateEdit() {
         description: error.message,
         variant: 'destructive',
       });
-      navigate('/admin/blog-manager');
+      navigate(ROUTES.ADMIN.BLOG_MANAGER);
     } finally {
       setLoading(false);
     }
@@ -185,7 +186,7 @@ export default function BlogPostCreateEdit() {
         description: t(`admin.blog.messages.${isEditing ? 'update' : 'create'}_success_desc`),
       });
 
-      navigate('/admin/blog-manager');
+      navigate(ROUTES.ADMIN.BLOG_MANAGER);
     } catch (error: any) {
       console.error(`Error ${isEditing ? 'updating' : 'creating'} blog post:`, error);
       toast({
@@ -212,7 +213,7 @@ export default function BlogPostCreateEdit() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate('/admin/blog-manager')}>
+          <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.BLOG_MANAGER)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('common.back')}
           </Button>
