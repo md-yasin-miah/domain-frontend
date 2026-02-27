@@ -11,6 +11,8 @@ import {
   ShoppingCart,
   Bell,
   CloudUpload,
+  Verified,
+  ShieldAlert,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -70,6 +72,16 @@ const adminMenuItems: MenuItem[] = [
     title: "Uploads",
     icon: CloudUpload,
     url: ROUTES.ADMIN.UPLOADS,
+  },
+  {
+    title: "Verifications",
+    icon: Verified,
+    url: ROUTES.ADMIN.VERIFICATIONS,
+  },
+  {
+    title: "Disputes",
+    icon: ShieldAlert,
+    url: ROUTES.ADMIN.DISPUTES,
   },
   {
     title: "Notifications",

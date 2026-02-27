@@ -83,5 +83,7 @@ export const ROUTES = {
     },
     NOTIFICATIONS: "/admin/notifications",
     UPLOADS: "/admin/uploads",
+    VERIFICATIONS: "/admin/verifications",
+    DISPUTES: "/admin/disputes",
   },
 }; 
