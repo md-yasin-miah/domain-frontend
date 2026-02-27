@@ -9,6 +9,10 @@ import {
   FolderTree,
   Handshake,
   ShoppingCart,
+  Bell,
+  CloudUpload,
+  Verified,
+  ShieldAlert,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -65,6 +69,26 @@ const adminMenuItems: MenuItem[] = [
     url: ROUTES.ADMIN.ROLES_PERMISSIONS,
   },
   {
+    title: "Uploads",
+    icon: CloudUpload,
+    url: ROUTES.ADMIN.UPLOADS,
+  },
+  {
+    title: "Verifications",
+    icon: Verified,
+    url: ROUTES.ADMIN.VERIFICATIONS,
+  },
+  {
+    title: "Disputes",
+    icon: ShieldAlert,
+    url: ROUTES.ADMIN.DISPUTES,
+  },
+  {
+    title: "Notifications",
+    icon: Bell,
+    url: ROUTES.ADMIN.NOTIFICATIONS,
+  },
+  {
     title: "Support",
     icon: MessageSquare,
     url: ROUTES.ADMIN.SUPPORT,
@@ -74,7 +98,6 @@ const adminMenuItems: MenuItem[] = [
 export function AdminSidebar() {
   return (
     <AppSidebar
-      title="Admin Panel"
       menuItems={adminMenuItems}
       footerType="simple"
       collapsible="icon"

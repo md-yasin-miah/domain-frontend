@@ -1,29 +1,49 @@
 import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
+import type { PaginatedResponse } from './types';
 
 export interface Notification {
   id: number;
   user_id: number;
+  notification_type: string;
   title: string;
   message: string;
-  type: string;
   is_read: boolean;
-  related_id: number | null;
-  related_type: string | null;
+  read_at: string | null;
+  related_listing_id: number | null;
+  related_order_id: number | null;
+  related_offer_id: number | null;
+  related_message_id: number | null;
   created_at: string;
 }
 
 export interface NotificationUnreadCount {
-  count: number;
+  unread_count: number;
+}
+
+export interface NotificationFilters {
+  skip?: number;
+  limit?: number;
+  is_read?: boolean;
+  notification_type?: string;
 }
 
 export const notificationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getNotifications: builder.query<PaginatedResponse<Notification> | Notification[], PaginationParams>({
+    getNotifications: builder.query<
+      PaginatedResponse<Notification>,
+      NotificationFilters
+    >({
       query: (params) => ({
         url: '/notifications',
         method: 'GET',
-        params,
+        params: {
+          skip: params.skip,
+          limit: params.limit,
+          ...(params.is_read !== undefined && { is_read: params.is_read }),
+          ...(params.notification_type && {
+            notification_type: params.notification_type,
+          }),
+        },
       }),
       providesTags: ['User'],
     }),
@@ -41,17 +61,17 @@ export const notificationApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['User'],
     }),
-    markAsRead: builder.mutation<void, number>({
+    markAsRead: builder.mutation<Notification, number>({
       query: (id) => ({
         url: `/notifications/${id}/read`,
-        method: 'PUT',
+        method: 'POST',
       }),
       invalidatesTags: (result, error, id) => [{ type: 'User', id }, 'User'],
     }),
-    markAllAsRead: builder.mutation<void, void>({
+    markAllAsRead: builder.mutation<{ updated_count: number }, void>({
       query: () => ({
         url: '/notifications/read-all',
-        method: 'PUT',
+        method: 'POST',
       }),
       invalidatesTags: ['User'],
     }),
@@ -62,10 +82,13 @@ export const notificationApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    deleteAllNotifications: builder.mutation<void, void>({
-      query: () => ({
+    deleteAllNotifications: builder.mutation<void, { is_read?: boolean } | void>({
+      query: (params) => ({
         url: '/notifications',
         method: 'DELETE',
+        ...(params && typeof params === 'object' && params.is_read !== undefined && {
+          params: { is_read: params.is_read },
+        }),
       }),
       invalidatesTags: ['User'],
     }),

@@ -73,9 +73,10 @@ export default function BlogManager() {
       posts.filter(
         (post) =>
           post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
+          (post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ??
+            false),
       ),
-    [posts, searchTerm]
+    [posts, searchTerm],
   );
 
   const handleDelete = async () => {
@@ -92,7 +93,10 @@ export default function BlogManager() {
     } catch (err: unknown) {
       const message =
         err && typeof err === "object" && "data" in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+          ? String(
+              (err as { data?: { detail?: string } }).data?.detail ??
+                (err as unknown as Error).message,
+            )
           : String(err);
       toast({
         title: t("admin.blog.errors.delete_error"),
@@ -104,11 +108,16 @@ export default function BlogManager() {
 
   const errorMessage =
     error && typeof error === "object" && "data" in error
-      ? String((error as { data?: { detail?: string } }).data?.detail ?? (error as unknown as Error).message)
-      : error ? String(error) : null;
+      ? String(
+          (error as { data?: { detail?: string } }).data?.detail ??
+            (error as unknown as Error).message,
+        )
+      : error
+        ? String(error)
+        : null;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -271,7 +280,9 @@ export default function BlogManager() {
                             </Button>
                           )}
                           <Button variant="ghost" size="sm" asChild>
-                            <Link to={`${ROUTES.ADMIN.BLOG_MANAGER}/edit/${post.id}`}>
+                            <Link
+                              to={`${ROUTES.ADMIN.BLOG_MANAGER}/edit/${post.id}`}
+                            >
                               <Edit className="h-4 w-4" />
                             </Link>
                           </Button>

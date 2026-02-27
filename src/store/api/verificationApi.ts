@@ -1,51 +1,66 @@
 import { apiSlice } from './apiSlice';
+import type { PaginationParams } from './types';
 
+/** Matches backend VerificationResponse / VerificationStatus (pending, verified, failed) */
 export interface Verification {
   id: number;
-  listing_id: number | null;
-  user_id: number;
-  verification_type: 'domain' | 'website' | 'identity';
-  status: 'pending' | 'approved' | 'rejected';
-  verification_data: Record<string, any> | null;
-  notes: string | null;
+  listing_id: number;
+  verification_type: string;
+  verification_method: string | null;
+  verification_token: string | null;
+  verification_code: string | null;
+  status: string;
   verified_at: string | null;
+  verified_by_id: number | null;
+  expires_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface VerificationCreateRequest {
-  listing_id?: number;
-  verification_type: 'domain' | 'website' | 'identity';
-  verification_data?: Record<string, any>;
-  notes?: string;
+  listing_id: number;
+  verification_type: string;
+  verification_method?: string | null;
+  verification_token?: string | null;
+  verification_code?: string | null;
 }
 
 export interface VerificationUpdateRequest {
-  verification_data?: Record<string, any>;
-  notes?: string;
+  status?: string;
+  verification_method?: string | null;
+  verification_token?: string | null;
+  verification_code?: string | null;
+  expires_at?: string | null;
 }
 
-export interface VerificationVerifyRequest {
-  status: 'approved' | 'rejected';
-  notes?: string;
+export interface VerificationFilters extends PaginationParams {
+  listing_id?: number;
+  status?: string;
+  verification_type?: string;
 }
 
 export const verificationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getVerifications: builder.query<PaginatedResponse<Verification> | Verification[], PaginationParams>({
+    getVerifications: builder.query<Verification[], VerificationFilters>({
       query: (params) => ({
         url: '/verifications',
         method: 'GET',
-        params,
+        params: {
+          skip: params.skip,
+          limit: params.limit,
+          ...(params.listing_id != null && { listing_id: params.listing_id }),
+          ...(params.status && { status: params.status }),
+          ...(params.verification_type && { verification_type: params.verification_type }),
+        },
       }),
-      providesTags: ['Domain'],
+      providesTags: ['User'],
     }),
     getVerification: builder.query<Verification, number>({
       query: (id) => ({
         url: `/verifications/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Domain', id }],
+      providesTags: (result, error, id) => [{ type: 'User', id: `verification-${id}` }, 'User'],
     }),
     createVerification: builder.mutation<Verification, VerificationCreateRequest>({
       query: (data) => ({
@@ -53,7 +68,7 @@ export const verificationApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ['User'],
     }),
     updateVerification: builder.mutation<Verification, { id: number; data: VerificationUpdateRequest }>({
       query: ({ id, data }) => ({
@@ -61,30 +76,28 @@ export const verificationApi = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id: `verification-${id}` }, 'User'],
     }),
-    verifyVerification: builder.mutation<Verification, { id: number; data: VerificationVerifyRequest }>({
-      query: ({ id, data }) => ({
+    verifyVerification: builder.mutation<Verification, number>({
+      query: (id) => ({
         url: `/verifications/${id}/verify`,
         method: 'POST',
-        body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+      invalidatesTags: (result, error, id) => [{ type: 'User', id: `verification-${id}` }, 'User'],
     }),
-    rejectVerification: builder.mutation<Verification, { id: number; data: { notes?: string } }>({
-      query: ({ id, data }) => ({
+    rejectVerification: builder.mutation<Verification, number>({
+      query: (id) => ({
         url: `/verifications/${id}/reject`,
         method: 'POST',
-        body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+      invalidatesTags: (result, error, id) => [{ type: 'User', id: `verification-${id}` }, 'User'],
     }),
     deleteVerification: builder.mutation<void, number>({
       query: (id) => ({
         url: `/verifications/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ['User'],
     }),
   }),
 });
@@ -98,4 +111,3 @@ export const {
   useRejectVerificationMutation,
   useDeleteVerificationMutation,
 } = verificationApi;
-

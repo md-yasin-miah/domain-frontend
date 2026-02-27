@@ -81,5 +81,9 @@ export const ROUTES = {
       FAQ: "/admin/categories/faq",
       BLOG: "/admin/categories/blog"
     },
+    NOTIFICATIONS: "/admin/notifications",
+    UPLOADS: "/admin/uploads",
+    VERIFICATIONS: "/admin/verifications",
+    DISPUTES: "/admin/disputes",
   },
 }; 

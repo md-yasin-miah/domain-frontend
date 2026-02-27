@@ -10,14 +10,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/hooks/useAuth';
 import {
-  Home,
-  ShoppingCart,
-  Grid3X3,
-  Settings,
-  BookOpen,
   LogIn,
   LogOut,
   User,
@@ -25,10 +21,6 @@ import {
   X,
   ChevronDown,
   LayoutDashboard,
-  Server,
-  CreditCard,
-  MessageSquare,
-  LucideIcon,
 } from 'lucide-react';
 import { MenuItem } from './AppSidebar';
 
@@ -87,13 +79,7 @@ export function Header({ menuItems, userServices, showDashboard = true, leftSlot
           {/* Logo Section - Enhanced */}
           <div className="flex items-center shrink-0 gap-4">
             {leftSlot}
-            <Link to="/" className="flex flex-col items-start hover:opacity-80 transition-opacity group">
-              <img
-                src="/uploads/logo-full.png"
-                alt="ADOMINIOZ"
-                className="h-10 w-auto transition-transform group-hover:scale-105"
-              />
-            </Link>
+            <span className='text-base font-medium text-primary uppercase'>Admin Panel</span>
           </div>
 
           {/* Desktop Navigation - Completely Redesigned */}
@@ -190,6 +176,9 @@ export function Header({ menuItems, userServices, showDashboard = true, leftSlot
             <div className="hidden sm:block">
               <LanguageSwitcher />
             </div>
+
+            {/* Notifications - when logged in */}
+            {user && <NotificationDropdown />}
 
             {user ? (
               /* Enhanced User Menu */

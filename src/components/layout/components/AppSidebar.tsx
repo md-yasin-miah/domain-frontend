@@ -4,16 +4,17 @@ import { LucideIcon, ChevronRight, LogOut } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubItem,
   SidebarMenuSubButton,
-  SidebarFooter,
+  SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -39,7 +40,6 @@ export interface MenuItem {
 }
 
 export interface AppSidebarProps {
-  title: string;
   menuItems: MenuItem[];
   footerType?: 'simple' | 'user-profile';
   collapsible?: 'icon' | 'offcanvas' | 'none';
@@ -47,7 +47,6 @@ export interface AppSidebarProps {
 }
 
 export function AppSidebar({
-  title,
   menuItems,
   footerType = 'simple',
   collapsible = 'icon',
@@ -202,10 +201,22 @@ export function AppSidebar({
         className
       )}
     >
+      <SidebarHeader className="sticky top-0 z-10 flex justify-center h-16 shrink-0 items-center border-b border-sidebar-border/50 bg-sidebar-background px-3">
+        <Link to="/" className="flex items-center overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <img
+            src="/uploads/logo-full.png"
+            alt="Logo"
+            className={cn(
+              'h-10 w-auto object-contain object-left',
+              isCollapsed && 'mx-auto h-7'
+            )}
+          />
+        </Link>
+      </SidebarHeader>
       <SidebarContent className="custom-scrollbar">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold text-sidebar-foreground uppercase tracking-wider">
-            {title}
+          <SidebarGroupLabel className="sr-only">
+            {menuItems.length > 0 ? 'Navigation' : ''}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">

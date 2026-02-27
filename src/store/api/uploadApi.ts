@@ -11,6 +11,9 @@ export interface Upload {
   mime_type: string;
   upload_type: string | null;
   created_at: string;
+  /** Present when returned from list/detail (backend FileUploadResponse) */
+  file_url?: string;
+  file_type?: string;
 }
 
 export interface UploadResponse {

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -14,8 +20,20 @@ import {
   ExternalLink,
   Shield,
 } from "lucide-react";
-import { useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation, useUpdateMarketplaceListingMutation, useDeleteMarketplaceListingMutation } from "@/store/api/marketplaceApi";
-import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from "@/lib/helperFun";
+import {
+  useGetMarketplaceListingQuery,
+  useUpdateMarketplaceListingStatusMutation,
+  useUpdateMarketplaceListingMutation,
+  useDeleteMarketplaceListingMutation,
+} from "@/store/api/marketplaceApi";
+import {
+  formatCurrency,
+  formatNumber,
+  getStatusColor,
+  getStatusLabel,
+  timeFormat,
+  getStatusBadgeVariant,
+} from "@/lib/helperFun";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,37 +65,66 @@ export default function ListingDetail() {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const numericId = id ? parseInt(id, 10) : 0;
-  const { data: listing, isLoading, error } = useGetMarketplaceListingQuery(
-    numericId ? { id: numericId, increment_view: false } : numericId
+  const {
+    data: listing,
+    isLoading,
+    error,
+  } = useGetMarketplaceListingQuery(
+    numericId ? { id: numericId, increment_view: false } : numericId,
   );
-  const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateMarketplaceListingStatusMutation();
+  const [updateStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateMarketplaceListingStatusMutation();
   const [updateListing] = useUpdateMarketplaceListingMutation();
-  const [deleteListing, { isLoading: isDeleting }] = useDeleteMarketplaceListingMutation();
+  const [deleteListing, { isLoading: isDeleting }] =
+    useDeleteMarketplaceListingMutation();
 
-  const handleStatusChange = async (newStatus: typeof LISTING_STATUSES[number]) => {
+  const handleStatusChange = async (
+    newStatus: (typeof LISTING_STATUSES)[number],
+  ) => {
     if (!listing) return;
     try {
       await updateStatus({ id: listing.id, new_status: newStatus }).unwrap();
       toast({
         title: t("admin.listings.status_updated") ?? "Status updated",
-        description: t("admin.listings.status_updated_desc", { title: listing.title, status: newStatus }) ?? `Status set to ${newStatus}.`,
+        description:
+          t("admin.listings.status_updated_desc", {
+            title: listing.title,
+            status: newStatus,
+          }) ?? `Status set to ${newStatus}.`,
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("admin.listings.status_update_error");
-      toast({ title: t("admin.listings.status_update_error") ?? "Update failed", description: msg, variant: "destructive" });
+      const msg =
+        err instanceof Error
+          ? err.message
+          : t("admin.listings.status_update_error");
+      toast({
+        title: t("admin.listings.status_update_error") ?? "Update failed",
+        description: msg,
+        variant: "destructive",
+      });
     }
   };
 
   const handleFeature = async () => {
     if (!listing) return;
     try {
-      await updateListing({ id: listing.id, data: { is_featured: !listing.is_featured } }).unwrap();
+      await updateListing({
+        id: listing.id,
+        data: { is_featured: !listing.is_featured },
+      }).unwrap();
       toast({
-        title: listing.is_featured ? (t("admin.listings.unfeatured") ?? "Unfeatured") : (t("admin.listings.featured") ?? "Featured"),
+        title: listing.is_featured
+          ? (t("admin.listings.unfeatured") ?? "Unfeatured")
+          : (t("admin.listings.featured") ?? "Featured"),
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("admin.listings.feature_error");
-      toast({ title: t("admin.listings.feature_error") ?? "Error", description: msg, variant: "destructive" });
+      const msg =
+        err instanceof Error ? err.message : t("admin.listings.feature_error");
+      toast({
+        title: t("admin.listings.feature_error") ?? "Error",
+        description: msg,
+        variant: "destructive",
+      });
     }
   };
 
@@ -85,18 +132,27 @@ export default function ListingDetail() {
     if (!listing) return;
     try {
       await deleteListing(listing.id).unwrap();
-      toast({ title: t("admin.listings.delete_success") ?? "Deleted", description: t("admin.listings.delete_success_desc") ?? "Listing deleted." });
+      toast({
+        title: t("admin.listings.delete_success") ?? "Deleted",
+        description:
+          t("admin.listings.delete_success_desc") ?? "Listing deleted.",
+      });
       setDeleteOpen(false);
       navigate("/admin/listings-management");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("admin.listings.delete_error");
-      toast({ title: t("admin.listings.delete_error") ?? "Delete failed", description: msg, variant: "destructive" });
+      const msg =
+        err instanceof Error ? err.message : t("admin.listings.delete_error");
+      toast({
+        title: t("admin.listings.delete_error") ?? "Delete failed",
+        description: msg,
+        variant: "destructive",
+      });
     }
   };
 
   if (isLoading || !numericId) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="space-y-6">
         <Skeleton className="h-8 w-48" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
@@ -115,7 +171,9 @@ export default function ListingDetail() {
   if (error || !listing) {
     return (
       <div className="container mx-auto p-6 flex flex-col items-center justify-center py-12">
-        <p className="text-muted-foreground mb-4">{t("admin.listings.not_found") ?? "Listing not found."}</p>
+        <p className="text-muted-foreground mb-4">
+          {t("admin.listings.not_found") ?? "Listing not found."}
+        </p>
         <Button variant="outline" asChild>
           <Link to="/admin/listings-management">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -127,17 +185,22 @@ export default function ListingDetail() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm">
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/admin/listings-management" className="text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin/listings-management"
+            className="text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4 mr-1" />
             {t("admin.listings.back_to_list") ?? "Back to Listings"}
           </Link>
         </Button>
         <span className="text-muted-foreground">/</span>
-        <span className="font-medium truncate max-w-[200px]">{listing.title}</span>
+        <span className="font-medium truncate max-w-[200px]">
+          {listing.title}
+        </span>
       </div>
 
       {/* Admin header */}
@@ -148,29 +211,48 @@ export default function ListingDetail() {
               <Shield className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-tight">{listing.title}</h1>
-              <p className="text-sm text-muted-foreground">Admin view · Manage listing</p>
+              <h1 className="text-xl font-semibold tracking-tight">
+                {listing.title}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Admin view · Manage listing
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" disabled={isUpdatingStatus}>
-                  {isUpdatingStatus ? <Loader2 className="h-4 w-4 animate-spin" /> : <Power className="h-4 w-4 mr-2" />}
+                  {isUpdatingStatus ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Power className="h-4 w-4 mr-2" />
+                  )}
                   {t("admin.listings.change_status") ?? "Status"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {LISTING_STATUSES.map((s) => (
-                  <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)} disabled={listing.status === s}>
+                  <DropdownMenuItem
+                    key={s}
+                    onClick={() => handleStatusChange(s)}
+                    disabled={listing.status === s}
+                  >
                     {t(`admin.listings.status_${s}`) ?? s}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
             <Button variant="outline" size="sm" onClick={handleFeature}>
-              <Star className={cn("h-4 w-4 mr-2", listing.is_featured && "fill-amber-400 text-amber-500")} />
-              {listing.is_featured ? (t("admin.listings.unfeature") ?? "Unfeature") : (t("admin.listings.feature") ?? "Feature")}
+              <Star
+                className={cn(
+                  "h-4 w-4 mr-2",
+                  listing.is_featured && "fill-amber-400 text-amber-500",
+                )}
+              />
+              {listing.is_featured
+                ? (t("admin.listings.unfeature") ?? "Unfeature")
+                : (t("admin.listings.feature") ?? "Feature")}
             </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to={`/admin/listings-management/edit/${listing.id}`}>
@@ -180,13 +262,21 @@ export default function ListingDetail() {
             </Button>
             {listing.public_url && (
               <Button variant="outline" size="sm" asChild>
-                <a href={listing.public_url} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={listing.public_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   {t("admin.listings.view_public") ?? "View public"}
                 </a>
               </Button>
             )}
-            <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setDeleteOpen(true)}
+            >
               <Trash2 className="h-4 w-4 mr-2" />
               {t("common.delete") ?? "Delete"}
             </Button>
@@ -199,26 +289,35 @@ export default function ListingDetail() {
         <Card className="border border-border bg-card">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground mb-1">Price</p>
-            <p className="text-lg font-semibold">{formatCurrency(listing.price)}</p>
+            <p className="text-lg font-semibold">
+              {formatCurrency(listing.price)}
+            </p>
             <p className="text-xs text-muted-foreground">{listing.currency}</p>
           </CardContent>
         </Card>
         <Card className="border border-border bg-card">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground mb-1">Views</p>
-            <p className="text-lg font-semibold">{formatNumber(listing.view_count)}</p>
+            <p className="text-lg font-semibold">
+              {formatNumber(listing.view_count)}
+            </p>
           </CardContent>
         </Card>
         <Card className="border border-border bg-card">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground mb-1">Favorites</p>
-            <p className="text-lg font-semibold">{formatNumber(listing.favorite_count)}</p>
+            <p className="text-lg font-semibold">
+              {formatNumber(listing.favorite_count)}
+            </p>
           </CardContent>
         </Card>
         <Card className="border border-border bg-card">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground mb-1">Status</p>
-            <Badge variant={getStatusBadgeVariant(listing.status)} className={cn("capitalize", getStatusColor(listing.status))}>
+            <Badge
+              variant={getStatusBadgeVariant(listing.status)}
+              className={cn("capitalize", getStatusColor(listing.status))}
+            >
               {getStatusLabel(listing.status, t)}
             </Badge>
           </CardContent>
@@ -229,44 +328,69 @@ export default function ListingDetail() {
         <div className="lg:col-span-2 space-y-6">
           <Card className="border border-border">
             <CardHeader className="border-b border-border bg-muted/20">
-              <CardTitle className="text-base font-semibold">Listing information</CardTitle>
+              <CardTitle className="text-base font-semibold">
+                Listing information
+              </CardTitle>
               <CardDescription>Type, price, description</CardDescription>
             </CardHeader>
             <CardContent className="p-4 space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-md border border-border bg-muted/20">
-                  <label className="text-xs font-medium text-muted-foreground">Type</label>
-                  <p className="text-sm font-medium">{listing.listing_type?.name ?? "—"}</p>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Type
+                  </label>
+                  <p className="text-sm font-medium">
+                    {listing.listing_type?.name ?? "—"}
+                  </p>
                 </div>
                 <div className="p-3 rounded-md border border-border bg-muted/20">
-                  <label className="text-xs font-medium text-muted-foreground">Status</label>
-                  <Badge variant={getStatusBadgeVariant(listing.status)} className="capitalize text-xs mt-1">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Status
+                  </label>
+                  <Badge
+                    variant={getStatusBadgeVariant(listing.status)}
+                    className="capitalize text-xs mt-1"
+                  >
                     {getStatusLabel(listing.status, t)}
                   </Badge>
                 </div>
                 <div className="p-3 rounded-md border border-border bg-muted/20">
-                  <label className="text-xs font-medium text-muted-foreground">Price</label>
-                  <p className="text-sm font-medium">{formatCurrency(listing.price)} {listing.currency}</p>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Price
+                  </label>
+                  <p className="text-sm font-medium">
+                    {formatCurrency(listing.price)} {listing.currency}
+                  </p>
                 </div>
                 {listing.is_featured && (
                   <div className="p-3 rounded-md border border-border bg-muted/20">
-                    <label className="text-xs font-medium text-muted-foreground">Featured</label>
-                    <Badge variant="default" className="mt-1">Featured</Badge>
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Featured
+                    </label>
+                    <Badge variant="default" className="mt-1">
+                      Featured
+                    </Badge>
                   </div>
                 )}
               </div>
               <Separator />
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Description</label>
+                <label className="text-xs font-medium text-muted-foreground">
+                  Description
+                </label>
                 <div className="mt-1 p-3 rounded-md border border-border bg-muted/10">
-                  <p className="text-sm whitespace-pre-wrap">{listing.description}</p>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {listing.description}
+                  </p>
                 </div>
               </div>
               {listing.short_description && (
                 <>
                   <Separator />
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Short description</label>
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Short description
+                    </label>
                     <p className="text-sm mt-1">{listing.short_description}</p>
                   </div>
                 </>
@@ -274,23 +398,34 @@ export default function ListingDetail() {
             </CardContent>
           </Card>
 
-          {(listing.website_traffic_monthly > 0 || listing.domain_authority) && (
+          {(listing.website_traffic_monthly > 0 ||
+            listing.domain_authority) && (
             <Card className="border border-border">
               <CardHeader className="border-b border-border bg-muted/20">
-                <CardTitle className="text-base font-semibold">Performance</CardTitle>
+                <CardTitle className="text-base font-semibold">
+                  Performance
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="grid grid-cols-2 gap-3">
                   {listing.website_traffic_monthly > 0 && (
                     <div className="p-3 rounded-md border border-border bg-muted/20">
-                      <label className="text-xs text-muted-foreground">Monthly traffic</label>
-                      <p className="text-sm font-medium">{formatNumber(listing.website_traffic_monthly)}</p>
+                      <label className="text-xs text-muted-foreground">
+                        Monthly traffic
+                      </label>
+                      <p className="text-sm font-medium">
+                        {formatNumber(listing.website_traffic_monthly)}
+                      </p>
                     </div>
                   )}
                   {listing.domain_authority != null && (
                     <div className="p-3 rounded-md border border-border bg-muted/20">
-                      <label className="text-xs text-muted-foreground">Domain authority</label>
-                      <p className="text-sm font-medium">{listing.domain_authority}</p>
+                      <label className="text-xs text-muted-foreground">
+                        Domain authority
+                      </label>
+                      <p className="text-sm font-medium">
+                        {listing.domain_authority}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -301,20 +436,34 @@ export default function ListingDetail() {
           {(listing.domain_name || listing.website_url) && (
             <Card className="border border-border">
               <CardHeader className="border-b border-border bg-muted/20">
-                <CardTitle className="text-base font-semibold">Asset details</CardTitle>
+                <CardTitle className="text-base font-semibold">
+                  Asset details
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="grid grid-cols-2 gap-3">
                   {listing.domain_name && (
                     <div className="p-3 rounded-md border border-border bg-muted/20">
-                      <label className="text-xs text-muted-foreground">Domain</label>
-                      <p className="text-sm font-medium">{listing.domain_name}{listing.domain_extension ?? ""}</p>
+                      <label className="text-xs text-muted-foreground">
+                        Domain
+                      </label>
+                      <p className="text-sm font-medium">
+                        {listing.domain_name}
+                        {listing.domain_extension ?? ""}
+                      </p>
                     </div>
                   )}
                   {listing.website_url && (
                     <div className="p-3 rounded-md border border-border bg-muted/20">
-                      <label className="text-xs text-muted-foreground">Website</label>
-                      <a href={listing.website_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1">
+                      <label className="text-xs text-muted-foreground">
+                        Website
+                      </label>
+                      <a
+                        href={listing.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline flex items-center gap-1"
+                      >
                         {listing.website_url}
                         <ExternalLink className="h-3 w-3" />
                       </a>
@@ -329,21 +478,31 @@ export default function ListingDetail() {
         <div className="space-y-6">
           <Card className="border border-border">
             <CardHeader className="border-b border-border bg-muted/20">
-              <CardTitle className="text-base font-semibold">Timeline</CardTitle>
+              <CardTitle className="text-base font-semibold">
+                Timeline
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-3">
               <div className="p-3 rounded-md border border-border bg-muted/20">
                 <label className="text-xs text-muted-foreground">Created</label>
-                <p className="text-sm font-medium">{timeFormat(listing.created_at, "MMM DD, YYYY")}</p>
+                <p className="text-sm font-medium">
+                  {timeFormat(listing.created_at, "MMM DD, YYYY")}
+                </p>
               </div>
               <div className="p-3 rounded-md border border-border bg-muted/20">
                 <label className="text-xs text-muted-foreground">Updated</label>
-                <p className="text-sm font-medium">{timeFormat(listing.updated_at, "MMM DD, YYYY")}</p>
+                <p className="text-sm font-medium">
+                  {timeFormat(listing.updated_at, "MMM DD, YYYY")}
+                </p>
               </div>
               {listing.expires_at && (
                 <div className="p-3 rounded-md border border-border bg-muted/20">
-                  <label className="text-xs text-muted-foreground">Expires</label>
-                  <p className="text-sm font-medium">{timeFormat(listing.expires_at, "MMM DD, YYYY")}</p>
+                  <label className="text-xs text-muted-foreground">
+                    Expires
+                  </label>
+                  <p className="text-sm font-medium">
+                    {timeFormat(listing.expires_at, "MMM DD, YYYY")}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -352,12 +511,18 @@ export default function ListingDetail() {
           {listing.seller && (
             <Card className="border border-border">
               <CardHeader className="border-b border-border bg-muted/20">
-                <CardTitle className="text-base font-semibold">Seller</CardTitle>
+                <CardTitle className="text-base font-semibold">
+                  Seller
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3">
                 <div className="p-3 rounded-md border border-border bg-muted/20">
-                  <label className="text-xs text-muted-foreground">Username</label>
-                  <p className="text-sm font-medium">{listing.seller.username}</p>
+                  <label className="text-xs text-muted-foreground">
+                    Username
+                  </label>
+                  <p className="text-sm font-medium">
+                    {listing.seller.username}
+                  </p>
                 </div>
                 <div className="p-3 rounded-md border border-border bg-muted/20">
                   <label className="text-xs text-muted-foreground">Email</label>
@@ -372,16 +537,29 @@ export default function ListingDetail() {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("admin.listings.delete_confirm_title") ?? "Delete listing?"}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("admin.listings.delete_confirm_title") ?? "Delete listing?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("admin.listings.delete_confirm_desc") ?? "This action cannot be undone."}
-              <div className="mt-2 p-2 rounded bg-muted font-medium">{listing.title}</div>
+              {t("admin.listings.delete_confirm_desc") ??
+                "This action cannot be undone."}
+              <div className="mt-2 p-2 rounded bg-muted font-medium">
+                {listing.title}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel") ?? "Cancel"}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground" disabled={isDeleting}>
-              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            <AlertDialogCancel>
+              {t("common.cancel") ?? "Cancel"}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
               {t("common.delete") ?? "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>

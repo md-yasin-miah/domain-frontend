@@ -1,3 +1,20 @@
+// ============ Pagination (used by API slices) ============
+interface PaginationParams {
+  skip?: number;
+  limit?: number;
+}
+
+interface PaginatedResponse<T> {
+  items: T[];
+  pagination: {
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_previous: boolean;
+  };
+}
 
 // ============ Auction Types ============
 interface Auction {

@@ -78,6 +78,14 @@ const FAQManager = lazy(() => import("./pages/admin/FAQManager"));
 const AdminSupportTickets = lazy(() => import("./pages/admin/AdminSupportTickets"));
 const AdminOffersPage = lazy(() => import("./pages/admin/AdminOffersPage"));
 const AdminOrdersPage = lazy(() => import("./pages/admin/AdminOrdersPage"));
+const AdminNotificationsPage = lazy(
+  () => import("./pages/admin/AdminNotificationsPage"),
+);
+const AdminUploadsPage = lazy(() => import("./pages/admin/AdminUploadsPage"));
+const AdminVerificationsPage = lazy(
+  () => import("./pages/admin/AdminVerificationsPage"),
+);
+const AdminDisputesPage = lazy(() => import("./pages/admin/AdminDisputesPage"));
 const AdminOrderDetailPage = lazy(() => import("./pages/admin/orders/AdminOrderDetailPage"));
 const AdminOrderInvoicePage = lazy(() => import("./pages/admin/orders/AdminOrderInvoicePage"));
 const AdminOrderPaymentPage = lazy(() => import("./pages/admin/orders/AdminOrderPaymentPage"));
@@ -993,6 +1001,38 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <AdminOffersPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "notifications",
+        element: (
+          <LazyComponent>
+            <AdminNotificationsPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "uploads",
+        element: (
+          <LazyComponent>
+            <AdminUploadsPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "verifications",
+        element: (
+          <LazyComponent>
+            <AdminVerificationsPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "disputes",
+        element: (
+          <LazyComponent>
+            <AdminDisputesPage />
           </LazyComponent>
         ),
       },

@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import {
   FolderTree,
   Search,
@@ -15,7 +15,7 @@ import {
   Trash2,
   ArrowLeft,
   Eye,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,18 +34,25 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@/lib/routes';
+} from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/lib/routes";
 import {
   useGetBlogCategoriesQuery,
   useCreateBlogCategoryMutation,
   useUpdateBlogCategoryMutation,
   useDeleteBlogCategoryMutation,
-} from '@/store/api/categoryApi';
+} from "@/store/api/categoryApi";
 
-type ModalMode = 'create' | 'view' | 'edit';
+type ModalMode = "create" | "view" | "edit";
 
 interface CategoryFormData {
   name: string;
@@ -54,16 +61,16 @@ interface CategoryFormData {
 }
 
 const defaultFormData: CategoryFormData = {
-  name: '',
-  slug: '',
-  description: '',
+  name: "",
+  slug: "",
+  description: "",
 };
 
 function generateSlug(name: string): string {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 export default function BlogCategories() {
@@ -71,22 +78,31 @@ export default function BlogCategories() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<ModalMode>('create');
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [modalMode, setModalMode] = useState<ModalMode>("create");
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  );
   const [formData, setFormData] = useState<CategoryFormData>(defaultFormData);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
+    null,
+  );
 
   const { data, isLoading, error, refetch } = useGetBlogCategoriesQuery({});
-  const [createCategory, { isLoading: isCreating }] = useCreateBlogCategoryMutation();
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateBlogCategoryMutation();
-  const [deleteCategory, { isLoading: isDeleting }] = useDeleteBlogCategoryMutation();
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateBlogCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateBlogCategoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] =
+    useDeleteBlogCategoryMutation();
 
   const categories: Category[] = useMemo(() => {
     if (!data) return [];
-    return Array.isArray(data) ? data : (data as { items: Category[] }).items ?? [];
+    return Array.isArray(data)
+      ? data
+      : ((data as { items: Category[] }).items ?? []);
   }, [data]);
 
   const filteredCategories = useMemo(
@@ -95,9 +111,12 @@ export default function BlogCategories() {
         (category) =>
           category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           category.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (category.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
+          (category.description
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ??
+            false),
       ),
-    [categories, searchTerm]
+    [categories, searchTerm],
   );
 
   const formLoading = isCreating || isUpdating || isDeleting;
@@ -117,7 +136,7 @@ export default function BlogCategories() {
 
   const openModal = (mode: ModalMode, category?: Category) => {
     setModalMode(mode);
-    if (mode === 'create') {
+    if (mode === "create") {
       resetForm();
       setSelectedCategory(null);
     } else if (category) {
@@ -125,7 +144,7 @@ export default function BlogCategories() {
       setFormData({
         name: category.name,
         slug: category.slug,
-        description: category.description ?? '',
+        description: category.description ?? "",
       });
     }
     setModalOpen(true);
@@ -139,8 +158,8 @@ export default function BlogCategories() {
   const handleCreate = async () => {
     if (!formData.name.trim()) {
       toast({
-        title: t('admin.blog.categories.errors.required_fields'),
-        variant: 'destructive',
+        title: t("admin.blog.categories.errors.required_fields"),
+        variant: "destructive",
       });
       return;
     }
@@ -149,23 +168,26 @@ export default function BlogCategories() {
         name: formData.name.trim(),
         slug: formData.slug.trim() || generateSlug(formData.name),
         description: formData.description.trim() || undefined,
-        type: 'blog',
+        type: "blog",
       }).unwrap();
       toast({
-        title: t('admin.blog.categories.messages.create_success'),
-        description: t('admin.blog.categories.messages.create_success_desc'),
+        title: t("admin.blog.categories.messages.create_success"),
+        description: t("admin.blog.categories.messages.create_success_desc"),
       });
       closeModal();
       refetch();
     } catch (err: unknown) {
       const msg =
-        err && typeof err === 'object' && 'data' in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+        err && typeof err === "object" && "data" in err
+          ? String(
+              (err as { data?: { detail?: string } }).data?.detail ??
+                (err as unknown as Error).message,
+            )
           : String(err);
       toast({
-        title: t('admin.blog.categories.errors.create_error'),
+        title: t("admin.blog.categories.errors.create_error"),
         description: msg,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -173,8 +195,8 @@ export default function BlogCategories() {
   const handleUpdate = async () => {
     if (!selectedCategory || !formData.name.trim()) {
       toast({
-        title: t('admin.blog.categories.errors.required_fields'),
-        variant: 'destructive',
+        title: t("admin.blog.categories.errors.required_fields"),
+        variant: "destructive",
       });
       return;
     }
@@ -188,20 +210,23 @@ export default function BlogCategories() {
         },
       }).unwrap();
       toast({
-        title: t('admin.blog.categories.messages.update_success'),
-        description: t('admin.blog.categories.messages.update_success_desc'),
+        title: t("admin.blog.categories.messages.update_success"),
+        description: t("admin.blog.categories.messages.update_success_desc"),
       });
       closeModal();
       refetch();
     } catch (err: unknown) {
       const msg =
-        err && typeof err === 'object' && 'data' in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+        err && typeof err === "object" && "data" in err
+          ? String(
+              (err as { data?: { detail?: string } }).data?.detail ??
+                (err as unknown as Error).message,
+            )
           : String(err);
       toast({
-        title: t('admin.blog.categories.errors.update_error'),
+        title: t("admin.blog.categories.errors.update_error"),
         description: msg,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -211,71 +236,77 @@ export default function BlogCategories() {
     try {
       await deleteCategory(categoryToDelete.id).unwrap();
       toast({
-        title: t('admin.blog.categories.messages.delete_success'),
-        description: t('admin.blog.categories.messages.delete_success_desc'),
+        title: t("admin.blog.categories.messages.delete_success"),
+        description: t("admin.blog.categories.messages.delete_success_desc"),
       });
       setShowDeleteDialog(false);
       setCategoryToDelete(null);
       refetch();
     } catch (err: unknown) {
       const msg =
-        err && typeof err === 'object' && 'data' in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+        err && typeof err === "object" && "data" in err
+          ? String(
+              (err as { data?: { detail?: string } }).data?.detail ??
+                (err as unknown as Error).message,
+            )
           : String(err);
       toast({
-        title: t('admin.blog.categories.errors.delete_error'),
+        title: t("admin.blog.categories.errors.delete_error"),
         description: msg,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
 
   const errorMessage =
-    error && typeof error === 'object' && 'data' in error
-      ? String((error as { data?: { detail?: string } }).data?.detail ?? (error as unknown as Error).message)
-      : error ? String(error) : null;
+    error && typeof error === "object" && "data" in error
+      ? String(
+          (error as { data?: { detail?: string } }).data?.detail ??
+            (error as unknown as Error).message,
+        )
+      : error
+        ? String(error)
+        : null;
 
-  const isViewMode = modalMode === 'view';
-  const isEditMode = modalMode === 'edit';
-  const isCreateMode = modalMode === 'create';
+  const isViewMode = modalMode === "view";
+  const isEditMode = modalMode === "edit";
+  const isCreateMode = modalMode === "create";
 
-  const modalTitle =
-    isCreateMode
-      ? t('admin.blog.categories.create_dialog.title')
-      : isViewMode
-        ? t('admin.blog.categories.view_dialog.title')
-        : t('admin.blog.categories.edit_dialog.title');
+  const modalTitle = isCreateMode
+    ? t("admin.blog.categories.create_dialog.title")
+    : isViewMode
+      ? t("admin.blog.categories.view_dialog.title")
+      : t("admin.blog.categories.edit_dialog.title");
 
-  const modalDescription =
-    isCreateMode
-      ? t('admin.blog.categories.create_dialog.description')
-      : isViewMode
-        ? t('admin.blog.categories.view_dialog.description')
-        : t('admin.blog.categories.edit_dialog.description');
+  const modalDescription = isCreateMode
+    ? t("admin.blog.categories.create_dialog.description")
+    : isViewMode
+      ? t("admin.blog.categories.view_dialog.description")
+      : t("admin.blog.categories.edit_dialog.description");
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.ROOT)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t('common.back')}
+            {t("common.back")}
           </Button>
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <FolderTree className="h-6 w-6" />
-              {t('admin.blog.categories.title')}
+              {t("admin.blog.categories.title")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {t('admin.blog.categories.description')}
+              {t("admin.blog.categories.description")}
             </p>
           </div>
         </div>
         <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
           <DialogTrigger asChild>
-            <Button onClick={() => openModal('create')}>
+            <Button onClick={() => openModal("create")}>
               <Plus className="h-4 w-4 mr-2" />
-              {t('admin.blog.categories.create_category')}
+              {t("admin.blog.categories.create_category")}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -285,32 +316,47 @@ export default function BlogCategories() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="modal-name">{t('admin.blog.categories.form.name')} *</Label>
+                <Label htmlFor="modal-name">
+                  {t("admin.blog.categories.form.name")} *
+                </Label>
                 <Input
                   id="modal-name"
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder={t('admin.blog.categories.form.name_placeholder')}
+                  placeholder={t("admin.blog.categories.form.name_placeholder")}
                   readOnly={isViewMode}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="modal-slug">{t('admin.blog.categories.form.slug')}</Label>
+                <Label htmlFor="modal-slug">
+                  {t("admin.blog.categories.form.slug")}
+                </Label>
                 <Input
                   id="modal-slug"
                   value={formData.slug}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
-                  placeholder={t('admin.blog.categories.form.slug_placeholder')}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, slug: e.target.value }))
+                  }
+                  placeholder={t("admin.blog.categories.form.slug_placeholder")}
                   readOnly={isViewMode}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="modal-description">{t('admin.blog.categories.form.description')}</Label>
+                <Label htmlFor="modal-description">
+                  {t("admin.blog.categories.form.description")}
+                </Label>
                 <Textarea
                   id="modal-description"
                   value={formData.description}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                  placeholder={t('admin.blog.categories.form.description_placeholder')}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  placeholder={t(
+                    "admin.blog.categories.form.description_placeholder",
+                  )}
                   rows={3}
                   readOnly={isViewMode}
                 />
@@ -320,27 +366,27 @@ export default function BlogCategories() {
               {isViewMode ? (
                 <>
                   <Button variant="outline" onClick={closeModal}>
-                    {t('common.close')}
+                    {t("common.close")}
                   </Button>
-                  <Button onClick={() => setModalMode('edit')}>
+                  <Button onClick={() => setModalMode("edit")}>
                     <Edit className="h-4 w-4 mr-2" />
-                    {t('admin.blog.categories.edit_dialog.update')}
+                    {t("admin.blog.categories.edit_dialog.update")}
                   </Button>
                 </>
               ) : (
                 <>
                   <Button variant="outline" onClick={closeModal}>
-                    {t('common.cancel')}
+                    {t("common.cancel")}
                   </Button>
                   {isCreateMode ? (
                     <Button onClick={handleCreate} disabled={isCreating}>
                       {isCreating ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t('common.loading')}
+                          {t("common.loading")}
                         </>
                       ) : (
-                        t('admin.blog.categories.create_dialog.create')
+                        t("admin.blog.categories.create_dialog.create")
                       )}
                     </Button>
                   ) : (
@@ -348,10 +394,10 @@ export default function BlogCategories() {
                       {isUpdating ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t('common.loading')}
+                          {t("common.loading")}
                         </>
                       ) : (
-                        t('admin.blog.categories.edit_dialog.update')
+                        t("admin.blog.categories.edit_dialog.update")
                       )}
                     </Button>
                   )}
@@ -368,7 +414,7 @@ export default function BlogCategories() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder={t('admin.blog.categories.search_placeholder')}
+                placeholder={t("admin.blog.categories.search_placeholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -377,7 +423,7 @@ export default function BlogCategories() {
 
             {errorMessage ? (
               <div className="text-center py-8 text-destructive">
-                {t('admin.blog.categories.errors.fetch_error')}: {errorMessage}
+                {t("admin.blog.categories.errors.fetch_error")}: {errorMessage}
               </div>
             ) : isLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -385,28 +431,42 @@ export default function BlogCategories() {
               </div>
             ) : filteredCategories.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                {searchTerm ? t('admin.blog.categories.no_results') : t('admin.blog.categories.no_categories')}
+                {searchTerm
+                  ? t("admin.blog.categories.no_results")
+                  : t("admin.blog.categories.no_categories")}
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('admin.blog.categories.table.name')}</TableHead>
-                    <TableHead>{t('admin.blog.categories.table.slug')}</TableHead>
-                    <TableHead>{t('admin.blog.categories.table.description')}</TableHead>
-                    <TableHead>{t('admin.blog.categories.table.actions')}</TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.name")}
+                    </TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.slug")}
+                    </TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.description")}
+                    </TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.actions")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredCategories.map((category) => (
                     <TableRow key={category.id}>
-                      <TableCell className="font-medium">{category.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {category.name}
+                      </TableCell>
                       <TableCell>
-                        <code className="text-sm bg-muted px-2 py-1 rounded">{category.slug}</code>
+                        <code className="text-sm bg-muted px-2 py-1 rounded">
+                          {category.slug}
+                        </code>
                       </TableCell>
                       <TableCell className="max-w-md">
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          {category.description || '-'}
+                          {category.description || "-"}
                         </p>
                       </TableCell>
                       <TableCell>
@@ -414,14 +474,14 @@ export default function BlogCategories() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => openModal('view', category)}
+                            onClick={() => openModal("view", category)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => openModal('edit', category)}
+                            onClick={() => openModal("edit", category)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -449,9 +509,11 @@ export default function BlogCategories() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('admin.blog.categories.delete_dialog.title')}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("admin.blog.categories.delete_dialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('admin.blog.categories.delete_dialog.description')}
+              {t("admin.blog.categories.delete_dialog.description")}
               {categoryToDelete && (
                 <div className="mt-2 p-2 bg-muted rounded">
                   <strong>{categoryToDelete.name}</strong>
@@ -460,7 +522,7 @@ export default function BlogCategories() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -469,10 +531,10 @@ export default function BlogCategories() {
               {isDeleting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('common.loading')}
+                  {t("common.loading")}
                 </>
               ) : (
-                t('common.delete')
+                t("common.delete")
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

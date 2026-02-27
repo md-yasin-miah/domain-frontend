@@ -73,9 +73,13 @@ function generateSlug(name: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-function getCategories(data: Category[] | { items: Category[] } | undefined): Category[] {
+function getCategories(
+  data: Category[] | { items: Category[] } | undefined,
+): Category[] {
   if (!data) return [];
-  return Array.isArray(data) ? data : (data as { items: Category[] }).items ?? [];
+  return Array.isArray(data)
+    ? data
+    : ((data as { items: Category[] }).items ?? []);
 }
 
 export default function AdminSupportCategories() {
@@ -86,17 +90,24 @@ export default function AdminSupportCategories() {
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("create");
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  );
   const [formData, setFormData] = useState<CategoryFormData>(defaultFormData);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
+    null,
+  );
 
   const { data, isLoading, error, refetch } = useGetSupportCategoriesQuery({
     is_active: true,
   });
-  const [createCategory, { isLoading: isCreating }] = useCreateSupportCategoryMutation();
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateSupportCategoryMutation();
-  const [deleteCategory, { isLoading: isDeleting }] = useDeleteSupportCategoryMutation();
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateSupportCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateSupportCategoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] =
+    useDeleteSupportCategoryMutation();
 
   const categories = useMemo(() => getCategories(data ?? undefined), [data]);
 
@@ -106,9 +117,12 @@ export default function AdminSupportCategories() {
         (category) =>
           category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           category.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (category.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
+          (category.description
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ??
+            false),
       ),
-    [categories, searchTerm]
+    [categories, searchTerm],
   );
 
   const resetForm = () => {
@@ -169,7 +183,10 @@ export default function AdminSupportCategories() {
     } catch (err: unknown) {
       const msg =
         err && typeof err === "object" && "data" in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+          ? String(
+              (err as { data?: { detail?: string } }).data?.detail ??
+                (err as unknown as Error).message,
+            )
           : String(err);
       toast({
         title: t("admin.blog.categories.errors.create_error"),
@@ -205,7 +222,10 @@ export default function AdminSupportCategories() {
     } catch (err: unknown) {
       const msg =
         err && typeof err === "object" && "data" in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+          ? String(
+              (err as { data?: { detail?: string } }).data?.detail ??
+                (err as unknown as Error).message,
+            )
           : String(err);
       toast({
         title: t("admin.blog.categories.errors.update_error"),
@@ -229,7 +249,10 @@ export default function AdminSupportCategories() {
     } catch (err: unknown) {
       const msg =
         err && typeof err === "object" && "data" in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as unknown as Error).message)
+          ? String(
+              (err as { data?: { detail?: string } }).data?.detail ??
+                (err as unknown as Error).message,
+            )
           : String(err);
       toast({
         title: t("admin.blog.categories.errors.delete_error"),
@@ -241,7 +264,10 @@ export default function AdminSupportCategories() {
 
   const errorMessage =
     error && typeof error === "object" && "data" in error
-      ? String((error as { data?: { detail?: string } }).data?.detail ?? (error as unknown as Error).message)
+      ? String(
+          (error as { data?: { detail?: string } }).data?.detail ??
+            (error as unknown as Error).message,
+        )
       : error
         ? String(error)
         : null;
@@ -263,7 +289,7 @@ export default function AdminSupportCategories() {
       : t("admin.blog.categories.edit_dialog.description");
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.ROOT)}>
@@ -276,7 +302,10 @@ export default function AdminSupportCategories() {
               {t("admin.categories.support_title", "Support Categories")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {t("admin.categories.support_description", "Manage support ticket categories")}
+              {t(
+                "admin.categories.support_description",
+                "Manage support ticket categories",
+              )}
             </p>
           </div>
         </div>
@@ -294,7 +323,9 @@ export default function AdminSupportCategories() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="modal-name">{t("admin.blog.categories.form.name")} *</Label>
+                <Label htmlFor="modal-name">
+                  {t("admin.blog.categories.form.name")} *
+                </Label>
                 <Input
                   id="modal-name"
                   value={formData.name}
@@ -304,22 +335,35 @@ export default function AdminSupportCategories() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="modal-slug">{t("admin.blog.categories.form.slug")}</Label>
+                <Label htmlFor="modal-slug">
+                  {t("admin.blog.categories.form.slug")}
+                </Label>
                 <Input
                   id="modal-slug"
                   value={formData.slug}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, slug: e.target.value }))
+                  }
                   placeholder={t("admin.blog.categories.form.slug_placeholder")}
                   readOnly={isViewMode}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="modal-description">{t("admin.blog.categories.form.description")}</Label>
+                <Label htmlFor="modal-description">
+                  {t("admin.blog.categories.form.description")}
+                </Label>
                 <Textarea
                   id="modal-description"
                   value={formData.description}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                  placeholder={t("admin.blog.categories.form.description_placeholder")}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  placeholder={t(
+                    "admin.blog.categories.form.description_placeholder",
+                  )}
                   rows={3}
                   readOnly={isViewMode}
                 />
@@ -402,18 +446,30 @@ export default function AdminSupportCategories() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t("admin.blog.categories.table.name")}</TableHead>
-                    <TableHead>{t("admin.blog.categories.table.slug")}</TableHead>
-                    <TableHead>{t("admin.blog.categories.table.description")}</TableHead>
-                    <TableHead>{t("admin.blog.categories.table.actions")}</TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.name")}
+                    </TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.slug")}
+                    </TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.description")}
+                    </TableHead>
+                    <TableHead>
+                      {t("admin.blog.categories.table.actions")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredCategories.map((category) => (
                     <TableRow key={category.id}>
-                      <TableCell className="font-medium">{category.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {category.name}
+                      </TableCell>
                       <TableCell>
-                        <code className="text-sm bg-muted px-2 py-1 rounded">{category.slug}</code>
+                        <code className="text-sm bg-muted px-2 py-1 rounded">
+                          {category.slug}
+                        </code>
                       </TableCell>
                       <TableCell className="max-w-md">
                         <p className="text-sm text-muted-foreground line-clamp-2">
@@ -422,10 +478,18 @@ export default function AdminSupportCategories() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => openModal("view", category)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openModal("view", category)}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => openModal("edit", category)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openModal("edit", category)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
@@ -452,7 +516,9 @@ export default function AdminSupportCategories() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("admin.blog.categories.delete_dialog.title")}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("admin.blog.categories.delete_dialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {t("admin.blog.categories.delete_dialog.description")}
               {categoryToDelete && (
