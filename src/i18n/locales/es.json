@@ -31,6 +31,33 @@
     "reviews": "Reseñas",
     "faq": "Preguntas Frecuentes"
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "Aún no hay notificaciones.",
+    "mark_all_read": "Marcar todas como leídas",
+    "aria_label": "Notificaciones",
+    "filter": "Filtrar",
+    "filter_unread": "No leídas",
+    "filter_read": "Leídas",
+    "marked_read": "Marcada como leída",
+    "all_marked_read": "Todas marcadas como leídas",
+    "deleted": "Notificación eliminada",
+    "all_deleted": "Todas las notificaciones eliminadas",
+    "read": "Leída",
+    "unread": "No leída",
+    "total": "total",
+    "table": {
+      "title": "Título",
+      "type": "Tipo",
+      "status": "Estado",
+      "created_at": "Creado"
+    },
+    "mark_read": "Marcar como leída",
+    "delete": "Eliminar",
+    "delete_all": "Eliminar todas",
+    "delete_all_confirm_title": "¿Eliminar todas las notificaciones?",
+    "delete_all_confirm_description": "Se eliminarán permanentemente todas tus notificaciones. Esta acción no se puede deshacer."
+  },
   "hero": {
     "title": "El futuro del comercio digital",
     "subtitle": "Plataforma avanzada de trading de activos digitales con verificación de identidad, servicios de escrow y garantías de autenticidad.",
@@ -374,6 +401,11 @@
     "offers": {
       "title": "Ofertas",
       "description": "Ver y gestionar todas las ofertas del marketplace."
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "description": "Ver y gestionar tus notificaciones.",
+      "manage": "Gestiona tus notificaciones."
     },
     "orders": {
       "title": "Gestión de pedidos",

@@ -31,6 +31,33 @@
     "reviews": "Reviews",
     "faq": "FAQ"
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet.",
+    "mark_all_read": "Mark all read",
+    "aria_label": "Notifications",
+    "filter": "Filter",
+    "filter_unread": "Unread",
+    "filter_read": "Read",
+    "marked_read": "Marked as read",
+    "all_marked_read": "All marked as read",
+    "deleted": "Notification deleted",
+    "all_deleted": "All notifications deleted",
+    "read": "Read",
+    "unread": "Unread",
+    "total": "total",
+    "table": {
+      "title": "Title",
+      "type": "Type",
+      "status": "Status",
+      "created_at": "Created"
+    },
+    "mark_read": "Mark as read",
+    "delete": "Delete",
+    "delete_all": "Delete all",
+    "delete_all_confirm_title": "Delete all notifications?",
+    "delete_all_confirm_description": "This will permanently remove all your notifications. This action cannot be undone."
+  },
   "hero": {
     "title": "The future of digital commerce",
     "subtitle": "Advanced digital asset trading platform with identity verification, escrow services and authenticity guarantees.",
@@ -249,6 +276,11 @@
     "offers": {
       "title": "Offers",
       "description": "View and manage all marketplace offers."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "View and manage your notifications.",
+      "manage": "Manage your notifications."
     },
     "orders": {
       "title": "Order Management",

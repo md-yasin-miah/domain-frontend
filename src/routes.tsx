@@ -78,6 +78,9 @@ const FAQManager = lazy(() => import("./pages/admin/FAQManager"));
 const AdminSupportTickets = lazy(() => import("./pages/admin/AdminSupportTickets"));
 const AdminOffersPage = lazy(() => import("./pages/admin/AdminOffersPage"));
 const AdminOrdersPage = lazy(() => import("./pages/admin/AdminOrdersPage"));
+const AdminNotificationsPage = lazy(
+  () => import("./pages/admin/AdminNotificationsPage"),
+);
 const AdminOrderDetailPage = lazy(() => import("./pages/admin/orders/AdminOrderDetailPage"));
 const AdminOrderInvoicePage = lazy(() => import("./pages/admin/orders/AdminOrderInvoicePage"));
 const AdminOrderPaymentPage = lazy(() => import("./pages/admin/orders/AdminOrderPaymentPage"));
@@ -993,6 +996,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <AdminOffersPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "notifications",
+        element: (
+          <LazyComponent>
+            <AdminNotificationsPage />
           </LazyComponent>
         ),
       },

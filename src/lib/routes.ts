@@ -81,5 +81,6 @@ export const ROUTES = {
       FAQ: "/admin/categories/faq",
       BLOG: "/admin/categories/blog"
     },
+    NOTIFICATIONS: "/admin/notifications",
   },
 }; 
