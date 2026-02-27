@@ -407,6 +407,23 @@
       "description": "Ver y gestionar tus notificaciones.",
       "manage": "Gestiona tus notificaciones."
     },
+    "uploads": {
+      "title": "Subidas",
+      "description": "Todos los archivos subidos. Desplázate hacia abajo para cargar más.",
+      "drive_title": "Archivos",
+      "files_shown": "archivos",
+      "empty": "Aún no hay archivos",
+      "empty_hint": "Los archivos subidos aparecerán aquí.",
+      "download": "Descargar",
+      "open": "Abrir",
+      "delete": "Eliminar",
+      "downloaded": "Descarga iniciada",
+      "download_error": "Error al descargar",
+      "deleted": "Archivo eliminado",
+      "delete_confirm_title": "¿Eliminar archivo?",
+      "delete_confirm_description": "Se eliminará permanentemente este archivo. Esta acción no se puede deshacer.",
+      "end_of_list": "Has llegado al final."
+    },
     "orders": {
       "title": "Gestión de pedidos",
       "description": "Ver y gestionar todos los pedidos del marketplace.",

@@ -10,6 +10,7 @@ import {
   Handshake,
   ShoppingCart,
   Bell,
+  CloudUpload,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -64,6 +65,11 @@ const adminMenuItems: MenuItem[] = [
     title: "Roles & Permissions",
     icon: Shield,
     url: ROUTES.ADMIN.ROLES_PERMISSIONS,
+  },
+  {
+    title: "Uploads",
+    icon: CloudUpload,
+    url: ROUTES.ADMIN.UPLOADS,
   },
   {
     title: "Notifications",

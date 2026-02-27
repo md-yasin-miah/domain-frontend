@@ -282,6 +282,23 @@
       "description": "View and manage your notifications.",
       "manage": "Manage your notifications."
     },
+    "uploads": {
+      "title": "Uploads",
+      "description": "All uploaded files. Scroll down to load more.",
+      "drive_title": "Files",
+      "files_shown": "files",
+      "empty": "No files yet",
+      "empty_hint": "Uploaded files will appear here.",
+      "download": "Download",
+      "open": "Open",
+      "delete": "Delete",
+      "downloaded": "Download started",
+      "download_error": "Download failed",
+      "deleted": "File deleted",
+      "delete_confirm_title": "Delete file?",
+      "delete_confirm_description": "This will permanently delete this file. This action cannot be undone.",
+      "end_of_list": "You've reached the end."
+    },
     "orders": {
       "title": "Order Management",
       "description": "View and manage all marketplace orders.",

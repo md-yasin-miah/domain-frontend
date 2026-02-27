@@ -94,9 +94,7 @@ function FAQForm({ formData, onChange, categories }: FAQFormProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="question">
-          {t("admin.faq.form.question")} *
-        </Label>
+        <Label htmlFor="question">{t("admin.faq.form.question")} *</Label>
         <Input
           id="question"
           value={formData.question}
@@ -106,9 +104,7 @@ function FAQForm({ formData, onChange, categories }: FAQFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="answer">
-          {t("admin.faq.form.answer")} *
-        </Label>
+        <Label htmlFor="answer">{t("admin.faq.form.answer")} *</Label>
         <Textarea
           id="answer"
           value={formData.answer}
@@ -119,9 +115,7 @@ function FAQForm({ formData, onChange, categories }: FAQFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="category">
-          {t("admin.faq.form.category")} *
-        </Label>
+        <Label htmlFor="category">{t("admin.faq.form.category")} *</Label>
         <Select
           value={formData.category_id ? String(formData.category_id) : ""}
           onValueChange={(val) =>
@@ -132,7 +126,9 @@ function FAQForm({ formData, onChange, categories }: FAQFormProps) {
           }
         >
           <SelectTrigger id="category">
-            <SelectValue placeholder={t("admin.faq.form.category_placeholder")} />
+            <SelectValue
+              placeholder={t("admin.faq.form.category_placeholder")}
+            />
           </SelectTrigger>
           <SelectContent>
             {categories.map((cat) => (
@@ -183,8 +179,14 @@ export default function FAQManager() {
   const [formData, setFormData] = useState<FAQFormData>(DEFAULT_FORM);
 
   // RTK Query hooks
-  const { data: faqsData, isLoading } = useGetFAQsQuery({ skip: 0, limit: 100 });
-  const { data: categoriesData } = useGetFAQCategoriesQuery({ skip: 0, limit: 100 });
+  const { data: faqsData, isLoading } = useGetFAQsQuery({
+    skip: 0,
+    limit: 100,
+  });
+  const { data: categoriesData } = useGetFAQCategoriesQuery({
+    skip: 0,
+    limit: 100,
+  });
 
   const [createFAQ, { isLoading: isCreating }] = useCreateFAQMutation();
   const [updateFAQ, { isLoading: isUpdating }] = useUpdateFAQMutation();
@@ -202,7 +204,9 @@ export default function FAQManager() {
     (faq) =>
       faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (faq.category?.name ?? "").toLowerCase().includes(searchTerm.toLowerCase())
+      (faq.category?.name ?? "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()),
   );
 
   const resetForm = () => {
@@ -211,7 +215,11 @@ export default function FAQManager() {
   };
 
   const handleCreate = async () => {
-    if (!formData.question.trim() || !formData.answer.trim() || !formData.category_id) {
+    if (
+      !formData.question.trim() ||
+      !formData.answer.trim() ||
+      !formData.category_id
+    ) {
       toast({
         title: t("admin.faq.errors.required_fields"),
         variant: "destructive",
@@ -236,7 +244,10 @@ export default function FAQManager() {
       setShowCreateDialog(false);
       resetForm();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : t("admin.faq.errors.create_error");
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("admin.faq.errors.create_error");
       toast({
         title: t("admin.faq.errors.create_error"),
         description: message,
@@ -258,7 +269,12 @@ export default function FAQManager() {
   };
 
   const handleUpdate = async () => {
-    if (!editingFAQ || !formData.question.trim() || !formData.answer.trim() || !formData.category_id) {
+    if (
+      !editingFAQ ||
+      !formData.question.trim() ||
+      !formData.answer.trim() ||
+      !formData.category_id
+    ) {
       toast({
         title: t("admin.faq.errors.required_fields"),
         variant: "destructive",
@@ -286,7 +302,10 @@ export default function FAQManager() {
       setShowEditDialog(false);
       resetForm();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : t("admin.faq.errors.update_error");
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("admin.faq.errors.update_error");
       toast({
         title: t("admin.faq.errors.update_error"),
         description: message,
@@ -309,7 +328,10 @@ export default function FAQManager() {
       setShowDeleteDialog(false);
       setFaqToDelete(null);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : t("admin.faq.errors.delete_error");
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("admin.faq.errors.delete_error");
       toast({
         title: t("admin.faq.errors.delete_error"),
         description: message,
@@ -319,7 +341,7 @@ export default function FAQManager() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -346,12 +368,18 @@ export default function FAQManager() {
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{t("admin.faq.create_dialog.title")}</DialogTitle>
+                  <DialogTitle>
+                    {t("admin.faq.create_dialog.title")}
+                  </DialogTitle>
                   <DialogDescription>
                     {t("admin.faq.create_dialog.description")}
                   </DialogDescription>
                 </DialogHeader>
-                <FAQForm formData={formData} onChange={setFormData} categories={categories} />
+                <FAQForm
+                  formData={formData}
+                  onChange={setFormData}
+                  categories={categories}
+                />
                 <DialogFooter>
                   <Button
                     variant="outline"
@@ -393,7 +421,9 @@ export default function FAQManager() {
               </div>
             ) : filteredFAQs.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                {searchTerm ? t("admin.faq.no_results") : t("admin.faq.no_faqs")}
+                {searchTerm
+                  ? t("admin.faq.no_results")
+                  : t("admin.faq.no_faqs")}
               </div>
             ) : (
               <Table>
@@ -481,7 +511,11 @@ export default function FAQManager() {
               {t("admin.faq.edit_dialog.description")}
             </DialogDescription>
           </DialogHeader>
-          <FAQForm formData={formData} onChange={setFormData} categories={categories} />
+          <FAQForm
+            formData={formData}
+            onChange={setFormData}
+            categories={categories}
+          />
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditDialog(false)}>
               {t("common.cancel")}
