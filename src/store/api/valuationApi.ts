@@ -1,195 +1,250 @@
 import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
+import type { PaginationParams } from './types';
 
+/** Matches backend ValuationResponse */
 export interface Valuation {
   id: number;
-  domain_name: string;
+  listing_id: number | null;
+  valuation_type: string;
+  domain_name: string | null;
+  domain_extension: string | null;
   estimated_value: number;
+  min_estimate: number | null;
+  max_estimate: number | null;
   currency: string;
-  valuation_method: string;
-  factors: Record<string, any>;
+  domain_length_score: number | null;
+  domain_age_years: number | null;
+  domain_authority_score: number | null;
+  backlinks_count: number | null;
+  monthly_traffic: number | null;
+  monthly_revenue: number | null;
+  comparable_sales_count: number;
+  calculated_at: string;
   created_at: string;
   updated_at: string;
+  valuation_data: Record<string, unknown> | null;
 }
 
-export interface ValuationCreateRequest {
-  domain_name: string;
-  estimated_value: number;
-  currency?: string;
-  valuation_method?: string;
-  factors?: Record<string, any>;
+export interface ValuationFilters extends PaginationParams {
+  listing_id?: number;
+  valuation_type?: string;
 }
 
-export interface ValuationCalculateRequest {
-  domain_name: string;
-  factors?: Record<string, any>;
+export interface ValuationUpdateRequest {
+  estimated_value?: number;
+  min_estimate?: number;
+  max_estimate?: number;
+  valuation_data?: Record<string, unknown>;
 }
 
-export interface ValuationCalculateResponse {
-  estimated_value: number;
-  currency: string;
-  factors: Record<string, any>;
-}
-
+/** Matches backend ComparableSaleResponse */
 export interface ComparableSale {
   id: number;
   domain_name: string;
+  domain_extension: string;
   sale_price: number;
-  sale_date: string;
   currency: string;
+  sale_date: string;
+  sale_source: string | null;
+  buyer_type: string | null;
+  domain_length: number | null;
+  domain_age_years: number | null;
+  has_numbers: boolean;
+  has_hyphens: boolean;
   created_at: string;
 }
 
 export interface ComparableSaleCreateRequest {
   domain_name: string;
+  domain_extension: string;
   sale_price: number;
-  sale_date: string;
   currency?: string;
+  sale_date: string;
+  sale_source?: string | null;
+  buyer_type?: string | null;
+  domain_age_years?: number | null;
 }
 
+export interface ComparableSaleFilters extends PaginationParams {
+  domain_extension?: string;
+  min_price?: number;
+  max_price?: number;
+}
+
+export interface ComparableSaleUpdateRequest {
+  sale_price?: number;
+  sale_date?: string;
+  sale_source?: string | null;
+  buyer_type?: string | null;
+}
+
+/** Matches backend MarketTrendResponse */
 export interface MarketTrend {
   id: number;
-  category: string;
-  trend_data: Record<string, any>;
+  trend_type: string;
+  trend_key: string;
   period_start: string;
   period_end: string;
+  average_sale_price: number;
+  median_sale_price: number;
+  total_sales_count: number;
+  total_sales_volume: number;
+  price_change_percentage: number | null;
+  sales_count_change_percentage: number | null;
+  currency: string;
+  trend_data: Record<string, unknown> | null;
   created_at: string;
+  updated_at: string;
+}
+
+export interface MarketTrendFilters extends PaginationParams {
+  trend_type?: string;
+  trend_key?: string;
 }
 
 export interface MarketTrendCreateRequest {
-  category: string;
-  trend_data: Record<string, any>;
+  trend_type: string;
+  trend_key: string;
   period_start: string;
   period_end: string;
+  average_sale_price: number;
+  median_sale_price: number;
+  total_sales_count: number;
+  total_sales_volume: number;
+  price_change_percentage?: number | null;
+  sales_count_change_percentage?: number | null;
+  currency?: string;
+  trend_data?: Record<string, unknown> | null;
+}
+
+export interface MarketTrendUpdateRequest {
+  average_sale_price?: number;
+  median_sale_price?: number;
+  total_sales_count?: number;
+  total_sales_volume?: number;
+  price_change_percentage?: number | null;
+  sales_count_change_percentage?: number | null;
+  trend_data?: Record<string, unknown> | null;
+}
+
+/** Params for POST /valuations/calculate (query params) */
+export interface ValuationCalculateParams {
+  domain_name: string;
+  domain_extension: string;
+  domain_age_years?: number;
+  domain_authority_score?: number;
+  backlinks_count?: number;
+  monthly_traffic?: number;
+  monthly_revenue?: number;
 }
 
 export const valuationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Valuations
-    getValuations: builder.query<PaginatedResponse<Valuation> | Valuation[], PaginationParams>({
+    getValuations: builder.query<Valuation[], ValuationFilters>({
       query: (params) => ({
         url: '/valuations',
         method: 'GET',
-        params,
+        params: {
+          skip: params.skip,
+          limit: params.limit,
+          ...(params.listing_id != null && { listing_id: params.listing_id }),
+          ...(params.valuation_type && { valuation_type: params.valuation_type }),
+        },
       }),
-      providesTags: ['Domain'],
+      providesTags: ['User'],
     }),
     getValuation: builder.query<Valuation, number>({
-      query: (id) => ({
-        url: `/valuations/${id}`,
-        method: 'GET',
-      }),
-      providesTags: (result, error, id) => [{ type: 'Domain', id }],
+      query: (id) => ({ url: `/valuations/${id}`, method: 'GET' }),
+      providesTags: (result, error, id) => [{ type: 'User', id: `valuation-${id}` }, 'User'],
     }),
-    createValuation: builder.mutation<Valuation, ValuationCreateRequest>({
-      query: (data) => ({
-        url: '/valuations',
-        method: 'POST',
-        body: data,
-      }),
-      invalidatesTags: ['Domain'],
+    createValuation: builder.mutation<Valuation, Record<string, unknown>>({
+      query: (data) => ({ url: '/valuations', method: 'POST', body: data }),
+      invalidatesTags: ['User'],
     }),
-    calculateValuation: builder.mutation<ValuationCalculateResponse, ValuationCalculateRequest>({
-      query: (data) => ({
+    calculateValuation: builder.mutation<Valuation, ValuationCalculateParams>({
+      query: (params) => ({
         url: '/valuations/calculate',
         method: 'POST',
-        body: data,
+        params: {
+          domain_name: params.domain_name,
+          domain_extension: params.domain_extension,
+          ...(params.domain_age_years != null && { domain_age_years: params.domain_age_years }),
+          ...(params.domain_authority_score != null && { domain_authority_score: params.domain_authority_score }),
+          ...(params.backlinks_count != null && { backlinks_count: params.backlinks_count }),
+          ...(params.monthly_traffic != null && { monthly_traffic: params.monthly_traffic }),
+          ...(params.monthly_revenue != null && { monthly_revenue: params.monthly_revenue }),
+        },
       }),
+      invalidatesTags: ['User'],
     }),
-    updateValuation: builder.mutation<Valuation, { id: number; data: Partial<ValuationCreateRequest> }>({
-      query: ({ id, data }) => ({
-        url: `/valuations/${id}`,
-        method: 'PUT',
-        body: data,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+    updateValuation: builder.mutation<Valuation, { id: number; data: ValuationUpdateRequest }>({
+      query: ({ id, data }) => ({ url: `/valuations/${id}`, method: 'PUT', body: data }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id: `valuation-${id}` }, 'User'],
     }),
     deleteValuation: builder.mutation<void, number>({
-      query: (id) => ({
-        url: `/valuations/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['Domain'],
+      query: (id) => ({ url: `/valuations/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['User'],
     }),
 
-    // Comparable Sales
-    getComparableSales: builder.query<PaginatedResponse<ComparableSale> | ComparableSale[], PaginationParams>({
+    getComparableSales: builder.query<ComparableSale[], ComparableSaleFilters>({
       query: (params) => ({
         url: '/valuations/comparable-sales',
         method: 'GET',
-        params,
+        params: {
+          skip: params.skip,
+          limit: params.limit,
+          ...(params.domain_extension && { domain_extension: params.domain_extension }),
+          ...(params.min_price != null && { min_price: params.min_price }),
+          ...(params.max_price != null && { max_price: params.max_price }),
+        },
       }),
-      providesTags: ['Domain'],
+      providesTags: ['User'],
     }),
     getComparableSale: builder.query<ComparableSale, number>({
-      query: (id) => ({
-        url: `/valuations/comparable-sales/${id}`,
-        method: 'GET',
-      }),
-      providesTags: (result, error, id) => [{ type: 'Domain', id }],
+      query: (id) => ({ url: `/valuations/comparable-sales/${id}`, method: 'GET' }),
+      providesTags: (result, error, id) => [{ type: 'User', id: `comparable-${id}` }, 'User'],
     }),
     createComparableSale: builder.mutation<ComparableSale, ComparableSaleCreateRequest>({
-      query: (data) => ({
-        url: '/valuations/comparable-sales',
-        method: 'POST',
-        body: data,
-      }),
-      invalidatesTags: ['Domain'],
+      query: (data) => ({ url: '/valuations/comparable-sales', method: 'POST', body: data }),
+      invalidatesTags: ['User'],
     }),
-    updateComparableSale: builder.mutation<ComparableSale, { id: number; data: Partial<ComparableSaleCreateRequest> }>({
-      query: ({ id, data }) => ({
-        url: `/valuations/comparable-sales/${id}`,
-        method: 'PUT',
-        body: data,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+    updateComparableSale: builder.mutation<ComparableSale, { id: number; data: ComparableSaleUpdateRequest }>({
+      query: ({ id, data }) => ({ url: `/valuations/comparable-sales/${id}`, method: 'PUT', body: data }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id: `comparable-${id}` }, 'User'],
     }),
     deleteComparableSale: builder.mutation<void, number>({
-      query: (id) => ({
-        url: `/valuations/comparable-sales/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['Domain'],
+      query: (id) => ({ url: `/valuations/comparable-sales/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['User'],
     }),
 
-    // Market Trends
-    getMarketTrends: builder.query<PaginatedResponse<MarketTrend> | MarketTrend[], PaginationParams>({
+    getMarketTrends: builder.query<MarketTrend[], MarketTrendFilters>({
       query: (params) => ({
         url: '/valuations/market-trends',
         method: 'GET',
-        params,
+        params: {
+          skip: params.skip,
+          limit: params.limit,
+          ...(params.trend_type && { trend_type: params.trend_type }),
+          ...(params.trend_key && { trend_key: params.trend_key }),
+        },
       }),
-      providesTags: ['Domain'],
+      providesTags: ['User'],
     }),
     getMarketTrend: builder.query<MarketTrend, number>({
-      query: (id) => ({
-        url: `/valuations/market-trends/${id}`,
-        method: 'GET',
-      }),
-      providesTags: (result, error, id) => [{ type: 'Domain', id }],
+      query: (id) => ({ url: `/valuations/market-trends/${id}`, method: 'GET' }),
+      providesTags: (result, error, id) => [{ type: 'User', id: `trend-${id}` }, 'User'],
     }),
     createMarketTrend: builder.mutation<MarketTrend, MarketTrendCreateRequest>({
-      query: (data) => ({
-        url: '/valuations/market-trends',
-        method: 'POST',
-        body: data,
-      }),
-      invalidatesTags: ['Domain'],
+      query: (data) => ({ url: '/valuations/market-trends', method: 'POST', body: data }),
+      invalidatesTags: ['User'],
     }),
-    updateMarketTrend: builder.mutation<MarketTrend, { id: number; data: Partial<MarketTrendCreateRequest> }>({
-      query: ({ id, data }) => ({
-        url: `/valuations/market-trends/${id}`,
-        method: 'PUT',
-        body: data,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+    updateMarketTrend: builder.mutation<MarketTrend, { id: number; data: MarketTrendUpdateRequest }>({
+      query: ({ id, data }) => ({ url: `/valuations/market-trends/${id}`, method: 'PUT', body: data }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id: `trend-${id}` }, 'User'],
     }),
     deleteMarketTrend: builder.mutation<void, number>({
-      query: (id) => ({
-        url: `/valuations/market-trends/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['Domain'],
+      query: (id) => ({ url: `/valuations/market-trends/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['User'],
     }),
   }),
 });
@@ -212,4 +267,3 @@ export const {
   useUpdateMarketTrendMutation,
   useDeleteMarketTrendMutation,
 } = valuationApi;
-

@@ -62,7 +62,9 @@ export const ROUTES = {
   ADMIN: {
     ROOT: "/admin",
     DASHBOARD: "/admin/dashboard",
+    ANALYTICS: "/admin/analytics",
     USERS: "/admin/users",
+    USER_DETAILS: (id: number | string) => `/admin/users/${id}`,
     ROLES_PERMISSIONS: "/admin/roles-and-permissions",
     BLOG_MANAGER: "/admin/blog-manager",
     FAQ_MANAGER: "/admin/faq-manager",
@@ -85,5 +87,8 @@ export const ROUTES = {
     UPLOADS: "/admin/uploads",
     VERIFICATIONS: "/admin/verifications",
     DISPUTES: "/admin/disputes",
+    VALUATIONS: "/admin/valuations",
+    SOCIAL: "/admin/social",
+    PROFILE: "/admin/profile",
   },
 }; 

@@ -13,6 +13,9 @@ import {
   CloudUpload,
   Verified,
   ShieldAlert,
+  ChartLine,
+  Globe,
+  DollarSign,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -22,6 +25,11 @@ const adminMenuItems: MenuItem[] = [
     title: "Dashboard",
     icon: LayoutDashboard,
     url: ROUTES.ADMIN.DASHBOARD,
+  },
+  {
+    title: "Analytics",
+    icon: ChartLine,
+    url: ROUTES.ADMIN.ANALYTICS,
   },
   {
     title: "User Management",
@@ -77,6 +85,15 @@ const adminMenuItems: MenuItem[] = [
     title: "Verifications",
     icon: Verified,
     url: ROUTES.ADMIN.VERIFICATIONS,
+  },{
+    title: "Valuations",
+    icon: DollarSign,
+    url: ROUTES.ADMIN.VALUATIONS,
+  },
+  {
+    title:"Social",
+    icon: Globe,
+    url: ROUTES.ADMIN.SOCIAL,
   },
   {
     title: "Disputes",

@@ -4,6 +4,11 @@ interface PaginationParams {
   limit?: number;
 }
 
+/** Extended params for listing users (search + pagination) */
+interface UsersListParams extends PaginationParams {
+  search?: string;
+}
+
 interface PaginatedResponse<T> {
   items: T[];
   pagination: {

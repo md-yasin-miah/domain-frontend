@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +18,8 @@ import {
   Mail,
   Phone,
   MapPin,
-  Building
+  Building,
+  Eye
 } from 'lucide-react';
 import {
   Dialog,
@@ -45,13 +47,13 @@ import {
   useGetUsersQuery,
   useGetRolesQuery,
   useCreateUserMutation,
-  useUpdateUserMutation,
   useDeleteUserMutation,
-  useAssignRoleMutation,
+  useAssignRolesMutation,
   useRemoveRoleMutation,
   useUpdateClientProfileMutation,
 } from '@/store/api/userApi';
-import CustomTooltip from '@/components/common/CustomTooltip';
+import { ROUTES } from '@/lib/routes';
+import { MultiSelect } from '@/components/common/MultiSelect';
 
 // Local User interface matching the component's needs
 interface User {
@@ -87,24 +89,23 @@ interface UserFormData {
 export default function UserManagement() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // RTK Query hooks
   const { data: usersData, isLoading: isLoadingUsers, refetch: refetchUsers } = useGetUsersQuery({});
   const { data: rolesData, isLoading: isLoadingRoles } = useGetRolesQuery();
   const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
-  const [updateUser] = useUpdateUserMutation();
   const [updateClientProfile] = useUpdateClientProfileMutation();
   const [deleteUser, { isLoading: isDeletingUser }] = useDeleteUserMutation();
-  const [assignRole] = useAssignRoleMutation();
+  const [assignRoles] = useAssignRolesMutation();
   const [removeRole] = useRemoveRoleMutation();
 
   // Local state
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [selectedRoleId, setSelectedRoleId] = useState<string>('');
+  const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
@@ -189,11 +190,11 @@ export default function UserManagement() {
         }).unwrap();
       }
 
-      // Assign role if selected
+      // Assign role(s) if selected
       if (formData.role_id) {
-        await assignRole({
+        await assignRoles({
           id: userResult.id,
-          roleId: Number(formData.role_id),
+          roleIds: [Number(formData.role_id)],
         }).unwrap();
       }
 
@@ -210,62 +211,6 @@ export default function UserManagement() {
       toast({
         title: 'Error',
         description: error?.data?.detail || error?.message || t('admin.user_management.messages.create_error'),
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleUpdateUser = async () => {
-    if (!selectedUser || !formData.full_name || !formData.phone_number || !formData.address) {
-      toast({
-        title: 'Error',
-        description: t('admin.user_management.create_dialog.required_fields'),
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      const userId = Number(selectedUser.id);
-
-      // Update user email/username if changed
-      if (formData.email !== selectedUser.email || formData.username) {
-        await updateUser({
-          id: userId,
-          data: {
-            email: formData.email !== selectedUser.email ? formData.email : undefined,
-            username: formData.username || undefined,
-          },
-        }).unwrap();
-      }
-
-      // Update profile
-      const nameParts = formData.full_name.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-
-      await updateClientProfile({
-        first_name: firstName,
-        last_name: lastName,
-        phone: formData.phone_number,
-        address_line1: formData.address,
-        company_name: formData.company_name || undefined,
-        bio: formData.company_details || undefined,
-      }).unwrap();
-
-      toast({
-        title: 'Success',
-        description: t('admin.user_management.messages.update_success'),
-      });
-
-      setShowEditDialog(false);
-      resetForm();
-      refetchUsers();
-    } catch (error: any) {
-      console.error('Error updating user:', error);
-      toast({
-        title: 'Error',
-        description: error?.data?.detail || error?.message || t('admin.user_management.messages.update_error'),
         variant: 'destructive',
       });
     }
@@ -295,46 +240,29 @@ export default function UserManagement() {
     }
   };
 
-  const handleAssignRole = async () => {
-    if (!selectedUser || !selectedRoleId) {
-      toast({
-        title: 'Error',
-        description: t('admin.user_management.messages.select_user_role'),
-        variant: 'destructive',
-      });
-      return;
-    }
+  const handleAssignRoles = async () => {
+    if (!selectedUser) return;
 
     try {
-      // Check if user already has this role
-      const hasRole = selectedUser.roles.some(r => r.id?.toString() === selectedRoleId);
-      if (hasRole) {
-        toast({
-          title: 'Already Assigned',
-          description: t('admin.user_management.messages.role_already_assigned'),
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      await assignRole({
+      await assignRoles({
         id: Number(selectedUser.id),
-        roleId: Number(selectedRoleId),
+        roleIds: selectedRoleIds,
       }).unwrap();
 
       toast({
-        title: 'Role Assigned',
-        description: t('admin.user_management.messages.role_assigned'),
+        title: t('admin.user_management.messages.role_assigned'),
+        description: t('admin.user_management.assign_role_dialog.roles_updated', 'Roles updated successfully.'),
       });
 
       setShowAssignDialog(false);
       setSelectedUser(null);
-      setSelectedRoleId('');
+      setSelectedRoleIds([]);
       refetchUsers();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { data?: { detail?: string }; message?: string };
       toast({
-        title: 'Error',
-        description: error?.data?.detail || error?.message || t('admin.user_management.messages.role_assigned_error'),
+        title: t('common.error', 'Error'),
+        description: err?.data?.detail || err?.message || t('admin.user_management.messages.role_assigned_error'),
         variant: 'destructive',
       });
     }
@@ -366,24 +294,6 @@ export default function UserManagement() {
     }
   };
 
-  const openEditDialog = (user: User) => {
-    setSelectedUser(user);
-    const profile = user.profile;
-    setFormData({
-      email: user.email,
-      password: '',
-      username: '', // Not available in current User interface
-      full_name: profile?.full_name || '',
-      phone_number: profile?.phone_number || '',
-      address: profile?.address || '',
-      company_name: profile?.company_name || '',
-      company_address: profile?.company_address || '',
-      company_details: profile?.company_details || '',
-      role_id: user.roles[0]?.id?.toString() || '',
-    });
-    setShowEditDialog(true);
-  };
-
   const resetForm = () => {
     setFormData({
       email: '',
@@ -398,7 +308,7 @@ export default function UserManagement() {
       role_id: '',
     });
     setSelectedUser(null);
-    setSelectedRoleId('');
+    setSelectedRoleIds([]);
   };
 
   const filteredUsers = users.filter(user =>
@@ -518,18 +428,25 @@ export default function UserManagement() {
           setShowAssignDialog(open);
           if (open) {
             setSelectedUser(user);
+            setSelectedRoleIds(
+              user.roles
+                .filter((r): r is Role => r != null && r.id != null)
+                .map((r) => r.id)
+            );
           } else {
             setSelectedUser(null);
-            setSelectedRoleId('');
+            setSelectedRoleIds([]);
           }
         }}
       >
         <DialogTrigger asChild>
-          <CustomTooltip content={t('admin.user_management.assign_role')}>
-            <Button size="sm" variant="outline">
-              <UserPlus className="h-4 w-4" />
-            </Button>
-          </CustomTooltip>
+          <Button
+            size="sm"
+            variant="outline"
+            title={t('admin.user_management.assign_role')}
+          >
+            <UserPlus className="h-4 w-4" />
+          </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -562,33 +479,22 @@ export default function UserManagement() {
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">
-                {t('admin.user_management.assign_role_dialog.select_role')}
+                {t('admin.user_management.assign_role_dialog.select_roles')}
               </label>
-              <Select
-                value={selectedRoleId}
-                onValueChange={setSelectedRoleId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('admin.user_management.assign_role_dialog.choose_role')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {rolesData.map((role: Role) => (
-                    <SelectItem key={role.id} value={role.id.toString()}>
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4" />
-                        <div>
-                          <div className="font-medium">{role.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {role.description}
-                          </div>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MultiSelect
+                options={(rolesData ?? []).map((role: Role) => ({
+                  value: role.id,
+                  label: role.name,
+                  description: role.description ?? undefined,
+                }))}
+                value={selectedRoleIds}
+                onChange={(ids) => setSelectedRoleIds(ids.map(Number))}
+                placeholder={t('admin.user_management.assign_role_dialog.choose_role')}
+                emptyMessage={t('admin.user_management.assign_role_dialog.no_roles_available', 'No roles available')}
+                triggerClassName="w-full"
+              />
             </div>
-            <Button onClick={handleAssignRole} className="w-full">
+            <Button onClick={handleAssignRoles} className="w-full">
               {t('admin.user_management.assign_role_dialog.assign')}
             </Button>
           </div>
@@ -597,10 +503,9 @@ export default function UserManagement() {
       <Button
         size="sm"
         variant="outline"
-        onClick={() => openEditDialog(user)}
+        onClick={() => navigate(ROUTES.ADMIN.USER_DETAILS(user.id))}
       >
-        <Edit className="h-4 w-4" />
-        {/* {t('admin.user_management.edit_user')} */}
+        <Eye className="h-4 w-4" />
       </Button>
       <Button
         size="sm"
@@ -816,89 +721,6 @@ export default function UserManagement() {
           />
         </CardContent>
       </Card>
-
-      {/* Edit Dialog */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{t('admin.user_management.edit_dialog.title')}</DialogTitle>
-            <DialogDescription>
-              {t('admin.user_management.edit_dialog.description')}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-email">{t('admin.user_management.create_dialog.email')} *</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-full-name">{t('admin.user_management.create_dialog.full_name')} *</Label>
-              <Input
-                id="edit-full-name"
-                value={formData.full_name}
-                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-phone">{t('admin.user_management.create_dialog.phone_number')} *</Label>
-              <Input
-                id="edit-phone"
-                value={formData.phone_number}
-                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-address">{t('admin.user_management.create_dialog.address')} *</Label>
-              <Textarea
-                id="edit-address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                rows={2}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-company-name">{t('admin.user_management.create_dialog.company_name')}</Label>
-              <Input
-                id="edit-company-name"
-                value={formData.company_name}
-                onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-company-address">{t('admin.user_management.create_dialog.company_address')}</Label>
-              <Textarea
-                id="edit-company-address"
-                value={formData.company_address}
-                onChange={(e) => setFormData({ ...formData, company_address: e.target.value })}
-                rows={2}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-company-details">{t('admin.user_management.create_dialog.company_details')}</Label>
-              <Textarea
-                id="edit-company-details"
-                value={formData.company_details}
-                onChange={(e) => setFormData({ ...formData, company_details: e.target.value })}
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
-              {t('admin.user_management.edit_dialog.cancel')}
-            </Button>
-            <Button onClick={handleUpdateUser} disabled={formLoading}>
-              {formLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              {t('admin.user_management.edit_dialog.update')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

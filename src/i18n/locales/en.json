@@ -282,6 +282,35 @@
       "description": "View and manage your notifications.",
       "manage": "Manage your notifications."
     },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Platform overview and key metrics.",
+      "period_7d": "Last 7 days",
+      "period_30d": "Last 30 days",
+      "period_90d": "Last 90 days",
+      "total_users": "Total users",
+      "registered_users": "Registered users",
+      "view_users": "View users",
+      "total_listings": "Total listings",
+      "active": "active",
+      "view_listings": "View listings",
+      "total_orders": "Total orders",
+      "completed": "completed",
+      "view_orders": "View orders",
+      "revenue": "Revenue",
+      "platform_fees_period": "Platform fees (last {{days}} days)",
+      "total_offers": "Total offers",
+      "all_offers": "All offers",
+      "view_offers": "View offers",
+      "disputes": "Disputes",
+      "open": "open",
+      "view_disputes": "View disputes",
+      "summary": "Summary",
+      "summary_description": "Key metrics for the last {{days}} days.",
+      "active_listings": "Active listings",
+      "completed_orders": "Completed orders",
+      "open_disputes": "Open disputes"
+    },
     "uploads": {
       "title": "Uploads",
       "description": "All uploaded files. Scroll down to load more.",
@@ -368,6 +397,65 @@
       "delete_confirm_title": "Delete dispute?",
       "delete_confirm_description": "This will permanently delete this dispute and all its comments.",
       "empty": "No disputes found."
+    },
+    "valuations": {
+      "title": "Valuations",
+      "description": "Manage valuations, comparable sales, and market trends.",
+      "tab_valuations": "Valuations",
+      "tab_comparable": "Comparable Sales",
+      "tab_trends": "Market Trends",
+      "domain": "Domain",
+      "estimated_value": "Est. value",
+      "listing_id": "Listing",
+      "calculated_at": "Calculated",
+      "sale_price": "Sale price",
+      "sale_date": "Sale date",
+      "sale_source": "Source",
+      "trend_type": "Type",
+      "trend_key": "Key",
+      "period": "Period",
+      "avg_price": "Avg. price",
+      "filter_extension": "Extension",
+      "filter_trend_type": "Trend type",
+      "delete": "Delete",
+      "deleted": "Valuation deleted.",
+      "comparable_deleted": "Comparable sale deleted.",
+      "trend_deleted": "Market trend deleted.",
+      "delete_confirm_title": "Delete?",
+      "delete_confirm_description": "This action cannot be undone.",
+      "empty": "No valuations found.",
+      "comparable_empty": "No comparable sales found.",
+      "trends_empty": "No market trends found."
+    },
+    "social": {
+      "title": "Social",
+      "description": "View seller stats, followers, and listing shares.",
+      "tab_stats": "Seller stats",
+      "tab_shares": "Listing shares",
+      "seller_id": "Seller",
+      "load": "Load",
+      "select_seller": "Select seller",
+      "search_seller": "Search by username or email",
+      "no_sellers": "No sellers found.",
+      "invalid_seller_id": "Enter a valid seller ID.",
+      "followers_count": "Followers",
+      "active_listings": "Active listings",
+      "total_shares": "Total shares",
+      "is_following": "Current user following",
+      "followers_list": "Followers ({{count}})",
+      "no_followers": "No followers.",
+      "follower_id": "Follower ID",
+      "followed_at": "Followed at",
+      "listing_id": "Listing",
+      "platform": "Platform",
+      "method": "Method",
+      "shared_by": "Shared by",
+      "created_at": "Created",
+      "shares_empty": "No shares found.",
+      "delete_share": "Delete share",
+      "share_deleted": "Share deleted.",
+      "delete_share_confirm_title": "Delete share?",
+      "delete_share_confirm_description": "This share record will be permanently deleted."
     },
     "orders": {
       "title": "Order Management",
@@ -472,13 +560,16 @@
         "cancel": "Cancel"
       },
       "assign_role_dialog": {
-        "title": "Assign Role to User",
-        "description": "Select a role to assign to",
+        "title": "Assign Roles to User",
+        "description": "Select roles to assign to",
         "current_roles": "Current Roles:",
         "no_roles_assigned": "No roles assigned",
         "select_role": "Select Role:",
-        "choose_role": "Choose a role",
-        "assign": "Assign Role"
+        "select_roles": "Select Roles:",
+        "choose_role": "Choose roles",
+        "no_roles_available": "No roles available",
+        "roles_updated": "Roles updated successfully.",
+        "assign": "Save Roles"
       },
       "delete_dialog": {
         "title": "Are you sure?",
@@ -503,6 +594,9 @@
         "email_update_warning": "Email update requires admin privileges. Please use Supabase dashboard.",
         "delete_warning": "Profile and roles deleted. Auth user still exists. Use Supabase dashboard to delete auth user."
       }
+    },
+    "user_detail": {
+      "invalid_id": "Invalid user ID"
     },
     "roles_permissions": {
       "title": "Roles and Permissions",
@@ -1105,6 +1199,13 @@
       "success_update_desc": "Profile updated successfully",
       "error_update": "Error",
       "error_update_desc": "Error updating profile"
+    },
+    "admin": {
+      "title": "Admin Profile",
+      "subtitle": "Manage your personal profile",
+      "create_profile": "Create Profile",
+      "profile_created": "Profile Created",
+      "profile_created_desc": "Your profile has been created successfully."
     },
     "setup": {
       "title": "Complete Your Profile",
