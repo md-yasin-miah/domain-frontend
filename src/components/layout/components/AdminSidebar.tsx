@@ -16,6 +16,7 @@ import {
   ChartLine,
   Globe,
   DollarSign,
+  LockIcon,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -99,6 +100,11 @@ const adminMenuItems: MenuItem[] = [
     title: "Disputes",
     icon: ShieldAlert,
     url: ROUTES.ADMIN.DISPUTES,
+  },
+  {
+    title:"Secure Box",
+    icon: LockIcon,
+    url: ROUTES.ADMIN.SECURE_BOX,
   },
   {
     title: "Notifications",

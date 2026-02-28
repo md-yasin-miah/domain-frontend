@@ -90,6 +90,7 @@ const AdminValuationsPage = lazy(
   () => import("./pages/admin/AdminValuationsPage"),
 );
 const AdminSocialPage = lazy(() => import("./pages/admin/AdminSocialPage"));
+const AdminSecureBoxPage = lazy(() => import("./pages/admin/AdminSecureBoxPage"));
 const AdminProfilePage = lazy(() => import("./pages/admin/AdminProfilePage"));
 const AdminUserDetailPage = lazy(() => import("./pages/admin/AdminUserDetailPage"));
 const AdminAnalyticsPage = lazy(() => import("./pages/admin/AdminAnalyticsPage"));
@@ -1080,6 +1081,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <AdminSocialPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "secure-box",
+        element: (
+          <LazyComponent>
+            <AdminSecureBoxPage />
           </LazyComponent>
         ),
       },
