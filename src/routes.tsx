@@ -86,6 +86,11 @@ const AdminVerificationsPage = lazy(
   () => import("./pages/admin/AdminVerificationsPage"),
 );
 const AdminDisputesPage = lazy(() => import("./pages/admin/AdminDisputesPage"));
+const AdminValuationsPage = lazy(
+  () => import("./pages/admin/AdminValuationsPage"),
+);
+const AdminSocialPage = lazy(() => import("./pages/admin/AdminSocialPage"));
+const AdminAnalyticsPage = lazy(() => import("./pages/admin/AdminAnalyticsPage"));
 const AdminOrderDetailPage = lazy(() => import("./pages/admin/orders/AdminOrderDetailPage"));
 const AdminOrderInvoicePage = lazy(() => import("./pages/admin/orders/AdminOrderInvoicePage"));
 const AdminOrderPaymentPage = lazy(() => import("./pages/admin/orders/AdminOrderPaymentPage"));
@@ -807,6 +812,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "analytics",
+        element: (
+          <LazyComponent>
+            <AdminAnalyticsPage />
+          </LazyComponent>
+        ),
+      },
+      {
         path: "roles-and-permissions",
         element: (
           <LazyComponent>
@@ -1033,6 +1046,22 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <AdminDisputesPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "valuations",
+        element: (
+          <LazyComponent>
+            <AdminValuationsPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "social",
+        element: (
+          <LazyComponent>
+            <AdminSocialPage />
           </LazyComponent>
         ),
       },

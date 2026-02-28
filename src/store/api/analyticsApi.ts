@@ -22,17 +22,22 @@ export interface SellerDashboardStats {
   conversion_rate: number;
 }
 
+/** Matches backend GET /analytics/admin/overview response */
 export interface AdminOverviewStats {
+  period_days: number;
   total_users: number;
-  active_users: number;
   total_listings: number;
   active_listings: number;
   total_orders: number;
+  completed_orders: number;
   total_revenue: number;
-  pending_orders: number;
-  active_disputes: number;
-  platform_fees: number;
-  recent_activity: any[];
+  total_offers: number;
+  total_disputes: number;
+  open_disputes: number;
+}
+
+export interface AdminOverviewParams {
+  days?: number; // 1–365, default 30
 }
 
 export const analyticsApi = apiSlice.injectEndpoints({
@@ -51,10 +56,13 @@ export const analyticsApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, sellerId) => [{ type: 'User', id: sellerId }],
     }),
-    getAdminOverview: builder.query<AdminOverviewStats, void>({
-      query: () => ({
+    getAdminOverview: builder.query<AdminOverviewStats, AdminOverviewParams | void>({
+      query: (params) => ({
         url: '/analytics/admin/overview',
         method: 'GET',
+        params: params && typeof params === 'object' && params.days != null
+          ? { days: params.days }
+          : undefined,
       }),
       providesTags: ['User'],
     }),

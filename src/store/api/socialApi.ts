@@ -1,5 +1,5 @@
 import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
+import type { PaginationParams } from './types';
 
 export interface Follow {
   id: number;
@@ -8,25 +8,29 @@ export interface Follow {
   created_at: string;
 }
 
+/** Matches backend GET /social/seller/{id}/stats */
 export interface SellerStats {
   seller_id: number;
   followers_count: number;
-  listings_count: number;
-  total_sales: number;
-  average_rating: number | null;
+  active_listings_count: number;
+  total_shares: number;
+  is_following: boolean;
 }
 
+/** Matches backend ListingShareResponse */
 export interface Share {
   id: number;
   listing_id: number;
-  user_id: number | null;
-  platform: string;
+  shared_by_id: number | null;
+  share_platform: string;
+  share_method: string;
   created_at: string;
 }
 
 export interface ShareCreateRequest {
   listing_id: number;
-  platform: string;
+  share_platform: string;
+  share_method: string;
 }
 
 export interface ShareStats {
@@ -52,7 +56,7 @@ export const socialApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, sellerId) => [{ type: 'User', id: sellerId }, 'User'],
     }),
-    getFollowing: builder.query<PaginatedResponse<Follow> | Follow[], PaginationParams>({
+    getFollowing: builder.query<Follow[], PaginationParams>({
       query: (params) => ({
         url: '/social/following',
         method: 'GET',
@@ -60,7 +64,7 @@ export const socialApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['User'],
     }),
-    getFollowers: builder.query<PaginatedResponse<Follow> | Follow[], { sellerId: number; params?: PaginationParams }>({
+    getFollowers: builder.query<Follow[], { sellerId: number; params?: PaginationParams }>({
       query: ({ sellerId, params }) => ({
         url: `/social/followers/${sellerId}`,
         method: 'GET',
@@ -68,7 +72,7 @@ export const socialApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, { sellerId }) => [{ type: 'User', id: sellerId }],
     }),
-    checkFollowing: builder.query<{ is_following: boolean }, number>({
+    checkFollowing: builder.query<{ is_following: boolean; seller_id: number }, number>({
       query: (sellerId) => ({
         url: `/social/following/check/${sellerId}`,
         method: 'GET',
@@ -90,36 +94,36 @@ export const socialApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: (result, error, { listing_id }) => [{ type: 'Domain', id: listing_id }, 'Domain'],
+      invalidatesTags: (result, error, { listing_id }) => [{ type: 'User', id: `listing-${listing_id}` }, 'User'],
     }),
-    getShares: builder.query<PaginatedResponse<Share> | Share[], PaginationParams>({
+    getShares: builder.query<Share[], { skip?: number; limit?: number; listing_id?: number; share_platform?: string }>({
       query: (params) => ({
         url: '/social/shares',
         method: 'GET',
         params,
       }),
-      providesTags: ['Domain'],
+      providesTags: ['User'],
     }),
     getShare: builder.query<Share, number>({
       query: (id) => ({
         url: `/social/shares/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Domain', id }],
+      providesTags: (result, error, id) => [{ type: 'User', id: `share-${id}` }, 'User'],
     }),
     getListingShareStats: builder.query<ShareStats, number>({
       query: (listingId) => ({
         url: `/social/listings/${listingId}/share-stats`,
         method: 'GET',
       }),
-      providesTags: (result, error, listingId) => [{ type: 'Domain', id: listingId }],
+      providesTags: (result, error, listingId) => [{ type: 'User', id: `listing-${listingId}` }, 'User'],
     }),
     deleteShare: builder.mutation<void, number>({
       query: (id) => ({
         url: `/social/shares/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ['User'],
     }),
   }),
 });

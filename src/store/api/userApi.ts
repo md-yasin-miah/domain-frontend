@@ -2,7 +2,7 @@ import { apiSlice } from './apiSlice';
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<PaginatedResponse<UserResponse>, PaginationParams>({
+    getUsers: builder.query<PaginatedResponse<UserResponse>, UsersListParams>({
       query: (params) => ({
         url: '/users',
         method: 'GET',
@@ -127,6 +127,7 @@ export const userApi = apiSlice.injectEndpoints({
 
 export const {
   useGetUsersQuery,
+  useLazyGetUsersQuery,
   useGetUserQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
