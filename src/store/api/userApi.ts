@@ -47,11 +47,11 @@ export const userApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    assignRole: builder.mutation<void, { id: number; roleId: number }>({
-      query: ({ id, roleId }) => ({
+    assignRoles: builder.mutation<UserResponse, { id: number; roleIds: number[] }>({
+      query: ({ id, roleIds }) => ({
         url: `/users/${id}/roles`,
         method: 'POST',
-        body: { role_id: roleId },
+        body: { role_ids: roleIds },
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'User', id }, 'User'],
     }),
@@ -133,7 +133,7 @@ export const {
   useUpdateUserMutation,
   useUpdatePasswordMutation,
   useResetPasswordMutation,
-  useAssignRoleMutation,
+  useAssignRolesMutation,
   useRemoveRoleMutation,
   useActivateUserMutation,
   useDeactivateUserMutation,

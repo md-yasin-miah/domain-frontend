@@ -560,13 +560,16 @@
         "cancel": "Cancel"
       },
       "assign_role_dialog": {
-        "title": "Assign Role to User",
-        "description": "Select a role to assign to",
+        "title": "Assign Roles to User",
+        "description": "Select roles to assign to",
         "current_roles": "Current Roles:",
         "no_roles_assigned": "No roles assigned",
         "select_role": "Select Role:",
-        "choose_role": "Choose a role",
-        "assign": "Assign Role"
+        "select_roles": "Select Roles:",
+        "choose_role": "Choose roles",
+        "no_roles_available": "No roles available",
+        "roles_updated": "Roles updated successfully.",
+        "assign": "Save Roles"
       },
       "delete_dialog": {
         "title": "Are you sure?",
@@ -591,6 +594,9 @@
         "email_update_warning": "Email update requires admin privileges. Please use Supabase dashboard.",
         "delete_warning": "Profile and roles deleted. Auth user still exists. Use Supabase dashboard to delete auth user."
       }
+    },
+    "user_detail": {
+      "invalid_id": "Invalid user ID"
     },
     "roles_permissions": {
       "title": "Roles and Permissions",
@@ -1193,6 +1199,13 @@
       "success_update_desc": "Profile updated successfully",
       "error_update": "Error",
       "error_update_desc": "Error updating profile"
+    },
+    "admin": {
+      "title": "Admin Profile",
+      "subtitle": "Manage your personal profile",
+      "create_profile": "Create Profile",
+      "profile_created": "Profile Created",
+      "profile_created_desc": "Your profile has been created successfully."
     },
     "setup": {
       "title": "Complete Your Profile",

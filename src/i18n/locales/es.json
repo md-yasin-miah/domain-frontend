@@ -685,13 +685,16 @@
         "cancel": "Cancelar"
       },
       "assign_role_dialog": {
-        "title": "Asignar Rol al Usuario",
-        "description": "Selecciona un rol para asignar",
+        "title": "Asignar Roles al Usuario",
+        "description": "Selecciona roles para asignar a",
         "current_roles": "Roles actuales:",
         "no_roles_assigned": "Sin roles asignados",
         "select_role": "Seleccionar Rol:",
-        "choose_role": "Elegir un rol",
-        "assign": "Asignar Rol"
+        "select_roles": "Seleccionar Roles:",
+        "choose_role": "Elegir roles",
+        "no_roles_available": "No hay roles disponibles",
+        "roles_updated": "Roles actualizados correctamente.",
+        "assign": "Guardar Roles"
       },
       "delete_dialog": {
         "title": "¿Estás seguro?",
@@ -716,6 +719,9 @@
         "email_update_warning": "La actualización de email requiere privilegios de administrador. Usa el panel de Supabase.",
         "delete_warning": "Perfil y roles eliminados. El usuario de auth sigue existiendo. Usa el panel de Supabase para eliminar el usuario de auth."
       }
+    },
+    "user_detail": {
+      "invalid_id": "ID de usuario inválido"
     },
     "roles_permissions": {
       "title": "Roles y Permisos",
@@ -1281,6 +1287,13 @@
       "success_update_desc": "Perfil actualizado correctamente",
       "error_update": "Error",
       "error_update_desc": "Error al actualizar el perfil"
+    },
+    "admin": {
+      "title": "Perfil de Administrador",
+      "subtitle": "Gestiona tu perfil personal",
+      "create_profile": "Crear Perfil",
+      "profile_created": "Perfil Creado",
+      "profile_created_desc": "Tu perfil ha sido creado correctamente."
     },
     "setup": {
       "title": "Completa Tu Perfil",

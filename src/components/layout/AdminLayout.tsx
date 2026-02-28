@@ -1,9 +1,11 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from './components/AdminSidebar';
 import { Header } from './components/Header';
+import { ROUTES } from '@/lib/routes';
 import { useTranslation } from 'react-i18next';
 import {
-  LayoutDashboard
+  LayoutDashboard,
+  UserCircle,
 } from 'lucide-react';
 import { MenuItem } from './components/AppSidebar';
 
@@ -19,6 +21,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   // Admin user services - quick access to admin features
   const adminUserServices: MenuItem[] = [
+    {
+      title: 'Profile',
+      url: ROUTES.ADMIN.PROFILE,
+      icon: UserCircle,
+    },
     {
       title: 'Dashboard',
       url: '/admin/dashboard',
