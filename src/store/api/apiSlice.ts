@@ -60,6 +60,7 @@ export const apiSlice = createApi({
     'Permission',
     'EndpointPermission',
     'Invoice',
+    'Payment',
     'Ticket',
     'Messaging',
     'Category',

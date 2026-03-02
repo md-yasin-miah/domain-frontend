@@ -69,6 +69,8 @@ export const ROUTES = {
     BLOG_MANAGER: "/admin/blog-manager",
     FAQ_MANAGER: "/admin/faq-manager",
     LISTINGS_MANAGEMENT: "/admin/listings-management",
+    PAYMENTS: "/admin/payments",
+    PAYMENT_DETAILS: (id: number | string) => `/admin/payments/${id}`,
     ORDERS: {
       LIST: "/admin/orders",
       DETAILS: (id: number) => `/admin/orders/${id}`,

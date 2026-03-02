@@ -17,6 +17,7 @@ import {
   Globe,
   DollarSign,
   LockIcon,
+  CreditCard,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -78,18 +79,9 @@ const adminMenuItems: MenuItem[] = [
     url: ROUTES.ADMIN.ROLES_PERMISSIONS,
   },
   {
-    title: "Uploads",
-    icon: CloudUpload,
-    url: ROUTES.ADMIN.UPLOADS,
-  },
-  {
-    title: "Verifications",
-    icon: Verified,
-    url: ROUTES.ADMIN.VERIFICATIONS,
-  },{
-    title: "Valuations",
-    icon: DollarSign,
-    url: ROUTES.ADMIN.VALUATIONS,
+    title:"Payments",
+    icon: CreditCard,
+    url: ROUTES.ADMIN.PAYMENTS,
   },
   {
     title:"Social",

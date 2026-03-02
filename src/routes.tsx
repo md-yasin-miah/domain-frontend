@@ -91,6 +91,8 @@ const AdminValuationsPage = lazy(
 );
 const AdminSocialPage = lazy(() => import("./pages/admin/AdminSocialPage"));
 const AdminSecureBoxPage = lazy(() => import("./pages/admin/AdminSecureBoxPage"));
+const AdminPaymentsPage = lazy(() => import("./pages/admin/AdminPaymentsPage"));
+const AdminPaymentViewPage = lazy(() => import("./pages/admin/AdminPaymentViewPage"));
 const AdminProfilePage = lazy(() => import("./pages/admin/AdminProfilePage"));
 const AdminUserDetailPage = lazy(() => import("./pages/admin/AdminUserDetailPage"));
 const AdminAnalyticsPage = lazy(() => import("./pages/admin/AdminAnalyticsPage"));
@@ -1089,6 +1091,22 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <AdminSecureBoxPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "payments",
+        element: (
+          <LazyComponent>
+            <AdminPaymentsPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "payments/:id",
+        element: (
+          <LazyComponent>
+            <AdminPaymentViewPage />
           </LazyComponent>
         ),
       },
