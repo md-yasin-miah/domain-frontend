@@ -52,7 +52,7 @@ export default function AdminSecureBoxPage() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [page, setPage] = useState(1);
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
+  const [actionType, setActionType] = useState<"approved" | "rejected" | null>(null);
   const [selectedBox, setSelectedBox] = useState<SecureBoxItem | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
@@ -71,14 +71,14 @@ export default function AdminSecureBoxPage() {
 
   const handleOpenApprove = (box: SecureBoxItem) => {
     setSelectedBox(box);
-    setActionType("approve");
+    setActionType("approved");
     setAdminNotes("");
     setRejectionReason("");
   };
 
   const handleOpenReject = (box: SecureBoxItem) => {
     setSelectedBox(box);
-    setActionType("reject");
+    setActionType("rejected");
     setAdminNotes("");
     setRejectionReason("");
   };
@@ -93,7 +93,7 @@ export default function AdminSecureBoxPage() {
   const handleSubmit = async () => {
     if (!selectedBox || !actionType) return;
 
-    if (actionType === "reject" && !rejectionReason.trim()) {
+    if (actionType === "rejected" && !rejectionReason.trim()) {
       toast({
         title: t("admin.secure_box.rejection_required", "Rejection reason required"),
         description: t("admin.secure_box.rejection_required_desc", "Please provide a reason when rejecting."),
@@ -108,7 +108,7 @@ export default function AdminSecureBoxPage() {
         data: {
           status: actionType,
           admin_notes: adminNotes.trim() || undefined,
-          rejection_reason: actionType === "reject" ? rejectionReason.trim() : undefined,
+          rejection_reason: actionType === "rejected" ? rejectionReason.trim() : undefined,
         },
       }).unwrap();
 
@@ -261,12 +261,12 @@ export default function AdminSecureBoxPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {actionType === "approve"
+              {actionType === "approved"
                 ? t("admin.secure_box.approve_title", "Approve Secure Box")
                 : t("admin.secure_box.reject_title", "Reject Secure Box")}
             </DialogTitle>
             <DialogDescription>
-              {actionType === "approve"
+              {actionType === "approved"
                 ? t("admin.secure_box.approve_desc", "This will allow the buyer to request OTP and access the secure box content.")
                 : t("admin.secure_box.reject_desc", "The seller will need to update the content and resubmit for review.")}
             </DialogDescription>
@@ -287,7 +287,7 @@ export default function AdminSecureBoxPage() {
                 rows={2}
               />
             </div>
-            {actionType === "reject" && (
+            {actionType === "rejected" && (
               <div className="space-y-2">
                 <Label htmlFor="rejection_reason">
                   {t("admin.secure_box.rejection_reason", "Rejection Reason")} *
@@ -308,14 +308,14 @@ export default function AdminSecureBoxPage() {
               {t("common.cancel", "Cancel")}
             </Button>
             <Button
-              variant={actionType === "reject" ? "destructive" : "default"}
+              variant={actionType === "rejected" ? "destructive" : "default"}
               onClick={handleSubmit}
-              disabled={isSubmitting || (actionType === "reject" && !rejectionReason.trim())}
+              disabled={isSubmitting || (actionType === "rejected" && !rejectionReason.trim())}
             >
               {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {actionType === "approve"
-                ? t("admin.secure_box.approve", "Approve")
-                : t("admin.secure_box.reject", "Reject")}
+              {actionType === "approved"
+                ? t("admin.secure_box.approved", "Approved")
+                : t("admin.secure_box.rejected", "Rejected")}
             </Button>
           </DialogFooter>
         </DialogContent>
