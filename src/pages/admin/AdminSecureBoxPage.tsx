@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -11,13 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -29,12 +28,16 @@ import {
 import { LockIcon, Loader2, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
-  useGetPendingSecureBoxesQuery,
+  useGetSecureBoxListQuery,
   useApproveSecureBoxMutation,
   type SecureBoxItem,
 } from "@/store/api/secureBoxApi";
+import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
+import { type ColumnDef } from "@/components/ui/data-table";
+import { usePagination } from "@/hooks/usePagination";
+import { Badge } from "@/components/ui/badge";
 
-const PAGE_SIZE = 15;
+const STATUS_OPTIONS = ["pending", "approved", "rejected", "accessed"] as const;
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleString(undefined, {
@@ -48,26 +51,53 @@ function truncateContent(content: string | null, maxLen = 80): string {
   return content.length <= maxLen ? content : `${content.slice(0, maxLen)}...`;
 }
 
+function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+  if (status === "approved" || status === "accessed") return "default";
+  if (status === "rejected") return "destructive";
+  return "secondary";
+}
+
 export default function AdminSecureBoxPage() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [actionType, setActionType] = useState<"approved" | "rejected" | null>(null);
   const [selectedBox, setSelectedBox] = useState<SecureBoxItem | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
 
-  const { data, isLoading, refetch } = useGetPendingSecureBoxesQuery({
-    skip: (page - 1) * PAGE_SIZE,
-    limit: PAGE_SIZE,
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
+    initialPage: 1,
+    initialPageSize: 15,
   });
 
+  const filters = useMemo(
+    () => ({
+      skip: (page - 1) * size,
+      limit: size,
+      ...(statusFilter !== "all" && { status: statusFilter }),
+    }),
+    [page, size, statusFilter]
+  );
+
+  const { data, isLoading, refetch, error } = useGetSecureBoxListQuery(filters);
   const [approveSecureBox, { isLoading: isSubmitting }] = useApproveSecureBoxMutation();
 
   const items = data?.items ?? [];
-  const pagination = data?.pagination;
-  const total = pagination?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const rawPagination = data?.pagination;
+  const pagination = useMemo(
+    () =>
+      rawPagination
+        ? {
+            total: rawPagination.total ?? 0,
+            page: rawPagination.page ?? 0,
+            total_pages: rawPagination.total_pages ?? 1,
+            has_next: rawPagination.has_next ?? false,
+            has_previous: rawPagination.has_previous ?? false,
+          }
+        : undefined,
+    [rawPagination]
+  );
 
   const handleOpenApprove = (box: SecureBoxItem) => {
     setSelectedBox(box);
@@ -135,6 +165,66 @@ export default function AdminSecureBoxPage() {
     }
   };
 
+  const columns: ColumnDef<SecureBoxItem>[] = useMemo(
+    () => [
+      {
+        id: "order",
+        accessorKey: (row) => row.order?.order_number ?? row.order_id,
+        header: t("admin.secure_box.order", "Order"),
+        cell: ({ row }) => (
+          <span className="font-medium">
+            {row.order?.order_number ?? `#${row.order_id}`}
+          </span>
+        ),
+      },
+      {
+        id: "buyer",
+        accessorKey: (row) => row.buyer?.username ?? row.buyer?.email ?? "—",
+        header: t("admin.secure_box.buyer", "Buyer"),
+        cell: ({ row }) =>
+          row.buyer ? `${row.buyer.username ?? row.buyer.email}` : "—",
+      },
+      {
+        id: "seller",
+        accessorKey: (row) => row.seller?.username ?? row.seller?.email ?? "—",
+        header: t("admin.secure_box.seller", "Seller"),
+        cell: ({ row }) =>
+          row.seller ? `${row.seller.username ?? row.seller.email}` : "—",
+      },
+      {
+        id: "status",
+        accessorKey: "status",
+        header: t("admin.secure_box.status", "Status"),
+        cell: ({ row }) => (
+          <Badge variant={getStatusVariant(row.status)} className="capitalize">
+            {row.status}
+          </Badge>
+        ),
+      },
+      {
+        id: "content",
+        accessorKey: "content",
+        header: t("admin.secure_box.content", "Content"),
+        cell: ({ row }) => (
+          <span className="max-w-[200px] truncate block" title={row.content ?? undefined}>
+            {truncateContent(row.content)}
+          </span>
+        ),
+      },
+      {
+        id: "created_at",
+        accessorKey: "created_at",
+        header: t("admin.secure_box.created", "Created"),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground text-sm">
+            {formatDate(row.created_at)}
+          </span>
+        ),
+      },
+    ],
+    [t]
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -148,112 +238,79 @@ export default function AdminSecureBoxPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>{t("admin.secure_box.pending_list", "Pending Secure Boxes")}</CardTitle>
-          <CardDescription>
-            {t("admin.secure_box.pending_desc", "Secure boxes awaiting admin approval.")}
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardTitle>{t("admin.secure_box.list_title", "All Secure Boxes")}</CardTitle>
+            <CardDescription>
+              {t("admin.secure_box.list_desc", "Full list of secure boxes. Filter by status.")}
+            </CardDescription>
+          </div>
+          <div className="space-y-2">
+            <Label className="sr-only">{t("admin.secure_box.filter_status", "Status")}</Label>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => {
+                setStatusFilter(v);
+                handlePageChange(1);
+              }}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("admin.secure_box.all_statuses", "All statuses")}</SelectItem>
+                {STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : items.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground">
-              {t("admin.secure_box.no_pending", "No pending secure boxes.")}
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("admin.secure_box.order", "Order")}</TableHead>
-                    <TableHead>{t("admin.secure_box.buyer", "Buyer")}</TableHead>
-                    <TableHead>{t("admin.secure_box.seller", "Seller")}</TableHead>
-                    <TableHead>{t("admin.secure_box.content", "Content")}</TableHead>
-                    <TableHead>{t("admin.secure_box.created", "Created")}</TableHead>
-                    <TableHead className="text-right">{t("admin.secure_box.actions", "Actions")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((box) => (
-                    <TableRow key={box.id}>
-                      <TableCell className="font-medium">
-                        {box.order?.order_number ?? `#${box.order_id}`}
-                      </TableCell>
-                      <TableCell>
-                        {box.buyer
-                          ? `${box.buyer.username ?? box.buyer.email}`
-                          : "—"}
-                      </TableCell>
-                      <TableCell>
-                        {box.seller
-                          ? `${box.seller.username ?? box.seller.email}`
-                          : "—"}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate" title={box.content ?? undefined}>
-                        {truncateContent(box.content)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {formatDate(box.created_at)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="default"
-                            onClick={() => handleOpenApprove(box)}
-                          >
-                            <Check className="h-4 w-4 mr-1" />
-                            {t("admin.secure_box.approve", "Approve")}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleOpenReject(box)}
-                          >
-                            <X className="h-4 w-4 mr-1" />
-                            {t("admin.secure_box.reject", "Reject")}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4">
-                  <p className="text-sm text-muted-foreground">
-                    {t("admin.secure_box.page_info", "Page {{current}} of {{total}} ({{totalCount}} total)", {
-                      current: page,
-                      total: totalPages,
-                      totalCount: total,
-                    })}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page <= 1}
-                      onClick={() => setPage((p) => p - 1)}
-                    >
-                      {t("common.previous", "Previous")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page >= totalPages}
-                      onClick={() => setPage((p) => p + 1)}
-                    >
-                      {t("common.next", "Next")}
-                    </Button>
-                  </div>
+          <DataTableWithPagination<SecureBoxItem>
+            data={items}
+            columns={columns}
+            pagination={pagination}
+            isLoading={isLoading}
+            emptyMessage={t("admin.secure_box.no_items", "No secure boxes found.")}
+            emptyIcon={<LockIcon className="w-16 h-16 text-muted-foreground" />}
+            getRowId={(row) => String(row.id)}
+            renderActions={(row) =>
+              row.status === "pending" ? (
+                <div className="flex justify-end gap-2">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => handleOpenApprove(row)}
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    {t("admin.secure_box.approve", "Approve")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleOpenReject(row)}
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    {t("admin.secure_box.reject", "Reject")}
+                  </Button>
                 </div>
-              )}
-            </>
-          )}
+              ) : (
+                <span className="text-muted-foreground text-sm">—</span>
+              )
+            }
+            actionsColumnHeader={t("admin.secure_box.actions", "Actions")}
+            enableSorting={true}
+            pageSize={size}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            error={error}
+            errorTitle={t("common.error", "Error")}
+            errorDescription={t("admin.secure_box.error_desc", "Failed to load secure boxes.")}
+            errorIcon={<LockIcon className="w-16 h-16 text-muted-foreground" />}
+          />
         </CardContent>
       </Card>
 

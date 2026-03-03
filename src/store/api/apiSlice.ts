@@ -65,6 +65,7 @@ export const apiSlice = createApi({
     'Messaging',
     'Category',
     'Notification',
+    'Order',
     'Upload',
     'Verification',
     'Analytics',

@@ -8,7 +8,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface MultiSelectOption {
   value: string | number;
@@ -41,7 +40,18 @@ export function MultiSelect({
   maxHeight = "240px",
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
   const valueSet = React.useMemo(() => new Set(value.map(String)), [value]);
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollHeight, clientHeight } = el;
+    if (scrollHeight <= clientHeight) return;
+    e.preventDefault();
+    e.stopPropagation();
+    el.scrollTop += e.deltaY;
+  };
 
   const toggle = (optValue: string | number) => {
     const str = String(optValue);
@@ -77,8 +87,15 @@ export function MultiSelect({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-        <ScrollArea style={{ maxHeight }}>
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <div
+          ref={scrollRef}
+          role="listbox"
+          tabIndex={0}
+          className="overflow-y-auto overflow-x-hidden rounded-md outline-none"
+          style={{ height: maxHeight }}
+          onWheel={handleWheel}
+        >
           <div className="p-1">
             {options.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
@@ -122,7 +139,7 @@ export function MultiSelect({
               })
             )}
           </div>
-        </ScrollArea>
+        </div>
       </PopoverContent>
     </Popover>
   );
