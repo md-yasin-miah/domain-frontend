@@ -1,12 +1,18 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import {
   Users,
   Shield,
@@ -19,8 +25,8 @@ import {
   Phone,
   MapPin,
   Building,
-  Eye
-} from 'lucide-react';
+  Eye,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,8 +34,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter
-} from '@/components/ui/dialog';
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,10 +45,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { DataTable, type ColumnDef } from '@/components/ui/data-table';
+} from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import {
   useGetUsersQuery,
   useGetRolesQuery,
@@ -51,9 +63,9 @@ import {
   useAssignRolesMutation,
   useRemoveRoleMutation,
   useUpdateClientProfileMutation,
-} from '@/store/api/userApi';
-import { ROUTES } from '@/lib/routes';
-import { MultiSelect } from '@/components/common/MultiSelect';
+} from "@/store/api/userApi";
+import { ROUTES } from "@/lib/routes";
+import { MultiSelect } from "@/components/common/MultiSelect";
 
 // Local User interface matching the component's needs
 interface User {
@@ -70,6 +82,7 @@ interface User {
     company_address?: string;
     company_details?: string;
     profile_completed: boolean;
+    is_verified: boolean;
   };
 }
 
@@ -92,7 +105,11 @@ export default function UserManagement() {
   const navigate = useNavigate();
 
   // RTK Query hooks
-  const { data: usersData, isLoading: isLoadingUsers, refetch: refetchUsers } = useGetUsersQuery({});
+  const {
+    data: usersData,
+    isLoading: isLoadingUsers,
+    refetch: refetchUsers,
+  } = useGetUsersQuery({});
   const { data: rolesData, isLoading: isLoadingRoles } = useGetRolesQuery();
   const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
   const [updateClientProfile] = useUpdateClientProfileMutation();
@@ -101,7 +118,7 @@ export default function UserManagement() {
   const [removeRole] = useRemoveRoleMutation();
 
   // Local state
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
@@ -109,16 +126,16 @@ export default function UserManagement() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
-    email: '',
-    password: '',
-    username: '',
-    full_name: '',
-    phone_number: '',
-    address: '',
-    company_name: '',
-    company_address: '',
-    company_details: '',
-    role_id: '',
+    email: "",
+    password: "",
+    username: "",
+    full_name: "",
+    phone_number: "",
+    address: "",
+    company_name: "",
+    company_address: "",
+    company_details: "",
+    role_id: "",
   });
 
   // Transform API response to local User format
@@ -130,24 +147,31 @@ export default function UserManagement() {
     return items.map((user: UserResponse) => {
       const profile = user.profile;
       const fullName = profile
-        ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || null
+        ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
+          null
         : null;
-      const roles = user.roles.map((role: string) => rolesData?.find((r: Role) => r.name === role));
+      const roles = user.roles.map((role: string) =>
+        rolesData?.find((r: Role) => r.name === role),
+      );
       return {
         id: String(user.id),
         email: user.email,
         created_at: user.created_at,
         roles,
-        profile: profile && fullName ? {
-          id: String(profile.id),
-          full_name: fullName,
-          phone_number: profile.phone || '',
-          address: profile.address_line1 || '',
-          company_name: profile.company_name || undefined,
-          company_address: undefined, // Not in UserProfile
-          company_details: profile.bio || undefined,
-          profile_completed: user.is_profile_complete || false,
-        } : undefined,
+        profile:
+          profile && fullName
+            ? {
+                id: String(profile.id),
+                full_name: fullName,
+                phone_number: profile.phone || "",
+                address: profile.address_line1 || "",
+                company_name: profile.company_name || undefined,
+                company_address: undefined, // Not in UserProfile
+                company_details: profile.bio || undefined,
+                profile_completed: user.is_profile_complete || false,
+                is_verified: profile.is_verified,
+              }
+            : undefined,
       };
     });
   }, [usersData, rolesData]);
@@ -156,11 +180,18 @@ export default function UserManagement() {
   const formLoading = isCreatingUser || isDeletingUser;
 
   const handleCreateUser = async () => {
-    if (!formData.email || !formData.password || !formData.username || !formData.full_name || !formData.phone_number || !formData.address) {
+    if (
+      !formData.email ||
+      !formData.password ||
+      !formData.username ||
+      !formData.full_name ||
+      !formData.phone_number ||
+      !formData.address
+    ) {
       toast({
-        title: 'Error',
-        description: t('admin.user_management.create_dialog.required_fields'),
-        variant: 'destructive',
+        title: "Error",
+        description: t("admin.user_management.create_dialog.required_fields"),
+        variant: "destructive",
       });
       return;
     }
@@ -176,9 +207,9 @@ export default function UserManagement() {
 
       // Create profile if profile data is provided
       if (formData.full_name || formData.phone_number || formData.address) {
-        const nameParts = formData.full_name.split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
+        const nameParts = formData.full_name.split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
 
         await updateClientProfile({
           first_name: firstName,
@@ -199,19 +230,22 @@ export default function UserManagement() {
       }
 
       toast({
-        title: 'Success',
-        description: t('admin.user_management.messages.create_success'),
+        title: "Success",
+        description: t("admin.user_management.messages.create_success"),
       });
 
       setShowCreateDialog(false);
       resetForm();
       refetchUsers();
     } catch (error: any) {
-      console.error('Error creating user:', error);
+      console.error("Error creating user:", error);
       toast({
-        title: 'Error',
-        description: error?.data?.detail || error?.message || t('admin.user_management.messages.create_error'),
-        variant: 'destructive',
+        title: "Error",
+        description:
+          error?.data?.detail ||
+          error?.message ||
+          t("admin.user_management.messages.create_error"),
+        variant: "destructive",
       });
     }
   };
@@ -223,19 +257,22 @@ export default function UserManagement() {
       await deleteUser(Number(userToDelete.id)).unwrap();
 
       toast({
-        title: 'Success',
-        description: t('admin.user_management.messages.delete_success'),
+        title: "Success",
+        description: t("admin.user_management.messages.delete_success"),
       });
 
       setShowDeleteDialog(false);
       setUserToDelete(null);
       refetchUsers();
     } catch (error: any) {
-      console.error('Error deleting user:', error);
+      console.error("Error deleting user:", error);
       toast({
-        title: 'Error',
-        description: error?.data?.detail || error?.message || t('admin.user_management.messages.delete_error'),
-        variant: 'destructive',
+        title: "Error",
+        description:
+          error?.data?.detail ||
+          error?.message ||
+          t("admin.user_management.messages.delete_error"),
+        variant: "destructive",
       });
     }
   };
@@ -250,8 +287,11 @@ export default function UserManagement() {
       }).unwrap();
 
       toast({
-        title: t('admin.user_management.messages.role_assigned'),
-        description: t('admin.user_management.assign_role_dialog.roles_updated', 'Roles updated successfully.'),
+        title: t("admin.user_management.messages.role_assigned"),
+        description: t(
+          "admin.user_management.assign_role_dialog.roles_updated",
+          "Roles updated successfully.",
+        ),
       });
 
       setShowAssignDialog(false);
@@ -261,15 +301,18 @@ export default function UserManagement() {
     } catch (error: unknown) {
       const err = error as { data?: { detail?: string }; message?: string };
       toast({
-        title: t('common.error', 'Error'),
-        description: err?.data?.detail || err?.message || t('admin.user_management.messages.role_assigned_error'),
-        variant: 'destructive',
+        title: t("common.error", "Error"),
+        description:
+          err?.data?.detail ||
+          err?.message ||
+          t("admin.user_management.messages.role_assigned_error"),
+        variant: "destructive",
       });
     }
   };
 
   const handleRemoveRole = async (userId: string, roleId: string) => {
-    if (!confirm(t('admin.user_management.messages.remove_role_confirm'))) {
+    if (!confirm(t("admin.user_management.messages.remove_role_confirm"))) {
       return;
     }
 
@@ -280,63 +323,72 @@ export default function UserManagement() {
       }).unwrap();
 
       toast({
-        title: 'Role Removed',
-        description: t('admin.user_management.messages.role_removed'),
+        title: "Role Removed",
+        description: t("admin.user_management.messages.role_removed"),
       });
 
       refetchUsers();
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error?.data?.detail || error?.message || t('admin.user_management.messages.role_removed_error'),
-        variant: 'destructive',
+        title: "Error",
+        description:
+          error?.data?.detail ||
+          error?.message ||
+          t("admin.user_management.messages.role_removed_error"),
+        variant: "destructive",
       });
     }
   };
 
   const resetForm = () => {
     setFormData({
-      email: '',
-      password: '',
-      username: '',
-      full_name: '',
-      phone_number: '',
-      address: '',
-      company_name: '',
-      company_address: '',
-      company_details: '',
-      role_id: '',
+      email: "",
+      password: "",
+      username: "",
+      full_name: "",
+      phone_number: "",
+      address: "",
+      company_name: "",
+      company_address: "",
+      company_details: "",
+      role_id: "",
     });
     setSelectedUser(null);
     setSelectedRoleIds([]);
   };
 
-  const filteredUsers = users.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.profile?.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.profile?.full_name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getRoleBadgeColor = (roleName: string) => {
     switch (roleName) {
-      case 'Admin':
-        return 'bg-red-500/10 text-red-500 hover:bg-red-500/20';
-      case 'Customer':
-        return 'bg-purple-500/10 text-purple-500 hover:bg-purple-500/20';
+      case "Admin":
+        return "bg-red-500/10 text-red-500 hover:bg-red-500/20";
+      case "Customer":
+        return "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20";
       default:
-        return 'bg-gray-500/10 text-gray-500 hover:bg-gray-500/20';
+        return "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
     }
   };
 
   // Define columns for DataTable
   const columns: ColumnDef<User>[] = [
     {
-      id: 'user',
-      header: t('admin.user_management.user'),
-      accessorKey: 'email',
+      id: "user",
+      header: t("admin.user_management.user"),
+      accessorKey: "email",
       cell: ({ row }) => (
         <div>
-          <div className="font-medium">
-            {row.profile?.full_name || t('admin.user_management.no_name')}
+          <div className="font-medium flex items-center gap-2">
+            {row.profile?.full_name || t("admin.user_management.no_name")}
+            <Badge variant={row.profile?.is_verified ? "success" : "secondary"}>
+              {row.profile?.is_verified
+                ? t("common.status.verified")
+                : t("common.status.not_verified")}
+            </Badge>
           </div>
           <div className="text-sm text-muted-foreground flex items-center gap-1">
             <Mail className="h-3 w-3" />
@@ -347,8 +399,8 @@ export default function UserManagement() {
       enableSorting: true,
     },
     {
-      id: 'contact',
-      header: t('admin.user_management.contact'),
+      id: "contact",
+      header: t("admin.user_management.contact"),
       cell: ({ row }) => (
         <div className="space-y-1 text-sm">
           {row.profile?.phone_number && (
@@ -360,7 +412,9 @@ export default function UserManagement() {
           {row.profile?.address && (
             <div className="flex items-center gap-1 text-muted-foreground">
               <MapPin className="h-3 w-3" />
-              <span className="truncate max-w-[200px]">{row.profile.address}</span>
+              <span className="truncate max-w-[200px]">
+                {row.profile.address}
+              </span>
             </div>
           )}
           {row.profile?.company_name && (
@@ -374,43 +428,45 @@ export default function UserManagement() {
       enableSorting: false,
     },
     {
-      id: 'roles',
-      header: t('admin.user_management.roles'),
+      id: "roles",
+      header: t("admin.user_management.roles"),
       cell: ({ row }) => {
-        return <div className="flex flex-wrap gap-2">
-          {row.roles.length === 0 ? (
-            <Badge variant="outline" className="text-muted-foreground">
-              {t('admin.user_management.no_roles')}
-            </Badge>
-          ) : (
-            row.roles.map((role) => (
-              <Badge
-                key={role.id}
-                className={getRoleBadgeColor(role.name)}
-                variant="secondary"
-              >
-                {role.name}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveRole(row.id, role.id.toString());
-                  }}
-                  className="ml-2 hover:text-destructive"
-                  title="Remove role"
-                >
-                  ×
-                </button>
+        return (
+          <div className="flex flex-wrap gap-2">
+            {row.roles.length === 0 ? (
+              <Badge variant="outline" className="text-muted-foreground">
+                {t("admin.user_management.no_roles")}
               </Badge>
-            ))
-          )}
-        </div>
+            ) : (
+              row.roles.map((role) => (
+                <Badge
+                  key={role.id}
+                  className={getRoleBadgeColor(role.name)}
+                  variant="secondary"
+                >
+                  {role.name}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveRole(row.id, role.id.toString());
+                    }}
+                    className="ml-2 hover:text-destructive"
+                    title="Remove role"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))
+            )}
+          </div>
+        );
       },
       enableSorting: false,
     },
     {
-      id: 'created',
-      header: t('admin.user_management.created'),
-      accessorKey: 'created_at',
+      id: "created",
+      header: t("admin.user_management.created"),
+      accessorKey: "created_at",
       cell: ({ getValue }) => {
         const date = getValue() as string;
         return new Date(date).toLocaleDateString();
@@ -431,7 +487,7 @@ export default function UserManagement() {
             setSelectedRoleIds(
               user.roles
                 .filter((r): r is Role => r != null && r.id != null)
-                .map((r) => r.id)
+                .map((r) => r.id),
             );
           } else {
             setSelectedUser(null);
@@ -443,27 +499,32 @@ export default function UserManagement() {
           <Button
             size="sm"
             variant="outline"
-            title={t('admin.user_management.assign_role')}
+            title={t("admin.user_management.assign_role")}
           >
             <UserPlus className="h-4 w-4" />
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('admin.user_management.assign_role_dialog.title')}</DialogTitle>
+            <DialogTitle>
+              {t("admin.user_management.assign_role_dialog.title")}
+            </DialogTitle>
             <DialogDescription>
-              {t('admin.user_management.assign_role_dialog.description')} {user.email}
+              {t("admin.user_management.assign_role_dialog.description")}{" "}
+              {user.email}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">
-                {t('admin.user_management.assign_role_dialog.current_roles')}
+                {t("admin.user_management.assign_role_dialog.current_roles")}
               </label>
               <div className="flex flex-wrap gap-2">
                 {user.roles.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
-                    {t('admin.user_management.assign_role_dialog.no_roles_assigned')}
+                    {t(
+                      "admin.user_management.assign_role_dialog.no_roles_assigned",
+                    )}
                   </p>
                 ) : (
                   user.roles.map((role) => (
@@ -479,7 +540,7 @@ export default function UserManagement() {
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">
-                {t('admin.user_management.assign_role_dialog.select_roles')}
+                {t("admin.user_management.assign_role_dialog.select_roles")}
               </label>
               <MultiSelect
                 options={(rolesData ?? []).map((role: Role) => ({
@@ -489,13 +550,18 @@ export default function UserManagement() {
                 }))}
                 value={selectedRoleIds}
                 onChange={(ids) => setSelectedRoleIds(ids.map(Number))}
-                placeholder={t('admin.user_management.assign_role_dialog.choose_role')}
-                emptyMessage={t('admin.user_management.assign_role_dialog.no_roles_available', 'No roles available')}
+                placeholder={t(
+                  "admin.user_management.assign_role_dialog.choose_role",
+                )}
+                emptyMessage={t(
+                  "admin.user_management.assign_role_dialog.no_roles_available",
+                  "No roles available",
+                )}
                 triggerClassName="w-full"
               />
             </div>
             <Button onClick={handleAssignRoles} className="w-full">
-              {t('admin.user_management.assign_role_dialog.assign')}
+              {t("admin.user_management.assign_role_dialog.assign")}
             </Button>
           </div>
         </DialogContent>
@@ -526,7 +592,9 @@ export default function UserManagement() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center space-y-4">
           <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">{t('admin.user_management.messages.loading')}</p>
+          <p className="text-muted-foreground">
+            {t("admin.user_management.messages.loading")}
+          </p>
         </div>
       </div>
     );
@@ -539,67 +607,89 @@ export default function UserManagement() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Users className="h-8 w-8" />
-              {t('admin.user_management.title')}
+              {t("admin.user_management.title")}
             </h1>
             <p className="text-muted-foreground mt-2">
-              {t('admin.user_management.description')}
+              {t("admin.user_management.description")}
             </p>
           </div>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
               <Button onClick={() => resetForm()}>
                 <UserPlus className="h-4 w-4 mr-2" />
-                {t('admin.user_management.create_user')}
+                {t("admin.user_management.create_user")}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{t('admin.user_management.create_dialog.title')}</DialogTitle>
+                <DialogTitle>
+                  {t("admin.user_management.create_dialog.title")}
+                </DialogTitle>
                 <DialogDescription>
-                  {t('admin.user_management.create_dialog.description')}
+                  {t("admin.user_management.create_dialog.description")}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="create-email">{t('admin.user_management.create_dialog.email')} *</Label>
+                    <Label htmlFor="create-email">
+                      {t("admin.user_management.create_dialog.email")} *
+                    </Label>
                     <Input
                       id="create-email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       placeholder="user@example.com"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="create-username">{t('admin.user_management.create_dialog.username')} *</Label>
+                    <Label htmlFor="create-username">
+                      {t("admin.user_management.create_dialog.username")} *
+                    </Label>
                     <Input
                       id="create-username"
                       value={formData.username}
-                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, username: e.target.value })
+                      }
                       placeholder="username"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="create-password">{t('admin.user_management.create_dialog.password')} *</Label>
+                    <Label htmlFor="create-password">
+                      {t("admin.user_management.create_dialog.password")} *
+                    </Label>
                     <Input
                       id="create-password"
                       type="password"
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
                       placeholder="••••••••"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="create-role">{t('admin.user_management.create_dialog.initial_role')}</Label>
+                    <Label htmlFor="create-role">
+                      {t("admin.user_management.create_dialog.initial_role")}
+                    </Label>
                     <Select
                       value={formData.role_id}
-                      onValueChange={(value) => setFormData({ ...formData, role_id: value })}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, role_id: value })
+                      }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={t('admin.user_management.create_dialog.select_role')} />
+                        <SelectValue
+                          placeholder={t(
+                            "admin.user_management.create_dialog.select_role",
+                          )}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {rolesData.map((role: Role) => (
@@ -612,72 +702,110 @@ export default function UserManagement() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="create-full-name">{t('admin.user_management.create_dialog.full_name')} *</Label>
+                  <Label htmlFor="create-full-name">
+                    {t("admin.user_management.create_dialog.full_name")} *
+                  </Label>
                   <Input
                     id="create-full-name"
                     value={formData.full_name}
-                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, full_name: e.target.value })
+                    }
                     placeholder="John Doe"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="create-phone">{t('admin.user_management.create_dialog.phone_number')} *</Label>
+                    <Label htmlFor="create-phone">
+                      {t("admin.user_management.create_dialog.phone_number")} *
+                    </Label>
                     <Input
                       id="create-phone"
                       value={formData.phone_number}
-                      onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          phone_number: e.target.value,
+                        })
+                      }
                       placeholder="+1234567890"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="create-address">{t('admin.user_management.create_dialog.address')} *</Label>
+                  <Label htmlFor="create-address">
+                    {t("admin.user_management.create_dialog.address")} *
+                  </Label>
                   <Textarea
                     id="create-address"
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
                     placeholder="123 Main St, City, State, ZIP"
                     rows={2}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="create-company-name">{t('admin.user_management.create_dialog.company_name')}</Label>
+                  <Label htmlFor="create-company-name">
+                    {t("admin.user_management.create_dialog.company_name")}
+                  </Label>
                   <Input
                     id="create-company-name"
                     value={formData.company_name}
-                    onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, company_name: e.target.value })
+                    }
                     placeholder="Company Inc."
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="create-company-address">{t('admin.user_management.create_dialog.company_address')}</Label>
+                  <Label htmlFor="create-company-address">
+                    {t("admin.user_management.create_dialog.company_address")}
+                  </Label>
                   <Textarea
                     id="create-company-address"
                     value={formData.company_address}
-                    onChange={(e) => setFormData({ ...formData, company_address: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        company_address: e.target.value,
+                      })
+                    }
                     placeholder="Company address"
                     rows={2}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="create-company-details">{t('admin.user_management.create_dialog.company_details')}</Label>
+                  <Label htmlFor="create-company-details">
+                    {t("admin.user_management.create_dialog.company_details")}
+                  </Label>
                   <Textarea
                     id="create-company-details"
                     value={formData.company_details}
-                    onChange={(e) => setFormData({ ...formData, company_details: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        company_details: e.target.value,
+                      })
+                    }
                     placeholder="Additional company information"
                     rows={3}
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                  {t('admin.user_management.create_dialog.cancel')}
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCreateDialog(false)}
+                >
+                  {t("admin.user_management.create_dialog.cancel")}
                 </Button>
                 <Button onClick={handleCreateUser} disabled={formLoading}>
-                  {formLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  {t('admin.user_management.create_dialog.create')}
+                  {formLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : null}
+                  {t("admin.user_management.create_dialog.create")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -689,17 +817,18 @@ export default function UserManagement() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <div>
-              <CardTitle>{t('admin.user_management.all_users')}</CardTitle>
+              <CardTitle>{t("admin.user_management.all_users")}</CardTitle>
               <CardDescription>
-                {filteredUsers.length} {filteredUsers.length === 1
-                  ? t('admin.user_management.users_found')
-                  : t('admin.user_management.users_found_plural')}
+                {filteredUsers.length}{" "}
+                {filteredUsers.length === 1
+                  ? t("admin.user_management.users_found")
+                  : t("admin.user_management.users_found_plural")}
               </CardDescription>
             </div>
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={t('admin.user_management.search_placeholder')}
+                placeholder={t("admin.user_management.search_placeholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -712,10 +841,10 @@ export default function UserManagement() {
             data={filteredUsers}
             columns={columns}
             isLoading={loading}
-            emptyMessage={t('admin.user_management.no_users')}
+            emptyMessage={t("admin.user_management.no_users")}
             getRowId={(row) => row.id}
             renderActions={renderUserActions}
-            actionsColumnHeader={t('admin.user_management.actions')}
+            actionsColumnHeader={t("admin.user_management.actions")}
             actionsColumnClassName="text-right"
             enableSorting={true}
           />
@@ -726,21 +855,28 @@ export default function UserManagement() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('admin.user_management.delete_dialog.title')}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("admin.user_management.delete_dialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('admin.user_management.delete_dialog.description')}
-              {userToDelete?.email && ` for ${userToDelete.email}`} {t('admin.user_management.delete_dialog.and_data')}
+              {t("admin.user_management.delete_dialog.description")}
+              {userToDelete?.email && ` for ${userToDelete.email}`}{" "}
+              {t("admin.user_management.delete_dialog.and_data")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setUserToDelete(null)}>{t('admin.user_management.delete_dialog.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setUserToDelete(null)}>
+              {t("admin.user_management.delete_dialog.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteUser}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={formLoading}
             >
-              {formLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              {t('admin.user_management.delete_dialog.delete')}
+              {formLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : null}
+              {t("admin.user_management.delete_dialog.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

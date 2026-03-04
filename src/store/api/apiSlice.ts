@@ -72,6 +72,7 @@ export const apiSlice = createApi({
     'Valuation',
     'Social',
     'SecureBox',
+    'Settings',
     'Bulk',
     'Export',
     'SavedSearch',

@@ -32,7 +32,7 @@
     --accent-foreground: 0 72% 50%;
 
     /* Status Colors - Harmonized with brand */
-    --success: 142 76% 45%;         /* Soft green for success states */
+    --success: 142deg 100% 26.36%;         /* Soft green for success states */
     --success-foreground: 0 0% 98%;
 
     --warning: 38 92% 60%;          /* Warm amber for warnings */

@@ -227,12 +227,14 @@ export default function ClientProfile() {
             {t("profile.client.subtitle")}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Badge variant={profile.is_verified ? "default" : "secondary"}>
-            {profile.is_verified
-              ? t("profile.client.verified")
-              : t("profile.client.not_verified")}
-          </Badge>
+        <div className="flex gap-2 items-center">
+          <div>
+            <Badge variant={profile.is_verified ? "success" : "secondary"}>
+              {profile.is_verified
+                ? t("profile.client.verified")
+                : t("profile.client.not_verified")}
+            </Badge>
+          </div>
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)}>
               {t("profile.client.edit_profile")}
@@ -411,7 +413,7 @@ export default function ClientProfile() {
             <div className="space-y-2">
               <Label>{t("profile.client.verification_status")}</Label>
               <div className="flex items-center gap-2">
-                <Badge variant={profile.is_verified ? "default" : "secondary"}>
+                <Badge variant={profile.is_verified ? "success" : "secondary"}>
                   {profile.is_verified
                     ? t("profile.client.verified")
                     : t("profile.client.not_verified")}

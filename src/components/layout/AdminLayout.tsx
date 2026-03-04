@@ -5,6 +5,7 @@ import { ROUTES } from '@/lib/routes';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
+  Settings,
   UserCircle,
 } from 'lucide-react';
 import { MenuItem } from './components/AppSidebar';
@@ -25,6 +26,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       title: 'Profile',
       url: ROUTES.ADMIN.PROFILE,
       icon: UserCircle,
+    },
+    {
+      title: 'Settings',
+      url: ROUTES.ADMIN.SETTINGS,
+      icon: Settings,
     },
     {
       title: 'Dashboard',

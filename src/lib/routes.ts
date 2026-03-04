@@ -93,5 +93,6 @@ export const ROUTES = {
     SOCIAL: "/admin/social",
     PROFILE: "/admin/profile",
     SECURE_BOX: "/admin/secure-box",
+    SETTINGS: "/admin/settings",
   },
 }; 
