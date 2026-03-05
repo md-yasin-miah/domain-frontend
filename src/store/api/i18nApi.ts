@@ -8,8 +8,23 @@ export interface LanguageItem {
   code: string;
   name: string;
   native_name: string;
-  flag: string;
+  flag: string | null;
   is_default: boolean;
+}
+
+export interface LanguageCreateRequest {
+  code: string;
+  name: string;
+  native_name: string;
+  flag?: string | null;
+  is_default?: boolean;
+}
+
+export interface LanguageUpdateRequest {
+  name?: string;
+  native_name?: string;
+  flag?: string | null;
+  is_default?: boolean;
 }
 
 export interface TranslationsLanguagesResponse {
@@ -56,7 +71,36 @@ export const i18nApi = apiSlice.injectEndpoints({
         url: "/i18n/languages",
         method: "GET",
       }),
-      providesTags: ["Translation"],
+      providesTags: ["Translation", "Language"],
+    }),
+
+    createLanguage: builder.mutation<LanguageItem, LanguageCreateRequest>({
+      query: (body) => ({
+        url: "/i18n/languages",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Language", "Translation"],
+    }),
+
+    updateLanguage: builder.mutation<
+      LanguageItem,
+      { code: string; data: LanguageUpdateRequest }
+    >({
+      query: ({ code, data }) => ({
+        url: `/i18n/languages/${encodeURIComponent(code)}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Language", "Translation"],
+    }),
+
+    deleteLanguage: builder.mutation<void, string>({
+      query: (code) => ({
+        url: `/i18n/languages/${encodeURIComponent(code)}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Language", "Translation"],
     }),
 
     getTranslationsByLocale: builder.query<TranslationsByLocaleResponse, string>({
@@ -143,6 +187,9 @@ export const i18nApi = apiSlice.injectEndpoints({
 
 export const {
   useGetLanguagesQuery,
+  useCreateLanguageMutation,
+  useUpdateLanguageMutation,
+  useDeleteLanguageMutation,
   useGetTranslationsByLocaleQuery,
   useListTranslationsQuery,
   useAddTranslationMutation,

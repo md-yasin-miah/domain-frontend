@@ -796,6 +796,14 @@
     "translations": {
       "title": "Traducciones",
       "description": "Gestiona las cadenas de traducción. Añade primero en inglés y luego traduce a otros idiomas.",
+      "languages_title": "Idiomas disponibles",
+      "languages_desc": "Idiomas usados en el selector de idioma y en las cadenas de traducción.",
+      "languages_empty": "No se cargaron idiomas.",
+      "language_name": "Nombre",
+      "language_native": "Nombre nativo",
+      "flag": "Bandera",
+      "default": "Por defecto",
+      "yes": "Sí",
       "list_title": "Cadenas de traducción",
       "list_desc": "Claves en notación de puntos, ej. common.save, nav.home",
       "locale": "Idioma",
@@ -817,7 +825,17 @@
       "bulk_updated": "Traducciones actualizadas",
       "at_least_one_locale": "Añade al menos una traducción",
       "delete_confirm_title": "¿Eliminar traducción?",
-      "delete_confirm_desc": "Se eliminará la cadena para esta clave e idioma. Los demás idiomas de la misma clave no se verán afectados."
+      "delete_confirm_desc": "Se eliminará la cadena para esta clave e idioma. Los demás idiomas de la misma clave no se verán afectados.",
+      "add_language": "Añadir idioma",
+      "add_language_title": "Añadir idioma",
+      "add_language_desc": "Añade un nuevo idioma al selector de idioma.",
+      "edit_language_title": "Editar idioma",
+      "language_required": "Código, nombre y nombre nativo requeridos",
+      "language_added": "Idioma añadido",
+      "language_updated": "Idioma actualizado",
+      "language_deleted": "Idioma eliminado",
+      "delete_language_title": "¿Eliminar idioma?",
+      "delete_language_desc": "Se eliminará el idioma del selector. El idioma por defecto no se puede eliminar."
     },
     "orders": {
       "title": "Gestión de pedidos",

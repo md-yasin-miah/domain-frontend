@@ -76,6 +76,7 @@ export const apiSlice = createApi({
     'SecureBox',
     'Withdrawal',
     'Translation',
+    'Language',
     'Settings',
     'Bulk',
     'Export',

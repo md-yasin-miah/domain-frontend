@@ -595,6 +595,14 @@
     "translations": {
       "title": "Translations",
       "description": "Manage translation strings. Add in English first, then translate for other locales.",
+      "languages_title": "Available languages",
+      "languages_desc": "Locales used in the language switcher and for translation strings.",
+      "languages_empty": "No languages loaded.",
+      "language_name": "Name",
+      "language_native": "Native name",
+      "flag": "Flag",
+      "default": "Default",
+      "yes": "Yes",
       "list_title": "Translation strings",
       "list_desc": "Dot notation keys, e.g. common.save, nav.home",
       "locale": "Locale",
@@ -616,7 +624,17 @@
       "bulk_updated": "Translations updated",
       "at_least_one_locale": "Add at least one translation",
       "delete_confirm_title": "Delete translation?",
-      "delete_confirm_desc": "This will remove the string for this key and locale. Other locales for the same key are not affected."
+      "delete_confirm_desc": "This will remove the string for this key and locale. Other locales for the same key are not affected.",
+      "add_language": "Add language",
+      "add_language_title": "Add language",
+      "add_language_desc": "Add a new locale for the language switcher.",
+      "edit_language_title": "Edit language",
+      "language_required": "Code, name and native name required",
+      "language_added": "Language added",
+      "language_updated": "Language updated",
+      "language_deleted": "Language deleted",
+      "delete_language_title": "Delete language?",
+      "delete_language_desc": "This will remove the language from the switcher. Default language cannot be deleted."
     },
     "orders": {
       "title": "Order Management",
