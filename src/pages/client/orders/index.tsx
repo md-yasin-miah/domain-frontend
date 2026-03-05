@@ -19,7 +19,14 @@ import {
 } from "@/components/ui/select";
 import { type ColumnDef } from "@/components/ui/data-table";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
-import { Search, Package, Loader2, FileText, MoreHorizontal } from "lucide-react";
+import {
+  Search,
+  Package,
+  Loader2,
+  FileText,
+  MoreHorizontal,
+  Box,
+} from "lucide-react";
 import { useGetOrdersQuery } from "@/store/api/ordersApi";
 import {
   formatCurrency,
@@ -37,6 +44,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/store/hooks/useAuth";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import CustomTooltip from "@/components/common/CustomTooltip";
+import { useToast } from "@/hooks/use-toast";
+import { useCreateSecureBoxMutation } from "@/store/api/secureBoxApi";
 
 type OrderStatus =
   | "pending"
@@ -47,8 +69,14 @@ type OrderStatus =
 
 const AllOrdersPage = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
+  const [secureBoxOrder, setSecureBoxOrder] = useState<Order | null>(null);
+  const [secureBoxContent, setSecureBoxContent] = useState("");
+
+  const [createSecureBox, { isLoading: isCreatingSecureBox }] = useCreateSecureBoxMutation();
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
     initialPageSize: 10,
@@ -114,9 +142,17 @@ const AllOrdersPage = () => {
         header: t("orders.table.buyer"),
         cell: ({ row }) => (
           <div>
-            <div className="font-medium">
-              {row.buyer?.username || row.buyer?.email || "N/A"}
-            </div>
+            {row.buyer_id === user?.id ? (
+              <Avatar className="w-7 h-7">
+                <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                  {user.email?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <div className="font-medium">
+                {row.buyer?.username || row.buyer?.email || "N/A"}
+              </div>
+            )}
           </div>
         ),
       },
@@ -126,9 +162,17 @@ const AllOrdersPage = () => {
         header: t("orders.table.seller"),
         cell: ({ row }) => (
           <div>
-            <div className="font-medium">
-              {row.seller?.username || row.seller?.email || "N/A"}
-            </div>
+            {row.seller_id === user?.id ? (
+              <Avatar className="w-7 h-7">
+                <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                  {user.email?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <div className="font-medium">
+                {row.seller?.username || row.seller?.email || "N/A"}
+              </div>
+            )}
           </div>
         ),
       },
@@ -167,28 +211,50 @@ const AllOrdersPage = () => {
       },
     ];
   }, [t]);
+  
 
-  // Render actions for each row
-  const orderDetailsPath = (orderId: number, hash?: string) =>
-    `${ROUTES.CLIENT.ORDERS.ORDER_DETAILS(orderId)}${hash ? `#${hash}` : ""}`;
+  const handleCreateSecureBox = async () => {
+    if (!secureBoxOrder || !secureBoxContent.trim()) return;
+    try {
+      await createSecureBox({
+        orderId: secureBoxOrder.id,
+        data: { content: secureBoxContent.trim() },
+      }).unwrap();
+      toast({
+        title: t("orders.secure_box.created", "Secure Box Created"),
+        description: t("orders.secure_box.created_desc", "Your secure box has been submitted for admin approval."),
+      });
+      setSecureBoxOrder(null);
+      setSecureBoxContent("");
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "data" in err && err.data && typeof (err as { data: { detail?: string } }).data === "object"
+          ? (err as { data: { detail?: string } }).data?.detail
+          : t("common.error");
+      toast({
+        title: t("common.error", "Error"),
+        description: String(message),
+        variant: "destructive",
+      });
+    }
+  };
 
   const renderActions = (order: Order) => (
     <div className="flex items-center gap-1">
-      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-        <Link to={orderDetailsPath(order.id)} title={t("orders.actions.view_order")}>
-          <FileText className="w-4 h-4" />
-        </Link>
-      </Button>
-      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-        <Link to={orderDetailsPath(order.id, "invoice")} title={t("orders.actions.invoice")}>
-          <FileText className="w-4 h-4" />
-        </Link>
-      </Button>
-      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-        <Link to={orderDetailsPath(order.id, "payment")} title={t("orders.actions.payment")}>
-          <FileText className="w-4 h-4" />
-        </Link>
-      </Button>
+      {order.seller_id === user?.id && order.status === "payment_received" && (
+        <CustomTooltip content={t("orders.secure_box.create_tooltip", "Create Secure Box")}>
+          <Button
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => {
+              setSecureBoxOrder(order);
+              setSecureBoxContent("");
+            }}
+          >
+            <Box className="w-4 h-4" />
+          </Button>
+        </CustomTooltip>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -203,13 +269,19 @@ const AllOrdersPage = () => {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to={ROUTES.CLIENT.ORDERS.INVOICES}>{t("orders.actions.invoices")}</Link>
+            <Link to={ROUTES.CLIENT.ORDERS.INVOICES}>
+              {t("orders.actions.invoices")}
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to={ROUTES.CLIENT.ORDERS.PAYMENTS}>{t("orders.actions.payments")}</Link>
+            <Link to={ROUTES.CLIENT.ORDERS.PAYMENTS}>
+              {t("orders.actions.payments")}
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to={ROUTES.CLIENT.ORDERS.ESCROWS}>{t("orders.actions.escrows")}</Link>
+            <Link to={ROUTES.CLIENT.ORDERS.ESCROWS}>
+              {t("orders.actions.escrows")}
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -308,6 +380,48 @@ const AllOrdersPage = () => {
           />
         </CardContent>
       </Card>
+
+      <Dialog open={!!secureBoxOrder} onOpenChange={(open) => !open && (setSecureBoxOrder(null), setSecureBoxContent(""))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("orders.secure_box.create_title", "Create Secure Box")}</DialogTitle>
+            <DialogDescription>
+              {t("orders.secure_box.create_desc", "Add the content for this order. Admin will review and approve before the buyer can access it.")}
+              {secureBoxOrder && (
+                <span className="block mt-1 font-medium">
+                  {t("orders.table.order_number")}: {secureBoxOrder.order_number}
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="secure-box-content">{t("orders.secure_box.content_label", "Content")}</Label>
+              <Textarea
+                id="secure-box-content"
+                placeholder={t("orders.secure_box.content_placeholder", "Enter secure box content...")}
+                value={secureBoxContent}
+                onChange={(e) => setSecureBoxContent(e.target.value)}
+                rows={5}
+                className="resize-none"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => (setSecureBoxOrder(null), setSecureBoxContent(""))}
+              disabled={isCreatingSecureBox}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button onClick={handleCreateSecureBox} disabled={!secureBoxContent.trim() || isCreatingSecureBox}>
+              {isCreatingSecureBox && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {t("orders.secure_box.submit", "Submit for Approval")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

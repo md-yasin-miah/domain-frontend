@@ -1787,6 +1787,16 @@
       "escrows": "Depósitos en garantía",
       "actions": "Acciones"
     },
+    "secure_box": {
+      "create_tooltip": "Crear Caja Segura",
+      "create_title": "Crear Caja Segura",
+      "create_desc": "Añade el contenido para esta orden. El administrador lo revisará y aprobará antes de que el comprador pueda acceder.",
+      "content_label": "Contenido",
+      "content_placeholder": "Introduce el contenido de la caja segura...",
+      "submit": "Enviar para Aprobación",
+      "created": "Caja Segura Creada",
+      "created_desc": "Tu caja segura ha sido enviada para aprobación del administrador."
+    },
     "empty": {
       "no_orders": "No se encontraron órdenes"
     },

@@ -1893,6 +1893,16 @@
       "escrows": "Escrows",
       "actions": "Actions"
     },
+    "secure_box": {
+      "create_tooltip": "Create Secure Box",
+      "create_title": "Create Secure Box",
+      "create_desc": "Add the content for this order. Admin will review and approve before the buyer can access it.",
+      "content_label": "Content",
+      "content_placeholder": "Enter secure box content...",
+      "submit": "Submit for Approval",
+      "created": "Secure Box Created",
+      "created_desc": "Your secure box has been submitted for admin approval."
+    },
     "empty": {
       "no_orders": "No orders found"
     },
