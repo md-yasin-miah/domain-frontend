@@ -88,7 +88,7 @@ export default function AdminTranslationsPage() {
     skip: 0,
     limit: 500,
   });
-  const items = listData ?? [];
+  const items = useMemo(() => listData ?? [], [listData]);
 
   const [addTranslation, { isLoading: isAdding }] = useAddTranslationMutation();
   const [updateTranslation, { isLoading: isUpdating }] = useUpdateTranslationMutation();
