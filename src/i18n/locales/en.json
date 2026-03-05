@@ -1895,13 +1895,24 @@
     },
     "secure_box": {
       "create_tooltip": "Create Secure Box",
+      "secure_box_tooltip": "Secure Box",
       "create_title": "Create Secure Box",
       "create_desc": "Add the content for this order. Admin will review and approve before the buyer can access it.",
+      "update_title": "Update Secure Box",
+      "update_desc": "Update the content below. It will be resubmitted for admin approval.",
       "content_label": "Content",
       "content_placeholder": "Enter secure box content...",
       "submit": "Submit for Approval",
+      "update_submit": "Update & Resubmit",
       "created": "Secure Box Created",
-      "created_desc": "Your secure box has been submitted for admin approval."
+      "created_desc": "Your secure box has been submitted for admin approval.",
+      "updated": "Secure Box Updated",
+      "updated_desc": "Your secure box content has been updated and resubmitted for approval.",
+      "already_exists_title": "Secure Box Exists",
+      "already_exists_desc": "A secure box already exists for this order. You can update the content below.",
+      "view_title": "Secure Box",
+      "exists_no_edit_desc": "This secure box has already been submitted and approved. You cannot edit it.",
+      "exists_no_edit_message": "The secure box for this order is no longer editable. It has been approved or already accessed."
     },
     "empty": {
       "no_orders": "No orders found"

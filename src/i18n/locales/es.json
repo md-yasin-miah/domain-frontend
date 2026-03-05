@@ -1789,13 +1789,24 @@
     },
     "secure_box": {
       "create_tooltip": "Crear Caja Segura",
+      "secure_box_tooltip": "Caja Segura",
       "create_title": "Crear Caja Segura",
       "create_desc": "Añade el contenido para esta orden. El administrador lo revisará y aprobará antes de que el comprador pueda acceder.",
+      "update_title": "Actualizar Caja Segura",
+      "update_desc": "Actualiza el contenido. Se volverá a enviar para aprobación del administrador.",
       "content_label": "Contenido",
       "content_placeholder": "Introduce el contenido de la caja segura...",
       "submit": "Enviar para Aprobación",
+      "update_submit": "Actualizar y Reenviar",
       "created": "Caja Segura Creada",
-      "created_desc": "Tu caja segura ha sido enviada para aprobación del administrador."
+      "created_desc": "Tu caja segura ha sido enviada para aprobación del administrador.",
+      "updated": "Caja Segura Actualizada",
+      "updated_desc": "El contenido de tu caja segura ha sido actualizado y reenviado para aprobación.",
+      "already_exists_title": "La Caja Segura ya existe",
+      "already_exists_desc": "Ya existe una caja segura para esta orden. Puedes actualizar el contenido a continuación.",
+      "view_title": "Caja Segura",
+      "exists_no_edit_desc": "Esta caja segura ya fue enviada y aprobada. No puedes editarla.",
+      "exists_no_edit_message": "La caja segura de esta orden ya no es editable. Ha sido aprobada o ya fue accedida."
     },
     "empty": {
       "no_orders": "No se encontraron órdenes"
