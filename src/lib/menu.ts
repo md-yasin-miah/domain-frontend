@@ -27,6 +27,7 @@ import {
   Verified,
   List,
   MessagesSquare,
+  Wallet,
 } from 'lucide-react';
 import { ROUTES } from "./routes";
 import { TFunction } from "i18next";
@@ -251,6 +252,7 @@ const getClientServices = (t: TFunction): MenuItem[] => {
   return [
     { title: t('nav.profile'), url: ROUTES.CLIENT.PROFILE, icon: User },
     { title: t('nav.settings'), url: ROUTES.CLIENT.PROFILE, icon: Settings },
+    { title: t('nav.wallet'), url: ROUTES.CLIENT.WALLET(), icon: Wallet },
     { title: t('nav.support'), url: ROUTES.CLIENT.SUPPORT, icon: MessageSquare },
     { title: t('nav.chat'), url: ROUTES.CLIENT.CHAT.ROOT, icon: MessagesSquare },
     { title: t('nav.reviews'), url: ROUTES.CLIENT.REVIEWS, icon: Star },

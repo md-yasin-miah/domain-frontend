@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { type ColumnDef } from "@/components/ui/data-table";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
-import { Search, Package, Loader2, Eye, FileText } from "lucide-react";
+import { Search, Package, Loader2, FileText, MoreHorizontal } from "lucide-react";
 import { useGetOrdersQuery } from "@/store/api/ordersApi";
 import {
   formatCurrency,
@@ -31,6 +31,12 @@ import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/routes";
 import { usePagination } from "@/hooks/usePagination";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type OrderStatus =
   | "pending"
@@ -163,12 +169,51 @@ const AllOrdersPage = () => {
   }, [t]);
 
   // Render actions for each row
+  const orderDetailsPath = (orderId: number, hash?: string) =>
+    `${ROUTES.CLIENT.ORDERS.ORDER_DETAILS(orderId)}${hash ? `#${hash}` : ""}`;
+
   const renderActions = (order: Order) => (
-    <Button variant="ghost" size="sm" asChild>
-      <Link to={ROUTES.CLIENT.ORDERS.ORDER_DETAILS(order.id)}>
-        <Eye className="w-4 h-4" />
-      </Link>
-    </Button>
+    <div className="flex items-center gap-1">
+      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+        <Link to={orderDetailsPath(order.id)} title={t("orders.actions.view_order")}>
+          <FileText className="w-4 h-4" />
+        </Link>
+      </Button>
+      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+        <Link to={orderDetailsPath(order.id, "invoice")} title={t("orders.actions.invoice")}>
+          <FileText className="w-4 h-4" />
+        </Link>
+      </Button>
+      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+        <Link to={orderDetailsPath(order.id, "payment")} title={t("orders.actions.payment")}>
+          <FileText className="w-4 h-4" />
+        </Link>
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <MoreHorizontal className="w-4 h-4" />
+            <span className="sr-only">{t("orders.actions.actions")}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link to={ROUTES.CLIENT.ORDERS.ORDER_DETAILS(order.id)}>
+              {t("orders.actions.view_order")}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to={ROUTES.CLIENT.ORDERS.INVOICES}>{t("orders.actions.invoices")}</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to={ROUTES.CLIENT.ORDERS.PAYMENTS}>{t("orders.actions.payments")}</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to={ROUTES.CLIENT.ORDERS.ESCROWS}>{t("orders.actions.escrows")}</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 
   return (

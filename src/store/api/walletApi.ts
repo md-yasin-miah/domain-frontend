@@ -73,16 +73,24 @@ export const walletApi = apiSlice.injectEndpoints({
         limit?: number;
       } | void
     >({
-      query: (params = {}) => ({
-        url: '/wallet/transactions',
-        method: 'GET',
-        params: {
-          skip: params?.skip ?? 0,
-          limit: params?.limit ?? 20,
-          ...(params?.currency && { currency: params.currency }),
-          ...(params?.type && { type: params.type }),
-        },
-      }),
+      query: (params) => {
+        const p = (params ?? {}) as {
+          currency?: string;
+          type?: string;
+          skip?: number;
+          limit?: number;
+        };
+        const skip = p.skip ?? 0;
+        const limit = Math.min(Math.max(p.limit ?? 20, 1), 100);
+        const queryParams: Record<string, string | number> = { skip, limit };
+        if (p.currency?.trim()) queryParams.currency = p.currency.trim();
+        if (p.type?.trim()) queryParams.type = p.type.trim();
+        return {
+          url: '/wallet/transactions',
+          method: 'GET',
+          params: queryParams,
+        };
+      },
       providesTags: ['Wallet'],
     }),
   }),

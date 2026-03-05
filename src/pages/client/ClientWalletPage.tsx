@@ -1,55 +1,65 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Wallet, Plus, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Wallet, Plus, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useGetWalletQuery, useGetWalletTransactionsQuery } from '@/store/api/walletApi';
-import AddFundModal from '@/components/wallet/AddFundModal';
-import { CopyToClipboard } from '@/components/common/CopyToClipboard';
+} from "@/components/ui/select";
+import {
+  useGetWalletQuery,
+  useGetWalletTransactionsQuery,
+} from "@/store/api/walletApi";
+import AddFundModal from "@/components/wallet/AddFundModal";
+import { CopyToClipboard } from "@/components/common/CopyToClipboard";
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD'] as const;
+const CURRENCIES = ["USD", "EUR", "GBP", "CAD"] as const;
 
-function formatWalletBalance(amount: number | string, currency: string): string {
-  const n = typeof amount === 'string' ? parseFloat(amount) : amount;
+function formatWalletBalance(
+  amount: number | string,
+  currency: string,
+): string {
+  const n = typeof amount === "string" ? parseFloat(amount) : amount;
   return new Intl.NumberFormat(undefined, {
-    style: 'currency',
+    style: "currency",
     currency,
   }).format(isNaN(n) ? 0 : n);
 }
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
-    dateStyle: 'medium',
+    dateStyle: "medium",
   });
 }
 
 export default function ClientWalletPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [currency, setCurrency] = useState<string>('USD');
+  const [currency, setCurrency] = useState<string>("USD");
   const [addFundOpen, setAddFundOpen] = useState(false);
 
-  const { data: wallet, isLoading: walletLoading } = useGetWalletQuery(currency);
-  const { data: transactions, isLoading: transactionsLoading, refetch: refetchTransactions } =
-    useGetWalletTransactionsQuery({ currency, skip: 0, limit: 20 });
+  const { data: wallet, isLoading: walletLoading } =
+    useGetWalletQuery(currency);
+  const {
+    data: transactions,
+    isLoading: transactionsLoading,
+    refetch: refetchTransactions,
+  } = useGetWalletTransactionsQuery({ currency, skip: 0, limit: 20 });
 
   // Open Add Fund modal when ?type=add-fund
   useEffect(() => {
-    if (searchParams.get('type') === 'add-fund') {
+    if (searchParams.get("type") === "add-fund") {
       setAddFundOpen(true);
     }
   }, [searchParams]);
@@ -57,9 +67,9 @@ export default function ClientWalletPage() {
   const handleAddFundSuccess = () => {
     setAddFundOpen(false);
     refetchTransactions();
-    if (searchParams.get('type') === 'add-fund') {
+    if (searchParams.get("type") === "add-fund") {
       const next = new URLSearchParams(searchParams);
-      next.delete('type');
+      next.delete("type");
       setSearchParams(next, { replace: true });
     }
   };
@@ -71,14 +81,17 @@ export default function ClientWalletPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{t('wallet.title') || 'Wallet'}</h1>
+          <h1 className="text-3xl font-bold">
+            {t("wallet.title") || "Wallet"}
+          </h1>
           <p className="text-muted-foreground">
-            {t('wallet.subtitle') || 'Manage your wallet balance and transactions'}
+            {t("wallet.subtitle") ||
+              "Manage your wallet balance and transactions"}
           </p>
         </div>
         <Button onClick={() => setAddFundOpen(true)} className="shrink-0">
           <Plus className="h-4 w-4 mr-2" />
-          {t('wallet.add_fund.title') || 'Add Funds'}
+          {t("wallet.add_fund.title") || "Add Funds"}
         </Button>
       </div>
 
@@ -87,7 +100,7 @@ export default function ClientWalletPage() {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             <Wallet className="h-4 w-4 text-muted-foreground" />
-            {t('wallet.balance.title') || 'Balance'}
+            {t("wallet.balance.title") || "Balance"}
           </CardTitle>
           <Select value={currency} onValueChange={setCurrency}>
             <SelectTrigger className="w-[100px] h-8">
@@ -112,13 +125,14 @@ export default function ClientWalletPage() {
               </div>
               {wallet.updated_at && (
                 <p className="text-xs text-muted-foreground">
-                  {t('wallet.balance.updated') || 'Last updated'}: {formatDate(wallet.updated_at)}
+                  {t("wallet.balance.updated") || "Last updated"}:{" "}
+                  {formatDate(wallet.updated_at)}
                 </p>
               )}
             </div>
           ) : (
             <p className="text-muted-foreground text-sm">
-              {t('wallet.balance.unavailable') || 'Balance unavailable'}
+              {t("wallet.balance.unavailable") || "Balance unavailable"}
             </p>
           )}
         </CardContent>
@@ -127,9 +141,12 @@ export default function ClientWalletPage() {
       {/* Transactions */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('wallet.transactions.title') || 'Recent Transactions'}</CardTitle>
+          <CardTitle>
+            {t("wallet.transactions.title") || "Recent Transactions"}
+          </CardTitle>
           <CardDescription>
-            {t('wallet.transactions.description') || 'Your wallet transaction history'}
+            {t("wallet.transactions.description") ||
+              "Your wallet transaction history"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -141,12 +158,13 @@ export default function ClientWalletPage() {
             </div>
           ) : items.length === 0 ? (
             <p className="text-muted-foreground text-sm py-8 text-center">
-              {t('wallet.transactions.empty') || 'No transactions yet'}
+              {t("wallet.transactions.empty") || "No transactions yet"}
             </p>
           ) : (
             <div className="space-y-2">
               {items.map((txn) => {
-                const isCredit = txn.type === 'add_fund' || txn.type === 'credit';
+                const isCredit =
+                  txn.type === "add_fund" || txn.type === "credit";
                 return (
                   <div
                     key={txn.id}
@@ -160,14 +178,13 @@ export default function ClientWalletPage() {
                       )}
                       <div className="space-y-1 min-w-0">
                         <p className="font-medium text-sm capitalize">
-                          {txn.type.replace(/_/g, ' ')}
+                          {txn.type.replace(/_/g, " ")}
                         </p>
-                        {txn.description && (
-                          <p className="text-xs text-muted-foreground">{txn.description}</p>
-                        )}
                         {txn.reference_id && (
                           <CopyToClipboard
-                            tooltipContent={t('wallet.transactions.copy_reference_id')}
+                            tooltipContent={t(
+                              "wallet.transactions.copy_reference_id",
+                            )}
                             textToCopy={txn.reference_id}
                             className="gap-1.5"
                             variant="ghost"
@@ -183,16 +200,23 @@ export default function ClientWalletPage() {
                         </p>
                       </div>
                     </div>
-                    <span
-                      className={
-                        isCredit
-                          ? 'font-semibold text-green-600'
-                          : 'font-medium text-muted-foreground'
-                      }
-                    >
-                      {isCredit ? '+' : ''}
-                      {formatWalletBalance(txn.amount, txn.currency)}
-                    </span>
+                    <div className="flex flex-col items-end">
+                      <span
+                        className={
+                          isCredit
+                            ? "font-semibold text-green-600"
+                            : "font-medium text-muted-foreground"
+                        }
+                      >
+                        {isCredit ? "+" : ""}
+                        {formatWalletBalance(txn.amount, txn.currency)}
+                      </span>
+                      {txn.description && (
+                        <p className="text-xs text-end text-muted-foreground whitespace-pre-line">
+                          {txn.description.replace(".", ".\n")}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 );
               })}

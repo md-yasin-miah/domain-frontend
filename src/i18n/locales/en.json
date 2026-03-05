@@ -29,7 +29,8 @@
     "support": "Support",
     "chat": "Chat",
     "reviews": "Reviews",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "wallet": "Wallet"
   },
   "notifications": {
     "title": "Notifications",
@@ -1883,7 +1884,14 @@
       "total_orders": "total orders"
     },
     "actions": {
-      "view": "View"
+      "view": "View",
+      "view_order": "View order",
+      "invoice": "Invoice",
+      "payment": "Payment",
+      "invoices": "Invoices",
+      "payments": "Payments",
+      "escrows": "Escrows",
+      "actions": "Actions"
     },
     "empty": {
       "no_orders": "No orders found"

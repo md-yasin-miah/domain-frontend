@@ -29,7 +29,8 @@
     "support": "Soporte",
     "chat": "Chat",
     "reviews": "Reseñas",
-    "faq": "Preguntas Frecuentes"
+    "faq": "Preguntas Frecuentes",
+    "wallet": "Cartera"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -1777,7 +1778,14 @@
       "total_orders": "órdenes en total"
     },
     "actions": {
-      "view": "Ver"
+      "view": "Ver",
+      "view_order": "Ver orden",
+      "invoice": "Factura",
+      "payment": "Pago",
+      "invoices": "Facturas",
+      "payments": "Pagos",
+      "escrows": "Depósitos en garantía",
+      "actions": "Acciones"
     },
     "empty": {
       "no_orders": "No se encontraron órdenes"
