@@ -25,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CreditCard, Loader2, Pencil, Eye } from "lucide-react";
+import { CreditCard, Loader2, Pencil, Eye, Banknote } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -34,11 +34,18 @@ import {
   type Payment,
   type PaymentUpdateRequest,
 } from "@/store/api/paymentsApi";
+import {
+  useAdminListWithdrawalsQuery,
+  useAdminUpdateWithdrawalMutation,
+  type WithdrawalItem,
+} from "@/store/api/withdrawalsApi";
 import { ROUTES } from "@/lib/routes";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import { type ColumnDef } from "@/components/ui/data-table";
 import { usePagination } from "@/hooks/usePagination";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
 
 const STATUS_OPTIONS = [
   "pending",
@@ -49,6 +56,8 @@ const STATUS_OPTIONS = [
   "refunded",
   "partially_refunded",
 ];
+
+const WITHDRAWAL_STATUS_OPTIONS = ["pending", "approved", "completed", "rejected"] as const;
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return "—";
@@ -80,11 +89,25 @@ export default function AdminPaymentsPage() {
   const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>("all");
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [updateForm, setUpdateForm] = useState<PaymentUpdateRequest>({});
+  const [activeTab, setActiveTab] = useState<string>("payments");
+
+  // Withdrawals (admin)
+  const [withdrawalStatusFilter, setWithdrawalStatusFilter] = useState<string>("all");
+  const [selectedWithdrawal, setSelectedWithdrawal] = useState<WithdrawalItem | null>(null);
+  const [withdrawalUpdateStatus, setWithdrawalUpdateStatus] = useState<"approved" | "rejected" | "completed">("approved");
+  const [withdrawalRejectionReason, setWithdrawalRejectionReason] = useState("");
+  const [withdrawalAdminNotes, setWithdrawalAdminNotes] = useState("");
 
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
     initialPageSize: 15,
   });
+  const {
+    page: wPage,
+    size: wSize,
+    handlePageChange: handleWPageChange,
+    handlePageSizeChange: handleWPageSizeChange,
+  } = usePagination({ initialPage: 1, initialPageSize: 15 });
 
   const filters = useMemo(
     () => ({
@@ -99,8 +122,21 @@ export default function AdminPaymentsPage() {
   const { data, isLoading, refetch, error } = useGetPaymentsQuery(filters);
   const [updatePayment, { isLoading: isUpdating }] = useUpdatePaymentMutation();
 
+  const withdrawalFilters = useMemo(
+    () => ({
+      skip: (wPage - 1) * wSize,
+      limit: wSize,
+      ...(withdrawalStatusFilter !== "all" && { status: withdrawalStatusFilter }),
+    }),
+    [wPage, wSize, withdrawalStatusFilter]
+  );
+  const { data: withdrawalsData, isLoading: withdrawalsLoading, error: withdrawalsError, refetch: refetchWithdrawals } = useAdminListWithdrawalsQuery(withdrawalFilters);
+  const [adminUpdateWithdrawal, { isLoading: isUpdatingWithdrawal }] = useAdminUpdateWithdrawalMutation();
+
   const items = data?.items ?? [];
   const rawPagination = data?.pagination;
+  const withdrawalItems = withdrawalsData?.items ?? [];
+  const rawWPagination = withdrawalsData?.pagination;
   const pagination = useMemo(
     () =>
       rawPagination
@@ -113,6 +149,81 @@ export default function AdminPaymentsPage() {
           }
         : undefined,
     [rawPagination]
+  );
+  const withdrawalsPagination = useMemo(
+    () =>
+      rawWPagination
+        ? {
+            total: rawWPagination.total ?? 0,
+            page: rawWPagination.page ?? 0,
+            total_pages: rawWPagination.total_pages ?? 1,
+            has_next: rawWPagination.has_next ?? false,
+            has_previous: rawWPagination.has_previous ?? false,
+          }
+        : undefined,
+    [rawWPagination]
+  );
+
+  const withdrawalColumns: ColumnDef<WithdrawalItem>[] = useMemo(
+    () => [
+      {
+        id: "id",
+        accessorKey: "id",
+        header: t("admin.withdrawals.id", "ID"),
+        cell: ({ row }) => <span className="font-mono text-sm">#{row.id}</span>,
+      },
+      {
+        id: "user",
+        accessorKey: (row) => row.user?.username ?? row.user?.email ?? row.user_id,
+        header: t("admin.withdrawals.user", "User"),
+        cell: ({ row }) =>
+          row.user ? (
+            <Link to={ROUTES.ADMIN.USER_DETAILS(row.user.id)} className="text-primary hover:underline">
+              {row.user.username || row.user.email}
+            </Link>
+          ) : (
+            row.user_id
+          ),
+      },
+      {
+        id: "amount",
+        accessorKey: "amount",
+        header: t("admin.withdrawals.amount", "Amount"),
+        cell: ({ row }) => (
+          <div>
+            <span>{formatAmount(row.amount, row.currency)}</span>
+            {row.net_amount != null && (
+              <span className="text-xs text-muted-foreground block">
+                Net: {formatAmount(row.net_amount, row.currency)}
+              </span>
+            )}
+          </div>
+        ),
+      },
+      {
+        id: "status",
+        accessorKey: "status",
+        header: t("admin.withdrawals.status", "Status"),
+        cell: ({ row }) => (
+          <span className={cn("capitalize", row.status === "completed" && "text-green-600", row.status === "rejected" && "text-destructive")}>
+            {row.status}
+          </span>
+        ),
+      },
+      {
+        id: "payout_method",
+        accessorKey: "payout_method",
+        header: t("admin.withdrawals.payout_method", "Payout method"),
+        cell: ({ row }) => row.payout_method ?? "—",
+      },
+      {
+        id: "requested_at",
+        accessorKey: "requested_at",
+        header: t("admin.withdrawals.requested_at", "Requested"),
+        cell: ({ row }) => formatDate(row.requested_at),
+      },
+    ],
+    [t]
   );
 
   const handleOpenUpdate = (payment: Payment) => {
@@ -162,6 +273,52 @@ export default function AdminPaymentsPage() {
       toast({
         title: t("common.error", "Error"),
         description: String(detail),
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOpenWithdrawalUpdate = (w: WithdrawalItem) => {
+    setSelectedWithdrawal(w);
+    setWithdrawalUpdateStatus(w.status === "pending" ? "approved" : (w.status as "approved" | "rejected" | "completed"));
+    setWithdrawalRejectionReason(w.rejection_reason ?? "");
+    setWithdrawalAdminNotes(w.admin_notes ?? "");
+  };
+  const handleCloseWithdrawalUpdate = () => {
+    setSelectedWithdrawal(null);
+    setWithdrawalRejectionReason("");
+    setWithdrawalAdminNotes("");
+  };
+  const handleSubmitWithdrawalUpdate = async () => {
+    if (!selectedWithdrawal) return;
+    if (withdrawalUpdateStatus === "rejected" && !withdrawalRejectionReason.trim()) {
+      toast({
+        title: t("admin.withdrawals.rejection_required", "Rejection reason required"),
+        description: t("admin.withdrawals.rejection_required_desc", "Please provide a reason when rejecting."),
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      await adminUpdateWithdrawal({
+        withdrawalId: selectedWithdrawal.id,
+        data: {
+          status: withdrawalUpdateStatus,
+          admin_notes: withdrawalAdminNotes.trim() || undefined,
+          rejection_reason: withdrawalUpdateStatus === "rejected" ? withdrawalRejectionReason.trim() : undefined,
+        },
+      }).unwrap();
+      toast({
+        title: t("admin.withdrawals.updated", "Withdrawal updated"),
+        description: t("admin.withdrawals.updated_desc", "Status has been updated successfully."),
+      });
+      handleCloseWithdrawalUpdate();
+      refetchWithdrawals();
+    } catch (err: unknown) {
+      const detail = err && typeof err === "object" && "data" in err && (err as { data?: { detail?: string } }).data?.detail;
+      toast({
+        title: t("common.error", "Error"),
+        description: typeof detail === "string" ? detail : t("common.error"),
         variant: "destructive",
       });
     }
@@ -264,6 +421,19 @@ export default function AdminPaymentsPage() {
         </p>
       </div>
 
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="payments" className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4" />
+            {t("admin.payments.tab_payments", "Payments")}
+          </TabsTrigger>
+          <TabsTrigger value="withdrawals" className="flex items-center gap-2">
+            <Banknote className="h-4 w-4" />
+            {t("admin.payments.tab_withdrawals", "Withdrawals")}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="payments" className="space-y-6 mt-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
@@ -362,6 +532,76 @@ export default function AdminPaymentsPage() {
           />
         </CardContent>
       </Card>
+        </TabsContent>
+
+        <TabsContent value="withdrawals" className="space-y-6 mt-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle>{t("admin.withdrawals.list_title", "All Withdrawals")}</CardTitle>
+                <CardDescription>
+                  {t("admin.withdrawals.list_desc", "Seller withdrawal requests. Approve, reject, or mark as completed.")}
+                </CardDescription>
+              </div>
+              <div className="space-y-2">
+                <Label className="sr-only">{t("admin.withdrawals.filter_status", "Status")}</Label>
+                <Select
+                  value={withdrawalStatusFilter}
+                  onValueChange={(v) => {
+                    setWithdrawalStatusFilter(v);
+                    handleWPageChange(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t("admin.withdrawals.all_statuses", "All statuses")}</SelectItem>
+                    {WITHDRAWAL_STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DataTableWithPagination<WithdrawalItem>
+                data={withdrawalItems}
+                columns={withdrawalColumns}
+                pagination={withdrawalsPagination}
+                isLoading={withdrawalsLoading}
+                emptyMessage={t("admin.withdrawals.no_withdrawals", "No withdrawals found.")}
+                emptyIcon={<Banknote className="w-16 h-16 text-muted-foreground" />}
+                getRowId={(row) => String(row.id)}
+                renderActions={(row) => (
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleOpenWithdrawalUpdate(row)}
+                      title={t("admin.withdrawals.update_status", "Update status")}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                actionsColumnHeader={t("admin.withdrawals.actions", "Actions")}
+                enableSorting={true}
+                pageSize={wSize}
+                onPageChange={handleWPageChange}
+                onPageSizeChange={handleWPageSizeChange}
+                error={withdrawalsError}
+                errorTitle={t("common.error", "Error")}
+                errorDescription={t("admin.withdrawals.error_desc", "Failed to load withdrawals.")}
+                errorIcon={<Banknote className="w-16 h-16 text-muted-foreground" />}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={!!selectedPayment} onOpenChange={(open) => !open && handleCloseUpdate()}>
         <DialogContent className="sm:max-w-md">
@@ -436,6 +676,69 @@ export default function AdminPaymentsPage() {
             </Button>
             <Button onClick={handleSubmitUpdate} disabled={isUpdating}>
               {isUpdating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {t("common.save", "Save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!selectedWithdrawal} onOpenChange={(open) => !open && handleCloseWithdrawalUpdate()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("admin.withdrawals.update_title", "Update Withdrawal")}</DialogTitle>
+            <DialogDescription>
+              {selectedWithdrawal && (
+                <>
+                  #{selectedWithdrawal.id} — {formatAmount(selectedWithdrawal.amount, selectedWithdrawal.currency)} ({selectedWithdrawal.user?.username ?? selectedWithdrawal.user_id})
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>{t("admin.withdrawals.status", "Status")}</Label>
+              <Select
+                value={withdrawalUpdateStatus}
+                onValueChange={(v) => setWithdrawalUpdateStatus(v as "approved" | "rejected" | "completed")}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="approved">{t("admin.withdrawals.status_approved", "Approved")}</SelectItem>
+                  <SelectItem value="rejected">{t("admin.withdrawals.status_rejected", "Rejected")}</SelectItem>
+                  <SelectItem value="completed">{t("admin.withdrawals.status_completed", "Completed")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {withdrawalUpdateStatus === "rejected" && (
+              <div className="space-y-2">
+                <Label htmlFor="withdrawal_rejection_reason">{t("admin.withdrawals.rejection_reason", "Rejection reason")} *</Label>
+                <Input
+                  id="withdrawal_rejection_reason"
+                  value={withdrawalRejectionReason}
+                  onChange={(e) => setWithdrawalRejectionReason(e.target.value)}
+                  placeholder={t("admin.withdrawals.rejection_placeholder", "Reason shown to seller")}
+                />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="withdrawal_admin_notes">{t("admin.withdrawals.admin_notes", "Admin notes")}</Label>
+              <Textarea
+                id="withdrawal_admin_notes"
+                value={withdrawalAdminNotes}
+                onChange={(e) => setWithdrawalAdminNotes(e.target.value)}
+                placeholder={t("admin.withdrawals.admin_notes_placeholder", "Internal notes (optional)")}
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseWithdrawalUpdate} disabled={isUpdatingWithdrawal}>
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button onClick={handleSubmitWithdrawalUpdate} disabled={isUpdatingWithdrawal}>
+              {isUpdatingWithdrawal && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {t("common.save", "Save")}
             </Button>
           </DialogFooter>
