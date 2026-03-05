@@ -274,6 +274,27 @@
     }
   },
   "admin": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "analytics": "Analytics",
+      "user_management": "User Management",
+      "blog_manager": "Blog Manager",
+      "order_management": "Order Management",
+      "listings_management": "Listings Management",
+      "offers": "Offers",
+      "categories": "Categories",
+      "support": "Support",
+      "faq": "FAQ",
+      "blog": "Blog",
+      "faq_manager": "FAQ Manager",
+      "roles_permissions": "Roles & Permissions",
+      "payments": "Payments",
+      "social": "Social",
+      "disputes": "Disputes",
+      "secure_box": "Secure Box",
+      "notifications": "Notifications",
+      "translations": "Translations"
+    },
     "offers": {
       "title": "Offers",
       "description": "View and manage all marketplace offers."

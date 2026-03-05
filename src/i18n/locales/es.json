@@ -475,6 +475,27 @@
     }
   },
   "admin": {
+    "sidebar": {
+      "dashboard": "Panel de control",
+      "analytics": "Analíticas",
+      "user_management": "Gestión de usuarios",
+      "blog_manager": "Gestión del blog",
+      "order_management": "Gestión de pedidos",
+      "listings_management": "Gestión de listados",
+      "offers": "Ofertas",
+      "categories": "Categorías",
+      "support": "Soporte",
+      "faq": "FAQ",
+      "blog": "Blog",
+      "faq_manager": "Gestión de FAQ",
+      "roles_permissions": "Roles y permisos",
+      "payments": "Pagos",
+      "social": "Social",
+      "disputes": "Disputas",
+      "secure_box": "Caja segura",
+      "notifications": "Notificaciones",
+      "translations": "Traducciones"
+    },
     "offers": {
       "title": "Ofertas",
       "description": "Ver y gestionar todas las ofertas del marketplace."
