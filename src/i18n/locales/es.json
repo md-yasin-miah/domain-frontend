@@ -675,6 +675,7 @@
       "approved": "Aprobar",
       "rejected": "Rechazar",
       "approve_title": "Aprobar Caja Segura",
+      "view_secure_box": "Ver Caja Segura",
       "approve_desc": "Esto permitirá al comprador solicitar OTP y acceder al contenido de la caja segura.",
       "reject_title": "Rechazar Caja Segura",
       "reject_desc": "El vendedor deberá actualizar el contenido y volver a enviar para revisión.",
@@ -1806,7 +1807,22 @@
       "already_exists_desc": "Ya existe una caja segura para esta orden. Puedes actualizar el contenido a continuación.",
       "view_title": "Caja Segura",
       "exists_no_edit_desc": "Esta caja segura ya fue enviada y aprobada. No puedes editarla.",
-      "exists_no_edit_message": "La caja segura de esta orden ya no es editable. Ha sido aprobada o ya fue accedida."
+      "exists_no_edit_message": "La caja segura de esta orden ya no es editable. Ha sido aprobada o ya fue accedida.",
+      "view_modal": {
+        "title": "Ver Caja Segura",
+        "not_available": "La caja segura no está disponible para esta orden.",
+        "not_approved": "Esta caja segura aún no está aprobada. No puedes ver el contenido hasta que un administrador la apruebe.",
+        "request_otp": "Solicitar OTP",
+        "request_otp_desc": "Solicita un código de un solo uso a tu correo para ver el contenido de la caja segura.",
+        "otp_sent": "OTP enviado",
+        "enter_otp": "Introduce el código OTP",
+        "otp_placeholder": "Código del correo",
+        "verify": "Verificar",
+        "verified": "Verificado",
+        "content_revealed": "El contenido ya es visible.",
+        "already_accessed": "Ya accedido",
+        "already_accessed_badge": "Ya has accedido a este contenido anteriormente."
+      }
     },
     "empty": {
       "no_orders": "No se encontraron órdenes"

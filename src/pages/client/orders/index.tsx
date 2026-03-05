@@ -26,6 +26,7 @@ import {
   FileText,
   MoreHorizontal,
   Box,
+  Eye,
 } from "lucide-react";
 import { useGetOrdersQuery } from "@/store/api/ordersApi";
 import {
@@ -48,6 +49,7 @@ import { useAuth } from "@/store/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CustomTooltip from "@/components/common/CustomTooltip";
 import { SecureBoxDialog } from "./SecureBoxDialog";
+import { SecureBoxViewModal } from "./SecureBoxViewModal";
 type OrderStatus =
   | "pending"
   | "processing"
@@ -60,6 +62,7 @@ const AllOrdersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
   const [secureBoxOrder, setSecureBoxOrder] = useState<Order | null>(null);
+  const [secureBoxViewOrder, setSecureBoxViewOrder] = useState<Order | null>(null);
 
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
@@ -199,13 +202,29 @@ const AllOrdersPage = () => {
   const renderActions = (order: Order) => (
     <div className="flex items-center gap-1">
       {order.seller_id === user?.id && order.status === "payment_received" && (
-        <CustomTooltip content={t("orders.secure_box.secure_box_tooltip", "Secure Box")}>
+        <CustomTooltip
+          content={t("orders.secure_box.secure_box_tooltip", "Secure Box")}
+        >
           <Button
             size="icon"
             className="h-8 w-8"
             onClick={() => setSecureBoxOrder(order)}
           >
             <Box className="w-4 h-4" />
+          </Button>
+        </CustomTooltip>
+      )}
+      {order.buyer_id === user?.id && ["payment_received", "accessed"].includes(order.status) && (
+        <CustomTooltip
+          content={t("orders.secure_box.view_secure_box", "View Secure Box")}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setSecureBoxViewOrder(order)}
+          >
+            <Eye className="w-4 h-4" />
           </Button>
         </CustomTooltip>
       )}
@@ -336,10 +355,29 @@ const AllOrdersPage = () => {
       </Card>
 
       <SecureBoxDialog
-        order={secureBoxOrder ? { id: secureBoxOrder.id, order_number: secureBoxOrder.order_number } : null}
+        order={
+          secureBoxOrder
+            ? {
+                id: secureBoxOrder.id,
+                order_number: secureBoxOrder.order_number,
+              }
+            : null
+        }
         open={!!secureBoxOrder}
         onOpenChange={(open) => !open && setSecureBoxOrder(null)}
         onSuccess={() => setSecureBoxOrder(null)}
+      />
+      <SecureBoxViewModal
+        order={
+          secureBoxViewOrder
+            ? {
+                id: secureBoxViewOrder.id,
+                order_number: secureBoxViewOrder.order_number,
+              }
+            : null
+        }
+        open={!!secureBoxViewOrder}
+        onOpenChange={(open) => !open && setSecureBoxViewOrder(null)}
       />
     </div>
   );

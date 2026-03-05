@@ -73,6 +73,7 @@ export interface SecureBoxByOrderResponse {
   secure_box: SecureBoxItem | null;
   secure_box_available: boolean;
   can_view_content?: boolean;
+  already_accessed?: boolean;
   message?: string;
 }
 
@@ -119,8 +120,9 @@ export interface OrderPaymentStatusUpdateResponse {
 export interface SecureBoxRequestOtpResponse {
   order_id: number;
   message: string;
-  expires_in_minutes: number;
-  expires_at: string;
+  expires_in_minutes?: number;
+  expires_at?: string;
+  already_accessed?: boolean;
 }
 
 /** POST /secure-box/orders/{order_id}/verify-otp - body */

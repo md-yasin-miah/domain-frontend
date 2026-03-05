@@ -502,6 +502,7 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "approve_title": "Approve Secure Box",
+      "view_secure_box": "View Secure Box",
       "approve_desc": "This will allow the buyer to request OTP and access the secure box content.",
       "reject_title": "Reject Secure Box",
       "reject_desc": "The seller will need to update the content and resubmit for review.",
@@ -1912,7 +1913,22 @@
       "already_exists_desc": "A secure box already exists for this order. You can update the content below.",
       "view_title": "Secure Box",
       "exists_no_edit_desc": "This secure box has already been submitted and approved. You cannot edit it.",
-      "exists_no_edit_message": "The secure box for this order is no longer editable. It has been approved or already accessed."
+      "exists_no_edit_message": "The secure box for this order is no longer editable. It has been approved or already accessed.",
+      "view_modal": {
+        "title": "View Secure Box",
+        "not_available": "Secure box is not available for this order.",
+        "not_approved": "This secure box is not approved yet. You cannot view content until an admin approves it.",
+        "request_otp": "Request OTP",
+        "request_otp_desc": "Request a one-time code to your email to view the secure box content.",
+        "otp_sent": "OTP sent",
+        "enter_otp": "Enter OTP code",
+        "otp_placeholder": "Enter code from email",
+        "verify": "Verify",
+        "verified": "Verified",
+        "content_revealed": "Content is now visible.",
+        "already_accessed": "Already accessed",
+        "already_accessed_badge": "You have previously accessed this content."
+      }
     },
     "empty": {
       "no_orders": "No orders found"
