@@ -35,15 +35,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
+import { type ColumnDef } from "@/components/ui/data-table";
+import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import { Languages, Loader2, Plus, Pencil, Trash2, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -82,11 +76,11 @@ export default function AdminTranslationsPage() {
   const [languageForm, setLanguageForm] = useState({ code: "", name: "", native_name: "", flag: "", is_default: false });
 
   const { data: languagesData, refetch: refetchLanguages } = useGetLanguagesQuery();
-  const languages = languagesData?.languages ?? [];
+  const languages = useMemo(() => languagesData?.languages ?? [], [languagesData]);
   const { data: listData, isLoading, refetch } = useListTranslationsQuery({
     locale: localeFilter === "all" ? undefined : localeFilter,
     skip: 0,
-    limit: 500,
+    limit: 20,
   });
   const items = useMemo(() => listData ?? [], [listData]);
 
@@ -103,6 +97,77 @@ export default function AdminTranslationsPage() {
     const lower = keySearch.trim().toLowerCase();
     return items.filter((r) => r.key.toLowerCase().includes(lower));
   }, [items, keySearch]);
+
+  const languageColumns: ColumnDef<LanguageItem>[] = useMemo(
+    () => [
+      {
+        id: "code",
+        accessorKey: "code",
+        header: t("admin.translations.locale", "Locale"),
+        cell: ({ row }) => <span className="font-mono text-sm">{row.code}</span>,
+      },
+      {
+        id: "name",
+        accessorKey: "name",
+        header: t("admin.translations.language_name", "Name"),
+      },
+      {
+        id: "native_name",
+        accessorKey: "native_name",
+        header: t("admin.translations.language_native", "Native name"),
+      },
+      {
+        id: "flag",
+        accessorKey: "flag",
+        header: t("admin.translations.flag", "Flag"),
+        cell: ({ row }) => <span className="text-xl">{row.flag ?? "—"}</span>,
+      },
+      {
+        id: "is_default",
+        accessorKey: "is_default",
+        header: t("admin.translations.default", "Default"),
+        cell: ({ row }) =>
+          row.is_default ? (
+            <span className="text-xs font-medium text-primary">{t("admin.translations.yes", "Yes")}</span>
+          ) : (
+            <span className="text-muted-foreground text-xs">—</span>
+          ),
+      },
+    ],
+    [t]
+  );
+
+  const translationColumns: ColumnDef<TranslationItem>[] = useMemo(
+    () => [
+      {
+        id: "key",
+        accessorKey: "key",
+        header: t("admin.translations.key", "Key"),
+        cell: ({ row }) => <span className="font-mono text-sm">{row.key}</span>,
+      },
+      {
+        id: "locale",
+        accessorKey: "locale",
+        header: t("admin.translations.locale", "Locale"),
+        cell: ({ row }) => (
+          <span className="inline-flex items-center gap-1">
+            {languages.find((l) => l.code === row.locale)?.flag ?? ""} {row.locale}
+          </span>
+        ),
+      },
+      {
+        id: "value",
+        accessorKey: "value",
+        header: t("admin.translations.value", "Value"),
+        cell: ({ row }) => (
+          <span className="max-w-[300px] truncate block text-muted-foreground" title={row.value}>
+            {row.value}
+          </span>
+        ),
+      },
+    ],
+    [t, languages]
+  );
 
   const handleAdd = async () => {
     if (!addKey.trim() || !addValue.trim()) {
@@ -326,58 +391,34 @@ export default function AdminTranslationsPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          {languages.length === 0 ? (
-            <p className="text-muted-foreground py-6 text-center text-sm">
-              {t("admin.translations.languages_empty", "No languages loaded.")}
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px]">{t("admin.translations.locale", "Locale")}</TableHead>
-                  <TableHead>{t("admin.translations.language_name", "Name")}</TableHead>
-                  <TableHead>{t("admin.translations.language_native", "Native name")}</TableHead>
-                  <TableHead className="w-[70px]">{t("admin.translations.flag", "Flag")}</TableHead>
-                  <TableHead className="w-[90px]">{t("admin.translations.default", "Default")}</TableHead>
-                  <TableHead className="w-[120px]">{t("common.actions", "Actions")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {languages.map((lang) => (
-                  <TableRow key={lang.code}>
-                    <TableCell className="font-mono text-sm">{lang.code}</TableCell>
-                    <TableCell>{lang.name}</TableCell>
-                    <TableCell>{lang.native_name}</TableCell>
-                    <TableCell className="text-xl">{lang.flag ?? "—"}</TableCell>
-                    <TableCell>
-                      {lang.is_default ? (
-                        <span className="text-xs font-medium text-primary">{t("admin.translations.yes", "Yes")}</span>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleLanguageEditOpen(lang)} title={t("common.edit", "Edit")}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive"
-                          onClick={() => setLanguageDeleteItem(lang)}
-                          title={t("common.delete", "Delete")}
-                          disabled={lang.is_default}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <DataTableWithPagination<LanguageItem>
+            data={languages}
+            columns={languageColumns}
+            getRowId={(row) => row.code}
+            isLoading={false}
+            emptyMessage={t("admin.translations.languages_empty", "No languages loaded.")}
+            renderActions={(row) => (
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleLanguageEditOpen(row)} title={t("common.edit", "Edit")}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive"
+                  onClick={() => setLanguageDeleteItem(row)}
+                  title={t("common.delete", "Delete")}
+                  disabled={row.is_default}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            actionsColumnHeader={t("common.actions", "Actions")}
+            pageSize={languages.length || 10}
+            onPageChange={() => {}}
+            onPageSizeChange={() => {}}
+          />
         </CardContent>
       </Card>
 
@@ -416,55 +457,30 @@ export default function AdminTranslationsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12 text-muted-foreground">
-              <Loader2 className="h-8 w-8 animate-spin mr-2" />
-              {t("common.loading", "Loading...")}
-            </div>
-          ) : filteredItems.length === 0 ? (
-            <p className="text-muted-foreground py-8 text-center">
-              {t("admin.translations.empty", "No translations found.")}
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("admin.translations.key", "Key")}</TableHead>
-                  <TableHead>{t("admin.translations.locale", "Locale")}</TableHead>
-                  <TableHead>{t("admin.translations.value", "Value")}</TableHead>
-                  <TableHead className="w-[180px]">{t("common.actions", "Actions")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredItems.map((row) => (
-                  <TableRow key={`${row.key}-${row.locale}`}>
-                    <TableCell className="font-mono text-sm">{row.key}</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center gap-1">
-                        {languages.find((l) => l.code === row.locale)?.flag ?? ""} {row.locale}
-                      </span>
-                    </TableCell>
-                    <TableCell className="max-w-[300px] truncate text-muted-foreground" title={row.value}>
-                      {row.value}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditOpen(row)} title={t("common.edit", "Edit")}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleBulkOpen(row.key)} title={t("admin.translations.bulk_edit", "Edit all locales")}>
-                          <Globe className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteItem(row)} title={t("common.delete", "Delete")}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <DataTableWithPagination<TranslationItem>
+            data={filteredItems}
+            columns={translationColumns}
+            getRowId={(row) => `${row.key}-${row.locale}`}
+            isLoading={isLoading}
+            emptyMessage={t("admin.translations.empty", "No translations found.")}
+            renderActions={(row) => (
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditOpen(row)} title={t("common.edit", "Edit")}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleBulkOpen(row.key)} title={t("admin.translations.bulk_edit", "Edit all locales")}>
+                  <Globe className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteItem(row)} title={t("common.delete", "Delete")}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            actionsColumnHeader={t("common.actions", "Actions")}
+            pageSize={20}
+            onPageChange={() => {}}
+            onPageSizeChange={() => {}}
+          />
         </CardContent>
       </Card>
 
