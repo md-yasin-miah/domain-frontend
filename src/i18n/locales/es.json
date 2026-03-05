@@ -297,6 +297,16 @@
   "client_dashboard": {
     "title": "Panel del Cliente",
     "subtitle": "Gestiona tus dominios, facturas y tickets de soporte",
+    "balance": {
+      "title": "Saldo",
+      "total": "Saldo total (cartera + ganancias)",
+      "wallet": "Cartera",
+      "earnings_available": "Ganancias disponibles",
+      "total_earned": "Total ganado",
+      "total_withdrawn": "Retirado",
+      "pending": "Pendiente",
+      "unavailable": "Saldo no disponible"
+    },
     "cards": {
       "total_domains": "Total de Dominios",
       "active_domains": "Dominios activos",
@@ -334,6 +344,43 @@
       "create_ticket": "Crear Ticket",
       "view_all_invoices": "Ver Todas las Facturas",
       "manage_domains": "Gestionar Dominios"
+    }
+  },
+  "wallet": {
+    "title": "Cartera",
+    "subtitle": "Gestiona tu saldo y transacciones",
+    "balance": {
+      "title": "Saldo",
+      "updated": "Última actualización",
+      "unavailable": "Saldo no disponible"
+    },
+    "transactions": {
+      "title": "Transacciones Recientes",
+      "description": "Historial de transacciones de tu cartera",
+      "empty": "Aún no hay transacciones",
+      "copy_reference_id": "Copiar ID de referencia"
+    },
+    "add_fund": {
+      "title": "Agregar Fondos",
+      "description": "Agregar fondos a tu cartera. Mínimo 1, máximo 50,000.",
+      "amount": "Monto",
+      "amount_label": "Monto",
+      "amount_placeholder": "Ingrese monto (1 - 50,000)",
+      "currency_label": "Moneda",
+      "currency_placeholder": "Seleccionar moneda",
+      "card_details": "Datos de la Tarjeta",
+      "card_info": "Tu información de tarjeta está segura y encriptada",
+      "continue": "Continuar al Pago",
+      "complete_payment": "Completar Pago",
+      "complete_payment_desc": "Ingresa los datos de tu tarjeta para completar la recarga",
+      "proceeding": "Procesando...",
+      "processing": "Procesando...",
+      "pay_now": "Pagar Ahora",
+      "success": "Fondos Agregados",
+      "success_desc": "Tu cartera ha sido acreditada. El saldo se actualizará en breve.",
+      "error": "Pago Fallido",
+      "error_desc": "No se pudieron agregar fondos. Por favor intenta de nuevo.",
+      "stripe_not_configured": "El pago no está configurado. Por favor contacta soporte."
     }
   },
   "marketplace": {

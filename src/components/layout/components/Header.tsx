@@ -79,7 +79,15 @@ export function Header({ menuItems, userServices, showDashboard = true, leftSlot
           {/* Logo Section - Enhanced */}
           <div className="flex items-center shrink-0 gap-4">
             {leftSlot}
-            <span className='text-base font-medium text-primary uppercase'>Admin Panel</span>
+            {
+              user?.roles?.includes('admin') ?
+                <span className='text-base font-medium text-primary uppercase'>Admin Panel</span>
+              :
+              //logo
+              <Link to="/" className="flex items-center space-x-2">
+                <img src="/uploads/logo-full.png" alt="Logo" className="h-10 w-auto object-contain object-left" />
+              </Link>
+            }
           </div>
 
           {/* Desktop Navigation - Completely Redesigned */}

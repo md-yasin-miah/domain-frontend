@@ -1384,6 +1384,16 @@
   "client_dashboard": {
     "title": "Client Dashboard",
     "subtitle": "Manage your domains, invoices, and support tickets",
+    "balance": {
+      "title": "Balance",
+      "total": "Total balance (wallet + earnings)",
+      "wallet": "Wallet",
+      "earnings_available": "Earnings available",
+      "total_earned": "Total earned",
+      "total_withdrawn": "Withdrawn",
+      "pending": "Pending",
+      "unavailable": "Balance unavailable"
+    },
     "cards": {
       "total_domains": "Total Domains",
       "active_domains": "Active domains",
@@ -1421,6 +1431,43 @@
       "create_ticket": "Create Ticket",
       "view_all_invoices": "View All Invoices",
       "manage_domains": "Manage Domains"
+    }
+  },
+  "wallet": {
+    "title": "Wallet",
+    "subtitle": "Manage your wallet balance and transactions",
+    "balance": {
+      "title": "Balance",
+      "updated": "Last updated",
+      "unavailable": "Balance unavailable"
+    },
+    "transactions": {
+      "title": "Recent Transactions",
+      "description": "Your wallet transaction history",
+      "empty": "No transactions yet",
+      "copy_reference_id": "Copy reference ID"
+    },
+    "add_fund": {
+      "title": "Add Funds",
+      "description": "Add funds to your wallet. Minimum 1, maximum 50,000.",
+      "amount": "Amount",
+      "amount_label": "Amount",
+      "amount_placeholder": "Enter amount (1 - 50,000)",
+      "currency_label": "Currency",
+      "currency_placeholder": "Select currency",
+      "card_details": "Card Details",
+      "card_info": "Your card information is secure and encrypted",
+      "continue": "Continue to Payment",
+      "complete_payment": "Complete Payment",
+      "complete_payment_desc": "Enter your card details to complete the top-up",
+      "proceeding": "Proceeding...",
+      "processing": "Processing...",
+      "pay_now": "Pay Now",
+      "success": "Funds Added",
+      "success_desc": "Your wallet has been credited. Balance will update shortly.",
+      "error": "Payment Failed",
+      "error_desc": "Failed to add funds. Please try again.",
+      "stripe_not_configured": "Payment is not configured. Please contact support."
     }
   },
   "common": {

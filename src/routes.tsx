@@ -130,6 +130,7 @@ const ClientProductsDetailsPage = lazy(
 );
 const ClientAuctionsPage = lazy(() => import("./pages/client/auctions"));
 const ClientSavedSearchPage = lazy(() => import("./pages/client/savedSearch"));
+const ClientWalletPage = lazy(() => import("./pages/client/ClientWalletPage"));
 const MyListing = lazy(() => import("./pages/client/marketplace/myListing"));
 const MyListingDetails = lazy(
   () => import("./pages/client/marketplace/myListing/Details"),
@@ -771,6 +772,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <FAQ />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: getLastPath(ROUTES.CLIENT.WALLET()),
+        element: (
+          <LazyComponent>
+            <ClientWalletPage />
           </LazyComponent>
         ),
       },

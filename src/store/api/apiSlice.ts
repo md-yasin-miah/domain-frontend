@@ -48,6 +48,7 @@ export const apiSlice = createApi({
   },
   tagTypes: [
     'Auth',
+    'Balance',
     'User',
     'Domain',
     'MarketplaceListing',
@@ -61,6 +62,7 @@ export const apiSlice = createApi({
     'EndpointPermission',
     'Invoice',
     'Payment',
+    'Wallet',
     'Ticket',
     'Messaging',
     'Category',

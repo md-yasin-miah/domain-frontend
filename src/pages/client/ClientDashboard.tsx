@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -18,6 +18,7 @@ import {
   AlertCircle,
   HelpCircle,
   ArrowRight,
+  Wallet,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -25,9 +26,27 @@ import { useAuth } from "@/store/hooks/useAuth";
 import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
 import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
 import { useGetTicketsQuery } from "@/store/api/supportApi";
-import { getStatusBadgeVariant, getStatusColor, getStatusLabel } from "@/lib/helperFun";
+import { useGetBalanceQuery } from "@/store/api/balanceApi";
+import { getStatusColor, getStatusLabel } from "@/lib/helperFun";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const CURRENCIES = ["USD", "EUR", "GBP", "CAD"] as const;
+
+function formatBalance(amount: number | string, currency: string): string {
+  const n = typeof amount === "string" ? parseFloat(amount) : amount;
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency,
+  }).format(isNaN(n) ? 0 : n);
+}
 
 interface ClientDomain {
   id: string;
@@ -72,10 +91,12 @@ export default function ClientDashboard() {
   const { data: tickets, isLoading: ticketsLoading } = useGetTicketsQuery({
     skip: 0,
   });
-  console.log({ domains });
+
+  const [balanceCurrency, setBalanceCurrency] = useState<string>("USD");
+  const { data: balance, isLoading: balanceLoading } =
+    useGetBalanceQuery(balanceCurrency);
 
   const loading = domainsLoading || invoicesLoading || ticketsLoading;
-
 
   const totalDuePayment = (invoices?.items || [])
     .filter((inv: Invoice) => inv.status === "issued")
@@ -109,6 +130,83 @@ export default function ClientDashboard() {
           {t("client_dashboard.subtitle")}
         </p>
       </div>
+      {/* balance card */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-4 md:gap-10">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+              <Wallet className="h-4 w-4 text-muted-foreground" />
+              {t("client_dashboard.balance.title", "Balance")}
+            </CardTitle>
+            <Select value={balanceCurrency} onValueChange={setBalanceCurrency}>
+              <SelectTrigger className="w-[100px] h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex gap-2">
+            <Link to={ROUTES.CLIENT.WALLET("add-fund")}>
+              <Button variant="default" size="sm">
+                Topup Balance
+              </Button>
+            </Link>
+            <Link to={ROUTES.CLIENT.WALLET()}>
+              <Button variant="outline" size="sm">
+                Wallet
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {balanceLoading ? (
+            <div className="text-muted-foreground text-sm">
+              {t("common.loading", "Loading...")}
+            </div>
+          ) : balance ? (
+            <div className="space-y-3">
+              <div className="text-2xl font-bold">
+                {formatBalance(balance.total_balance, balance.currency)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("client_dashboard.balance.total", "Total balance (wallet + earnings)")}
+              </p>
+              <div className="flex flex-wrap gap-4 pt-2 text-xs text-muted-foreground">
+                <span>
+                  {t("client_dashboard.balance.wallet", "Wallet")}:{" "}
+                  {formatBalance(balance.wallet_balance, balance.currency)}
+                </span>
+                <span>
+                  {t("client_dashboard.balance.earnings_available", "Earnings available")}:{" "}
+                  {formatBalance(balance.earnings_available, balance.currency)}
+                </span>
+                <span>
+                  {t("client_dashboard.balance.total_earned", "Total earned")}:{" "}
+                  {formatBalance(balance.total_earned, balance.currency)}
+                </span>
+                <span>
+                  {t("client_dashboard.balance.total_withdrawn", "Withdrawn")}:{" "}
+                  {formatBalance(balance.total_withdrawn, balance.currency)}
+                </span>
+                <span>
+                  {t("client_dashboard.balance.pending", "Pending")}:{" "}
+                  {formatBalance(balance.pending_balance, balance.currency)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              {t("client_dashboard.balance.unavailable", "Balance unavailable")}
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Overview Cards */}
       <div className="grid gap-6 md:grid-cols-4">
@@ -209,16 +307,19 @@ export default function ClientDashboard() {
                           <p className="text-xs text-muted-foreground">
                             {domain.expires_at
                               ? `${t(
-                                "client_dashboard.recent_domains.expires"
-                              )}: ${new Date(
-                                domain.expires_at
-                              ).toLocaleDateString()}`
+                                  "client_dashboard.recent_domains.expires",
+                                )}: ${new Date(
+                                  domain.expires_at,
+                                ).toLocaleDateString()}`
                               : t("client_dashboard.recent_domains.no_expiry")}
                           </p>
                         </div>
                         <Badge
                           variant="outline"
-                          className={cn("capitalize", getStatusColor(domain.status))}
+                          className={cn(
+                            "capitalize",
+                            getStatusColor(domain.status),
+                          )}
                         >
                           {getStatusLabel(domain.status, t)}
                         </Badge>
@@ -265,7 +366,10 @@ export default function ClientDashboard() {
                           </div>
                           <Badge
                             variant="outline"
-                            className={cn("capitalize", getStatusColor(ticket.status))}
+                            className={cn(
+                              "capitalize",
+                              getStatusColor(ticket.status),
+                            )}
                           >
                             {getStatusLabel(ticket.status, t)}
                           </Badge>
@@ -316,7 +420,10 @@ export default function ClientDashboard() {
                         </p>
                         <Badge
                           variant="outline"
-                          className={cn("capitalize", getStatusColor(invoice.status))}
+                          className={cn(
+                            "capitalize",
+                            getStatusColor(invoice.status),
+                          )}
                         >
                           {getStatusLabel(invoice.status, t)}
                         </Badge>

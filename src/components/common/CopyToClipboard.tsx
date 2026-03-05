@@ -13,6 +13,7 @@ interface CopyToClipboardProps {
   showIcon?: boolean;
   variant?: 'default' | 'ghost' | 'outline' | 'link';
   size?: 'sm' | 'default' | 'lg' | 'icon';
+  tooltipContent?: string;
 }
 
 export const CopyToClipboard = ({
@@ -22,6 +23,7 @@ export const CopyToClipboard = ({
   showIcon = true,
   variant = 'ghost',
   size = 'icon',
+  tooltipContent,
 }: CopyToClipboardProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -51,7 +53,7 @@ export const CopyToClipboard = ({
       <div className="flex-1">{children}</div>
       {showIcon && (
         <CustomTooltip
-          content={copied ? (t('common.copied') || 'Copied!') : (t('common.copy') || 'Copy to clipboard')}
+          content={tooltipContent || (copied ? (t('common.copied') || 'Copied!') : (t('common.copy') || 'Copy to clipboard'))}
         >
           <Button
             variant={variant}
