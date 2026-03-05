@@ -18,6 +18,7 @@ import {
   DollarSign,
   LockIcon,
   CreditCard,
+  Languages,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -108,6 +109,11 @@ const adminMenuItems: MenuItem[] = [
     icon: MessageSquare,
     url: ROUTES.ADMIN.SUPPORT,
   },
+  {
+    title: "Translations",
+    icon: Languages,
+    url: ROUTES.ADMIN.TRANSLATIONS,
+  }
 ];
 
 export function AdminSidebar() {

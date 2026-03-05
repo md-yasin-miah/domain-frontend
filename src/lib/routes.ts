@@ -98,5 +98,6 @@ export const ROUTES = {
     PROFILE: "/admin/profile",
     SECURE_BOX: "/admin/secure-box",
     SETTINGS: "/admin/settings",
+    TRANSLATIONS: "/admin/translations",
   },
 };
