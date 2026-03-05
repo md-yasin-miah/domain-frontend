@@ -195,7 +195,7 @@ export function Header({ menuItems, userServices, showDashboard = true, leftSlot
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex items-center space-x-2 px-3 py-2 border transition-all ${isUserMenuActive()
+                    className={`flex items-center space-x-2 px-3 py-2 border transition-all bg-gray-100 ${isUserMenuActive()
                       ? 'bg-primary/10 text-primary border-primary/20'
                       : 'hover:bg-muted/60 border-transparent'
                       }`}

@@ -28,6 +28,7 @@ import { useAuth } from "@/store/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useSearchParams } from "react-router-dom";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -270,13 +271,16 @@ export default function Login() {
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {t("auth.login_page.back_to_home")}
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {t("auth.login_page.back_to_home")}
+            </Link>
+            <LanguageSwitcher />
+          </div>
           <h1 className="text-3xl font-bold">Adominioz</h1>
           <p className="text-muted-foreground">
             {t("Login and Register to access your personal dashboard")}
@@ -494,25 +498,25 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-          <div className="space-y-2 bg-primary/5 p-10 rounded-md">
-            <h5 className="text-center text-md font-semibold">
-              Login as different user
-            </h5>
-            {mockUser.map((user) => (
-              <Button
-                key={user.value}
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  loginForm.setValue("email", user.value);
-                  loginForm.setValue("password", user.password);
-                }}
-              >
-                {user.label}
-              </Button>
-            ))}
-          </div>
+        <div className="space-y-2 bg-primary/5 p-10 rounded-md">
+          <h5 className="text-center text-md font-semibold">
+            Login as different user
+          </h5>
+          {mockUser.map((user) => (
+            <Button
+              key={user.value}
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                loginForm.setValue("email", user.value);
+                loginForm.setValue("password", user.password);
+              }}
+            >
+              {user.label}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
