@@ -81,7 +81,7 @@ export function Header({ menuItems, userServices, showDashboard = true, leftSlot
             {leftSlot}
             {
               user?.roles?.includes('admin') ?
-                <span className='text-base font-medium text-primary uppercase'>Admin Panel</span>
+                <span className='text-base font-medium text-primary uppercase'>{t('admin.admin_panel_title', 'Admin Panel')}</span>
               :
               //logo
               <Link to="/" className="flex items-center space-x-2">

@@ -471,9 +471,12 @@ export default function AdminTranslationsPage() {
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleBulkOpen(row.key)} title={t("admin.translations.bulk_edit", "Edit all locales")}>
                   <Globe className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteItem(row)} title={t("common.delete", "Delete")}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {/* only for developers */}
+                {process.env.NODE_ENV === "development" && (
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteItem(row)} title={t("common.delete", "Delete")}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             )}
             actionsColumnHeader={t("common.actions", "Actions")}
