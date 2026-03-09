@@ -10,11 +10,9 @@ import { useAuth } from "@/store/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useGetBlogPostsQuery } from "@/store/api/blogApi";
 import { useGetBlogCategoriesQuery } from "@/store/api/categoryApi";
-import type { BlogPost as ApiBlogPost } from "@/store/api/types";
-import type { Category } from "@/store/api/categoryApi";
 import { Loader2 } from "lucide-react";
 
-interface BlogPost {
+interface NewBlogPost {
   id: string;
   title: string;
   slug: string;
@@ -66,7 +64,7 @@ const Blog = () => {
     ? postsData
     : (postsData?.items || []);
 
-  const posts: BlogPost[] = postsArray.map((post: ApiBlogPost) => ({
+  const posts: NewBlogPost[] = postsArray.map((post: BlogPost) => ({
     id: String(post.id),
     title: post.title,
     slug: post.slug,
@@ -158,10 +156,10 @@ const Blog = () => {
                 className="pl-10 h-12"
               />
             </div>
-            <Button variant="outline" size="lg" className="border-primary/20 hover:bg-primary/5">
+            {/* <Button variant="outline" size="lg" className="border-primary/20 hover:bg-primary/5">
               <Filter className="w-4 h-4 mr-2" />
               {t('common.filter')}
-            </Button>
+            </Button> */}
           </div>
         </div>
       </section>

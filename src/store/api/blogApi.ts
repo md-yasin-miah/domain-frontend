@@ -1,10 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type {
-  BlogPost,
-  BlogPostCreateRequest,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export interface BlogComment {
   id: number;
@@ -22,6 +16,14 @@ export interface BlogComment {
 
 export const blogApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getPublicBlogPosts: builder.query<PaginatedResponse<BlogPost> | BlogPost[], PaginationParams>({
+      query: (params) => ({
+        url: "/blog/posts/public",
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['PublicBlog'],
+    }),
     getBlogPosts: builder.query<PaginatedResponse<BlogPost> | BlogPost[], PaginationParams>({
       query: (params) => ({
         url: '/blog/posts',
