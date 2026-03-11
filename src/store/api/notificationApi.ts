@@ -1,5 +1,4 @@
-import { apiSlice } from './apiSlice';
-import type { PaginatedResponse } from './types';
+import { apiSlice } from "./apiSlice";
 
 export interface Notification {
   id: number;
@@ -29,13 +28,20 @@ export interface NotificationFilters {
 
 export const notificationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getStreamNotifications: builder.query<Notification[], void>({
+      query: () => ({
+        url: "/notifications/stream",
+        method: "GET",
+      }),
+      providesTags: ["User", "Notification"],
+    }),
     getNotifications: builder.query<
       PaginatedResponse<Notification>,
       NotificationFilters
     >({
       query: (params) => ({
-        url: '/notifications',
-        method: 'GET',
+        url: "/notifications",
+        method: "GET",
         params: {
           skip: params.skip,
           limit: params.limit,
@@ -45,57 +51,63 @@ export const notificationApi = apiSlice.injectEndpoints({
           }),
         },
       }),
-      providesTags: ['User'],
+      providesTags: ["User", "Notification"],
     }),
     getNotification: builder.query<Notification, number>({
       query: (id) => ({
         url: `/notifications/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'User', id }],
+      providesTags: (result, error, id) => [{ type: "User", id }],
     }),
     getUnreadCount: builder.query<NotificationUnreadCount, void>({
       query: () => ({
-        url: '/notifications/unread/count',
-        method: 'GET',
+        url: "/notifications/unread/count",
+        method: "GET",
       }),
-      providesTags: ['User'],
+      providesTags: ["User", "Notification"],
     }),
     markAsRead: builder.mutation<Notification, number>({
       query: (id) => ({
         url: `/notifications/${id}/read`,
-        method: 'POST',
+        method: "POST",
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'User', id }, 'User'],
+      invalidatesTags: (result, error, id) => [{ type: "User", id }, "User"],
     }),
     markAllAsRead: builder.mutation<{ updated_count: number }, void>({
       query: () => ({
-        url: '/notifications/read-all',
-        method: 'POST',
+        url: "/notifications/read-all",
+        method: "POST",
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User", "Notification"],
     }),
     deleteNotification: builder.mutation<void, number>({
       query: (id) => ({
         url: `/notifications/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User", "Notification"],
     }),
-    deleteAllNotifications: builder.mutation<void, { is_read?: boolean } | void>({
+    deleteAllNotifications: builder.mutation<
+      void,
+      { is_read?: boolean } | void
+    >({
       query: (params) => ({
-        url: '/notifications',
-        method: 'DELETE',
-        ...(params && typeof params === 'object' && params.is_read !== undefined && {
-          params: { is_read: params.is_read },
-        }),
+        url: "/notifications",
+        method: "DELETE",
+        ...(params &&
+          typeof params === "object" &&
+          params.is_read !== undefined && {
+            params: { is_read: params.is_read },
+          }),
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User", "Notification"],
     }),
   }),
 });
 
 export const {
+  useGetStreamNotificationsQuery,
   useGetNotificationsQuery,
   useGetNotificationQuery,
   useGetUnreadCountQuery,
@@ -104,4 +116,3 @@ export const {
   useDeleteNotificationMutation,
   useDeleteAllNotificationsMutation,
 } = notificationApi;
-

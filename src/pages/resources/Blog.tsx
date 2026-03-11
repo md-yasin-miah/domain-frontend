@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, Link } from "react-router-dom";
-import { Search, Calendar, User, ArrowRight, Tag, TrendingUp, Eye, BookOpen, Filter, MessageCircle, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, Calendar, User, ArrowRight, Tag, TrendingUp, Eye, BookOpen, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

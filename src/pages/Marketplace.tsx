@@ -159,7 +159,7 @@ const Marketplace = () => {
       : listingsTab === "newest"
         ? newestListings
         : trendingListings;
-
+console.log({listingsByTab})
   const howItWorks = [
     {
       step: 1,

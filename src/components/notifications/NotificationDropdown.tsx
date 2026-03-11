@@ -14,6 +14,7 @@ import {
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
   type Notification,
+  useGetStreamNotificationsQuery,
 } from "@/store/api/notificationApi";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +48,11 @@ export function NotificationDropdown() {
       { skip: 0, limit: NOTIFICATION_LIST_LIMIT },
       { skip: !user }
     );
+  const { data: streamNotificationsData, isLoading: isLoadingStream } =
+    useGetStreamNotificationsQuery(undefined, {
+      skip: !user,
+    });
+    console.log({streamNotificationsData})
 
   const unreadCount = unreadData?.unread_count ?? 0;
   const list: Notification[] = notificationsData?.items ?? [];
