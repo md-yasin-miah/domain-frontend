@@ -112,8 +112,8 @@ export const i18nApi = apiSlice.injectEndpoints({
     }),
 
     listTranslations: builder.query<
-      TranslationItem[],
-      { locale?: string; skip?: number; limit?: number }
+      PaginatedResponse<TranslationItem>,
+      { locale?: string; skip?: number; limit?: number; search?: string }
     >({
       query: (params) => ({
         url: "/i18n/strings",
@@ -122,12 +122,13 @@ export const i18nApi = apiSlice.injectEndpoints({
           skip: params.skip ?? 0,
           limit: params.limit ?? 200,
           ...(params.locale && { locale: params.locale }),
+          ...(params.search && { search: params.search }),
         },
       }),
       providesTags: (result) =>
         result
           ? [
-              ...result.map((r) => ({ type: "Translation" as const, id: r.id })),
+              ...result.items.map((r) => ({ type: "Translation" as const, id: r.id })),
               { type: "Translation", id: "LIST" },
             ]
           : [{ type: "Translation", id: "LIST" }],

@@ -25,7 +25,7 @@ export const escrowApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Invoice'],
     }),
-    getEscrowByOrder: builder.query<Escrow, number>({
+    getEscrowByOrder: builder.query<EscrowWithOrderResponse, number>({
       query: (orderId) => ({
         url: `/escrow/order/${orderId}`,
         method: 'GET',

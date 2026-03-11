@@ -65,6 +65,7 @@ export default function AdminSecureBoxPage() {
   const [selectedBox, setSelectedBox] = useState<SecureBoxItem | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [viewedContent, setViewedContent] = useState<string | null>(null);
 
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
@@ -206,7 +207,11 @@ export default function AdminSecureBoxPage() {
         accessorKey: "content",
         header: t("admin.secure_box.content", "Content"),
         cell: ({ row }) => (
-          <span className="max-w-[200px] truncate block" title={row.content ?? undefined}>
+          <span 
+            className="max-w-[200px] truncate block cursor-pointer hover:text-primary transition-colors" 
+            title={t("admin.secure_box.click_to_view", "Click to view full content")}
+            onClick={() => setViewedContent(row.content)}
+          >
             {truncateContent(row.content)}
           </span>
         ),
@@ -373,6 +378,24 @@ export default function AdminSecureBoxPage() {
               {actionType === "approved"
                 ? t("admin.secure_box.approved", "Approved")
                 : t("admin.secure_box.rejected", "Rejected")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={viewedContent !== null} onOpenChange={(open) => !open && setViewedContent(null)}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t("admin.secure_box.content_details", "Secure Box Content Details")}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-muted p-4 rounded-lg overflow-auto max-h-[60vh]">
+              <pre className="text-sm whitespace-pre-wrap font-mono">{viewedContent}</pre>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setViewedContent(null)}>
+              {t("common.close", "Close")}
             </Button>
           </DialogFooter>
         </DialogContent>

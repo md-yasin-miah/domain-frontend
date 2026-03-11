@@ -9,6 +9,8 @@ export const ticketCreateSchema = z.object({
   description: z.string().min(1, 'Description is required').min(10, 'Description must be at least 10 characters'),
   category_id: z.string().min(1, 'Category is required'),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  assigned_to_id: z.string().optional(),
+  user_id: z.string().optional(),
 })
 
 export type TicketCreateFormData = z.infer<typeof ticketCreateSchema>;

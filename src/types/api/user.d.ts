@@ -5,6 +5,7 @@ interface UserMini {
 }
 interface UserResponse {
   id: number;
+  name: string;
   username: string;
   email: string;
   is_active: boolean;

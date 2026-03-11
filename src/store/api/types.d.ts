@@ -7,6 +7,7 @@ interface PaginationParams {
 /** Extended params for listing users (search + pagination) */
 interface UsersListParams extends PaginationParams {
   search?: string;
+  role?: string;
 }
 
 interface PaginatedResponse<T> {

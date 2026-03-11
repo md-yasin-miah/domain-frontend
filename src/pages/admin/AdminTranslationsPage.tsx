@@ -75,14 +75,17 @@ export default function AdminTranslationsPage() {
   const [languageDeleteItem, setLanguageDeleteItem] = useState<LanguageItem | null>(null);
   const [languageForm, setLanguageForm] = useState({ code: "", name: "", native_name: "", flag: "", is_default: false });
 
-  const { data: languagesData, refetch: refetchLanguages } = useGetLanguagesQuery();
+  const { data: languagesData, refetch: refetchLanguages, isLoading: loadingLanguages } = useGetLanguagesQuery();
   const languages = useMemo(() => languagesData?.languages ?? [], [languagesData]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const { data: listData, isLoading, refetch } = useListTranslationsQuery({
     locale: localeFilter === "all" ? undefined : localeFilter,
-    skip: 0,
-    limit: 20,
+    search: keySearch,
+    skip: (page - 1) * pageSize,
+    limit: pageSize,
   });
-  const items = useMemo(() => listData ?? [], [listData]);
+  const items = useMemo(() => listData?.items ?? [], [listData]);
 
   const [addTranslation, { isLoading: isAdding }] = useAddTranslationMutation();
   const [updateTranslation, { isLoading: isUpdating }] = useUpdateTranslationMutation();
@@ -395,7 +398,7 @@ export default function AdminTranslationsPage() {
             data={languages}
             columns={languageColumns}
             getRowId={(row) => row.code}
-            isLoading={false}
+            isLoading={loadingLanguages}
             emptyMessage={t("admin.translations.languages_empty", "No languages loaded.")}
             renderActions={(row) => (
               <div className="flex items-center gap-1">
@@ -480,9 +483,14 @@ export default function AdminTranslationsPage() {
               </div>
             )}
             actionsColumnHeader={t("common.actions", "Actions")}
-            pageSize={20}
-            onPageChange={() => {}}
-            onPageSizeChange={() => {}}
+            pageSize={pageSize}
+            onPageChange={(page) => {
+              setPage(page);
+            }}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+            }}
+            pagination={listData?.pagination}
           />
         </CardContent>
       </Card>

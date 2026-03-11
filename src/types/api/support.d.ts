@@ -19,6 +19,8 @@ interface TicketCreateRequest {
   msg?: string;
   category_id: number;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
+  assigned_to_id?: number | null;
+  user_id?: number | null;
 }
 
 interface TicketUpdateRequest {

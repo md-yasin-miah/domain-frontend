@@ -29,14 +29,12 @@ export default function AdminOrderEscrowPage() {
   const { id } = useParams<{ id: string }>();
   const orderId = id ? parseInt(id, 10) : 0;
 
-  const { data: order, isLoading: orderLoading, error: orderError } = useGetOrderQuery(orderId, {
+  const { data: escrowData, isLoading: escrowLoading } = useGetEscrowByOrderQuery(orderId, {
     skip: !orderId || isNaN(orderId),
   });
-  const { data: escrow, isLoading: escrowLoading } = useGetEscrowByOrderQuery(orderId, {
-    skip: !orderId || isNaN(orderId),
-  });
-
-  const isLoading = orderLoading || escrowLoading;
+const escrow = escrowData?.escrow;
+const order = escrowData?.order;
+  const isLoading = escrowLoading;
 
   if (isLoading && !order) {
     return (
@@ -47,7 +45,7 @@ export default function AdminOrderEscrowPage() {
     );
   }
 
-  if (orderError || !order) {
+  if (!order) {
     return (
       <EmptyState
         variant="error"

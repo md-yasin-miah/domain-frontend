@@ -37,6 +37,11 @@ interface Escrow {
   } | null;
 }
 
+interface EscrowWithOrderResponse {
+  escrow: Escrow;
+  order: Order;
+}
+
 interface EscrowCreateRequest {
   order_id: number;
   amount: number;
