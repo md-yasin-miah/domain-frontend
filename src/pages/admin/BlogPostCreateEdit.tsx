@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { mockData, mockAuth } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/routes";
+import { useCreateBlogPostMutation } from "@/store/api/blogApi";
 
 interface BlogCategory {
   id: string;
@@ -77,7 +77,7 @@ export default function BlogPostCreateEdit() {
       fetchPost(id);
     }
   }, [id, isEditing]);
-
+  const [createBlogPost, { isLoading: isCreating }] = useCreateBlogPostMutation();
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase

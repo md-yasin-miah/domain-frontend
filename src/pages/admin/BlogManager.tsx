@@ -138,48 +138,6 @@ export default function BlogManager() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Quick Links */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <Button variant="outline" asChild className="h-auto p-4">
-                <Link to={ROUTES.ADMIN.CATEGORIES.BLOG}>
-                  <FolderTree className="h-5 w-5 mr-2" />
-                  <div className="text-left">
-                    <div className="font-semibold">
-                      {t("admin.blog.categories.title")}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {t("admin.blog.categories.manage")}
-                    </div>
-                  </div>
-                </Link>
-              </Button>
-              <Button variant="outline" asChild className="h-auto p-4">
-                <Link to="/admin/blog-manager/comments">
-                  <MessageSquare className="h-5 w-5 mr-2" />
-                  <div className="text-left">
-                    <div className="font-semibold">
-                      {t("admin.blog.comments.title")}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {t("admin.blog.comments.manage")}
-                    </div>
-                  </div>
-                </Link>
-              </Button>
-              <Button variant="outline" asChild className="h-auto p-4">
-                <Link to="/admin/blog-manager/seo">
-                  <TrendingUp className="h-5 w-5 mr-2" />
-                  <div className="text-left">
-                    <div className="font-semibold">
-                      {t("admin.blog.seo.title")}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {t("admin.blog.seo.manage")}
-                    </div>
-                  </div>
-                </Link>
-              </Button>
-            </div>
 
             <div className="flex items-center gap-4">
               <div className="relative flex-1">
