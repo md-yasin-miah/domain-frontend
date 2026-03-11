@@ -1,15 +1,15 @@
-
 // ============ Pagination Types ============
+
 interface PaginatedResponse<T> {
   items: T[];
   pagination: {
-    total: number,
-    page: number,
-    page_size: number,
-    total_pages: number,
-    has_next: boolean,
-    has_previous: boolean
-  }
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_previous: boolean;
+  };
 }
 
 interface PaginationParams {
@@ -18,10 +18,12 @@ interface PaginationParams {
 }
 
 // ============ Error Types ============
+
 interface ApiError {
-  data?: { detail: string }
+  data?: { detail: string };
   status?: number;
 }
+
 interface ApiFormPostError {
   data?: {
     detail: Array<{
@@ -30,10 +32,10 @@ interface ApiFormPostError {
       msg: string;
       input: any;
     }>;
-  }
+  };
   message?: string;
   errors?: Record<string, string[]>;
   status?: number;
 }
 
-type Currency = 'USD'
+type Currency = "USD";

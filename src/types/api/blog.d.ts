@@ -1,22 +1,43 @@
-/**
- * Blog API Types
- */
+interface UserBasicInfo {
+  id: number;
+  username: string;
+  email: string;
+  name: string | null;
+}
+
+interface BlogCategoryResponse {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  is_active: boolean;
+  order: number;
+  meta_title: string | null;
+  meta_description: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 interface BlogPost {
   id: number;
+  author_id: number;
+  category_id: number | null;
   title: string;
   slug: string;
   content: string;
   excerpt: string | null;
-  author_id: number;
-  featured_image: string | null;
   meta_title: string | null;
   meta_description: string | null;
-  status: 'draft' | 'published';
-  published_at: string | null;
+  meta_keywords: string | null;
+  og_image: string | null;
+  status: "draft" | "published" | "archived";
+  is_featured: boolean;
   view_count: number;
+  published_at: string | null;
   created_at: string;
   updated_at: string;
+  author?: UserBasicInfo | null;
+  category?: BlogCategoryResponse | null;
 }
 
 interface BlogPostCreateRequest {
@@ -26,7 +47,10 @@ interface BlogPostCreateRequest {
   featured_image?: string;
   meta_title?: string;
   meta_description?: string;
-  status?: 'draft' | 'published';
+  meta_keywords?: string;
+  og_image?: string;
+  status?: string;
+  category_id?: number;
 }
 
 interface BlogComment {
@@ -34,14 +58,15 @@ interface BlogComment {
   post_id: number;
   user_id: number;
   content: string;
-  parent_id: number | null;
   created_at: string;
   updated_at: string;
-  replies?: BlogComment[];
+  user?: UserBasicInfo | null;
 }
 
 interface BlogCommentCreateRequest {
   content: string;
-  parent_id?: number;
 }
 
+interface BlogCommentUpdateRequest {
+  content: string;
+}

@@ -1,19 +1,4 @@
 import { apiSlice } from './apiSlice';
-
-export interface BlogComment {
-  id: number;
-  post_id: number;
-  user_id: number | null;
-  parent_id: number | null;
-  author_name: string;
-  author_email: string | null;
-  content: string;
-  is_approved: boolean;
-  is_spam: boolean;
-  created_at: string;
-  replies?: BlogComment[];
-}
-
 export const blogApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPublicBlogPosts: builder.query<PaginatedResponse<BlogPost> | BlogPost[], PaginationParams>({
@@ -47,19 +32,36 @@ export const blogApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, slug) => [{ type: 'Blog', id: result?.id }],
     }),
-    getBlogComments: builder.query<BlogComment[], number>({
-      query: (postId) => ({
+    getBlogComments: builder.query<PaginatedResponse<BlogComment>, { postId: number; params?: PaginationParams }>({
+      query: ({ postId, params }) => ({
         url: `/blog/posts/${postId}/comments`,
         method: 'GET',
+        params,
       }),
-      providesTags: (result, error, postId) => [{ type: 'Blog', id: postId }],
-      // Return empty array if endpoint doesn't exist (404) or other errors
-      transformResponse: (response: unknown) => {
-        if (Array.isArray(response)) {
-          return response as BlogComment[];
-        }
-        return [];
-      },
+      providesTags: (result, error, { postId }) => [{ type: 'Blog', id: `comments-${postId}` }],
+    }),
+    createBlogComment: builder.mutation<BlogComment, { postId: number; data: { content: string } }>({
+      query: ({ postId, data }) => ({
+        url: `/blog/posts/${postId}/comments`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { postId }) => [{ type: 'Blog', id: `comments-${postId}` }],
+    }),
+    updateBlogComment: builder.mutation<BlogComment, { postId: number; commentId: number; data: { content: string } }>({
+      query: ({ postId, commentId, data }) => ({
+        url: `/blog/posts/${postId}/comments/${commentId}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { postId }) => [{ type: 'Blog', id: `comments-${postId}` }],
+    }),
+    deleteBlogComment: builder.mutation<void, { postId: number; commentId: number }>({
+      query: ({ postId, commentId }) => ({
+        url: `/blog/posts/${postId}/comments/${commentId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, { postId }) => [{ type: 'Blog', id: `comments-${postId}` }],
     }),
     createBlogPost: builder.mutation<BlogPost, BlogPostCreateRequest>({
       query: (data) => ({
@@ -92,6 +94,9 @@ export const {
   useGetBlogPostQuery,
   useGetBlogPostBySlugQuery,
   useGetBlogCommentsQuery,
+  useCreateBlogCommentMutation,
+  useUpdateBlogCommentMutation,
+  useDeleteBlogCommentMutation,
   useCreateBlogPostMutation,
   useUpdateBlogPostMutation,
   useDeleteBlogPostMutation,

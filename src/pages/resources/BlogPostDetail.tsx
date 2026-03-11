@@ -1,14 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/store/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { useGetBlogPostBySlugQuery, useGetBlogCommentsQuery } from '@/store/api/blogApi';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "@/store/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import {
+  useGetBlogPostBySlugQuery,
+  useGetBlogCommentsQuery,
+  useCreateBlogCommentMutation,
+  useUpdateBlogCommentMutation,
+  useDeleteBlogCommentMutation,
+} from "@/store/api/blogApi";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Calendar,
   User,
@@ -21,50 +33,11 @@ import {
   Send,
   Share2,
   BookOpen,
-  Sparkles
-} from 'lucide-react';
-
-interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  content: string;
-  featured_image: string | null;
-  category_id: string | null;
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  tags: string[];
-  author_id: string;
-  author?: {
-    email: string;
-    profile?: {
-      full_name: string;
-    };
-  };
-  is_published: boolean;
-  is_featured: boolean;
-  published_at: string | null;
-  view_count: number;
-  created_at: string;
-}
-
-interface BlogComment {
-  id: string;
-  post_id: string;
-  user_id: string | null;
-  parent_id: string | null;
-  author_name: string;
-  author_email: string | null;
-  content: string;
-  is_approved: boolean;
-  is_spam: boolean;
-  created_at: string;
-  replies?: BlogComment[];
-}
+  Sparkles,
+  Pencil,
+  Trash2,
+  X,
+} from "lucide-react";
 
 export default function BlogPostDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -72,164 +45,152 @@ export default function BlogPostDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [commentContent, setCommentContent] = useState('');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
-  const [commentLoading, setCommentLoading] = useState(false);
+  const [commentContent, setCommentContent] = useState("");
+  const [editingComment, setEditingComment] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [skip, setSkip] = useState(0);
+  const limit = 50;
 
   // Use RTK Query hooks - get post by slug (views are auto-incremented via query param)
-  const { data: postData, isLoading: loading, error: postError } = useGetBlogPostBySlugQuery(slug || '', {
+  const {
+    data: postData,
+    isLoading: loading,
+    error: postError,
+  } = useGetBlogPostBySlugQuery(slug || "", {
     skip: !slug,
   });
-  const { data: commentsData = [], isLoading: commentsLoading } = useGetBlogCommentsQuery(postData?.id || 0, {
-    skip: !postData?.id,
-  });
 
-  // Transform post data to match component interface
-  const post: BlogPost | null = postData ? {
-    id: String(postData.id),
-    title: postData.title,
-    slug: postData.slug,
-    excerpt: postData.excerpt || null,
-    content: postData.content,
-    featured_image: postData.og_image || null,
-    category_id: postData.category_id ? String(postData.category_id) : null,
-    category: postData.category ? {
-      id: String(postData.category.id),
-      name: postData.category.name,
-      slug: postData.category.slug,
-    } : undefined,
-    tags: [], // Backend doesn't have tags field
-    author_id: String(postData.author_id),
-    author: postData.author ? {
-      email: postData.author.email,
-      profile: {
-        full_name: postData.author.username, // Use username as fallback
+  const { data: commentsResponse, isLoading: commentsLoading } =
+    useGetBlogCommentsQuery(
+      {
+        postId: postData?.id || 0,
+        params: { skip, limit },
       },
-    } : undefined,
-    is_published: postData.status === 'published',
-    is_featured: postData.is_featured || false,
-    published_at: postData.published_at || postData.created_at,
-    view_count: postData.view_count || 0,
-    created_at: postData.created_at,
-  } : null;
+      {
+        skip: !postData?.id,
+      },
+    );
 
-  // Transform comments data
-  const comments: BlogComment[] = Array.isArray(commentsData) ? commentsData.map(comment => ({
-    id: String(comment.id),
-    post_id: postData?.id ? String(postData.id) : '',
-    user_id: comment.user_id ? String(comment.user_id) : null,
-    parent_id: comment.parent_id ? String(comment.parent_id) : null,
-    author_name: comment.author_name,
-    author_email: comment.author_email,
-    content: comment.content,
-    is_approved: comment.is_approved,
-    is_spam: comment.is_spam,
-    created_at: comment.created_at,
-    replies: comment.replies || [],
-  })) : [];
+  const [createComment, { isLoading: isCreating }] =
+    useCreateBlogCommentMutation();
+  const [updateComment, { isLoading: isUpdating }] =
+    useUpdateBlogCommentMutation();
+  const [deleteComment, { isLoading: isDeleting }] =
+    useDeleteBlogCommentMutation();
+
+  const commentsData = commentsResponse?.items || [];
+
+  // Transform post data to match component expects (or use direct)
+  const post = postData;
 
   // Navigate if post not found
   useEffect(() => {
-    if (postError && 'status' in postError && postError.status === 404) {
-      navigate('/blog');
+    if (postError && "status" in postError && postError.status === 404) {
+      navigate("/blog");
     }
   }, [postError, navigate]);
 
   const handleSubmitComment = async () => {
     if (!user) {
       toast({
-        title: t('blog.comment_section.login_required'),
-        description: 'Please log in to comment',
-        variant: 'destructive',
+        title: t("blog.comment_section.login_required"),
+        description: "Please log in to comment",
+        variant: "destructive",
       });
-      navigate('/auth');
+      navigate("/auth");
       return;
     }
 
     if (!commentContent.trim()) {
       toast({
-        title: 'Error',
-        description: 'Please enter a comment',
-        variant: 'destructive',
+        title: "Error",
+        description: "Please enter a comment",
+        variant: "destructive",
       });
       return;
     }
 
     try {
-      setCommentLoading(true);
-      // TODO: Implement comment creation mutation when API is ready
-      // For now, just show success message
+      await createComment({
+        postId: postData!.id,
+        data: { content: commentContent },
+      }).unwrap();
+
       toast({
-        title: t('blog.comment_section.success'),
-        description: t('blog.comment_section.pending_approval'),
+        title: t("blog.comment_section.success"),
+        description: "Comment posted successfully",
       });
 
-      setCommentContent('');
-    } catch (error: unknown) {
-      console.error('Error submitting comment:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      setCommentContent("");
+    } catch (error: any) {
+      console.error("Error submitting comment:", error);
       toast({
-        title: t('blog.comment_section.error'),
-        description: errorMessage,
-        variant: 'destructive',
+        title: t("blog.comment_section.error"),
+        description: error.data?.detail || "An error occurred",
+        variant: "destructive",
       });
-    } finally {
-      setCommentLoading(false);
     }
   };
 
-  const handleSubmitReply = async (parentId: string) => {
-    if (!user) {
-      toast({
-        title: t('blog.comment_section.login_required'),
-        description: 'Please log in to reply',
-        variant: 'destructive',
-      });
-      navigate('/auth');
-      return;
-    }
-
-    if (!replyContent.trim()) {
-      return;
-    }
+  const handleUpdateComment = async (commentId: number) => {
+    if (!editContent.trim()) return;
 
     try {
-      setCommentLoading(true);
-      // TODO: Implement reply creation mutation when API is ready
-      // For now, just show success message
-      toast({
-        title: t('blog.comment_section.success'),
-        description: t('blog.comment_section.pending_approval'),
-      });
+      await updateComment({
+        postId: postData!.id,
+        commentId,
+        data: { content: editContent },
+      }).unwrap();
 
-      setReplyContent('');
-      setReplyingTo(null);
-    } catch (error: unknown) {
-      console.error('Error submitting reply:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       toast({
-        title: t('blog.comment_section.error'),
-        description: errorMessage,
-        variant: 'destructive',
+        title: "Success",
+        description: "Comment updated",
       });
-    } finally {
-      setCommentLoading(false);
+      setEditingComment(null);
+      setEditContent("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.data?.detail || "Failed to update comment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm("Are you sure you want to delete this comment?")) return;
+
+    try {
+      await deleteComment({
+        postId: postData!.id,
+        commentId,
+      }).unwrap();
+
+      toast({
+        title: "Success",
+        description: "Comment deleted",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.data?.detail || "Failed to delete comment",
+        variant: "destructive",
+      });
     }
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const calculateReadTime = (content: string) => {
     const wordsPerMinute = 200;
-    const words = content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
     return Math.ceil(words / wordsPerMinute);
   };
 
@@ -238,7 +199,9 @@ export default function BlogPostDetail() {
       <div className="container mx-auto p-6 max-w-4xl">
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-muted-foreground">{t('blog.loading')}</span>
+          <span className="ml-2 text-muted-foreground">
+            {t("blog.loading")}
+          </span>
         </div>
       </div>
     );
@@ -250,7 +213,7 @@ export default function BlogPostDetail() {
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground mb-4">Post not found</p>
-            <Button onClick={() => navigate('/blog')}>
+            <Button onClick={() => navigate("/blog")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Blog
             </Button>
@@ -263,11 +226,11 @@ export default function BlogPostDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background">
       {/* Hero Section with Featured Image */}
-      {post.featured_image && (
+      {post.og_image && (
         <div className="relative w-full h-[60vh] min-h-[400px] max-h-[600px] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent z-10" />
           <img
-            src={post.featured_image}
+            src={post.og_image}
             alt={post.title}
             className="w-full h-full object-cover"
           />
@@ -304,17 +267,17 @@ export default function BlogPostDetail() {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate('/blog')}
+          onClick={() => navigate("/blog")}
           className="mb-6 hover:bg-primary/10 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t('blog.back_to_blog') || 'Back to Blog'}
+          {t("blog.back_to_blog") || "Back to Blog"}
         </Button>
 
         {/* Post Content */}
         <article className="space-y-8">
           {/* Header Section (if no featured image) */}
-          {!post.featured_image && (
+          {!post.og_image && (
             <div className="space-y-4 pb-6 border-b">
               <div className="flex flex-wrap items-center gap-3">
                 {post.category && (
@@ -349,19 +312,30 @@ export default function BlogPostDetail() {
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <User className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="font-medium">{post.author?.profile?.full_name || post.author?.email || 'Unknown'}</span>
+                  <span className="font-medium">
+                    {post.author?.username ||
+                      post.author?.username ||
+                      post.author?.email ||
+                      "Unknown"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="w-4 h-4" />
-                  <span>{formatDate(post.published_at)}</span>
+                  <span>
+                    {formatDate(post.published_at || post.created_at)}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Clock className="w-4 h-4" />
-                  <span>{calculateReadTime(post.content)} {t('blog.read_time')}</span>
+                  <span>
+                    {calculateReadTime(post.content)} {t("blog.read_time")}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Eye className="w-4 h-4" />
-                  <span>{post.view_count || 0} {t('blog.views')}</span>
+                  <span>
+                    {post.view_count || 0} {t("blog.views")}
+                  </span>
                 </div>
                 <div className="ml-auto">
                   <Button variant="outline" size="sm" className="gap-2">
@@ -373,17 +347,17 @@ export default function BlogPostDetail() {
             </CardContent>
           </Card>
 
-          {/* Tags */}
-          {post.tags.length > 0 && (
+          {/* Tags - Backend meta_keywords is string, we can split it */}
+          {post.meta_keywords && (
             <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag, index) => (
+              {post.meta_keywords.split(",").map((tag, index) => (
                 <Badge
                   key={index}
                   variant="secondary"
                   className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20 hover:from-primary/20 hover:to-secondary/20 transition-all cursor-pointer"
                 >
                   <Tag className="w-3 h-3 mr-1" />
-                  {tag}
+                  {tag.trim()}
                 </Badge>
               ))}
             </div>
@@ -420,9 +394,9 @@ export default function BlogPostDetail() {
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                 <MessageCircle className="h-5 w-5 text-primary" />
               </div>
-              <span>{t('blog.comment_section.title')}</span>
+              <span>{t("blog.comment_section.title")}</span>
               <Badge variant="secondary" className="ml-2">
-                {comments.length}
+                {commentsResponse?.pagination.total || 0}
               </Badge>
             </CardTitle>
           </CardHeader>
@@ -437,7 +411,7 @@ export default function BlogPostDetail() {
                   <span className="font-medium">Add a comment</span>
                 </div>
                 <Textarea
-                  placeholder={t('blog.comment_section.comment_placeholder')}
+                  placeholder={t("blog.comment_section.comment_placeholder")}
                   value={commentContent}
                   onChange={(e) => setCommentContent(e.target.value)}
                   rows={5}
@@ -445,18 +419,18 @@ export default function BlogPostDetail() {
                 />
                 <Button
                   onClick={handleSubmitComment}
-                  disabled={commentLoading || !commentContent.trim()}
+                  disabled={isCreating || !commentContent.trim()}
                   className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                 >
-                  {commentLoading ? (
+                  {isCreating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t('blog.comment_section.submitting')}
+                      {t("blog.comment_section.submitting")}
                     </>
                   ) : (
                     <>
                       <Send className="mr-2 h-4 w-4" />
-                      {t('blog.comment_section.submit')}
+                      {t("blog.comment_section.submit")}
                     </>
                   )}
                 </Button>
@@ -465,14 +439,14 @@ export default function BlogPostDetail() {
               <div className="p-6 border-2 rounded-lg bg-gradient-to-br from-primary/5 to-secondary/5 text-center">
                 <MessageCircle className="w-12 h-12 mx-auto mb-4 text-primary/50" />
                 <p className="text-base font-medium mb-2">
-                  {t('blog.comment_section.login_required')}
+                  {t("blog.comment_section.login_required")}
                 </p>
                 <p className="text-sm text-muted-foreground mb-4">
                   Join the conversation by logging in
                 </p>
                 <Button
                   variant="default"
-                  onClick={() => navigate('/auth')}
+                  onClick={() => navigate("/auth")}
                   className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                 >
                   Log In to Comment
@@ -483,13 +457,13 @@ export default function BlogPostDetail() {
             <Separator className="my-8" />
 
             {/* Comments List */}
-            {comments.length === 0 ? (
+            {commentsData.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                   <MessageCircle className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <p className="text-lg font-medium text-foreground mb-2">
-                  {t('blog.comment_section.no_comments')}
+                  {t("blog.comment_section.no_comments")}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Be the first to share your thoughts!
@@ -497,99 +471,123 @@ export default function BlogPostDetail() {
               </div>
             ) : (
               <div className="space-y-6">
-                {comments.map((comment) => (
+                {commentsData.map((comment: BlogComment) => (
                   <div key={comment.id} className="space-y-4">
                     <div className="flex gap-4 group">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center group-hover:from-primary/30 group-hover:to-secondary/30 transition-all flex-shrink-0">
                         <User className="w-6 h-6 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2 flex-wrap">
-                          <span className="font-semibold text-base">{comment.author_name}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {formatDate(comment.created_at)}
-                          </span>
-                        </div>
-                        <p className="text-base whitespace-pre-wrap leading-relaxed mb-3">{comment.content}</p>
-                        {user && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="mt-2 hover:bg-primary/10"
-                            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                          >
-                            <MessageCircle className="w-4 h-4 mr-1" />
-                            {t('blog.comment_section.reply')}
-                          </Button>
-                        )}
+                        <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
+                          <div className="flex items-center gap-3">
+                            <span className="font-semibold text-base">
+                              {comment.user?.name ||
+                                comment.user?.username ||
+                                "Guest"}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              {formatDate(comment.created_at)}
+                            </span>
+                          </div>
 
-                        {/* Reply Form */}
-                        {replyingTo === comment.id && (
-                          <div className="mt-4 ml-4 p-4 rounded-lg border-2 bg-muted/30 space-y-3">
+                          {user && user.id === comment.user_id && (
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={() => {
+                                  setEditingComment(comment.id);
+                                  setEditContent(comment.content);
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => handleDeleteComment(comment.id)}
+                                disabled={isDeleting}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        {editingComment === comment.id ? (
+                          <div className="space-y-3 p-4 rounded-lg bg-muted/50 border">
                             <Textarea
-                              placeholder={t('blog.comment_section.comment_placeholder')}
-                              value={replyContent}
-                              onChange={(e) => setReplyContent(e.target.value)}
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
                               rows={3}
-                              className="resize-none border-2 focus:border-primary transition-colors"
                             />
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
-                                onClick={() => handleSubmitReply(comment.id)}
-                                disabled={commentLoading || !replyContent.trim()}
-                                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
+                                onClick={() => handleUpdateComment(comment.id)}
+                                disabled={isUpdating}
                               >
-                                {t('blog.comment_section.submit')}
+                                {isUpdating && (
+                                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                                )}
+                                Save
                               </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => {
-                                  setReplyingTo(null);
-                                  setReplyContent('');
-                                }}
+                                onClick={() => setEditingComment(null)}
                               >
-                                {t('common.cancel')}
+                                Cancel
                               </Button>
                             </div>
                           </div>
-                        )}
-
-                        {/* Replies */}
-                        {comment.replies && comment.replies.length > 0 && (
-                          <div className="mt-6 ml-4 space-y-4 border-l-4 border-primary/20 pl-6">
-                            {comment.replies.map((reply) => (
-                              <div key={reply.id} className="flex gap-3 group">
-                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center group-hover:bg-muted/80 transition-colors flex-shrink-0">
-                                  <User className="w-5 h-5 text-muted-foreground" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                    <span className="font-medium text-sm">{reply.author_name}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                      {formatDate(reply.created_at)}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{reply.content}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                        ) : (
+                          <p className="text-base whitespace-pre-wrap leading-relaxed mb-3">
+                            {comment.content}
+                          </p>
                         )}
                       </div>
                     </div>
-                    {comment.id !== comments[comments.length - 1]?.id && (
+                    {comment.id !==
+                      commentsData[commentsData.length - 1]?.id && (
                       <Separator className="my-6" />
                     )}
                   </div>
                 ))}
               </div>
             )}
+
+            {/* Pagination Controls */}
+            {commentsResponse?.pagination &&
+              commentsResponse.pagination.total_pages > 1 && (
+                <div className="flex justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!commentsResponse.pagination.has_previous}
+                    onClick={() => setSkip(Math.max(0, skip - limit))}
+                  >
+                    Previous
+                  </Button>
+                  <div className="flex items-center px-4 text-sm font-medium">
+                    Page {commentsResponse.pagination.page + 1} of{" "}
+                    {commentsResponse.pagination.total_pages}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!commentsResponse.pagination.has_next}
+                    onClick={() => setSkip(skip + limit)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
           </CardContent>
         </Card>
       </div>
     </div>
   );
 }
-
