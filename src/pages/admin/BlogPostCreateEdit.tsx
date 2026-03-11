@@ -25,13 +25,12 @@ import {
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/routes";
-import { useCreateBlogPostMutation } from "@/store/api/blogApi";
-
-interface BlogCategory {
-  id: string;
-  name: string;
-  slug: string;
-}
+import {
+  useCreateBlogPostMutation,
+  useUpdateBlogPostMutation,
+  useGetBlogPostQuery,
+} from "@/store/api/blogApi";
+import { useGetBlogCategoriesQuery } from "@/store/api/categoryApi";
 
 interface BlogFormData {
   title: string;
@@ -41,7 +40,7 @@ interface BlogFormData {
   featured_image: string;
   category_id: string;
   tags: string;
-  is_published: boolean;
+  status: "draft" | "published" | "archived";
   is_featured: boolean;
   meta_title: string;
   meta_description: string;
@@ -53,9 +52,18 @@ export default function BlogPostCreateEdit() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isEditing = !!id;
-  const [loading, setLoading] = useState(isEditing);
-  const [saving, setSaving] = useState(false);
-  const [categories, setCategories] = useState<BlogCategory[]>([]);
+
+  const { data: postData, isLoading: postLoading } = useGetBlogPostQuery(
+    Number(id),
+    { skip: !id },
+  );
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetBlogCategoriesQuery({ is_active: true } as any);
+
+  const [createBlogPost, { isLoading: isCreating }] =
+    useCreateBlogPostMutation();
+  const [updateBlogPost, { isLoading: isUpdating }] =
+    useUpdateBlogPostMutation();
 
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
@@ -65,71 +73,29 @@ export default function BlogPostCreateEdit() {
     featured_image: "",
     category_id: "",
     tags: "",
-    is_published: false,
+    status: "draft",
     is_featured: false,
     meta_title: "",
     meta_description: "",
   });
 
   useEffect(() => {
-    fetchCategories();
-    if (isEditing && id) {
-      fetchPost(id);
-    }
-  }, [id, isEditing]);
-  const [createBlogPost, { isLoading: isCreating }] = useCreateBlogPostMutation();
-  const fetchCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("blog_categories")
-        .select("*")
-        .order("name");
-
-      if (error) throw error;
-      setCategories(data || []);
-    } catch (error: any) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const fetchPost = async (postId: string) => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select("*")
-        .eq("id", postId)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        setFormData({
-          title: data.title,
-          slug: data.slug,
-          excerpt: data.excerpt || "",
-          content: data.content,
-          featured_image: data.featured_image || "",
-          category_id: data.category_id || "",
-          tags: data.tags ? data.tags.join(", ") : "",
-          is_published: data.is_published,
-          is_featured: data.is_featured,
-          meta_title: data.meta_title || "",
-          meta_description: data.meta_description || "",
-        });
-      }
-    } catch (error: any) {
-      console.error("Error fetching post:", error);
-      toast({
-        title: t("admin.blog.errors.fetch_error"),
-        description: error.message,
-        variant: "destructive",
+    if (isEditing && postData) {
+      setFormData({
+        title: postData.title,
+        slug: postData.slug,
+        excerpt: postData.excerpt || "",
+        content: postData.content,
+        featured_image: postData.og_image || "",
+        category_id: postData.category_id?.toString() || "",
+        tags: postData.meta_keywords || "",
+        status: postData.status || "draft",
+        is_featured: postData.is_featured || false,
+        meta_title: postData.meta_title || "",
+        meta_description: postData.meta_description || "",
       });
-      navigate(ROUTES.ADMIN.BLOG_MANAGER);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [postData, isEditing]);
 
   const generateSlug = (title: string) => {
     return title
@@ -151,53 +117,41 @@ export default function BlogPostCreateEdit() {
   const handleSave = async () => {
     if (!formData.title || !formData.content) {
       toast({
-        title: t("admin.blog.errors.required_fields"),
+        title: t("admin.blog.errors.required_fields", "Required fields are missing"),
         variant: "destructive",
       });
       return;
     }
 
     try {
-      setSaving(true);
-
-      const payload = {
+      const payload: any = {
         title: formData.title,
         slug: formData.slug || generateSlug(formData.title),
         excerpt: formData.excerpt || null,
         content: formData.content,
-        featured_image: formData.featured_image || null,
-        category_id: formData.category_id || null,
-        tags: formData.tags
-          ? formData.tags.split(",").map((t) => t.trim())
-          : [],
-        is_published: formData.is_published,
+        og_image: formData.featured_image || null,
+        category_id: formData.category_id ? Number(formData.category_id) : null,
+        meta_keywords: formData.tags || null,
+        status: formData.status,
         is_featured: formData.is_featured,
         meta_title: formData.meta_title || null,
         meta_description: formData.meta_description || null,
       };
 
-      const functionName = isEditing ? "update-blog-post" : "create-blog-post";
-      const body = isEditing ? { id, ...payload } : payload;
-
-      const { data, error } = await supabase.functions.invoke(functionName, {
-        body,
-      });
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error(
-          data?.error ||
-            t(`admin.blog.errors.${isEditing ? "update" : "create"}_error`),
-        );
+      if (isEditing && id) {
+        await updateBlogPost({ id: Number(id), data: payload }).unwrap();
+      } else {
+        await createBlogPost(payload).unwrap();
       }
 
       toast({
         title: t(
           `admin.blog.messages.${isEditing ? "update" : "create"}_success`,
+          `${isEditing ? "Updated" : "Created"} successfully`,
         ),
         description: t(
           `admin.blog.messages.${isEditing ? "update" : "create"}_success_desc`,
+          `The blog post has been ${isEditing ? "updated" : "created"}.`,
         ),
       });
 
@@ -208,16 +162,19 @@ export default function BlogPostCreateEdit() {
         error,
       );
       toast({
-        title: t(`admin.blog.errors.${isEditing ? "update" : "create"}_error`),
-        description: error.message,
+        title: t(
+          `admin.blog.errors.${isEditing ? "update" : "create"}_error`,
+          `Failed to ${isEditing ? "update" : "create"} blog post`,
+        ),
+        description: error?.data?.detail || error.message,
         variant: "destructive",
       });
-    } finally {
-      setSaving(false);
     }
   };
 
-  if (loading) {
+  const categories = Array.isArray(categoriesData) ? categoriesData : categoriesData?.items || [];
+
+  if (postLoading) {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-center py-24">
@@ -226,6 +183,8 @@ export default function BlogPostCreateEdit() {
       </div>
     );
   }
+
+  const isSaving = isCreating || isUpdating;
 
   return (
     <div className="space-y-6">
@@ -236,41 +195,41 @@ export default function BlogPostCreateEdit() {
             onClick={() => navigate(ROUTES.ADMIN.BLOG_MANAGER)}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("common.back")}
+            {t("common.back", "Back")}
           </Button>
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <FileText className="h-6 w-6" />
               {isEditing
-                ? t("admin.blog.edit_post")
-                : t("admin.blog.create_post")}
+                ? t("admin.blog.edit_post", "Edit Post")
+                : t("admin.blog.create_post", "Create Post")}
             </h1>
             <p className="text-muted-foreground mt-1">
               {isEditing
-                ? t("admin.blog.edit_post_desc")
-                : t("admin.blog.create_post_desc")}
+                ? t("admin.blog.edit_post_desc", "Edit an existing blog post")
+                : t("admin.blog.create_post_desc", "Write and publish a new blog post")}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {isEditing && formData.is_published && (
+          {isEditing && formData.status === "published" && (
             <Button variant="outline" asChild>
               <Link to={`/blog/${formData.slug}`} target="_blank">
                 <Eye className="h-4 w-4 mr-2" />
-                {t("admin.blog.view_post")}
+                {t("admin.blog.view_post", "View Post")}
               </Link>
             </Button>
           )}
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? (
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("common.saving")}
+                {t("common.saving", "Saving...")}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                {t("common.save")}
+                {t("common.save", "Save")}
               </>
             )}
           </Button>
@@ -281,53 +240,52 @@ export default function BlogPostCreateEdit() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.blog.form.basic_info")}</CardTitle>
+              <CardTitle>{t("admin.blog.form.basic_info", "Basic Information")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">{t("admin.blog.form.title")} *</Label>
+                <Label htmlFor="title">{t("admin.blog.form.title", "Title")} *</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder={t("admin.blog.form.title_placeholder")}
+                  placeholder={t("admin.blog.form.title_placeholder", "Post title")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="slug">{t("admin.blog.form.slug")}</Label>
+                <Label htmlFor="slug">{t("admin.blog.form.slug", "Slug")}</Label>
                 <Input
                   id="slug"
                   value={formData.slug}
                   onChange={(e) =>
                     setFormData({ ...formData, slug: e.target.value })
                   }
-                  placeholder={t("admin.blog.form.slug_placeholder")}
+                  placeholder={t("admin.blog.form.slug_placeholder", "URL-friendly slug")}
                 />
                 <p className="text-xs text-muted-foreground">
-                  {t("admin.blog.form.slug_auto_generated") ||
-                    "Slug is automatically generated from the title. You can edit it manually if needed."}
+                  {t("admin.blog.form.slug_auto_generated", "Slug is automatically generated from the title. You can edit it manually if needed.")}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="excerpt">{t("admin.blog.form.excerpt")}</Label>
+                <Label htmlFor="excerpt">{t("admin.blog.form.excerpt", "Excerpt")}</Label>
                 <Textarea
                   id="excerpt"
                   value={formData.excerpt}
                   onChange={(e) =>
                     setFormData({ ...formData, excerpt: e.target.value })
                   }
-                  placeholder={t("admin.blog.form.excerpt_placeholder")}
+                  placeholder={t("admin.blog.form.excerpt_placeholder", "Small summary of the post")}
                   rows={3}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">
-                  {t("admin.blog.form.content")} *
+                  {t("admin.blog.form.content", "Content")} *
                 </Label>
                 <RichTextEditor
                   content={formData.content}
                   onChange={(content) => setFormData({ ...formData, content })}
-                  placeholder={t("admin.blog.form.content_placeholder")}
+                  placeholder={t("admin.blog.form.content_placeholder", "Start writing...")}
                 />
               </div>
             </CardContent>
@@ -335,12 +293,12 @@ export default function BlogPostCreateEdit() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.blog.form.media")}</CardTitle>
+              <CardTitle>{t("admin.blog.form.media", "Media")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <Label htmlFor="featured_image">
-                  {t("admin.blog.form.featured_image")}
+                  {t("admin.blog.form.featured_image", "Featured Image")}
                 </Label>
                 <Input
                   id="featured_image"
@@ -348,7 +306,7 @@ export default function BlogPostCreateEdit() {
                   onChange={(e) =>
                     setFormData({ ...formData, featured_image: e.target.value })
                   }
-                  placeholder={t("admin.blog.form.featured_image_placeholder")}
+                  placeholder={t("admin.blog.form.featured_image_placeholder", "Image URL")}
                 />
                 {formData.featured_image && (
                   <div className="mt-4">
@@ -370,24 +328,30 @@ export default function BlogPostCreateEdit() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.blog.form.publish_settings")}</CardTitle>
+              <CardTitle>{t("admin.blog.form.publish_settings", "Publishing Settings")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="is_published">
-                  {t("admin.blog.form.is_published")}
-                </Label>
-                <Switch
-                  id="is_published"
-                  checked={formData.is_published}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, is_published: checked })
+              <div className="space-y-2">
+                <Label htmlFor="status">{t("admin.blog.form.status", "Status")}</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value: any) =>
+                    setFormData({ ...formData, status: value })
                   }
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("admin.blog.form.select_status", "Select Status")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">{t("common.draft", "Draft")}</SelectItem>
+                    <SelectItem value="published">{t("common.published", "Published")}</SelectItem>
+                    <SelectItem value="archived">{t("common.archived", "Archived")}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="is_featured">
-                  {t("admin.blog.form.is_featured")}
+                  {t("admin.blog.form.is_featured", "Feature this post")}
                 </Label>
                 <Switch
                   id="is_featured"
@@ -402,12 +366,12 @@ export default function BlogPostCreateEdit() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.blog.form.categorization")}</CardTitle>
+              <CardTitle>{t("admin.blog.form.categorization", "Categorization")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="category_id">
-                  {t("admin.blog.form.category")}
+                  {t("admin.blog.form.category", "Category")}
                 </Label>
                 <Select
                   value={formData.category_id || undefined}
@@ -420,15 +384,15 @@ export default function BlogPostCreateEdit() {
                 >
                   <SelectTrigger>
                     <SelectValue
-                      placeholder={t("admin.blog.form.select_category")}
+                      placeholder={t("admin.blog.form.select_category", "Select Category")}
                     />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">
-                      {t("admin.blog.form.no_category")}
+                      {t("admin.blog.form.no_category", "No Category")}
                     </SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
+                    {categories.map((category: any) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
                         {category.name}
                       </SelectItem>
                     ))}
@@ -436,14 +400,14 @@ export default function BlogPostCreateEdit() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="tags">{t("admin.blog.form.tags")}</Label>
+                <Label htmlFor="tags">{t("admin.blog.form.tags", "Tags")}</Label>
                 <Input
                   id="tags"
                   value={formData.tags}
                   onChange={(e) =>
                     setFormData({ ...formData, tags: e.target.value })
                   }
-                  placeholder={t("admin.blog.form.tags_placeholder")}
+                  placeholder={t("admin.blog.form.tags_placeholder", "Keywords separated by commas")}
                 />
               </div>
             </CardContent>
@@ -451,12 +415,12 @@ export default function BlogPostCreateEdit() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.blog.form.seo_basic")}</CardTitle>
+              <CardTitle>{t("admin.blog.form.seo_basic", "SEO Settings")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="meta_title">
-                  {t("admin.blog.form.meta_title")}
+                  {t("admin.blog.form.meta_title", "Meta Title")}
                 </Label>
                 <Input
                   id="meta_title"
@@ -464,12 +428,12 @@ export default function BlogPostCreateEdit() {
                   onChange={(e) =>
                     setFormData({ ...formData, meta_title: e.target.value })
                   }
-                  placeholder={t("admin.blog.form.meta_title_placeholder")}
+                  placeholder={t("admin.blog.form.meta_title_placeholder", "SEO Title")}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="meta_description">
-                  {t("admin.blog.form.meta_description")}
+                  {t("admin.blog.form.meta_description", "Meta Description")}
                 </Label>
                 <Textarea
                   id="meta_description"
@@ -482,6 +446,7 @@ export default function BlogPostCreateEdit() {
                   }
                   placeholder={t(
                     "admin.blog.form.meta_description_placeholder",
+                    "SEO description for search engines"
                   )}
                   rows={3}
                 />
