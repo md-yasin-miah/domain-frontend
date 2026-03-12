@@ -3,6 +3,7 @@ import { ArrowLeft, BookOpen, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ROUTES } from "@/lib/routes";
 
 const GuideCategory = () => {
   const { category } = useParams();
@@ -71,7 +72,7 @@ const GuideCategory = () => {
       <div className="min-h-screen bg-background py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Categoría no encontrada</h1>
-          <Link to="/resources/guides">
+          <Link to={ROUTES.APP.GUIDES.ROOT}>
             <Button>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Volver a Guías

@@ -143,21 +143,27 @@ const getAppMenuItems = (t: TFunction): MenuItem[] => {
       subItems: [
         {
           title: t('resources.guides'),
-          url: '/resources/guides',
+          url: ROUTES.APP.GUIDES.ROOT,
           icon: BookOpen,
           description: t('resources.guides_desc'),
         },
         {
           title: t('resources.help_center'),
-          url: '/resources/help',
+          url: ROUTES.APP.HELP_CENTER.ROOT,
           icon: BookOpen,
           description: t('resources.help_center_desc'),
         },
         {
           title: t('resources.blog'),
-          url: '/resources/blog',
+          url: ROUTES.APP.BLOG.ROOT,
           icon: BookOpen,
           description: t('resources.blog_desc'),
+        },
+        {
+          title: "FAQs",
+          url: ROUTES.APP.FAQ,
+          icon: HelpCircle,
+          description: t('resources.faqs_desc'),
         },
       ],
     },

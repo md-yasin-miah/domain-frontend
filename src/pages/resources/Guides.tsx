@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ROUTES } from "@/lib/routes";
 
 const Guides = () => {
   const categories = [
@@ -177,7 +178,7 @@ const Guides = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((category, index) => (
-              <Link key={index} to={`/resources/guides/category/${category.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>
+              <Link key={index} to={`${ROUTES.APP.GUIDES.CATEGORY(category.title.toLowerCase().replace(/[^a-z0-9]/g, '-'))}`}>
                 <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer group">
                   <CardHeader className="text-center">
                     <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
@@ -212,7 +213,7 @@ const Guides = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredGuides.map((guide, index) => (
-              <Link key={index} to={`/resources/guides/${guide.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')}`}>
+              <Link key={index} to={`${ROUTES.APP.GUIDES.DETAILS(guide.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-'))}`}>
                 <Card className="hover:shadow-xl transition-all duration-300 group cursor-pointer h-full">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-3">
@@ -271,7 +272,7 @@ const Guides = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allGuides.map((guide, index) => (
-              <Link key={index} to={`/resources/guides/${guide.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')}`}>
+              <Link key={index} to={`${ROUTES.APP.GUIDES.DETAILS(guide.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-'))}`}>
                 <Card className="hover:shadow-lg transition-all duration-300 group cursor-pointer h-full">
                   <CardHeader>
                     <div className="flex items-center justify-between mb-2">

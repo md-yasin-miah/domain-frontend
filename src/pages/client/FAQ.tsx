@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 
 const PAGE_SIZE = 10;
 
-export default function FAQ() {
+export default function FAQ({ publicPage = false }: { publicPage?: boolean }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | 'all' | 'uncategorized'>('all');
@@ -33,6 +33,7 @@ export default function FAQ() {
 
   const { data: faqsData, isLoading: loading } = useGetFAQsQuery({
     is_active: true,
+    public: publicPage,
     skip: (page - 1) * size,
     limit: size,
     category_id:

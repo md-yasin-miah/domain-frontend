@@ -34,9 +34,11 @@ const ClientDomainsPage = lazy(
 const Facturas = lazy(() => import("./pages/client/Facturas"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const SupportTicketConversationPage = lazy(
-  () => import("./pages/SupportTicketConversationPage")
+  () => import("./pages/SupportTicketConversationPage"),
 );
-const ListingsManagement = lazy(() => import("./pages/admin/ListingsManagement"));
+const ListingsManagement = lazy(
+  () => import("./pages/admin/ListingsManagement"),
+);
 const ListingCreateEdit = lazy(() => import("./pages/admin/ListingCreateEdit"));
 const AdminListingDetail = lazy(() => import("./pages/admin/ListingDetail"));
 const AdminConfig = lazy(() => import("./pages/admin/AdminConfig"));
@@ -75,10 +77,16 @@ const BlogPostCreateEdit = lazy(
   () => import("./pages/admin/BlogPostCreateEdit"),
 );
 const BlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
-const AdminSupportCategories = lazy(() => import("./pages/admin/AdminSupportCategories"));
-const AdminFAQCategories = lazy(() => import("./pages/admin/AdminFAQCategories"));
+const AdminSupportCategories = lazy(
+  () => import("./pages/admin/AdminSupportCategories"),
+);
+const AdminFAQCategories = lazy(
+  () => import("./pages/admin/AdminFAQCategories"),
+);
 const FAQManager = lazy(() => import("./pages/admin/FAQManager"));
-const AdminSupportTickets = lazy(() => import("./pages/admin/AdminSupportTickets"));
+const AdminSupportTickets = lazy(
+  () => import("./pages/admin/AdminSupportTickets"),
+);
 const AdminOffersPage = lazy(() => import("./pages/admin/AdminOffersPage"));
 const AdminOrdersPage = lazy(() => import("./pages/admin/AdminOrdersPage"));
 const AdminNotificationsPage = lazy(
@@ -93,18 +101,36 @@ const AdminValuationsPage = lazy(
   () => import("./pages/admin/AdminValuationsPage"),
 );
 const AdminSocialPage = lazy(() => import("./pages/admin/AdminSocialPage"));
-const AdminSecureBoxPage = lazy(() => import("./pages/admin/AdminSecureBoxPage"));
+const AdminSecureBoxPage = lazy(
+  () => import("./pages/admin/AdminSecureBoxPage"),
+);
 const AdminPaymentsPage = lazy(() => import("./pages/admin/AdminPaymentsPage"));
-const AdminPaymentViewPage = lazy(() => import("./pages/admin/AdminPaymentViewPage"));
-const AdminTranslationsPage = lazy(() => import("./pages/admin/AdminTranslationsPage"));
+const AdminPaymentViewPage = lazy(
+  () => import("./pages/admin/AdminPaymentViewPage"),
+);
+const AdminTranslationsPage = lazy(
+  () => import("./pages/admin/AdminTranslationsPage"),
+);
 const AdminProfilePage = lazy(() => import("./pages/admin/AdminProfilePage"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
-const AdminUserDetailPage = lazy(() => import("./pages/admin/AdminUserDetailPage"));
-const AdminAnalyticsPage = lazy(() => import("./pages/admin/AdminAnalyticsPage"));
-const AdminOrderDetailPage = lazy(() => import("./pages/admin/orders/AdminOrderDetailPage"));
-const AdminOrderInvoicePage = lazy(() => import("./pages/admin/orders/AdminOrderInvoicePage"));
-const AdminOrderPaymentPage = lazy(() => import("./pages/admin/orders/AdminOrderPaymentPage"));
-const AdminOrderEscrowPage = lazy(() => import("./pages/admin/orders/AdminOrderEscrowPage"));
+const AdminUserDetailPage = lazy(
+  () => import("./pages/admin/AdminUserDetailPage"),
+);
+const AdminAnalyticsPage = lazy(
+  () => import("./pages/admin/AdminAnalyticsPage"),
+);
+const AdminOrderDetailPage = lazy(
+  () => import("./pages/admin/orders/AdminOrderDetailPage"),
+);
+const AdminOrderInvoicePage = lazy(
+  () => import("./pages/admin/orders/AdminOrderInvoicePage"),
+);
+const AdminOrderPaymentPage = lazy(
+  () => import("./pages/admin/orders/AdminOrderPaymentPage"),
+);
+const AdminOrderEscrowPage = lazy(
+  () => import("./pages/admin/orders/AdminOrderEscrowPage"),
+);
 const RolesPermissions = lazy(() => import("./pages/admin/RolesPermissions"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const ClientAppsPage = lazy(() => import("./pages/client/ClientAppsPage"));
@@ -424,54 +450,41 @@ export const router = createBrowserRouter([
       },
       // Resources routes - Nested
       {
-        path: "resources",
+        path: "guides",
         children: [
           {
-            path: "guides",
-            children: [
-              {
-                index: true,
-                element: (
-                  <LazyComponent>
-                    <Guides />
-                  </LazyComponent>
-                ),
-              },
-              {
-                path: ":slug",
-                element: (
-                  <LazyComponent>
-                    <GuideDetail />
-                  </LazyComponent>
-                ),
-              },
-              {
-                path: "category/:category",
-                element: (
-                  <LazyComponent>
-                    <GuideCategory />
-                  </LazyComponent>
-                ),
-              },
-            ],
-          },
-          {
-            path: "help",
+            index: true,
             element: (
               <LazyComponent>
-                <HelpCenter />
+                <Guides />
               </LazyComponent>
             ),
           },
           {
-            path: "blog",
+            path: ":slug",
             element: (
               <LazyComponent>
-                <Blog />
+                <GuideDetail />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "category/:category",
+            element: (
+              <LazyComponent>
+                <GuideCategory />
               </LazyComponent>
             ),
           },
         ],
+      },
+      {
+        path: "help-center",
+        element: (
+          <LazyComponent>
+            <HelpCenter />
+          </LazyComponent>
+        ),
       },
       // Blog routes (alternative paths)
       {
@@ -494,6 +507,14 @@ export const router = createBrowserRouter([
             ),
           },
         ],
+      },
+      {
+        path: "faq",
+        element: (
+          <LazyComponent>
+            <FAQ publicPage={true} />
+          </LazyComponent>
+        ),
       },
       // Support routes
       {

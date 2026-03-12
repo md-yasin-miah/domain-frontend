@@ -5,6 +5,7 @@ export const ROUTES = {
   },
   APP: {
     MARKETPLACE: "/marketplace",
+    FAQ: "/faq",
     CATEGORIES: {
       ROOT: "/categories",
       DOMAINS: {
@@ -19,6 +20,21 @@ export const ROUTES = {
       DATABASES: "/categories/databases",
       DIGITAL_CHANNELS: "/categories/digital-channels",
       NFTs: "/categories/nfts",
+    },
+    GUIDES: {
+      ROOT: "/guides",
+      DETAILS: (slug: string) => `/guides/${slug}`,
+      CATEGORY: (category: string) => `/guides/category/${category}`,
+    },
+    HELP_CENTER: {
+      ROOT: "/help-center",
+      DETAILS: (slug: string) => `/help-center/${slug}`,
+      CATEGORY: (category: string) => `/help-center/category/${category}`,
+    },
+    BLOG: {
+      ROOT: "/blog",
+      DETAILS: (slug: string) => `/blog/${slug}`,
+      CATEGORY: (category: string) => `/blog/category/${category}`,
     },
   },
   CLIENT: {

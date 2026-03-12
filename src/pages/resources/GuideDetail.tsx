@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ROUTES } from "@/lib/routes";
 
 interface GuideContent {
   title: string;
@@ -239,17 +240,17 @@ const GuideDetail = () => {
       relatedGuides: [
         {
           title: "10 Errores Comunes al Comprar Sitios Web",
-          url: "/resources/guides/10-errores-comunes-al-comprar-sitios-web",
+          url: ROUTES.APP.GUIDES.DETAILS("10-errores-comunes-al-comprar-sitios-web"),
           readTime: "12 min"
         },
         {
           title: "Fundamentos de SEO para Dominios",
-          url: "/resources/guides/fundamentos-de-seo-para-dominios",
+          url: ROUTES.APP.GUIDES.DETAILS("fundamentos-de-seo-para-dominios"),
           readTime: "8 min"
         },
         {
           title: "Negociación Efectiva en Marketplace Digital",
-          url: "/resources/guides/negociacion-efectiva-en-marketplace-digital",
+          url: ROUTES.APP.GUIDES.DETAILS("negociacion-efectiva-en-marketplace-digital"),
           readTime: "11 min"
         }
       ]
@@ -310,7 +311,7 @@ const GuideDetail = () => {
       relatedGuides: [
         {
           title: "Guía Completa: Cómo Valorar un Dominio Premium",
-          url: "/resources/guides/guia-completa-como-valorar-un-dominio-premium",
+          url: ROUTES.APP.GUIDES.DETAILS("guia-completa-como-valorar-un-dominio-premium"),
           readTime: "15 min"
         }
       ]
@@ -335,14 +336,10 @@ const GuideDetail = () => {
   const renderContent = (item: any) => {
     switch (item.type) {
       case "heading":
-        const HeadingTag = `h${item.level + 1}` as keyof JSX.IntrinsicElements;
-        const headingClass = item.level === 1 
-          ? "text-2xl font-bold text-foreground mt-8 mb-4" 
-          : "text-xl font-semibold text-foreground mt-6 mb-3";
         return (
-          <HeadingTag key={item.content} className={headingClass} id={item.content.toLowerCase().replace(/[^a-z0-9]/g, "-")}>
+          <h2 key={item.content} className="text-2xl font-bold text-foreground mt-8 mb-4" id={item.content.toLowerCase().replace(/[^a-z0-9]/g, "-")}>
             {item.content}
-          </HeadingTag>
+          </h2>
         );
       case "paragraph":
         return (
@@ -392,7 +389,7 @@ const GuideDetail = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Guía no encontrada</h1>
           <p className="text-muted-foreground mb-6">La guía que buscas no existe o ha sido movida.</p>
-          <Link to="/resources/guides">
+          <Link to={ROUTES.APP.GUIDES.ROOT}>
             <Button>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Volver a Guías
@@ -408,7 +405,7 @@ const GuideDetail = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 via-background to-secondary/10 py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <Link to="/resources/guides" className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
+          <Link to={ROUTES.APP.GUIDES.ROOT} className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver a Guías
           </Link>

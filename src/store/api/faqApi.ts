@@ -2,9 +2,9 @@ import { apiSlice } from './apiSlice';
 
 export const faqApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getFAQs: builder.query<PaginatedResponse<FAQ>, PaginationParams & { is_active?: boolean; category_id?: number; search?: string }>({
+    getFAQs: builder.query<PaginatedResponse<FAQ>, PaginationParams & { is_active?: boolean; category_id?: number; search?: string; public?: boolean }>({
       query: (params) => ({
-        url: '/faq',
+        url: params.public ? '/faq/public' : '/faq',
         method: 'GET',
         params,
       }),

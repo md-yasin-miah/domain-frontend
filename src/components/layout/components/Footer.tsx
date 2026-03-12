@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '@/lib/routes';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -69,7 +70,7 @@ export function Footer() {
             <h4 className="font-semibold text-foreground">Soporte</h4>
             <div className="space-y-2 text-sm">
               <Link
-                to="/resources/help"
+                to={ROUTES.APP.HELP_CENTER.ROOT}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 Centro de Ayuda
@@ -82,7 +83,7 @@ export function Footer() {
               </Link>
               <span className="block text-muted-foreground">Chat en vivo disponible</span>
               <Link
-                to="/resources/guides"
+                to={ROUTES.APP.GUIDES.ROOT}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 Guías y Tutoriales

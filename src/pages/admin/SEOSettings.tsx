@@ -11,6 +11,7 @@ import { Globe, Save, Eye, AlertTriangle, Search, ExternalLink } from "lucide-re
 import { useSettings } from "@/hooks/useSettings";
 import { mockData, mockAuth } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
+import { ROUTES } from "@/lib/routes";
 
 interface SEORoute {
   id?: string;
@@ -38,8 +39,8 @@ const DEFAULT_ROUTES = [
   { route: '/services/valuations', name: 'Valuaciones', category: 'Servicios' },
   { route: '/services/trends', name: 'Market Trends', category: 'Servicios' },
   { route: '/services/brokers', name: 'Brokers', category: 'Servicios' },
-  { route: '/resources/guides', name: 'Guías', category: 'Recursos' },
-  { route: '/resources/blog', name: 'Blog', category: 'Recursos' }
+  { route: ROUTES.APP.GUIDES.ROOT, name: 'Guías', category: 'Recursos' },
+  { route: ROUTES.APP.BLOG.ROOT, name: 'Blog', category: 'Recursos' }
 ];
 
 export default function SEOSettings() {
