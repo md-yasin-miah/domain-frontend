@@ -10,12 +10,21 @@ export const supportApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['Ticket'],
     }),
-    getTicket: builder.query<SupportTicket, number>({
-      query: (id) => ({
+    getTicket: builder.query<SupportTicket, { id: number; include_replies?: boolean }>({
+      query: ({ id, include_replies }) => ({
         url: `/support/tickets/${id}`,
         method: 'GET',
+        params: include_replies != null ? { include_replies } : undefined,
       }),
-      providesTags: (result, error, id) => [{ type: 'Ticket', id }],
+      providesTags: (result, error, { id }) => [{ type: 'Ticket', id }],
+    }),
+    addTicketReply: builder.mutation<SupportTicketReply, { ticketId: number; data: TicketReplyCreateRequest }>({
+      query: ({ ticketId, data }) => ({
+        url: `/support/tickets/${ticketId}/replies`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { ticketId }) => [{ type: 'Ticket', id: ticketId }],
     }),
     createTicket: builder.mutation<SupportTicket, TicketCreateRequest>({
       query: (data) => ({
@@ -41,5 +50,6 @@ export const {
   useGetTicketQuery,
   useCreateTicketMutation,
   useUpdateTicketMutation,
+  useAddTicketReplyMutation,
 } = supportApi;
 

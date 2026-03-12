@@ -57,6 +57,7 @@ export const ROUTES = {
     PROFILE_SETUP: "/client/profile-setup",
     SAVED_SEARCH: "/client/saved-search",
     SUPPORT: "/client/support",
+    SUPPORT_TICKET: (id: number) => `/client/support/tickets/${id}`,
     CHAT: {
       ROOT: "/client/chat",
       CONVERSATION: (id: number) => `/client/chat/${id}`,
@@ -83,6 +84,7 @@ export const ROUTES = {
       ESCROWS: (id: number) => `/admin/orders/${id}/escrows`,
     },
     SUPPORT: "/admin/support",
+    SUPPORT_TICKET: (id: number) => `/admin/support/tickets/${id}`,
     OFFERS: "/admin/offers",
     CATEGORIES: {
       SUPPORT: "/admin/categories/support",

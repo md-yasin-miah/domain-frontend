@@ -33,6 +33,9 @@ const ClientDomainsPage = lazy(
 );
 const Facturas = lazy(() => import("./pages/client/Facturas"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
+const SupportTicketConversationPage = lazy(
+  () => import("./pages/SupportTicketConversationPage")
+);
 const ListingsManagement = lazy(() => import("./pages/admin/ListingsManagement"));
 const ListingCreateEdit = lazy(() => import("./pages/admin/ListingCreateEdit"));
 const AdminListingDetail = lazy(() => import("./pages/admin/ListingDetail"));
@@ -748,6 +751,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "support/tickets/:ticketId",
+        element: (
+          <LazyComponent>
+            <SupportTicketConversationPage />
+          </LazyComponent>
+        ),
+      },
+      {
         path: getLastPath(ROUTES.CLIENT.CHAT.ROOT),
         children: [
           {
@@ -1046,6 +1057,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <AdminSupportTickets />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "support/tickets/:ticketId",
+        element: (
+          <LazyComponent>
+            <SupportTicketConversationPage />
           </LazyComponent>
         ),
       },

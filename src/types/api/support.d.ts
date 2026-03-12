@@ -11,6 +11,22 @@ interface SupportTicket {
   created_by: UserMini | null;
   assigned_to: UserMini | null;
   category: Category | null;
+  replies?: SupportTicketReply[];
+}
+
+interface SupportTicketReply {
+  id: number;
+  ticket_id: number;
+  user_id: number;
+  message: string;
+  is_internal: boolean;
+  created_at: string;
+  user: UserMini | null;
+}
+
+interface TicketReplyCreateRequest {
+  message: string;
+  is_internal?: boolean;
 }
 
 interface TicketCreateRequest {

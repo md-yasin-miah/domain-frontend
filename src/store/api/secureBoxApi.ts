@@ -23,6 +23,7 @@ export interface SecureBoxUserInfo {
   id: number;
   username: string;
   email: string;
+  name: string;
 }
 
 export interface SecureBoxOrderInfo {

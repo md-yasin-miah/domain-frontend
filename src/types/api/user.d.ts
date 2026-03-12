@@ -2,6 +2,7 @@ interface UserMini {
   id: number;
   username: string;
   email: string;
+  name: string | null;
 }
 interface UserResponse {
   id: number;

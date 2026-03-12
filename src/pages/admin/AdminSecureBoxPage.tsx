@@ -36,6 +36,8 @@ import { DataTableWithPagination } from "@/components/common/DataTableWithPagina
 import { type ColumnDef } from "@/components/ui/data-table";
 import { usePagination } from "@/hooks/usePagination";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { ROUTES } from "@/lib/routes";
 
 const STATUS_OPTIONS = ["pending", "approved", "rejected", "accessed"] as const;
 
@@ -182,15 +184,27 @@ export default function AdminSecureBoxPage() {
         id: "buyer",
         accessorKey: (row) => row.buyer?.username ?? row.buyer?.email ?? "—",
         header: t("admin.secure_box.buyer", "Buyer"),
-        cell: ({ row }) =>
-          row.buyer ? `${row.buyer.username ?? row.buyer.email}` : "—",
+        cell: ({ row }) =>{
+          return <Link
+            to={ROUTES.ADMIN.USER_DETAILS(row.buyer?.id)}
+            className="text-primary hover:underline"
+          >
+            {row.buyer?.name || row.buyer?.username || row.buyer?.email}
+          </Link>
+        }
       },
       {
         id: "seller",
         accessorKey: (row) => row.seller?.username ?? row.seller?.email ?? "—",
         header: t("admin.secure_box.seller", "Seller"),
-        cell: ({ row }) =>
-          row.seller ? `${row.seller.username ?? row.seller.email}` : "—",
+        cell: ({ row }) =>{
+          return <Link
+            to={ROUTES.ADMIN.USER_DETAILS(row.seller?.id)}
+            className="text-primary hover:underline"
+          >
+            {row.seller?.name || row.seller?.username || row.seller?.email}
+          </Link>
+        }
       },
       {
         id: "status",

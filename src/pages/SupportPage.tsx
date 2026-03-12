@@ -53,13 +53,14 @@ import {
   type TicketCreateFormData,
   type ContactFormData,
 } from "@/schemas/support";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/lib/routes";
 import SupportTicketDetailsModal from "@/pages/component/SupportTicketDetailsModal";
 import { usePagination } from "@/hooks/usePagination";
 
 const SupportPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
@@ -447,6 +448,9 @@ const SupportPage = () => {
                                 <Button
                                   size="sm"
                                   className="bg-primary hover:bg-primary/90"
+                                  onClick={() =>
+                                    navigate(ROUTES.CLIENT.SUPPORT_TICKET(ticket.id))
+                                  }
                                 >
                                   {t("support.tickets.respond")}
                                 </Button>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -62,6 +63,7 @@ import {
 import SupportTicketDetailsModal from "@/pages/component/SupportTicketDetailsModal";
 import { useAuth } from "@/store/hooks/useAuth";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
+import { ROUTES } from "@/lib/routes";
 
 const PAGE_SIZE = 10;
 const STATUS_OPTIONS = [
@@ -74,6 +76,7 @@ const STATUS_OPTIONS = [
 
 export default function AdminSupportTickets() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { toast } = useToast();
   const [page, setPage] = useState(1);
@@ -314,7 +317,7 @@ export default function AdminSupportTickets() {
                     <TableHead>{t("support.detail.created")} By</TableHead>
                     <TableHead>{t("support.detail.assigned_to")}</TableHead>
                     <TableHead>{t("support.detail.created")}</TableHead>
-                    <TableHead className="w-[120px]">
+                    <TableHead className="w-[120px] text-center">
                       {t("common.actions")}
                     </TableHead>
                   </TableRow>
@@ -373,6 +376,17 @@ export default function AdminSupportTickets() {
                           >
                             <UserPlus className="h-4 w-4" />
                           </Button>
+                          {ticket.status !== "closed" && Number(ticket.assigned_to_id) === user?.id && (
+                            <Button
+                              size="sm"
+                              className="bg-primary hover:bg-primary/90"
+                              onClick={() =>
+                                navigate(ROUTES.ADMIN.SUPPORT_TICKET(ticket.id))
+                              }
+                            >
+                              {t("support.tickets.respond")}
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -531,10 +545,13 @@ export default function AdminSupportTickets() {
                           onValueChange={field.onChange}
                           placeholder={t(
                             "admin.support.select_user_for_ticket",
-                            "Select user (role: user)"
+                            "Select user (role: user)",
                           )}
                           searchPlaceholder={t("common.search", "Search...")}
-                          emptyMessage={t("common.no_results", "No results found.")}
+                          emptyMessage={t(
+                            "common.no_results",
+                            "No results found.",
+                          )}
                         />
                       </FormControl>
                       <FormMessage />
@@ -556,10 +573,13 @@ export default function AdminSupportTickets() {
                           onValueChange={field.onChange}
                           placeholder={t(
                             "admin.support.select_assigned",
-                            "Select assignee (admin)"
+                            "Select assignee (admin)",
                           )}
                           searchPlaceholder={t("common.search", "Search...")}
-                          emptyMessage={t("common.no_results", "No results found.")}
+                          emptyMessage={t(
+                            "common.no_results",
+                            "No results found.",
+                          )}
                         />
                       </FormControl>
                       <FormMessage />
@@ -582,10 +602,13 @@ export default function AdminSupportTickets() {
                             onValueChange={field.onChange}
                             placeholder={t(
                               "support.form.category_placeholder",
-                              "Select category"
+                              "Select category",
                             )}
                             searchPlaceholder={t("common.search", "Search...")}
-                            emptyMessage={t("common.no_results", "No results found.")}
+                            emptyMessage={t(
+                              "common.no_results",
+                              "No results found.",
+                            )}
                             loading={isLoadingCategories}
                           />
                         </FormControl>
