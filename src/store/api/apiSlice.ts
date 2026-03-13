@@ -51,6 +51,7 @@ export const apiSlice = createApi({
     'Balance',
     'User',
     'Domain',
+    'ListingType',
     'MarketplaceListing',
     'MyMarketplaceListing',
     'Blog',

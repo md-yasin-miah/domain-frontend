@@ -76,12 +76,15 @@ const BlogManager = lazy(() => import("./pages/admin/BlogManager"));
 const BlogPostCreateEdit = lazy(
   () => import("./pages/admin/BlogPostCreateEdit"),
 );
-const BlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
+const BlogCategories = lazy(() => import("./pages/admin/categories/BlogCategories"));
 const AdminSupportCategories = lazy(
-  () => import("./pages/admin/AdminSupportCategories"),
+  () => import("./pages/admin/categories/AdminSupportCategories"),
+);
+const AdminListingCategories = lazy(
+  () => import("./pages/admin/categories/AdminListingCategories"),
 );
 const AdminFAQCategories = lazy(
-  () => import("./pages/admin/AdminFAQCategories"),
+  () => import("./pages/admin/categories/AdminFAQCategories"),
 );
 const FAQManager = lazy(() => import("./pages/admin/FAQManager"));
 const AdminSupportTickets = lazy(
@@ -1038,6 +1041,14 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Navigate to={ROUTES.ADMIN.CATEGORIES.SUPPORT} replace />,
+          },
+          {
+            path: "listings",
+            element: (
+              <LazyComponent>
+                <AdminListingCategories />
+              </LazyComponent>
+            ),
           },
           {
             path: "support",

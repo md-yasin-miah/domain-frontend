@@ -103,6 +103,7 @@ export const ROUTES = {
     SUPPORT_TICKET: (id: number) => `/admin/support/tickets/${id}`,
     OFFERS: "/admin/offers",
     CATEGORIES: {
+      LISTINGS: "/admin/categories/listings",
       SUPPORT: "/admin/categories/support",
       FAQ: "/admin/categories/faq",
       BLOG: "/admin/categories/blog",

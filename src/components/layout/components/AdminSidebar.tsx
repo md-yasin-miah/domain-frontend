@@ -67,6 +67,7 @@ export function AdminSidebar() {
         icon: FolderTree,
         url: ROUTES.ADMIN.CATEGORIES.SUPPORT,
         subItems: [
+          { title: t("admin.sidebar.listings", "Listings"), url: ROUTES.ADMIN.CATEGORIES.LISTINGS },
           { title: t("admin.sidebar.support", "Support"), url: ROUTES.ADMIN.CATEGORIES.SUPPORT },
           { title: t("admin.sidebar.faq", "FAQ"), url: ROUTES.ADMIN.CATEGORIES.FAQ },
           { title: t("admin.sidebar.blog", "Blog"), url: ROUTES.ADMIN.CATEGORIES.BLOG },

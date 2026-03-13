@@ -4,11 +4,27 @@ export interface ListingType {
   id: number;
   name: string;
   slug: string;
-  description: string;
+  description: string | null;
   is_active: boolean;
-  icon: string;
+  icon: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface ListingTypeCreateRequest {
+  name: string;
+  slug?: string;
+  description?: string | null;
+  is_active?: boolean;
+  icon?: string | null;
+}
+
+export interface ListingTypeUpdateRequest {
+  name?: string;
+  slug?: string;
+  description?: string | null;
+  is_active?: boolean;
+  icon?: string | null;
 }
 
 export const marketplaceApi = apiSlice.injectEndpoints({
@@ -110,20 +126,51 @@ export const marketplaceApi = apiSlice.injectEndpoints({
         'MyMarketplaceListing',
       ],
     }),
-    getMarketplaceListingTypes: builder.query<ListingType[], void>({
-      query: () => ({
+    getMarketplaceListingTypes: builder.query<ListingType[], { is_active?: boolean } | void>({
+      query: (params) => ({
         url: '/marketplace/listing-types',
         method: 'GET',
+        params: params ?? {},
       }),
-      providesTags: ['Domain'],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: 'ListingType' as const, id })),
+              { type: 'ListingType', id: 'LIST' },
+            ]
+          : [{ type: 'ListingType', id: 'LIST' }],
     }),
-    createMarketplaceListingType: builder.mutation<any, any>({
+    createMarketplaceListingType: builder.mutation<ListingType, ListingTypeCreateRequest>({
       query: (data) => ({
         url: '/marketplace/listing-types',
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: [{ type: 'ListingType', id: 'LIST' }],
+    }),
+    updateMarketplaceListingType: builder.mutation<
+      ListingType,
+      { id: number; data: ListingTypeUpdateRequest }
+    >({
+      query: ({ id, data }) => ({
+        url: `/marketplace/listing-types/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'ListingType', id },
+        { type: 'ListingType', id: 'LIST' },
+      ],
+    }),
+    deleteMarketplaceListingType: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/marketplace/listing-types/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'ListingType', id },
+        { type: 'ListingType', id: 'LIST' },
+      ],
     }),
   }),
 });
@@ -141,4 +188,6 @@ export const {
   useUpdateMarketplaceListingStatusMutation,
   useGetMarketplaceListingTypesQuery,
   useCreateMarketplaceListingTypeMutation,
+  useUpdateMarketplaceListingTypeMutation,
+  useDeleteMarketplaceListingTypeMutation,
 } = marketplaceApi;
