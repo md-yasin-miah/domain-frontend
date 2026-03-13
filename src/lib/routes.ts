@@ -8,18 +8,11 @@ export const ROUTES = {
     FAQ: "/faq",
     CATEGORIES: {
       ROOT: "/categories",
+      BY_SLUG: (slug: string) => `/categories/${slug}`,
       DOMAINS: {
         ROOT: "/categories/domains",
         DETAILS: (id: number) => `/categories/domains/${id}`,
       },
-      WEBSITES: "/categories/websites",
-      APPS: "/categories/apps",
-      FBA_STORES: "/categories/fba-stores",
-      E_COMMERCE: "/categories/e-commerce",
-      SOFTWARE_SAAS: "/categories/software-saas",
-      DATABASES: "/categories/databases",
-      DIGITAL_CHANNELS: "/categories/digital-channels",
-      NFTs: "/categories/nfts",
     },
     GUIDES: {
       ROOT: "/guides",

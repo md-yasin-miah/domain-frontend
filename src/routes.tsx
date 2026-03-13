@@ -11,8 +11,8 @@ import LazyComponent from "./components/common/LazyComponent";
 // Lazy load all page components for code splitting
 const Index = lazy(() => import("./pages/Index"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
-const DomainsPage = lazy(() => import("./pages/marketplace/domains"));
-const WebsitesPage = lazy(() => import("./pages/marketplace/WebsitesPage"));
+const ListingIndexByCategory = lazy(() => import("./pages/public/categories/ListingIndexByCategory"));
+const ListingDetailsByCategory = lazy(() => import("./pages/public/categories/ListingDetailsByCategory"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Terminos = lazy(() => import("./pages/legal/Terminos"));
 const Privacidad = lazy(() => import("./pages/legal/Privacidad"));
@@ -26,8 +26,6 @@ const BuyerDashboard = lazy(() => import("./pages/admin/BuyerDashboard"));
 const SuperAdminDashboard = lazy(
   () => import("./pages/admin/SuperAdminDashboard"),
 );
-const Apps = lazy(() => import("./pages/marketplace/Apps"));
-const FBA = lazy(() => import("./pages/marketplace/FBA"));
 const ClientDomainsPage = lazy(
   () => import("./pages/client/ClientDomainsPage"),
 );
@@ -54,17 +52,7 @@ const GuideCategory = lazy(() => import("./pages/resources/GuideCategory"));
 const HelpCenter = lazy(() => import("./pages/resources/HelpCenter"));
 const Blog = lazy(() => import("./pages/resources/Blog"));
 const BlogPostDetail = lazy(() => import("./pages/resources/BlogPostDetail"));
-const EcommercePage = lazy(() => import("./pages/categories/EcommercePage"));
-const NFTsPage = lazy(() => import("./pages/categories/NFTsPage"));
-const SoftwareSaaSPage = lazy(
-  () => import("./pages/categories/SoftwareSaaSPage"),
-);
-const DatabasesPage = lazy(() => import("./pages/categories/DatabasesPage"));
-const DigitalChannelsPage = lazy(
-  () => import("./pages/categories/DigitalChannelsPage"),
-);
 const SuperAdminPanel = lazy(() => import("./pages/admin/SuperAdminPanel"));
-const ListingDetail = lazy(() => import("./pages/marketplace/ListingDetail"));
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
 const ClientProfile = lazy(() => import("./pages/client/ClientProfile"));
 const ProfileSetup = lazy(() => import("./pages/client/ProfileSetup"));
@@ -203,18 +191,18 @@ export const router = createBrowserRouter([
           </LazyComponent>
         ),
       },
-      // Categories routes - Nested
+      // Categories routes - dynamic by listing type slug (from GET /marketplace/listing-types)
       {
         path: "categories",
         children: [
           {
-            path: "domains",
+            path: ":slug",
             children: [
               {
                 index: true,
                 element: (
                   <LazyComponent>
-                    <DomainsPage />
+                    <ListingIndexByCategory />
                   </LazyComponent>
                 ),
               },
@@ -222,83 +210,11 @@ export const router = createBrowserRouter([
                 path: ":id",
                 element: (
                   <LazyComponent>
-                    <MyListingDetails />
+                    <ListingDetailsByCategory />
                   </LazyComponent>
                 ),
               },
             ],
-          },
-          {
-            path: "websites",
-            element: (
-              <LazyComponent>
-                <WebsitesPage />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "apps",
-            element: (
-              <LazyComponent>
-                <Apps />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "fba-stores",
-            element: (
-              <LazyComponent>
-                <FBA />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "listing/:id",
-            element: (
-              <LazyComponent>
-                <ListingDetail />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "ecommerce",
-            element: (
-              <LazyComponent>
-                <EcommercePage />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "nfts",
-            element: (
-              <LazyComponent>
-                <NFTsPage />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "software-saas",
-            element: (
-              <LazyComponent>
-                <SoftwareSaaSPage />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "databases",
-            element: (
-              <LazyComponent>
-                <DatabasesPage />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "digital-channels",
-            element: (
-              <LazyComponent>
-                <DigitalChannelsPage />
-              </LazyComponent>
-            ),
           },
         ],
       },

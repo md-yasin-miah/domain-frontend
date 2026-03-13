@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -31,7 +32,122 @@ import {
 } from 'lucide-react';
 import { ROUTES } from "./routes";
 import { TFunction } from "i18next";
+import { useGetMarketplaceListingTypesQuery } from '@/store/api/marketplaceApi';
+import type { LucideIcon } from 'lucide-react';
 
+/** Map listing type slug to menu icon (optional). */
+const slugToIcon: Record<string, LucideIcon> = {
+  domains: Server,
+  domain: Server,
+  websites: Globe,
+  website: Globe,
+  apps: Smartphone,
+  app: Smartphone,
+};
+
+/** Build Categories subitems from GET /marketplace/listing-types (active only). */
+function buildCategorySubItems(listingTypes: { id: number; name: string; slug: string; description: string | null }[]) {
+  return listingTypes.map((type) => ({
+    title: type.name,
+    url: ROUTES.APP.CATEGORIES.BY_SLUG(type.slug),
+    icon: slugToIcon[type.slug] ?? Server,
+    description: type.description ?? undefined,
+  }));
+}
+
+/**
+ * App menu with Categories subitems loaded from GET /marketplace/listing-types.
+ * Use this in AppLayout so the nav reflects active listing types.
+ */
+export function useAppMenuItems(t: TFunction): MenuItem[] {
+  const { data: listingTypes } = useGetMarketplaceListingTypesQuery({ is_active: true });
+
+  return useMemo(() => {
+    const types = Array.isArray(listingTypes) ? listingTypes : [];
+    return [
+    {
+      title: t('nav.home'),
+      url: ROUTES.ROOT,
+      icon: Home,
+    },
+    {
+      title: t('nav.marketplace'),
+      url: ROUTES.APP.MARKETPLACE,
+      icon: ShoppingCart,
+    },
+    {
+      title: t('nav.categories'),
+      url: '#',
+      icon: Grid3X3,
+      subItems: buildCategorySubItems(types),
+    },
+    {
+      title: 'Servicios',
+      url: '#',
+      icon: Settings,
+      subItems: [
+        {
+          title: t('services.valuations'),
+          url: '/services/valuations',
+          icon: Server,
+          description: t('services.valuations_desc'),
+        },
+        {
+          title: t('services.market_trends'),
+          url: '/services/trends',
+          icon: TrendingUp,
+          description: t('services.market_trends_desc'),
+        },
+        {
+          title: t('services.brokers_network'),
+          url: '/services/brokers',
+          icon: Users,
+          description: t('services.brokers_network_desc'),
+        },
+        {
+          title: t('services.referral_program'),
+          url: '/services/referrals',
+          icon: Users,
+          description: t('services.referral_program_desc'),
+        },
+      ],
+    },
+    {
+      title: 'Recursos',
+      url: '#',
+      icon: BookOpen,
+      subItems: [
+        {
+          title: t('resources.guides'),
+          url: ROUTES.APP.GUIDES.ROOT,
+          icon: BookOpen,
+          description: t('resources.guides_desc'),
+        },
+        {
+          title: t('resources.help_center'),
+          url: ROUTES.APP.HELP_CENTER.ROOT,
+          icon: BookOpen,
+          description: t('resources.help_center_desc'),
+        },
+        {
+          title: t('resources.blog'),
+          url: ROUTES.APP.BLOG.ROOT,
+          icon: BookOpen,
+          description: t('resources.blog_desc'),
+        },
+        {
+          title: "FAQs",
+          url: ROUTES.APP.FAQ,
+          icon: HelpCircle,
+          description: t('resources.faqs_desc'),
+        },
+      ],
+    },
+  ];
+  }, [t, listingTypes]);
+}
+
+/** Legacy: app menu with static Categories (single "Domains" item). Prefer useAppMenuItems for API-driven categories. */
 const getAppMenuItems = (t: TFunction): MenuItem[] => {
   return [
     {
@@ -54,54 +170,6 @@ const getAppMenuItems = (t: TFunction): MenuItem[] => {
           url: ROUTES.APP.CATEGORIES.DOMAINS.ROOT,
           icon: Server,
           description: t('categories.domains_desc'),
-        },
-        {
-          title: t('categories.websites'),
-          url: ROUTES.APP.CATEGORIES.WEBSITES,
-          icon: Globe,
-          description: t('categories.websites_desc'),
-        },
-        {
-          title: t('categories.fba_stores'),
-          url: ROUTES.APP.CATEGORIES.FBA_STORES,
-          icon: Smartphone,
-          description: t('categories.fba_stores_desc'),
-        },
-        {
-          title: t('categories.mobile_apps'),
-          url: ROUTES.APP.CATEGORIES.APPS,
-          icon: Code,
-          description: t('categories.mobile_apps_desc'),
-        },
-        {
-          title: t('categories.ecommerce'),
-          url: ROUTES.APP.CATEGORIES.E_COMMERCE,
-          icon: ShoppingCart,
-          description: t('categories.ecommerce_desc'),
-        },
-        {
-          title: t('categories.software_saas'),
-          url: ROUTES.APP.CATEGORIES.SOFTWARE_SAAS,
-          icon: Code,
-          description: t('categories.software_saas_desc'),
-        },
-        {
-          title: t('categories.databases'),
-          url: ROUTES.APP.CATEGORIES.DATABASES,
-          icon: Database,
-          description: t('categories.databases_desc'),
-        },
-        {
-          title: t('categories.digital_channels'),
-          url: ROUTES.APP.CATEGORIES.DIGITAL_CHANNELS,
-          icon: Globe,
-          description: t('categories.digital_channels_desc'),
-        },
-        {
-          title: t('categories.nfts'),
-          url: ROUTES.APP.CATEGORIES.NFTs,
-          icon: Gem,
-          description: t('categories.nfts_desc'),
         },
       ],
     },
@@ -168,7 +236,7 @@ const getAppMenuItems = (t: TFunction): MenuItem[] => {
       ],
     },
   ];
-}
+};
 
 const getClientMenuItems = (t: TFunction): MenuItem[] => {
   return [
