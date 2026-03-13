@@ -9,6 +9,7 @@ import {
   UserCircle,
 } from 'lucide-react';
 import { MenuItem } from './components/AppSidebar';
+import { getAdminServices } from '@/lib/menu';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -21,23 +22,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const adminMenuItems: MenuItem[] = [];
 
   // Admin user services - quick access to admin features
-  const adminUserServices: MenuItem[] = [
-    {
-      title: 'Profile',
-      url: ROUTES.ADMIN.PROFILE,
-      icon: UserCircle,
-    },
-    {
-      title: 'Settings',
-      url: ROUTES.ADMIN.SETTINGS,
-      icon: Settings,
-    },
-    {
-      title: 'Dashboard',
-      url: '/admin/dashboard',
-      icon: LayoutDashboard,
-    }
-  ];
+  const adminUserServices: MenuItem[] = getAdminServices(t);
 
   return (
     <SidebarProvider>
@@ -47,10 +32,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           <Header
             menuItems={adminMenuItems}
             userServices={adminUserServices}
-            showDashboard={false}
             leftSlot={
               <SidebarTrigger className="transition-all duration-200 hover:bg-accent hover:text-accent-foreground hover:scale-105" />
             }
+            navigationType="admin"
           />
           <main className="flex-1 overflow-auto custom-scrollbar p-6 lg:p-8">
             <div className="mx-auto max-w-7xl">

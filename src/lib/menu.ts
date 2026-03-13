@@ -266,8 +266,16 @@ const getClientServices = (t: TFunction): MenuItem[] => {
   ];
 }
 
+const getAdminServices = (t: TFunction): MenuItem[] => {
+  return [
+    { title: t('nav.profile'), url: ROUTES.ADMIN.PROFILE, icon: User },
+    { title: t('nav.settings'), url: ROUTES.ADMIN.SETTINGS, icon: Settings },
+    { title: t('nav.dashboard'), url: ROUTES.ADMIN.DASHBOARD, icon: LayoutDashboard },
+  ];
+}
 export {
   getAppMenuItems,
   getClientMenuItems,
   getClientServices,
+  getAdminServices,
 };
