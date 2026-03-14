@@ -9,9 +9,9 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const menuItems = useAppMenuItems(t);
-  const userServices = user && user.roles.some((role: string) => role === 'user')
+  const userServices = user && user?.roles?.some((role: string) => role === 'user')
     ? getClientServices(t)
-    : user.roles.some((role: string) => role === 'admin')
+    : user?.roles?.some((role: string) => role === 'admin')
       ? getAdminServices(t)
       : [];
 

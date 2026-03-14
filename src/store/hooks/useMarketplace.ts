@@ -1,8 +1,12 @@
-import { useGetMarketplaceListingsQuery } from '@/store/api/marketplaceApi';
-import { useGetDashboardQuery } from '@/store/api/dashboardApi';
+import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
+import { useGetDashboardQuery } from "@/store/api/dashboardApi";
 
 export const useMarketplace = () => {
-  const { data: listings, isLoading, error } = useGetMarketplaceListingsQuery({ status: 'active' });
+  const {
+    data: listings,
+    isLoading,
+    error,
+  } = useGetMarketplaceListingsQuery({ status: "active" });
 
   return {
     items: Array.isArray(listings) ? listings : listings?.items || [],
@@ -11,10 +15,10 @@ export const useMarketplace = () => {
   };
 };
 
-export const useMarketplaceDomains = () => {
+export const useMarketplaceListingsById = (listing_type_id: number) => {
   const { data, isLoading } = useGetMarketplaceListingsQuery({
-    status: 'active',
-    listing_type_id: 1, // Assuming 1 is domain type
+    status: "active",
+    listing_type_id,
   });
 
   return {

@@ -2,6 +2,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -21,17 +22,29 @@ import {
   CheckCircle,
 } from "lucide-react";
 import {
-  useMarketplaceDomains,
+  useMarketplaceListingsById,
   useMarketplaceStats,
   useIncrementViews,
 } from "@/store/hooks/useMarketplace";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useGetMarketplaceListingTypesQuery } from "@/store/api/marketplaceApi";
 
 const DomainsPage = () => {
   const { t } = useTranslation();
-  const { data: domains, isLoading: domainsLoading } = useMarketplaceDomains();
+  const { slug } = useParams<{ slug: string }>();
+  const { data: listingTypes } = useGetMarketplaceListingTypesQuery(
+    { is_active: true },
+    {
+      skip: !slug,
+    },
+  );
+  const listing_type_id = listingTypes?.find(
+    (type: MarketplaceListingType) => type.slug === slug,
+  )?.id;
+  const { data: listings, isLoading: listingsLoading } =
+    useMarketplaceListingsById(listing_type_id);
   const { data: stats } = useMarketplaceStats();
   const incrementViews = useIncrementViews();
 
@@ -169,7 +182,7 @@ const DomainsPage = () => {
           </Button>
         </div>
 
-        {domainsLoading ? (
+        {listingsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <Card key={i} className="border-2">
@@ -200,102 +213,245 @@ const DomainsPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {domains && domains.length > 0 ? (
-              domains.map((domain) => {
-                const domainData = (domain.domain_data as Record<string, unknown>) || {};
-                const displayDomain =
-                  domain.title ||
-                  (typeof domainData.domain === "string" ? domainData.domain : "") ||
-                  "domain.com";
-                const extension =
-                  (typeof domainData.extension === "string"
-                    ? domainData.extension
-                    : "") ||
-                  displayDomain.split(".").pop() ||
-                  ".com";
-                const registrar =
-                  (typeof domainData.registrar === "string"
-                    ? domainData.registrar
-                    : "") || t("marketplace_domains.labels.unknown");
-                const expires =
-                  (typeof domainData.expires === "string" ? domainData.expires : "") ||
-                  "2025-12-31";
-                const length = displayDomain.length;
+            {listings && listings.length > 0 ? (
+              listings.map((listing: MarketplaceListing) => {
+                const price =
+                  typeof listing.price === "string"
+                    ? parseFloat(listing.price)
+                    : listing.price;
+                const displayTitle =
+                  listing.title ||
+                  listing.domain_name ||
+                  listing.slug ||
+                  "#" + listing.id;
+                const detailUrl = slug
+                  ? `/categories/${slug}/${listing.id}`
+                  : ROUTES.APP.MARKETPLACE;
 
                 return (
                   <Card
-                    key={domain.id}
-                    className="hover:shadow-lg transition-all duration-300 group border-2 hover:border-primary/20 cursor-pointer"
-                    onClick={() => incrementViews(domain.id)}
+                    key={listing.id}
+                    className="hover:shadow-lg transition-all duration-300 group border-2 hover:border-primary/20 cursor-pointer flex flex-col justify-between"
+                    onClick={() => incrementViews(listing.id)}
                   >
-                    <CardHeader className="pb-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                            {displayDomain}
-                            {domain.is_premium && (
-                              <Award className="inline h-4 w-4 text-yellow-500 ml-2" />
-                            )}
-                          </CardTitle>
-                          <div className="flex items-center gap-2 mt-2">
-                            <Badge variant="outline">
-                              {domain.marketplace_categories?.name ||
-                                t("marketplace_domains.labels.no_category")}
-                            </Badge>
-                            <Badge variant="secondary" className="text-xs">
-                              {extension}
-                            </Badge>
+                    <div>
+                      <CardHeader className="pb-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                              {displayTitle}
+                              {listing.is_featured && (
+                                <Award className="inline h-4 w-4 text-yellow-500 ml-2" />
+                              )}
+                            </CardTitle>
+                            <div className="flex flex-wrap items-center gap-1 w-fit gap-2 mt-2">
+                              {listing.listing_type?.name && (
+                                <Badge variant="outline">
+                                  {listing.listing_type.name}
+                                </Badge>
+                              )}
+                              {listing.domain_extension && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {listing.domain_extension}
+                                </Badge>
+                              )}
+                              {listing.is_price_negotiable && (
+                                <Badge variant="secondary">
+                                  {t(
+                                    "marketplace_domains.labels.negotiable",
+                                    "Negotiable",
+                                  )}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardHeader>
+                      </CardHeader>
 
-                    <CardContent className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-2xl font-bold text-primary">
-                          ${domain.price.toLocaleString()}
-                        </span>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Eye className="h-4 w-4" />
-                          {domain.views_count}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">
-                            {t("marketplace_domains.labels.length")}:
+                      <CardContent className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-2xl font-bold text-primary">
+                            {listing.currency || "USD"}{" "}
+                            {Number.isFinite(price)
+                              ? price.toLocaleString()
+                              : listing.price}
                           </span>
-                          <p className="font-medium">
-                            {t("marketplace_domains.labels.length_value", {
-                              count: length,
-                            })}
+                          {(listing.view_count != null ||
+                            listing.favorite_count != null) && (
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              {listing.view_count != null && (
+                                <span className="flex items-center gap-1">
+                                  <Eye className="h-4 w-4" />
+                                  {listing.view_count}
+                                </span>
+                              )}
+                              {listing.favorite_count != null &&
+                                listing.favorite_count > 0 && (
+                                  <span>
+                                    {listing.favorite_count}{" "}
+                                    {t("common.favorites", "favorites")}
+                                  </span>
+                                )}
+                            </div>
+                          )}
+                        </div>
+
+                        {listing.short_description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {listing.short_description}
                           </p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            {t("marketplace_domains.labels.registrar")}:
-                          </span>
-                          <p className="font-medium">{registrar}</p>
-                        </div>
-                      </div>
+                        )}
 
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        {t("marketplace_domains.labels.expires")}: {expires}
-                      </div>
+                        <div className="flex flex-wrap gap-x-1 gap-y-2 text-sm">
+                          {listing.domain_name && (
+                            <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                              <span className="text-muted-foreground">
+                                {t(
+                                  "marketplace_domains.labels.domain",
+                                  "Domain",
+                                )}
+                                :
+                              </span>
+                              <p className="font-medium">
+                                {listing.domain_name}
+                              </p>
+                            </div>
+                          )}
+                          {listing.domain_age_years != null &&
+                            listing.domain_age_years > 0 && (
+                              <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                                <span className="text-muted-foreground">
+                                  {t("marketplace_domains.labels.age", "Age")}:
+                                </span>
+                                <p className="font-medium">
+                                  {listing.domain_age_years}{" "}
+                                  {t("common.years", "yrs")}
+                                </p>
+                              </div>
+                            )}
+                          {listing.domain_authority != null &&
+                            listing.domain_authority > 0 && (
+                              <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                                <span className="text-muted-foreground">
+                                  {t(
+                                    "marketplace_domains.labels.domain_authority",
+                                    "DA",
+                                  )}
+                                  :
+                                </span>
+                                <p className="font-medium">
+                                  {listing.domain_authority}
+                                </p>
+                              </div>
+                            )}
+                          {listing.domain_backlinks != null &&
+                            listing.domain_backlinks > 0 && (
+                              <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                                <span className="text-muted-foreground">
+                                  {t(
+                                    "marketplace_domains.labels.backlinks",
+                                    "Backlinks",
+                                  )}
+                                  :
+                                </span>
+                                <p className="font-medium">
+                                  {listing.domain_backlinks}
+                                </p>
+                              </div>
+                            )}
+                          {listing.website_traffic_monthly != null &&
+                            listing.website_traffic_monthly > 0 && (
+                              <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3 ">
+                                <span className="text-muted-foreground">
+                                  {t(
+                                    "marketplace_domains.labels.traffic",
+                                    "Traffic",
+                                  )}
+                                  :
+                                </span>
+                                <p className="font-medium">
+                                  {listing.website_traffic_monthly.toLocaleString()}
+                                  /mo
+                                </p>
+                              </div>
+                            )}
+                          {listing.website_url && (
+                            <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                              <span className="text-muted-foreground">
+                                {t(
+                                  "marketplace_domains.labels.website",
+                                  "Website",
+                                )}
+                                :
+                              </span>
+                              <p className="font-medium truncate">
+                                {listing.website_url}
+                              </p>
+                            </div>
+                          )}
+                          {listing.website_revenue_monthly != null &&
+                            Number(listing.website_revenue_monthly) > 0 && (
+                              <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                                <span className="text-muted-foreground">
+                                  {t(
+                                    "marketplace_domains.labels.revenue",
+                                    "Revenue",
+                                  )}
+                                  :
+                                </span>
+                                <p className="font-medium">
+                                  {typeof listing.website_revenue_monthly ===
+                                  "string"
+                                    ? listing.website_revenue_monthly
+                                    : listing.website_revenue_monthly.toLocaleString()}
+                                  /mo
+                                </p>
+                              </div>
+                            )}
+                          {listing.website_technology && (
+                            <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                              <span className="text-muted-foreground">
+                                {t(
+                                  "marketplace_domains.labels.technology",
+                                  "Tech",
+                                )}
+                                :
+                              </span>
+                              <p className="font-medium truncate">
+                                {listing.website_technology}
+                              </p>
+                            </div>
+                          )}
+                        </div>
 
-                      <div className="flex gap-2 pt-2">
-                        <Link to={ROUTES.APP.CATEGORIES.DOMAINS.DETAILS(domain.id)}>
-                          <Button className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground">
+                        {listing.expires_at && (
+                          <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                            <Calendar className="h-4 w-4 shrink-0" />
+                            {t("marketplace_domains.labels.expires", "Expires")}
+                            : {listing.expires_at}
+                          </div>
+                        )}
+
+                        {listing.seller?.name && (
+                          <p className="text-sm text-muted-foreground">
+                            {t("marketplace_domains.labels.seller", "Seller")}:{" "}
+                            {listing.seller.name}
+                          </p>
+                        )}
+                      </CardContent>
+                    </div>
+                    <CardFooter>
+                      <div className="grid grid-cols-2 gap-2 w-full">
+                        <Link to={detailUrl}>
+                          <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
                             {t("marketplace_domains.actions.view_details")}
                           </Button>
                         </Link>
-                        <Button variant="outline" className="flex-1">
+                        <Button variant="outline" className="w-full">
                           {t("marketplace_domains.actions.make_offer")}
                         </Button>
                       </div>
-                    </CardContent>
+                    </CardFooter>
                   </Card>
                 );
               })
@@ -312,32 +468,6 @@ const DomainsPage = () => {
             )}
           </div>
         )}
-      </div>
-
-      {/* Stats Section */}
-      <div className="bg-gradient-to-r from-primary/5 to-transparent rounded-2xl p-8 border">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-primary mb-2">
-              {stats?.domains.toLocaleString() || "0"}
-            </div>
-            <div className="text-muted-foreground">
-              {t("marketplace_domains.stats.domains_available")}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">$1.2M</div>
-            <div className="text-muted-foreground">
-              {t("marketplace_domains.stats.in_transactions")}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">15,432</div>
-            <div className="text-muted-foreground">
-              {t("marketplace_domains.stats.active_users")}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

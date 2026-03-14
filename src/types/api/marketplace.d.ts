@@ -59,6 +59,7 @@ interface MarketplaceListing {
     id: number,
     username: string,
     email: string
+    name: string
   },
   listing_type: MarketplaceListingType,
   is_favorited: boolean,

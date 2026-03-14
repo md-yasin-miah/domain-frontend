@@ -37,6 +37,13 @@ export const marketplaceApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['MarketplaceListing'],
     }),
+    getMarketplaceListingsBySlug: builder.query<PaginatedResponse<MarketplaceListing>, string>({
+      query: (slug) => ({
+        url: `/marketplace/listings/slug/${slug}`,
+        method: 'GET',
+      }),
+      providesTags: ['MarketplaceListing'],
+    }),
     getMyMarketListing: builder.query<PaginatedResponse<MarketplaceListing>, MarketplaceListingFilters>({
       query: (params) => ({
         url: '/marketplace/listings/my',
