@@ -433,65 +433,68 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-roboto font-black text-foreground mb-6">
-              {t("requirements.title")}
+              {t("requirements.title", "Requirements to participate")}
             </h2>
+            <p className="text-lg text-muted-foreground font-roboto max-w-2xl mx-auto">
+              {t("requirements.subtitle", "What you need to buy or sell domains, websites, and digital assets on our marketplace.")}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* Para Compradores */}
+            {/* For Buyers */}
             <div className="card-professional">
               <h3 className="text-3xl font-roboto font-bold mb-8 text-primary">
-                {t("requirements.buyers")}
+                {t("requirements.buyers", "For buyers")}
               </h3>
               <ul className="space-y-4 font-roboto">
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.buyers_reqs.0")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.buyers_reqs.0", "Create an account and complete verification to access the marketplace.")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.buyers_reqs.1")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.buyers_reqs.1", "Browse domains, websites, and apps by category; filter by price, traffic, or metrics.")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.buyers_reqs.2")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.buyers_reqs.2", "Make offers or buy at listed price; participate in auctions when available.")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.buyers_reqs.3")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.buyers_reqs.3", "Pay securely through escrow; funds are released only after the asset is transferred to you.")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.buyers_reqs.4")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.buyers_reqs.4", "Track orders, invoices, and payouts from your dashboard; contact support if needed.")}</span>
                 </li>
               </ul>
             </div>
 
-            {/* Para Vendedores */}
+            {/* For Sellers */}
             <div className="card-professional">
               <h3 className="text-3xl font-roboto font-bold mb-8 text-primary">
-                {t("requirements.sellers")}
+                {t("requirements.sellers", "For sellers")}
               </h3>
               <ul className="space-y-4 font-roboto">
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.sellers_reqs.0")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.sellers_reqs.0", "Register and verify your account to list domains, websites, or apps.")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.sellers_reqs.1")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.sellers_reqs.1", "Add listings with title, description, price, and optional metrics (DA, traffic, revenue).")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.sellers_reqs.2")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.sellers_reqs.2", "Receive and manage offers; accept or decline; run auctions for your listings.")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.sellers_reqs.3")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.sellers_reqs.3", "Get paid via escrow after you transfer the asset to the buyer; funds go to your wallet.")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-1" />
-                  <span>{t("requirements.sellers_reqs.4")}</span>
+                  <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
+                  <span>{t("requirements.sellers_reqs.4", "Manage listings, orders, and payouts from your dashboard; use support for disputes.")}</span>
                 </li>
               </ul>
             </div>
