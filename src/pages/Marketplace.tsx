@@ -38,6 +38,8 @@ import {
   useGetMarketplaceListingsQuery,
 } from "@/store/api/marketplaceApi";
 import { ROUTES } from "@/lib/routes";
+import MarketplaceListingCard from "@/components/marketplace/MarketplaceListingCard";
+import { useIncrementViews } from "@/store/hooks/useMarketplace";
 
 const LISTING_TYPE_ICONS: Record<string, typeof Globe> = {
   domain: Globe,
@@ -151,6 +153,8 @@ const Marketplace = () => {
         })),
     [listingTypes],
   );
+
+  const incrementViews = useIncrementViews();
 
   const listingsLoading =
     listingsTab === "featured"
@@ -327,85 +331,12 @@ const Marketplace = () => {
               const grid = (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {list.map((listing: MarketplaceListing) => (
-                    <Card
+                    <MarketplaceListingCard
                       key={listing.id}
-                      className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 hover:border-primary/20"
-                    >
-                      <CardHeader className="pb-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                            {listing.title}
-                          </CardTitle>
-                          <div className="flex gap-2 flex-wrap justify-end">
-                            {listing.is_featured && (
-                              <Badge className="bg-gradient-to-r from-primary to-secondary">
-                                Destacado
-                              </Badge>
-                            )}
-                            <Badge
-                              variant="outline"
-                              className="text-green-600 border-green-600"
-                            >
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Verificado
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary">
-                            {listing.listing_type?.name ?? "—"}
-                          </Badge>
-                          {listing.domain_name && (
-                            <>
-                              <span className="text-sm text-muted-foreground">
-                                •
-                              </span>
-                              <span className="text-sm text-muted-foreground truncate max-w-[120px]">
-                                {listing.domain_name}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-muted-foreground">
-                              Precio:
-                            </span>
-                            <span className="text-xl font-bold text-primary">
-                              {formatPrice(listing.price, listing.currency)}
-                            </span>
-                          </div>
-                          {(listing.short_description ||
-                            listing.domain_name ||
-                            listing.website_traffic_monthly) && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-muted-foreground">
-                                Tráfico/Métricas:
-                              </span>
-                              <span className="text-sm font-medium truncate max-w-[180px]">
-                                {listing.short_description ||
-                                  listing.domain_name ||
-                                  (listing.website_traffic_monthly
-                                    ? `${Number(listing.website_traffic_monthly).toLocaleString()}/mes`
-                                    : "—")}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex gap-2 pt-2">
-                            <Button
-                              asChild
-                              className="flex-1 bg-gradient-to-r from-primary to-secondary hover:shadow-lg"
-                            >
-                              <Link to={ROUTES.APP.LISTING_DETAIL(listing.slug)}>
-                                View Details
-                              </Link>
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                      listing={listing}
+                      detailUrl={ROUTES.APP.LISTING_DETAIL(listing.slug)}
+                      onViewClick={incrementViews}
+                    />
                   ))}
                 </div>
               );

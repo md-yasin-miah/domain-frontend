@@ -80,6 +80,15 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
   const listingTypes = Array.isArray(typesData) ? typesData : typesData?.items ?? [];
   const [updateListing, { isLoading: isUpdating }] = useUpdateMarketplaceListingMutation();
 
+  // Resolve current listing type (from form selection or initial listing)
+  const selectedListingType =
+    listingTypes.find((t) => t.id === formData.listing_type_id) ?? listing?.listing_type;
+  const typeSlug = (selectedListingType?.slug ?? selectedListingType?.name ?? '').toLowerCase();
+  const isDomainType =
+    typeSlug === 'domain' || typeSlug === 'domains' || typeSlug.includes('domain');
+  const isWebsiteType =
+    typeSlug === 'website' || typeSlug === 'websites' || typeSlug.includes('website');
+
   useEffect(() => {
     if (open && listing) {
       setFormData({
@@ -334,86 +343,118 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             </div>
           </div>
 
-          {/* Domain / website */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-sm">{t('client.listings.edit.domain_website', 'Domain & website')}</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>{t('client.listings.edit.domain_name', 'Domain name')}</Label>
-                <Input
-                  value={formData.domain_name}
-                  onChange={(e) => setFormData((p) => ({ ...p, domain_name: e.target.value }))}
-                  placeholder="example.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t('client.listings.edit.domain_extension', 'Extension')}</Label>
-                <Input
-                  value={formData.domain_extension}
-                  onChange={(e) => setFormData((p) => ({ ...p, domain_extension: e.target.value }))}
-                  placeholder=".com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t('client.listings.edit.domain_age', 'Domain age (years)')}</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={formData.domain_age_years}
-                  onChange={(e) => setFormData((p) => ({ ...p, domain_age_years: e.target.value }))}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t('client.listings.edit.domain_authority', 'Domain authority')}</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={formData.domain_authority}
-                  onChange={(e) => setFormData((p) => ({ ...p, domain_authority: e.target.value }))}
-                  placeholder="0-100"
-                />
-              </div>
-              <div className="space-y-2 col-span-2">
-                <Label>{t('client.listings.edit.website_url', 'Website URL')}</Label>
-                <Input
-                  value={formData.website_url}
-                  onChange={(e) => setFormData((p) => ({ ...p, website_url: e.target.value }))}
-                  placeholder="https://..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t('client.listings.edit.traffic', 'Monthly traffic')}</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={formData.website_traffic_monthly}
-                  onChange={(e) => setFormData((p) => ({ ...p, website_traffic_monthly: e.target.value }))}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t('client.listings.edit.revenue', 'Monthly revenue')}</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  value={formData.website_revenue_monthly}
-                  onChange={(e) => setFormData((p) => ({ ...p, website_revenue_monthly: e.target.value }))}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2 col-span-2">
-                <Label>{t('client.listings.edit.technology', 'Website technology')}</Label>
-                <Input
-                  value={formData.website_technology}
-                  onChange={(e) => setFormData((p) => ({ ...p, website_technology: e.target.value }))}
-                  placeholder="e.g. WordPress, React"
-                />
+          {/* Domain data – only when listing type is domain */}
+          {isDomainType && (
+            <div className="space-y-4">
+              <h4 className="font-semibold text-sm">{t('client.listings.edit.domain_info', 'Domain information')}</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('client.listings.edit.domain_name', 'Domain name')}</Label>
+                  <Input
+                    value={formData.domain_name}
+                    onChange={(e) => setFormData((p) => ({ ...p, domain_name: e.target.value }))}
+                    placeholder="example.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('client.listings.edit.domain_extension', 'Extension')}</Label>
+                  <Input
+                    value={formData.domain_extension}
+                    onChange={(e) => setFormData((p) => ({ ...p, domain_extension: e.target.value }))}
+                    placeholder=".com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('client.listings.edit.domain_age', 'Domain age (years)')}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={formData.domain_age_years}
+                    onChange={(e) => setFormData((p) => ({ ...p, domain_age_years: e.target.value }))}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('client.listings.edit.domain_authority', 'Domain authority')}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={formData.domain_authority}
+                    onChange={(e) => setFormData((p) => ({ ...p, domain_authority: e.target.value }))}
+                    placeholder="0-100"
+                  />
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label>{t('client.listings.edit.domain_backlinks', 'Domain backlinks')}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={formData.domain_backlinks}
+                    onChange={(e) => setFormData((p) => ({ ...p, domain_backlinks: e.target.value }))}
+                    placeholder="0"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Website data – only when listing type is website */}
+          {isWebsiteType && (
+            <div className="space-y-4">
+              <h4 className="font-semibold text-sm">{t('client.listings.edit.website_info', 'Website information')}</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2 col-span-2">
+                  <Label>{t('client.listings.edit.website_url', 'Website URL')}</Label>
+                  <Input
+                    value={formData.website_url}
+                    onChange={(e) => setFormData((p) => ({ ...p, website_url: e.target.value }))}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('client.listings.edit.traffic', 'Monthly traffic')}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={formData.website_traffic_monthly}
+                    onChange={(e) => setFormData((p) => ({ ...p, website_traffic_monthly: e.target.value }))}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('client.listings.edit.revenue', 'Monthly revenue')}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={formData.website_revenue_monthly}
+                    onChange={(e) => setFormData((p) => ({ ...p, website_revenue_monthly: e.target.value }))}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('client.listings.edit.profit', 'Monthly profit')}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={formData.website_profit_monthly}
+                    onChange={(e) => setFormData((p) => ({ ...p, website_profit_monthly: e.target.value }))}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label>{t('client.listings.edit.technology', 'Website technology')}</Label>
+                  <Input
+                    value={formData.website_technology}
+                    onChange={(e) => setFormData((p) => ({ ...p, website_technology: e.target.value }))}
+                    placeholder="e.g. WordPress, React"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Media & SEO */}
           <div className="space-y-4">
