@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,6 +27,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState, useMemo } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { Link } from "react-router-dom";
 import {
   useGetMarketplaceListingTypesQuery,
@@ -40,6 +36,7 @@ import {
 import { ROUTES } from "@/lib/routes";
 import MarketplaceListingCard from "@/components/marketplace/MarketplaceListingCard";
 import { useIncrementViews } from "@/store/hooks/useMarketplace";
+import { Input } from "@/components/ui/input";
 
 const LISTING_TYPE_ICONS: Record<string, typeof Globe> = {
   domain: Globe,
@@ -84,6 +81,7 @@ function getPriceRangeParams(value: string): {
 const Marketplace = () => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 300);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
   const [listingsTab, setListingsTab] = useState<
@@ -93,14 +91,14 @@ const Marketplace = () => {
   const baseFilters = useMemo(() => {
     const price = getPriceRangeParams(priceRange);
     return {
-      search: searchQuery.trim() || undefined,
+      search: debouncedSearchQuery.trim() || undefined,
       listing_type_id:
         selectedCategory === "all" ? undefined : Number(selectedCategory),
       ...price,
       skip: 0,
       limit: 12,
     };
-  }, [searchQuery, selectedCategory, priceRange]);
+  }, [debouncedSearchQuery, selectedCategory, priceRange]);
 
   const { data: listingTypes = [], isLoading: typesLoading } =
     useGetMarketplaceListingTypesQuery(undefined, { skip: false });
@@ -214,6 +212,12 @@ const Marketplace = () => {
           {/* Advanced Search */}
           <div className="max-w-4xl mx-auto mb-8">
             <div className="flex flex-col md:flex-row gap-4 bg-background/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50">
+              <Input
+                placeholder="Search for a listing"
+                className="w-full h-12"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
               <Select
                 value={selectedCategory}
                 onValueChange={setSelectedCategory}
@@ -222,7 +226,9 @@ const Marketplace = () => {
                   <SelectValue placeholder="Categoría" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas las categorías</SelectItem>
+                  <SelectItem value="all">
+                    All Categories
+                  </SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
@@ -235,25 +241,16 @@ const Marketplace = () => {
                   <SelectValue placeholder="Precio" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los precios</SelectItem>
+                  <SelectItem value="all">
+                    All Prices
+                  </SelectItem>
                   <SelectItem value="0-1000">$0 - $1,000</SelectItem>
                   <SelectItem value="1000-10000">$1,000 - $10,000</SelectItem>
                   <SelectItem value="10000-50000">$10,000 - $50,000</SelectItem>
                   <SelectItem value="50000+">$50,000+</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={priceRange} onValueChange={setPriceRange}>
-                <SelectTrigger className="h-12 min-w-[160px]">
-                  <SelectValue placeholder="Precio" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los precios</SelectItem>
-                  <SelectItem value="0-1000">$0 - $1,000</SelectItem>
-                  <SelectItem value="1000-10000">$1,000 - $10,000</SelectItem>
-                  <SelectItem value="10000-50000">$10,000 - $50,000</SelectItem>
-                  <SelectItem value="50000+">$50,000+</SelectItem>
-                </SelectContent>
-              </Select>
+              
             </div>
           </div>
 
