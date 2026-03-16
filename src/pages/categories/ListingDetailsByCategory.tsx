@@ -374,7 +374,7 @@ export default function ListingDetailsByCategory() {
             {t("marketplace_domains.actions.make_offer", "Make an offer")}
           </Link>
         </Button>
-        {listing.public_url && (
+        {/* {listing.public_url && (
           <Button variant="outline" asChild>
             <a
               href={listing.public_url}
@@ -386,7 +386,7 @@ export default function ListingDetailsByCategory() {
               {t("marketplace_domains.actions.share", "Share")}
             </a>
           </Button>
-        )}
+        )} */}
         <Button variant="ghost" onClick={() => navigate(categoryUrl)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("marketplace_domains.actions.back_to_list", "Back to list")}
