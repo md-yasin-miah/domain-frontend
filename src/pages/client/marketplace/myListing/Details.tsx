@@ -36,6 +36,7 @@ import { ReturnBack } from '@/components/common/ReturnBack';
 import { CopyToClipboard } from '@/components/common/CopyToClipboard';
 import { useAuth } from '@/store/hooks/useAuth';
 import MakeOfferModal from './components/MakeOfferModal';
+import EditListingModal from './components/EditListingModal';
 import { ROUTES } from '@/lib/routes';
 import { useGetProfileCompletionQuery } from '@/store/api/profileApi';
 
@@ -48,6 +49,7 @@ const Details = () => {
   const { data: listing, isLoading, error } = useGetMarketplaceListingQuery(Number(id));
   const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateMarketplaceListingStatusMutation();
   const [makeOfferModalOpen, setMakeOfferModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const navigate = useNavigate();
   
   // Check profile completion if user is logged in
@@ -191,7 +193,7 @@ const Details = () => {
                     {listing.status === 'active' ? 'Unpublish' : 'Publish'}
                   </Button>
                 )}
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => setEditModalOpen(true)}>
                   <Edit className="w-3.5 h-3.5 mr-2" />
                   Edit Listing
                 </Button>
@@ -815,6 +817,15 @@ const Details = () => {
           onOpenChange={setMakeOfferModalOpen}
           listing={listing}
           onSuccess={() => setMakeOfferModalOpen(false)}
+        />
+      )}
+
+      {/* Edit Listing Modal */}
+      {listing && (
+        <EditListingModal
+          open={editModalOpen}
+          onOpenChange={setEditModalOpen}
+          listing={listing}
         />
       )}
     </div>

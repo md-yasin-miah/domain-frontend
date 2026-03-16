@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import CreateListingModal from './components/CreateListingModal';
+import EditListingModal from './components/EditListingModal';
 
 const MyListing = () => {
   const { t } = useTranslation();
@@ -40,6 +41,8 @@ const MyListing = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [listingToEdit, setListingToEdit] = useState<MarketplaceListing | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
     initialPageSize: 10,
@@ -289,7 +292,12 @@ const MyListing = () => {
                     <Power className="w-4 h-4 mr-2" />
                     {row.status === 'active' ? 'Unpublish' : 'Publish'}
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setListingToEdit(row);
+                      setEditModalOpen(true);
+                    }}
+                  >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
@@ -315,6 +323,17 @@ const MyListing = () => {
 
       {/* Create Listing Modal */}
       <CreateListingModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+
+      {/* Edit Listing Modal */}
+      <EditListingModal
+        open={editModalOpen}
+        onOpenChange={(open) => {
+          setEditModalOpen(open);
+          if (!open) setListingToEdit(null);
+        }}
+        listing={listingToEdit}
+        onSuccess={() => setListingToEdit(null)}
+      />
     </div>
   );
 };
