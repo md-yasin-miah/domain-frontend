@@ -1,10 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type {
-  Review,
-  ReviewCreateRequest,
-  PaginatedResponse,
-  PaginationParams,
-} from './types';
 
 export const reviewsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

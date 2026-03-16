@@ -157,6 +157,7 @@ const MyListingDetails = lazy(
   () => import("./pages/client/marketplace/myListing/Details"),
 );
 const ClientChatPage = lazy(() => import("./pages/client/chat"));
+const ClientReviews = lazy(() => import("./pages/client/Reviews"));
 const Conversation = lazy(() => import("./pages/client/chat/Conversation"));
 
 const getLastPath = (route: string) => {
@@ -724,6 +725,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <FAQ />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: getLastPath(ROUTES.CLIENT.REVIEWS),
+        element: (
+          <LazyComponent>
+            <ClientReviews />
           </LazyComponent>
         ),
       },
