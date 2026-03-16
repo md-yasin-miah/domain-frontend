@@ -25,14 +25,13 @@ import { ROUTES } from "@/lib/routes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatNumber } from "@/lib/helperFun";
 
-export default function ListingDetailsByCategory() {
-  const { slug, listingSlug } = useParams<{ slug: string; listingSlug: string }>();
+export default function ListingDetailsBySlug() {
+  const { listingSlug } = useParams<{ listingSlug: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  console.log({slug, listingSlug})
   const { data: listing, isLoading, error } = useGetMarketplaceListingBySlugQuery(
     listingSlug,
-    { skip: !slug || !listingSlug }
+    { skip: !listingSlug }
   );
 
   const price =
@@ -44,14 +43,12 @@ export default function ListingDetailsByCategory() {
     listing?.domain_name ||
     listing?.slug ||
     (listing ? `#${listing.id}` : "");
-  const categoryUrl = slug ? ROUTES.APP.CATEGORIES.BY_SLUG(slug) : ROUTES.APP.CATEGORIES.ROOT;
-
   if (!listingSlug) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <p className="text-muted-foreground">{t("common.not_found", "Not found")}</p>
         <Button variant="link" asChild className="mt-2">
-          <Link to={ROUTES.APP.CATEGORIES.ROOT}>{t("common.back")}</Link>
+          <Link to={ROUTES.APP.MARKETPLACE}>{t("common.back")}</Link>
         </Button>
       </div>
     );
@@ -63,7 +60,7 @@ export default function ListingDetailsByCategory() {
         <p className="text-destructive">
           {t("marketplace_domains.errors.load_failed", "Failed to load listing")}
         </p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate(categoryUrl)}>
+        <Button variant="outline" className="mt-4" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("common.back")}
         </Button>
@@ -105,28 +102,6 @@ export default function ListingDetailsByCategory() {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-6 md:py-8 space-y-6">
-      {/* Back + breadcrumb */}
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to={categoryUrl} className="flex items-center gap-1">
-            <ArrowLeft className="h-4 w-4" />
-            {t("common.back")}
-          </Link>
-        </Button>
-        <span className="text-muted-foreground">/</span>
-        {listing.listing_type?.name && (
-          <>
-            <Link
-              to={categoryUrl}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              {listing.listing_type.name}
-            </Link>
-            <span className="text-muted-foreground">/</span>
-          </>
-        )}
-        <span className="font-medium truncate max-w-[200px]">{displayTitle}</span>
-      </div>
 
       {/* Hero: image + title + price */}
       <Card className="overflow-hidden border-2">
@@ -374,7 +349,7 @@ export default function ListingDetailsByCategory() {
             {t("marketplace_domains.actions.make_offer", "Make an offer")}
           </Link>
         </Button>
-        {listing.public_url && (
+        {/* {listing.public_url && (
           <Button variant="outline" asChild>
             <a
               href={listing.public_url}
@@ -386,8 +361,8 @@ export default function ListingDetailsByCategory() {
               {t("marketplace_domains.actions.share", "Share")}
             </a>
           </Button>
-        )}
-        <Button variant="ghost" onClick={() => navigate(categoryUrl)}>
+        )} */}
+        <Button variant="ghost" onClick={() => navigate(ROUTES.APP.MARKETPLACE)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("marketplace_domains.actions.back_to_list", "Back to list")}
         </Button>

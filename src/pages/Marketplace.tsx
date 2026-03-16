@@ -398,13 +398,8 @@ const Marketplace = () => {
                               asChild
                               className="flex-1 bg-gradient-to-r from-primary to-secondary hover:shadow-lg"
                             >
-                              <Link to={`/marketplace/listing/${listing.id}`}>
-                                Ver Detalles
-                              </Link>
-                            </Button>
-                            <Button variant="outline" size="icon" asChild>
-                              <Link to={`/marketplace/listing/${listing.id}`}>
-                                <Users className="w-4 h-4" />
+                              <Link to={ROUTES.APP.LISTING_DETAIL(listing.slug)}>
+                                View Details
                               </Link>
                             </Button>
                           </div>

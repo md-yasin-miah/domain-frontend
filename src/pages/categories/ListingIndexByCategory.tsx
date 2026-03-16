@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import {
   useMarketplaceListingsById,
-  useMarketplaceStats,
   useIncrementViews,
 } from "@/store/hooks/useMarketplace";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,7 +44,6 @@ const DomainsPage = () => {
   )?.id;
   const { data: listings, isLoading: listingsLoading } =
     useMarketplaceListingsById(listing_type_id);
-  const { data: stats } = useMarketplaceStats();
   const incrementViews = useIncrementViews();
 
   const categories = [

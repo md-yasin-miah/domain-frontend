@@ -11,8 +11,9 @@ import LazyComponent from "./components/common/LazyComponent";
 // Lazy load all page components for code splitting
 const Index = lazy(() => import("./pages/Index"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
-const ListingIndexByCategory = lazy(() => import("./pages/public/categories/ListingIndexByCategory"));
-const ListingDetailsByCategory = lazy(() => import("./pages/public/categories/ListingDetailsByCategory"));
+const ListingIndexByCategory = lazy(() => import("./pages/categories/ListingIndexByCategory"));
+const ListingDetailsByCategory = lazy(() => import("./pages/categories/ListingDetailsByCategory"));
+const ListingDetailsBySlug = lazy(() => import("./pages/ListingDetailsBySlug"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Terminos = lazy(() => import("./pages/legal/Terminos"));
 const Privacidad = lazy(() => import("./pages/legal/Privacidad"));
@@ -182,6 +183,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <Marketplace />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "listings/:listingSlug",
+        element: (
+          <LazyComponent>
+            <ListingDetailsBySlug />
           </LazyComponent>
         ),
       },

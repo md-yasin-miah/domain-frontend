@@ -9,12 +9,14 @@ export const ROUTES = {
     CATEGORIES: {
       ROOT: "/categories",
       BY_SLUG: (slug: string) => `/categories/${slug}`,
-      LISTING_DETAIL: (slug: string, listingSlug: string) => `/categories/${slug}/${listingSlug}`,
+      LISTING_DETAIL: (slug: string, listingSlug: string) =>
+        `/categories/${slug}/${listingSlug}`,
       DOMAINS: {
         ROOT: "/categories/domains",
         DETAILS: (listingSlug: string) => `/categories/domains/${listingSlug}`,
       },
     },
+    LISTING_DETAIL: (listingSlug: string) => `/listings/${listingSlug}`,
     GUIDES: {
       ROOT: "/guides",
       DETAILS: (slug: string) => `/guides/${slug}`,

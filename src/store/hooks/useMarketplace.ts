@@ -1,5 +1,4 @@
 import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
-import { useGetDashboardQuery } from "@/store/api/dashboardApi";
 
 export const useMarketplace = () => {
   const {
@@ -27,18 +26,6 @@ export const useMarketplaceListingsById = (listing_type_id: number) => {
   };
 };
 
-export const useMarketplaceStats = () => {
-  const { data: dashboard, isLoading } = useGetDashboardQuery();
-
-  return {
-    data: dashboard ? {
-      domains: (dashboard as any).active_listings || 0,
-      transactions: (dashboard as any).total_orders || 0,
-      activeUsers: (dashboard as any).total_users || 0,
-    } : { domains: 0, transactions: 0, activeUsers: 0 },
-    isLoading,
-  };
-};
 
 export const useIncrementViews = () => {
   // View incrementing is typically handled server-side when fetching listing details

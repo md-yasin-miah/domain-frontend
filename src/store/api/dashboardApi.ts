@@ -1,19 +1,14 @@
 import { apiSlice } from './apiSlice';
-import type {
-  AdminDashboard,
-  SellerDashboard,
-  BuyerDashboard,
-} from './types';
 
 export const dashboardApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getDashboard: builder.query<AdminDashboard | SellerDashboard | BuyerDashboard, void>({
-      query: () => ({
-        url: '/dashboard',
-        method: 'GET',
-      }),
-      providesTags: ['User'],
-    }),
+    // getDashboard: builder.query<AdminDashboard | SellerDashboard | BuyerDashboard, void>({
+    //   query: () => ({
+    //     url: '/dashboard',
+    //     method: 'GET',
+    //   }),
+    //   providesTags: ['User'],
+    // }),
     getAdminDashboard: builder.query<AdminDashboard, void>({
       query: () => ({
         url: '/dashboard/admin',
@@ -39,7 +34,6 @@ export const dashboardApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetDashboardQuery,
   useGetAdminDashboardQuery,
   useGetSellerDashboardQuery,
   useGetBuyerDashboardQuery,
