@@ -55,9 +55,6 @@ export const ROUTES = {
       PRODUCTS_VERIFICATION: "/client/marketplace/products-verification",
       PRODUCTS_VERIFICATION_DETAILS: (id: number) =>
         `/client/marketplace/products-verification/${id}`,
-      APPS: "/client/marketplace/apps",
-      DOMAINS: "/client/marketplace/domains",
-      WEBSITES: "/client/marketplace/websites",
     },
     OFFERS: {
       INDEX: "/client/offers",

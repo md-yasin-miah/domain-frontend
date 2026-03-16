@@ -29,18 +29,18 @@ export const getStatusColor = (status: string) => {
       case 'payment_received':
       case 'paid':
       case 'open':
-      case 'active': return 'bg-green-500/10 text-green-500 border-green-500';
+      case 'active': return 'bg-green-500/10 !text-green-500 border-green-500 hover:bg-green-500/30';
       case 'failed':
       case 'rejected':
       case 'inactive':
       case 'cancelled':
-      case 'expired': return 'bg-red-500/10 text-red-500 border-red-500';
+      case 'expired': return 'bg-red-500/10 !text-red-500 border-red-500 hover:bg-red-500/30';
       case 'sent':
       case 'in_progress':
-      case 'pending': return 'bg-yellow-500/10 text-yellow-600 border-yellow-600';
-      case 'countered': return 'bg-blue-500/10 text-blue-500 border-blue-500';
+      case 'pending': return 'bg-yellow-500/10 !text-yellow-600 border-yellow-600 hover:bg-yellow-500/30';
+      case 'countered': return 'bg-blue-500/10 !text-blue-500 border-blue-500 hover:bg-blue-500/30';
       case 'closed':
-      case 'withdrawn': return 'bg-gray-500/10 text-gray-500 border-gray-500';
+      case 'withdrawn': return 'bg-gray-500/10 !text-gray-500 border-gray-500 hover:bg-gray-500/30';
       default: return 'bg-gray-500';
     }
   }

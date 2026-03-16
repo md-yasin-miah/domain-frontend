@@ -99,6 +99,7 @@ const ClientOrderDetailsPage = () => {
   } = useGetOrderQuery(orderId, {
     skip: !orderId || isNaN(orderId),
   });
+  console.log({order})
 
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
   const [completeOrder, { isLoading: isCompleting }] =
@@ -132,13 +133,14 @@ const ClientOrderDetailsPage = () => {
 
   // Get escrow for this order
   const {
-    data: escrow,
+    data,
     isLoading: isLoadingEscrow,
     refetch: refetchEscrow,
   } = useGetEscrowByOrderQuery(orderId, {
     skip: !orderId || isNaN(orderId),
   });
-
+  console.log({data})
+  const escrow = data?.escrow;
   const [createPayment, { isLoading: isCreatingPayment }] = useCreatePaymentMutation();
 
   // Get status label

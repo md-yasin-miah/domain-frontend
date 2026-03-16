@@ -260,21 +260,6 @@ const getClientMenuItems = (t: TFunction): MenuItem[] => {
           url: ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS,
           icon: List,
         },
-        {
-          title: t('nav.apps'),
-          url: ROUTES.CLIENT.MARKETPLACE.APPS,
-          icon: Smartphone,
-        },
-        {
-          title: t('nav.domains'),
-          url: ROUTES.CLIENT.MARKETPLACE.DOMAINS,
-          icon: Server,
-        },
-        {
-          title: t('nav.websites'),
-          url: ROUTES.CLIENT.MARKETPLACE.WEBSITES,
-          icon: Globe,
-        },
       ],
     },
     {

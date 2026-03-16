@@ -26,9 +26,6 @@ const BuyerDashboard = lazy(() => import("./pages/admin/BuyerDashboard"));
 const SuperAdminDashboard = lazy(
   () => import("./pages/admin/SuperAdminDashboard"),
 );
-const ClientDomainsPage = lazy(
-  () => import("./pages/client/ClientDomainsPage"),
-);
 const Facturas = lazy(() => import("./pages/client/Facturas"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const SupportTicketConversationPage = lazy(
@@ -124,10 +121,6 @@ const AdminOrderEscrowPage = lazy(
 );
 const RolesPermissions = lazy(() => import("./pages/admin/RolesPermissions"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
-const ClientAppsPage = lazy(() => import("./pages/client/ClientAppsPage"));
-const ClientWebsitesPage = lazy(
-  () => import("./pages/client/ClientWebsitesPage"),
-);
 const ClientAllOrderPage = lazy(() => import("./pages/client/orders"));
 const ClientInvoicePage = lazy(() => import("./pages/client/orders/invoice"));
 const ClientPaymentPage = lazy(
@@ -595,30 +588,6 @@ export const router = createBrowserRouter([
                 ),
               },
             ],
-          },
-          {
-            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.APPS),
-            element: (
-              <LazyComponent>
-                <ClientAppsPage />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.DOMAINS),
-            element: (
-              <LazyComponent>
-                <ClientDomainsPage />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: getLastPath(ROUTES.CLIENT.MARKETPLACE.WEBSITES),
-            element: (
-              <LazyComponent>
-                <ClientWebsitesPage />
-              </LazyComponent>
-            ),
           },
         ],
       },
