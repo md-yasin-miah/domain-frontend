@@ -23,7 +23,6 @@ import {
   Code,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { AdminQuickAccess } from "@/components/AdminQuickAccess";
 import { FlipWords } from "@/components/ui/flip-words";
 import { ROUTES } from "@/lib/routes";
 
@@ -239,7 +238,7 @@ const Index = () => {
             </Link>
 
             <Link
-              to={ROUTES.APP.CATEGORIES.WEBSITES}
+              to={ROUTES.APP.CATEGORIES.DOMAINS.ROOT}
               className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
             >
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -604,172 +603,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer with Legal */}
-      <footer className="bg-muted/50 py-16 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <img
-                  src="/uploads/logo-full.png"
-                  alt="ADOMINIOZ"
-                  className="h-12 w-auto"
-                />
-              </div>
-              <p className="text-muted-foreground font-roboto leading-relaxed mb-6">
-                {t("footer.description")}
-              </p>
-              <div className="flex space-x-4">
-                <Bitcoin className="w-6 h-6 text-primary" />
-                <Shield className="w-6 h-6 text-primary" />
-                <Zap className="w-6 h-6 text-primary" />
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-roboto font-bold mb-6 text-foreground">
-                {t("footer.legal")}
-              </h4>
-              <ul className="space-y-3 font-roboto">
-                <li>
-                  <a
-                    href="/terminos"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.terms")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/privacidad"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.privacy")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/cookies"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.cookies")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/legal"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.legal_notice")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/aml"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.aml")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/proteccion-datos"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.data_protection")}
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-roboto font-bold mb-6 text-foreground">
-                {t("footer.support")}
-              </h4>
-              <ul className="space-y-3 font-roboto">
-                <li>
-                  <a
-                    href="/ayuda"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.help")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/contacto"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.contact")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/verificacion"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.verification")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/escrow"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.escrow")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/disputas"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.disputes")}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/tarifas"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t("footer.fees")}
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-border pt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-              <div>
-                <p className="text-muted-foreground font-roboto text-sm mb-2">
-                  {t("footer.copyright")}
-                </p>
-                <p className="text-muted-foreground font-roboto text-xs">
-                  {t("footer.registry")}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-muted-foreground font-roboto text-xs mb-2">
-                  {t("footer.regulated")}
-                </p>
-                <p className="text-muted-foreground font-roboto text-xs">
-                  {t("footer.license")}
-                </p>
-              </div>
-            </div>
-            <div className="text-center pt-4 border-t border-border">
-              <p className="text-muted-foreground font-roboto text-xs">
-                {t("footer.disclaimer")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* Admin Quick Access - Solo visible para configuración */}
-      <AdminQuickAccess />
     </div>
   );
 };

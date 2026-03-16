@@ -1,12 +1,10 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -17,8 +15,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Search,
-  Filter,
   Globe,
   Smartphone,
   Package,
@@ -41,6 +37,7 @@ import {
   useGetMarketplaceListingTypesQuery,
   useGetMarketplaceListingsQuery,
 } from "@/store/api/marketplaceApi";
+import { ROUTES } from "@/lib/routes";
 
 const LISTING_TYPE_ICONS: Record<string, typeof Globe> = {
   domain: Globe,
@@ -64,7 +61,10 @@ function formatPrice(price: number | string, currency: string = "USD"): string {
   }).format(Number(price));
 }
 
-function getPriceRangeParams(value: string): { min_price?: number; max_price?: number } {
+function getPriceRangeParams(value: string): {
+  min_price?: number;
+  max_price?: number;
+} {
   switch (value) {
     case "0-1000":
       return { min_price: 0, max_price: 1000 };
@@ -84,13 +84,16 @@ const Marketplace = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
-  const [listingsTab, setListingsTab] = useState<"featured" | "newest" | "trending">("featured");
+  const [listingsTab, setListingsTab] = useState<
+    "featured" | "newest" | "trending"
+  >("featured");
 
   const baseFilters = useMemo(() => {
     const price = getPriceRangeParams(priceRange);
     return {
       search: searchQuery.trim() || undefined,
-      listing_type_id: selectedCategory === "all" ? undefined : Number(selectedCategory),
+      listing_type_id:
+        selectedCategory === "all" ? undefined : Number(selectedCategory),
       ...price,
       skip: 0,
       limit: 12,
@@ -100,23 +103,26 @@ const Marketplace = () => {
   const { data: listingTypes = [], isLoading: typesLoading } =
     useGetMarketplaceListingTypesQuery(undefined, { skip: false });
 
-  const { data: featuredData, isLoading: featuredLoading } = useGetMarketplaceListingsQuery({
-    ...baseFilters,
-    limit: 6,
-    is_featured: true,
-  });
+  const { data: featuredData, isLoading: featuredLoading } =
+    useGetMarketplaceListingsQuery({
+      ...baseFilters,
+      limit: 6,
+      is_featured: true,
+    });
 
-  const { data: newestData, isLoading: newestLoading } = useGetMarketplaceListingsQuery({
-    ...baseFilters,
-    sort_by: "created_at",
-    sort_order: "desc",
-  });
+  const { data: newestData, isLoading: newestLoading } =
+    useGetMarketplaceListingsQuery({
+      ...baseFilters,
+      sort_by: "created_at",
+      sort_order: "desc",
+    });
 
-  const { data: trendingData, isLoading: trendingLoading } = useGetMarketplaceListingsQuery({
-    ...baseFilters,
-    sort_by: "view_count",
-    sort_order: "desc",
-  });
+  const { data: trendingData, isLoading: trendingLoading } =
+    useGetMarketplaceListingsQuery({
+      ...baseFilters,
+      sort_by: "view_count",
+      sort_order: "desc",
+    });
 
   const featuredListings = useMemo(() => {
     const raw = featuredData?.items ?? featuredData;
@@ -142,9 +148,8 @@ const Marketplace = () => {
           name: type.name,
           slug: type.slug,
           icon: LISTING_TYPE_ICONS[type.slug?.toLowerCase() ?? ""] ?? Package,
-          path: `/marketplace?listing_type_id=${type.id}`,
         })),
-    [listingTypes]
+    [listingTypes],
   );
 
   const listingsLoading =
@@ -159,7 +164,7 @@ const Marketplace = () => {
       : listingsTab === "newest"
         ? newestListings
         : trendingListings;
-console.log({listingsByTab})
+  console.log({ listingsByTab });
   const howItWorks = [
     {
       step: 1,
@@ -205,15 +210,6 @@ console.log({listingsByTab})
           {/* Advanced Search */}
           <div className="max-w-4xl mx-auto mb-8">
             <div className="flex flex-col md:flex-row gap-4 bg-background/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por nombre, tipo, categoría..."
-                  className="pl-12 h-12 text-lg"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
               <Select
                 value={selectedCategory}
                 onValueChange={setSelectedCategory}
@@ -254,10 +250,6 @@ console.log({listingsByTab})
                   <SelectItem value="50000+">$50,000+</SelectItem>
                 </SelectContent>
               </Select>
-              <Button className="h-12 px-8 bg-gradient-to-r from-primary to-secondary hover:shadow-lg">
-                <Search className="h-4 w-4 mr-2" />
-                Buscar
-              </Button>
             </div>
           </div>
 
@@ -285,67 +277,6 @@ console.log({listingsByTab})
         </div>
       </section>
 
-      {/* Categories Overview */}
-      <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">
-              Explora por Categorías
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Encuentra el activo digital perfecto para tu portafolio o negocio
-            </p>
-          </div>
-
-          {typesLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-8">
-                    <div className="h-16 w-16 rounded-2xl bg-muted mb-6" />
-                    <div className="h-6 bg-muted rounded w-3/4 mb-2" />
-                    <div className="h-4 bg-muted rounded w-1/2" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {categories.map((category) => (
-              <Link to={category.path}>
-              <Card
-                key={category.id}
-                className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 hover:border-primary/20 cursor-pointer"
-              >
-                <CardContent className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div
-                      className={`w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      <category.icon className="w-8 h-8 text-primary" />
-                    </div>
-                    <Badge variant="secondary" className="text-xs">
-                      Ver categoría
-                    </Badge>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {category.name}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Ver todos
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                </CardContent>
-              </Card>
-              </Link>
-            ))}
-          </div>
-          )}
-        </div>
-      </section>
-
       {/* Featured Listings */}
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
@@ -358,12 +289,6 @@ console.log({listingsByTab})
                 Selección curada de activos premium con métricas verificadas
               </p>
             </div>
-            <Button variant="outline" className="hidden md:flex items-center gap-2" asChild>
-              <Link to="/marketplace">
-                Ver todos los activos
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
           </div>
 
           <Tabs
@@ -374,9 +299,15 @@ console.log({listingsByTab})
             className="w-full"
           >
             <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="featured">Destacados</TabsTrigger>
-              <TabsTrigger value="newest">Más Recientes</TabsTrigger>
-              <TabsTrigger value="trending">Tendencias</TabsTrigger>
+              <TabsTrigger value="featured" className="capitalize">
+                featured
+              </TabsTrigger>
+              <TabsTrigger value="newest" className="capitalize">
+                newest
+              </TabsTrigger>
+              <TabsTrigger value="trending" className="capitalize">
+                trending
+              </TabsTrigger>
             </TabsList>
 
             {(() => {
@@ -385,8 +316,12 @@ console.log({listingsByTab})
               const empty = (
                 <div className="text-center py-16 text-muted-foreground">
                   <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium">No hay activos en esta sección</p>
-                  <p className="text-sm mt-1">Prueba otros filtros o categorías</p>
+                  <p className="text-lg font-medium">
+                    No hay activos en esta sección
+                  </p>
+                  <p className="text-sm mt-1">
+                    Prueba otros filtros o categorías
+                  </p>
                 </div>
               );
               const grid = (
@@ -407,7 +342,10 @@ console.log({listingsByTab})
                                 Destacado
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-green-600 border-green-600">
+                            <Badge
+                              variant="outline"
+                              className="text-green-600 border-green-600"
+                            >
                               <CheckCircle className="w-3 h-3 mr-1" />
                               Verificado
                             </Badge>
@@ -419,7 +357,9 @@ console.log({listingsByTab})
                           </Badge>
                           {listing.domain_name && (
                             <>
-                              <span className="text-sm text-muted-foreground">•</span>
+                              <span className="text-sm text-muted-foreground">
+                                •
+                              </span>
                               <span className="text-sm text-muted-foreground truncate max-w-[120px]">
                                 {listing.domain_name}
                               </span>
@@ -430,7 +370,9 @@ console.log({listingsByTab})
                       <CardContent className="pt-0">
                         <div className="space-y-4">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-muted-foreground">Precio:</span>
+                            <span className="text-sm text-muted-foreground">
+                              Precio:
+                            </span>
                             <span className="text-xl font-bold text-primary">
                               {formatPrice(listing.price, listing.currency)}
                             </span>
@@ -493,7 +435,8 @@ console.log({listingsByTab})
                   <TabsContent value="featured" className="space-y-8">
                     {listingsTab === "featured" && featuredLoading
                       ? skeleton
-                      : listingsTab === "featured" && featuredListings.length === 0
+                      : listingsTab === "featured" &&
+                          featuredListings.length === 0
                         ? empty
                         : grid}
                   </TabsContent>
@@ -507,7 +450,8 @@ console.log({listingsByTab})
                   <TabsContent value="trending" className="space-y-8">
                     {listingsTab === "trending" && trendingLoading
                       ? skeleton
-                      : listingsTab === "trending" && trendingListings.length === 0
+                      : listingsTab === "trending" &&
+                          trendingListings.length === 0
                         ? empty
                         : grid}
                   </TabsContent>
@@ -515,6 +459,67 @@ console.log({listingsByTab})
               );
             })()}
           </Tabs>
+        </div>
+      </section>
+
+      {/* Categories Overview */}
+      <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">
+              Explore by categories
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Find the perfect digital asset for your portfolio or business
+            </p>
+          </div>
+
+          {typesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-8">
+                    <div className="h-16 w-16 rounded-2xl bg-muted mb-6" />
+                    <div className="h-6 bg-muted rounded w-3/4 mb-2" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {categories.map((category) => (
+                <Link to={ROUTES.APP.CATEGORIES.BY_SLUG(category.slug)}>
+                  <Card
+                    key={category.id}
+                    className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 hover:border-primary/20 cursor-pointer"
+                  >
+                    <CardContent className="p-8">
+                      <div className="flex items-center justify-between mb-6">
+                        <div
+                          className={`w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                        >
+                          <category.icon className="w-8 h-8 text-primary" />
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          Ver categoría
+                        </Badge>
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                        {category.name}
+                      </h3>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Ver todos
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
