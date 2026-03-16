@@ -9,9 +9,10 @@ export const ROUTES = {
     CATEGORIES: {
       ROOT: "/categories",
       BY_SLUG: (slug: string) => `/categories/${slug}`,
+      LISTING_DETAIL: (slug: string, listingSlug: string) => `/categories/${slug}/${listingSlug}`,
       DOMAINS: {
         ROOT: "/categories/domains",
-        DETAILS: (id: number) => `/categories/domains/${id}`,
+        DETAILS: (listingSlug: string) => `/categories/domains/${listingSlug}`,
       },
     },
     GUIDES: {

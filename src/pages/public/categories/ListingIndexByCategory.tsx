@@ -225,7 +225,7 @@ const DomainsPage = () => {
                   listing.slug ||
                   "#" + listing.id;
                 const detailUrl = slug
-                  ? `/categories/${slug}/${listing.id}`
+                  ? ROUTES.APP.CATEGORIES.LISTING_DETAIL(slug, listing.slug)
                   : ROUTES.APP.MARKETPLACE;
 
                 return (
