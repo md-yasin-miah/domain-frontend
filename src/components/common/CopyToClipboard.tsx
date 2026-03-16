@@ -50,7 +50,7 @@ export const CopyToClipboard = ({
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <div className="flex-1">{children}</div>
+      {children}
       {showIcon && (
         <CustomTooltip
           content={tooltipContent || (copied ? (t('common.copied') || 'Copied!') : (t('common.copy') || 'Copy to clipboard'))}

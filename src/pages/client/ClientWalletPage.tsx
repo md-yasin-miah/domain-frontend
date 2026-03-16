@@ -11,7 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wallet, Plus, ArrowDownLeft, ArrowUpRight, Banknote, Loader2 } from "lucide-react";
+import {
+  Wallet,
+  Plus,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Banknote,
+  Loader2,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -74,7 +81,8 @@ export default function ClientWalletPage() {
 
   // Withdraw form
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawPayoutMethod, setWithdrawPayoutMethod] = useState<string>("bank_transfer");
+  const [withdrawPayoutMethod, setWithdrawPayoutMethod] =
+    useState<string>("bank_transfer");
   const [withdrawPayoutDetails, setWithdrawPayoutDetails] = useState("");
 
   const { data: wallet, isLoading: walletLoading } =
@@ -85,13 +93,19 @@ export default function ClientWalletPage() {
     refetch: refetchTransactions,
   } = useGetWalletTransactionsQuery({ currency, skip: 0, limit: 20 });
 
-  const { data: withdrawalBalance, isLoading: balanceLoading } = useGetWithdrawalBalanceQuery(currency);
-  const [createWithdrawal, { isLoading: isCreatingWithdrawal }] = useCreateWithdrawalMutation();
+  const { data: withdrawalBalance, isLoading: balanceLoading } =
+    useGetWithdrawalBalanceQuery(currency);
+  const [createWithdrawal, { isLoading: isCreatingWithdrawal }] =
+    useCreateWithdrawalMutation();
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
     initialPageSize: 10,
   });
-  const { data: withdrawalsData, isLoading: withdrawalsLoading, refetch: refetchWithdrawals } = useListMyWithdrawalsQuery({
+  const {
+    data: withdrawalsData,
+    isLoading: withdrawalsLoading,
+    refetch: refetchWithdrawals,
+  } = useListMyWithdrawalsQuery({
     skip: (page - 1) * size,
     limit: size,
   });
@@ -121,7 +135,10 @@ export default function ClientWalletPage() {
     if (!Number.isFinite(amount) || amount <= 0) {
       toast({
         title: t("wallet.withdraw.amount_required", "Invalid amount"),
-        description: t("wallet.withdraw.amount_required_desc", "Enter a positive amount."),
+        description: t(
+          "wallet.withdraw.amount_required_desc",
+          "Enter a positive amount.",
+        ),
         variant: "destructive",
       });
       return;
@@ -130,9 +147,13 @@ export default function ClientWalletPage() {
     if (amount > available) {
       toast({
         title: t("wallet.withdraw.insufficient", "Insufficient balance"),
-        description: t("wallet.withdraw.insufficient_desc", "Available: {{amount}}", {
-          amount: formatWalletBalance(available, currency),
-        }),
+        description: t(
+          "wallet.withdraw.insufficient_desc",
+          "Available: {{amount}}",
+          {
+            amount: formatWalletBalance(available, currency),
+          },
+        ),
         variant: "destructive",
       });
       return;
@@ -141,7 +162,10 @@ export default function ClientWalletPage() {
       let payout_details: Record<string, unknown> | undefined;
       if (withdrawPayoutDetails.trim()) {
         try {
-          payout_details = JSON.parse(withdrawPayoutDetails.trim()) as Record<string, unknown>;
+          payout_details = JSON.parse(withdrawPayoutDetails.trim()) as Record<
+            string,
+            unknown
+          >;
         } catch {
           payout_details = { notes: withdrawPayoutDetails.trim() };
         }
@@ -154,13 +178,20 @@ export default function ClientWalletPage() {
       }).unwrap();
       toast({
         title: t("wallet.withdraw.success", "Withdrawal requested"),
-        description: t("wallet.withdraw.success_desc", "Your withdrawal request has been submitted."),
+        description: t(
+          "wallet.withdraw.success_desc",
+          "Your withdrawal request has been submitted.",
+        ),
       });
       setWithdrawAmount("");
       setWithdrawPayoutDetails("");
       refetchWithdrawals();
     } catch (err: unknown) {
-      const detail = err && typeof err === "object" && "data" in err && (err as { data?: { detail?: string } }).data?.detail;
+      const detail =
+        err &&
+        typeof err === "object" &&
+        "data" in err &&
+        (err as { data?: { detail?: string } }).data?.detail;
       toast({
         title: t("common.error", "Error"),
         description: typeof detail === "string" ? detail : t("common.error"),
@@ -170,7 +201,9 @@ export default function ClientWalletPage() {
   };
 
   const items = transactions?.items ?? [];
-  const availableToWithdraw = Number(withdrawalBalance?.earnings_available ?? 0);
+  const availableToWithdraw = Number(
+    withdrawalBalance?.earnings_available ?? 0,
+  );
 
   const withdrawalColumns: ColumnDef<(typeof withdrawalItems)[0]>[] = [
     {
@@ -315,7 +348,10 @@ export default function ClientWalletPage() {
               {transactionsLoading ? (
                 <div className="space-y-3">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="h-12 bg-muted animate-pulse rounded" />
+                    <div
+                      key={i}
+                      className="h-12 bg-muted animate-pulse rounded"
+                    />
                   ))}
                 </div>
               ) : items.length === 0 ? (
@@ -342,21 +378,24 @@ export default function ClientWalletPage() {
                             <p className="font-medium text-sm capitalize">
                               {txn.type.replace(/_/g, " ")}
                             </p>
-                            {txn.reference_id && (
-                              <CopyToClipboard
-                                tooltipContent={t(
-                                  "wallet.transactions.copy_reference_id",
-                                )}
-                                textToCopy={txn.reference_id}
-                                className="gap-1.5"
-                                variant="ghost"
-                                size="icon"
-                              >
-                                <span className="text-xs text-muted-foreground font-mono truncate">
-                                  {txn.reference_id}
-                                </span>
-                              </CopyToClipboard>
-                            )}
+                            <p className="flex items-center gap-1">
+                              <small>Reference ID:</small>
+                              {txn.reference_id && (
+                                <CopyToClipboard
+                                  tooltipContent={t(
+                                    "wallet.transactions.copy_reference_id",
+                                  )}
+                                  textToCopy={txn.reference_id}
+                                  className="gap-1.5"
+                                  variant="ghost"
+                                  size="icon"
+                                >
+                                  <span className="text-xs text-muted-foreground font-mono truncate">
+                                    {txn.reference_id}
+                                  </span>
+                                </CopyToClipboard>
+                              )}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               {formatDate(txn.created_at)}
                             </p>
@@ -393,10 +432,16 @@ export default function ClientWalletPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Banknote className="h-5 w-5" />
-                {t("wallet.withdraw.earnings_title", "Earnings available to withdraw")}
+                {t(
+                  "wallet.withdraw.earnings_title",
+                  "Earnings available to withdraw",
+                )}
               </CardTitle>
               <CardDescription>
-                {t("wallet.withdraw.earnings_desc", "Withdraw released escrow funds (seller earnings). Commission may apply.")}
+                {t(
+                  "wallet.withdraw.earnings_desc",
+                  "Withdraw released escrow funds (seller earnings). Commission may apply.",
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -407,10 +452,16 @@ export default function ClientWalletPage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="rounded-lg border bg-muted/30 p-4">
                       <p className="text-sm text-muted-foreground">
-                        {t("wallet.withdraw.available", "Available to withdraw")}
+                        {t(
+                          "wallet.withdraw.available",
+                          "Available to withdraw",
+                        )}
                       </p>
                       <p className="text-2xl font-bold">
-                        {formatWalletBalance(withdrawalBalance.earnings_available, currency)}
+                        {formatWalletBalance(
+                          withdrawalBalance.earnings_available,
+                          currency,
+                        )}
                       </p>
                     </div>
                     <div className="rounded-lg border bg-muted/30 p-4">
@@ -418,7 +469,10 @@ export default function ClientWalletPage() {
                         {t("wallet.withdraw.total_earned", "Total earned")}
                       </p>
                       <p className="text-2xl font-bold">
-                        {formatWalletBalance(withdrawalBalance.total_earned, currency)}
+                        {formatWalletBalance(
+                          withdrawalBalance.total_earned,
+                          currency,
+                        )}
                       </p>
                     </div>
                   </div>
@@ -429,7 +483,8 @@ export default function ClientWalletPage() {
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="withdraw_amount">
-                          {t("wallet.withdraw.amount_label", "Amount")} ({currency})
+                          {t("wallet.withdraw.amount_label", "Amount")} (
+                          {currency})
                         </Label>
                         <Input
                           id="withdraw_amount"
@@ -445,7 +500,10 @@ export default function ClientWalletPage() {
                         <Label htmlFor="withdraw_method">
                           {t("wallet.withdraw.payout_method", "Payout method")}
                         </Label>
-                        <Select value={withdrawPayoutMethod} onValueChange={setWithdrawPayoutMethod}>
+                        <Select
+                          value={withdrawPayoutMethod}
+                          onValueChange={setWithdrawPayoutMethod}
+                        >
                           <SelectTrigger id="withdraw_method">
                             <SelectValue />
                           </SelectTrigger>
@@ -461,27 +519,39 @@ export default function ClientWalletPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="withdraw_details">
-                        {t("wallet.withdraw.payout_details", "Payout details (optional JSON)")}
+                        {t(
+                          "wallet.withdraw.payout_details",
+                          "Payout details (optional JSON)",
+                        )}
                       </Label>
                       <Input
                         id="withdraw_details"
                         placeholder='{"account": "...", "bank": "..."}'
                         value={withdrawPayoutDetails}
-                        onChange={(e) => setWithdrawPayoutDetails(e.target.value)}
+                        onChange={(e) =>
+                          setWithdrawPayoutDetails(e.target.value)
+                        }
                       />
                     </div>
                     <Button
                       onClick={handleRequestWithdrawal}
-                      disabled={isCreatingWithdrawal || availableToWithdraw <= 0}
+                      disabled={
+                        isCreatingWithdrawal || availableToWithdraw <= 0
+                      }
                     >
-                      {isCreatingWithdrawal && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                      {isCreatingWithdrawal && (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      )}
                       {t("wallet.withdraw.submit", "Request withdrawal")}
                     </Button>
                   </div>
                 </>
               ) : (
                 <p className="text-muted-foreground text-sm">
-                  {t("wallet.withdraw.balance_unavailable", "Balance unavailable.")}
+                  {t(
+                    "wallet.withdraw.balance_unavailable",
+                    "Balance unavailable.",
+                  )}
                 </p>
               )}
             </CardContent>
@@ -489,9 +559,14 @@ export default function ClientWalletPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("wallet.withdraw.history_title", "My withdrawal requests")}</CardTitle>
+              <CardTitle>
+                {t("wallet.withdraw.history_title", "My withdrawal requests")}
+              </CardTitle>
               <CardDescription>
-                {t("wallet.withdraw.history_desc", "List of your withdrawal requests and their status.")}
+                {t(
+                  "wallet.withdraw.history_desc",
+                  "List of your withdrawal requests and their status.",
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -500,8 +575,13 @@ export default function ClientWalletPage() {
                 columns={withdrawalColumns}
                 pagination={pagination}
                 isLoading={withdrawalsLoading}
-                emptyMessage={t("wallet.withdraw.no_withdrawals", "No withdrawals yet")}
-                emptyIcon={<Banknote className="w-16 h-16 text-muted-foreground" />}
+                emptyMessage={t(
+                  "wallet.withdraw.no_withdrawals",
+                  "No withdrawals yet",
+                )}
+                emptyIcon={
+                  <Banknote className="w-16 h-16 text-muted-foreground" />
+                }
                 getRowId={(row) => String(row.id)}
                 pageSize={size}
                 onPageChange={handlePageChange}
