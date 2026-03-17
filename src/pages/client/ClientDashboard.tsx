@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -12,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Globe,
-  CreditCard,
   FileText,
   MessageCircle,
   AlertCircle,
@@ -21,8 +19,6 @@ import {
   Wallet,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/store/hooks/useAuth";
 import { useGetMarketplaceListingsQuery } from "@/store/api/marketplaceApi";
 import { useGetInvoicesQuery } from "@/store/api/invoiceApi";
 import { useGetTicketsQuery } from "@/store/api/supportApi";
@@ -37,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "CAD"] as const;
 
@@ -76,9 +73,6 @@ interface SupportTicket {
 
 export default function ClientDashboard() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { toast } = useToast();
 
   const { data: invoices, isLoading: invoicesLoading } = useGetInvoicesQuery({
     skip: 0,
@@ -92,9 +86,9 @@ export default function ClientDashboard() {
     skip: 0,
   });
 
-  const [balanceCurrency, setBalanceCurrency] = useState<string>("USD");
+  const { currency } = useCurrency();
   const { data: balance, isLoading: balanceLoading } =
-    useGetBalanceQuery(balanceCurrency);
+    useGetBalanceQuery(currency);
 
   const loading = domainsLoading || invoicesLoading || ticketsLoading;
 
@@ -138,18 +132,6 @@ export default function ClientDashboard() {
               <Wallet className="h-4 w-4 text-muted-foreground" />
               {t("client_dashboard.balance.title", "Balance")}
             </CardTitle>
-            <Select value={balanceCurrency} onValueChange={setBalanceCurrency}>
-              <SelectTrigger className="w-[100px] h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CURRENCIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
           <div className="flex gap-2">
             <Link to={ROUTES.CLIENT.WALLET("add-fund")}>
@@ -175,7 +157,10 @@ export default function ClientDashboard() {
                 {formatBalance(balance.total_balance, balance.currency)}
               </div>
               <p className="text-xs text-muted-foreground">
-                {t("client_dashboard.balance.total", "Total balance (wallet + earnings)")}
+                {t(
+                  "client_dashboard.balance.total",
+                  "Total balance (wallet + earnings)",
+                )}
               </p>
               <div className="flex flex-wrap gap-4 pt-2 text-xs text-muted-foreground">
                 <span>
@@ -183,7 +168,11 @@ export default function ClientDashboard() {
                   {formatBalance(balance.wallet_balance, balance.currency)}
                 </span>
                 <span>
-                  {t("client_dashboard.balance.earnings_available", "Earnings available")}:{" "}
+                  {t(
+                    "client_dashboard.balance.earnings_available",
+                    "Earnings available",
+                  )}
+                  :{" "}
                   {formatBalance(balance.earnings_available, balance.currency)}
                 </span>
                 <span>
@@ -300,7 +289,7 @@ export default function ClientDashboard() {
               <div className="space-y-3">
                 {domains?.items?.map((domain, index) => (
                   <div key={index}>
-                    <Link to={ROUTES.CLIENT.MARKETPLACE.DOMAINS}>
+                    <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
                       <div className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <h4 className="font-medium">{domain.domain_name}</h4>
@@ -460,24 +449,24 @@ export default function ClientDashboard() {
 
       {/* Actions */}
       <div className="flex gap-4 flex-wrap">
-        <Button onClick={() => navigate(ROUTES.CLIENT.SUPPORT)}>
-          <MessageCircle className="h-4 w-4 mr-2" />
-          {t("client_dashboard.actions.create_ticket")}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => navigate(ROUTES.CLIENT.ORDERS.INVOICES)}
-        >
-          <FileText className="h-4 w-4 mr-2" />
-          {t("client_dashboard.actions.view_all_invoices")}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.DOMAINS)}
-        >
-          <Globe className="h-4 w-4 mr-2" />
-          {t("client_dashboard.actions.manage_domains")}
-        </Button>
+        <Link to={ROUTES.CLIENT.SUPPORT}>
+          <Button variant="outline">
+            <MessageCircle className="h-4 w-4 mr-2" />
+            {t("client_dashboard.actions.create_ticket")}
+          </Button>
+        </Link>
+        <Link to={ROUTES.CLIENT.ORDERS.INVOICES}>
+          <Button variant="outline">
+            <FileText className="h-4 w-4 mr-2" />
+            {t("client_dashboard.actions.view_all_invoices")}
+          </Button>
+        </Link>
+        <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
+          <Button variant="outline">
+            <Globe className="h-4 w-4 mr-2" />
+            {t("client_dashboard.actions.manage_domains")}
+          </Button>
+        </Link>
       </div>
     </div>
   );

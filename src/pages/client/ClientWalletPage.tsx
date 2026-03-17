@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  useGetWalletQuery,
   useGetWalletTransactionsQuery,
 } from "@/store/api/walletApi";
 import {
@@ -43,9 +42,9 @@ import { usePagination } from "@/hooks/usePagination";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import { type ColumnDef } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
+import { CURRENCIES, PAYOUT_METHODS } from "@/lib/constant";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
-const CURRENCIES = ["USD", "EUR", "GBP", "CAD"] as const;
-const PAYOUT_METHODS = ["bank_transfer", "stripe", "paypal", "other"] as const;
 
 function formatWalletBalance(
   amount: number | string,
@@ -73,9 +72,9 @@ function formatDateTime(iso: string): string {
 
 export default function ClientWalletPage() {
   const { t } = useTranslation();
+  const { currency } = useCurrency();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [currency, setCurrency] = useState<string>("USD");
   const [addFundOpen, setAddFundOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("balance");
 
@@ -85,8 +84,6 @@ export default function ClientWalletPage() {
     useState<string>("bank_transfer");
   const [withdrawPayoutDetails, setWithdrawPayoutDetails] = useState("");
 
-  const { data: wallet, isLoading: walletLoading } =
-    useGetWalletQuery(currency);
   const {
     data: transactions,
     isLoading: transactionsLoading,
@@ -298,33 +295,30 @@ export default function ClientWalletPage() {
                 <Wallet className="h-4 w-4 text-muted-foreground" />
                 {t("wallet.balance.title") || "Balance"}
               </CardTitle>
-              <Select value={currency} onValueChange={setCurrency}>
-                <SelectTrigger className="w-[100px] h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </CardHeader>
             <CardContent>
-              {walletLoading ? (
+              {balanceLoading ? (
                 <div className="h-10 w-32 bg-muted animate-pulse rounded" />
-              ) : wallet ? (
+              ) : withdrawalBalance ? (
                 <div className="space-y-1">
                   <div className="text-2xl font-bold">
-                    {formatWalletBalance(wallet.balance, wallet.currency)}
+                    {formatWalletBalance(withdrawalBalance.total_balance, withdrawalBalance.currency)}
                   </div>
-                  {wallet.updated_at && (
+                  <small>
+                    
+                  </small>
+                  {/* {wallet.updated_at && (
                     <p className="text-xs text-muted-foreground">
                       {t("wallet.balance.updated") || "Last updated"}:{" "}
                       {formatDate(wallet.updated_at)}
                     </p>
-                  )}
+                  )} */}
+                  <p className="text-xs text-muted-foreground">
+                    Total earnings available: {formatWalletBalance(withdrawalBalance.earnings_available, withdrawalBalance.currency)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Total topup balance: {formatWalletBalance(withdrawalBalance.wallet_balance , withdrawalBalance.currency)}
+                  </p>
                 </div>
               ) : (
                 <p className="text-muted-foreground text-sm">

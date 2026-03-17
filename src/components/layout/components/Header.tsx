@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import CurrencySwitcher from "@/components/CurrencySwitcher";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/store/hooks/useAuth";
@@ -208,6 +209,10 @@ export function Header({
 
           {/* Right Section - Enhanced Auth & User Menu */}
           <div className="flex items-center space-x-3">
+            {/* Currency Switcher - Desktop */}
+            <div className="hidden sm:block">
+              <CurrencySwitcher />
+            </div>
             {/* Language Switcher - Desktop */}
             <div className="hidden sm:block">
               <LanguageSwitcher />
@@ -519,8 +524,11 @@ export function Header({
                 </div>
               )}
 
-              {/* Language Selector - Mobile */}
-              <div className="pt-3 border-t border-border/40 sm:hidden">
+              {/* Currency & Language - Mobile */}
+              <div className="pt-3 border-t border-border/40 sm:hidden space-y-2">
+                <div className="px-2">
+                  <CurrencySwitcher />
+                </div>
                 <div className="px-2">
                   <LanguageSwitcher />
                 </div>

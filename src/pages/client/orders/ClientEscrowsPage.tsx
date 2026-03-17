@@ -67,6 +67,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { extractErrorMessage } from "@/lib/errorHandler";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 type EscrowStatus = "pending" | "released" | "refunded" | "disputed";
 
@@ -154,7 +155,7 @@ const ClientEscrowsPage = () => {
   // Check if user can release/refund escrow
   const canReleaseEscrow = useCallback((escrow: Escrow) => {
     return escrow.status === "pending" &&
-      (user?.id === escrow.seller_id || user?.roles?.some(r => r === "admin"));
+      (user?.id === escrow.buyer_id || user?.roles?.some(r => r === "admin"));
   }, [user]);
 
   const canRefundEscrow = useCallback((escrow: Escrow) => {
@@ -280,16 +281,34 @@ const ClientEscrowsPage = () => {
       cell: ({ row }) => (
         <div className="space-y-1 text-sm">
           <div className="flex items-center gap-1">
-            <User className="h-3 w-3 text-muted-foreground" />
-            <span className="text-xs">
-              {t("escrows.table.buyer")}: {row.buyer?.email || `#${row.buyer_id}`}
-            </span>
+            <User className="h-3 w-3 text-muted-foreground" /> 
+            <span className="text-xs">Buyer:</span>
+            {
+              row.buyer?.id === user?.id ? (
+                <Avatar className="w-7 h-7">
+                  <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                    Me
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <span className="text-xs">{row.buyer?.name || row.buyer?.username}</span>
+              )
+            }
           </div>
           <div className="flex items-center gap-1">
             <User className="h-3 w-3 text-muted-foreground" />
-            <span className="text-xs">
-              {t("escrows.table.seller")}: {row.seller?.email || `#${row.seller_id}`}
-            </span>
+            <span className="text-xs">Seller:</span>
+            {
+              row.seller?.id === user?.id ? (
+                <Avatar className="w-7 h-7">
+                  <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                    Me
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <span className="text-xs">{row.seller?.name || row.seller?.username}</span>
+              )
+            }
           </div>
         </div>
       ),

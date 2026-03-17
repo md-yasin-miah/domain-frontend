@@ -24,11 +24,13 @@ interface Escrow {
     id: number;
     email: string;
     username: string | null;
+    name: string | null;
   } | null;
   seller?: {
     id: number;
     email: string;
     username: string | null;
+    name: string | null;
   } | null;
   order?: {
     id: number;
