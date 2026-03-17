@@ -81,12 +81,6 @@ export function Footer() {
                 {t('footer.ticket_system')}
               </Link>
               <span className="block text-muted-foreground">{t('footer.live_chat')}</span>
-              <Link
-                to={ROUTES.APP.GUIDES.ROOT}
-                className="block text-muted-foreground hover:text-primary transition-colors"
-              >
-                {t('footer.guides')}
-              </Link>
             </div>
           </div>
 

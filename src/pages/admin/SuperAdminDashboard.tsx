@@ -84,7 +84,7 @@ const SuperAdminDashboard = () => {
     if (stats) {
       if (stats.open_support_tickets > 0) {
         alerts.push({
-          id: "support",
+          id: stats.open_support_tickets,
           type: "support",
           severity: stats.open_support_tickets > 5 ? "high" : "medium",
           message: t("super_admin.support_tickets_alert", { count: stats.open_support_tickets }),
@@ -94,7 +94,7 @@ const SuperAdminDashboard = () => {
       }
       if (stats.open_disputes > 0) {
         alerts.push({
-          id: "disputes",
+          id: stats.open_disputes,
           type: "dispute",
           severity: "high",
           message: t("super_admin.disputes_alert", { count: stats.open_disputes }),
@@ -213,7 +213,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header with Security Warning */}
-      <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
+      {/* <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
           <Shield className="h-6 w-6 text-destructive" />
           <div>
@@ -223,10 +223,10 @@ const SuperAdminDashboard = () => {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* System Controls */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
@@ -277,7 +277,7 @@ const SuperAdminDashboard = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* System Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 gap-4">
@@ -423,7 +423,11 @@ const SuperAdminDashboard = () => {
                     {alert.resolved ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
+                      <Link to={
+                        alert.type === "support" ? ROUTES.ADMIN.SUPPORT : ROUTES.ADMIN.DISPUTES}
+                      >
                       <Button variant="ghost" size="sm">{t("super_admin.resolve")}</Button>
+                      </Link>
                     )}
                   </div>
                 </div>

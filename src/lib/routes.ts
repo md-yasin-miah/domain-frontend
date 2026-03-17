@@ -17,11 +17,6 @@ export const ROUTES = {
       },
     },
     LISTING_DETAIL: (listingSlug: string) => `/listings/${listingSlug}`,
-    GUIDES: {
-      ROOT: "/guides",
-      DETAILS: (slug: string) => `/guides/${slug}`,
-      CATEGORY: (category: string) => `/guides/category/${category}`,
-    },
     HELP_CENTER: {
       ROOT: "/help-center",
       DETAILS: (slug: string) => `/help-center/${slug}`,

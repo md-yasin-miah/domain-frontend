@@ -44,9 +44,6 @@ const Trends = lazy(() => import("./pages/services/Trends"));
 const PremiumTrends = lazy(() => import("./pages/services/PremiumTrends"));
 const Brokers = lazy(() => import("./pages/services/Brokers"));
 const ReferralProgram = lazy(() => import("./pages/services/ReferralProgram"));
-const Guides = lazy(() => import("./pages/resources/Guides"));
-const GuideDetail = lazy(() => import("./pages/resources/GuideDetail"));
-const GuideCategory = lazy(() => import("./pages/resources/GuideCategory"));
 const HelpCenter = lazy(() => import("./pages/resources/HelpCenter"));
 const Blog = lazy(() => import("./pages/resources/Blog"));
 const BlogPostDetail = lazy(() => import("./pages/resources/BlogPostDetail"));
@@ -371,35 +368,6 @@ export const router = createBrowserRouter([
         ],
       },
       // Resources routes - Nested
-      {
-        path: "guides",
-        children: [
-          {
-            index: true,
-            element: (
-              <LazyComponent>
-                <Guides />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: ":slug",
-            element: (
-              <LazyComponent>
-                <GuideDetail />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "category/:category",
-            element: (
-              <LazyComponent>
-                <GuideCategory />
-              </LazyComponent>
-            ),
-          },
-        ],
-      },
       {
         path: "help-center",
         element: (

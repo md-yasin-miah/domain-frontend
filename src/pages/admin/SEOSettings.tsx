@@ -39,7 +39,6 @@ const DEFAULT_ROUTES = [
   { route: '/services/valuations', name: 'Valuaciones', category: 'Servicios' },
   { route: '/services/trends', name: 'Market Trends', category: 'Servicios' },
   { route: '/services/brokers', name: 'Brokers', category: 'Servicios' },
-  { route: ROUTES.APP.GUIDES.ROOT, name: 'Guías', category: 'Recursos' },
   { route: ROUTES.APP.BLOG.ROOT, name: 'Blog', category: 'Recursos' }
 ];
 

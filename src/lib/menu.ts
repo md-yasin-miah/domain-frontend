@@ -118,12 +118,6 @@ export function useAppMenuItems(t: TFunction): MenuItem[] {
       icon: BookOpen,
       subItems: [
         {
-          title: t('resources.guides'),
-          url: ROUTES.APP.GUIDES.ROOT,
-          icon: BookOpen,
-          description: t('resources.guides_desc'),
-        },
-        {
           title: t('resources.help_center'),
           url: ROUTES.APP.HELP_CENTER.ROOT,
           icon: BookOpen,
@@ -209,12 +203,6 @@ const getAppMenuItems = (t: TFunction): MenuItem[] => {
       url: '#',
       icon: BookOpen,
       subItems: [
-        {
-          title: t('resources.guides'),
-          url: ROUTES.APP.GUIDES.ROOT,
-          icon: BookOpen,
-          description: t('resources.guides_desc'),
-        },
         {
           title: t('resources.help_center'),
           url: ROUTES.APP.HELP_CENTER.ROOT,
