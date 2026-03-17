@@ -11,8 +11,12 @@ import LazyComponent from "./components/common/LazyComponent";
 // Lazy load all page components for code splitting
 const Index = lazy(() => import("./pages/Index"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
-const ListingIndexByCategory = lazy(() => import("./pages/categories/ListingIndexByCategory"));
-const ListingDetailsByCategory = lazy(() => import("./pages/categories/ListingDetailsByCategory"));
+const ListingIndexByCategory = lazy(
+  () => import("./pages/categories/ListingIndexByCategory"),
+);
+const ListingDetailsByCategory = lazy(
+  () => import("./pages/categories/ListingDetailsByCategory"),
+);
 const ListingDetailsBySlug = lazy(() => import("./pages/ListingDetailsBySlug"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Terminos = lazy(() => import("./pages/legal/Terminos"));
@@ -44,10 +48,14 @@ const Trends = lazy(() => import("./pages/services/Trends"));
 const PremiumTrends = lazy(() => import("./pages/services/PremiumTrends"));
 const Brokers = lazy(() => import("./pages/services/Brokers"));
 const ReferralProgram = lazy(() => import("./pages/services/ReferralProgram"));
-const HelpCenter = lazy(() => import("./pages/resources/HelpCenter"));
+const HelpsAndGuidesPage = lazy(
+  () => import("./pages/resources/HelpsAndGuidesPage"),
+);
+const HelpsAndGuidesArticlePage = lazy(
+  () => import("./pages/resources/HelpsAndGuidesArticlePage"),
+);
 const Blog = lazy(() => import("./pages/resources/Blog"));
 const BlogPostDetail = lazy(() => import("./pages/resources/BlogPostDetail"));
-const SuperAdminPanel = lazy(() => import("./pages/admin/SuperAdminPanel"));
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
 const ClientProfile = lazy(() => import("./pages/client/ClientProfile"));
 const ProfileSetup = lazy(() => import("./pages/client/ProfileSetup"));
@@ -59,7 +67,9 @@ const BlogManager = lazy(() => import("./pages/admin/BlogManager"));
 const BlogPostCreateEdit = lazy(
   () => import("./pages/admin/BlogPostCreateEdit"),
 );
-const BlogCategories = lazy(() => import("./pages/admin/categories/BlogCategories"));
+const BlogCategories = lazy(
+  () => import("./pages/admin/categories/BlogCategories"),
+);
 const AdminSupportCategories = lazy(
   () => import("./pages/admin/categories/AdminSupportCategories"),
 );
@@ -68,6 +78,15 @@ const AdminListingCategories = lazy(
 );
 const AdminFAQCategories = lazy(
   () => import("./pages/admin/categories/AdminFAQCategories"),
+);
+const AdminGuideCategoriesPage = lazy(
+  () => import("./pages/admin/AdminGuideCategoriesPage"),
+);
+const AdminGuideArticlesPage = lazy(
+  () => import("./pages/admin/AdminGuideArticlesPage"),
+);
+const AdminGuideArticleEditPage = lazy(
+  () => import("./pages/admin/AdminGuideArticleEditPage"),
 );
 const FAQManager = lazy(() => import("./pages/admin/FAQManager"));
 const AdminSupportTickets = lazy(
@@ -105,9 +124,7 @@ const AdminUserDetailPage = lazy(
 const AdminAnalyticsPage = lazy(
   () => import("./pages/admin/AdminAnalyticsPage"),
 );
-const AdminReportsPage = lazy(
-  () => import("./pages/admin/AdminReportsPage"),
-);
+const AdminReportsPage = lazy(() => import("./pages/admin/AdminReportsPage"));
 const AdminOrderDetailPage = lazy(
   () => import("./pages/admin/orders/AdminOrderDetailPage"),
 );
@@ -370,14 +387,36 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      // Resources routes - Nested
+      // Resources routes
+      // Guides (public API-backed)
       {
-        path: "help-center",
-        element: (
-          <LazyComponent>
-            <HelpCenter />
-          </LazyComponent>
-        ),
+        path: "helps-and-guides",
+        children: [
+          {
+            index: true,
+            element: (
+              <LazyComponent>
+                <HelpsAndGuidesPage />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "category/:slug",
+            element: (
+              <LazyComponent>
+                <HelpsAndGuidesPage />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "article/:slug",
+            element: (
+              <LazyComponent>
+                <HelpsAndGuidesArticlePage />
+              </LazyComponent>
+            ),
+          },
+        ],
       },
       // Blog routes (alternative paths)
       {
@@ -400,36 +439,6 @@ export const router = createBrowserRouter([
             ),
           },
         ],
-      },
-      {
-        path: "faq",
-        element: (
-          <LazyComponent>
-            <FAQ publicPage={true} />
-          </LazyComponent>
-        ),
-      },
-      // Support routes
-      {
-        path: "user",
-        children: [
-          {
-            path: "soporte",
-            element: (
-              <LazyComponent>
-                <SupportPage />
-              </LazyComponent>
-            ),
-          },
-        ],
-      },
-      {
-        path: "soporte",
-        element: (
-          <LazyComponent>
-            <SupportPage />
-          </LazyComponent>
-        ),
       },
     ],
   },
@@ -973,6 +982,38 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <FAQManager />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "guides/categories",
+        element: (
+          <LazyComponent>
+            <AdminGuideCategoriesPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "guides/articles",
+        element: (
+          <LazyComponent>
+            <AdminGuideArticlesPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "guides/articles/new",
+        element: (
+          <LazyComponent>
+            <AdminGuideArticleEditPage />
+          </LazyComponent>
+        ),
+      },
+      {
+        path: "guides/articles/:id",
+        element: (
+          <LazyComponent>
+            <AdminGuideArticleEditPage />
           </LazyComponent>
         ),
       },

@@ -98,6 +98,15 @@ export function AdminSidebar() {
         url: ROUTES.ADMIN.FAQ_MANAGER,
       },
       {
+        title: t("admin.sidebar.guides", "Guides"),
+        icon: FileText,
+        url: ROUTES.ADMIN.GUIDES.CATEGORIES,
+        subItems: [
+          { title: t("admin.sidebar.guides_categories", "Guide Categories"), url: ROUTES.ADMIN.GUIDES.CATEGORIES },
+          { title: t("admin.sidebar.guides_articles", "Guide Articles"), url: ROUTES.ADMIN.GUIDES.ARTICLES },
+        ],
+      },
+      {
         title: t("admin.sidebar.roles_permissions", "Roles & Permissions"),
         icon: Shield,
         url: ROUTES.ADMIN.ROLES_PERMISSIONS,

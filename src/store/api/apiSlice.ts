@@ -87,6 +87,8 @@ export const apiSlice = createApi({
     'Commission',
     'Offer',
     'ProductVerification',
+    'GuideCategory',
+    'GuideArticle',
   ],
   endpoints: () => ({}),
 });

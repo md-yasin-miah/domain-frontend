@@ -6,7 +6,7 @@ export function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-muted/30 border-t border-border/40 mt-16">
+    <footer className="bg-muted/30 border-t border-border/40">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -69,7 +69,7 @@ export function Footer() {
             <h4 className="font-semibold text-foreground">{t('footer.support_title')}</h4>
             <div className="space-y-2 text-sm">
               <Link
-                to={ROUTES.APP.HELP_CENTER.ROOT}
+                to={ROUTES.APP.HELP_GUIDES.ROOT}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 {t('footer.help_center')}

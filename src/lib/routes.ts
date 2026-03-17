@@ -5,7 +5,6 @@ export const ROUTES = {
   },
   APP: {
     MARKETPLACE: "/marketplace",
-    FAQ: "/faq",
     CATEGORIES: {
       ROOT: "/categories",
       BY_SLUG: (slug: string) => `/categories/${slug}`,
@@ -17,10 +16,10 @@ export const ROUTES = {
       },
     },
     LISTING_DETAIL: (listingSlug: string) => `/listings/${listingSlug}`,
-    HELP_CENTER: {
-      ROOT: "/help-center",
-      DETAILS: (slug: string) => `/help-center/${slug}`,
-      CATEGORY: (category: string) => `/help-center/category/${category}`,
+    HELP_GUIDES: {
+      ROOT: "/helps-and-guides",
+      CATEGORY: (slug: string) => `/helps-and-guides/category/${slug}`,
+      ARTICLE: (slug: string) => `/helps-and-guides/article/${slug}`,
     },
     BLOG: {
       ROOT: "/blog",
@@ -109,6 +108,11 @@ export const ROUTES = {
       SUPPORT: "/admin/categories/support",
       FAQ: "/admin/categories/faq",
       BLOG: "/admin/categories/blog",
+    },
+    GUIDES: {
+      CATEGORIES: "/admin/guides/categories",
+      ARTICLES: "/admin/guides/articles",
+      ARTICLE_EDIT: (id: number | "new") => `/admin/guides/articles/${id}`,
     },
     NOTIFICATIONS: "/admin/notifications",
     UPLOADS: "/admin/uploads",

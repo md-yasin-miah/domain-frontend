@@ -219,6 +219,91 @@ interface PasswordResetRequest {
   new_password: string;
 }
 
+// ============ Guide (Knowledge Base) Types ============
+interface GuideCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  is_active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface GuideCategoryCreateRequest {
+  name: string;
+  slug: string;
+  description?: string | null;
+  is_active?: boolean;
+  order?: number;
+}
+
+interface GuideCategoryUpdateRequest {
+  name?: string;
+  slug?: string;
+  description?: string | null;
+  is_active?: boolean;
+  order?: number;
+}
+
+interface UserBasicInfo {
+  id: number;
+  username: string;
+  email: string;
+  name?: string | null;
+}
+
+interface GuideArticle {
+  id: number;
+  category_id: number | null;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string | null;
+  is_published: boolean;
+  requires_auth: boolean;
+  order: number;
+  meta_title: string | null;
+  meta_description: string | null;
+  og_image: string | null;
+  view_count: number;
+  published_at: string | null;
+  created_by_id: number | null;
+  created_at: string;
+  updated_at: string;
+  created_by?: UserBasicInfo | null;
+  category?: GuideCategory | null;
+}
+
+interface GuideArticleCreateRequest {
+  category_id?: number | null;
+  title: string;
+  slug?: string;
+  content: string;
+  excerpt?: string | null;
+  is_published?: boolean;
+  requires_auth?: boolean;
+  order?: number;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  og_image?: string | null;
+}
+
+interface GuideArticleUpdateRequest {
+  category_id?: number | null;
+  title?: string;
+  slug?: string;
+  content?: string;
+  excerpt?: string | null;
+  is_published?: boolean;
+  requires_auth?: boolean;
+  order?: number;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  og_image?: string | null;
+}
+
 interface UserStats {
   total_listings: number;
   total_orders: number;

@@ -119,7 +119,7 @@ export function useAppMenuItems(t: TFunction): MenuItem[] {
       subItems: [
         {
           title: t('resources.help_center'),
-          url: ROUTES.APP.HELP_CENTER.ROOT,
+          url: ROUTES.APP.HELP_GUIDES.ROOT,
           icon: BookOpen,
           description: t('resources.help_center_desc'),
         },
@@ -128,103 +128,12 @@ export function useAppMenuItems(t: TFunction): MenuItem[] {
           url: ROUTES.APP.BLOG.ROOT,
           icon: BookOpen,
           description: t('resources.blog_desc'),
-        },
-        {
-          title: "FAQs",
-          url: ROUTES.APP.FAQ,
-          icon: HelpCircle,
-          description: t('resources.faqs_desc'),
         },
       ],
     },
   ];
   }, [t, listingTypes]);
 }
-
-/** Legacy: app menu with static Categories (single "Domains" item). Prefer useAppMenuItems for API-driven categories. */
-const getAppMenuItems = (t: TFunction): MenuItem[] => {
-  return [
-    {
-      title: t('nav.home'),
-      url: ROUTES.ROOT,
-      icon: Home,
-    },
-    {
-      title: t('nav.marketplace'),
-      url: ROUTES.APP.MARKETPLACE,
-      icon: ShoppingCart,
-    },
-    {
-      title: t('nav.categories'),
-      url: '#',
-      icon: Grid3X3,
-      subItems: [
-        {
-          title: t('categories.domains'),
-          url: ROUTES.APP.CATEGORIES.DOMAINS.ROOT,
-          icon: Server,
-          description: t('categories.domains_desc'),
-        },
-      ],
-    },
-    {
-      title: 'Servicios',
-      url: '#',
-      icon: Settings,
-      subItems: [
-        {
-          title: t('services.valuations'),
-          url: '/services/valuations',
-          icon: Server,
-          description: t('services.valuations_desc'),
-        },
-        {
-          title: t('services.market_trends'),
-          url: '/services/trends',
-          icon: TrendingUp,
-          description: t('services.market_trends_desc'),
-        },
-        {
-          title: t('services.brokers_network'),
-          url: '/services/brokers',
-          icon: Users,
-          description: t('services.brokers_network_desc'),
-        },
-        {
-          title: t('services.referral_program'),
-          url: '/services/referrals',
-          icon: Users,
-          description: t('services.referral_program_desc'),
-        },
-      ],
-    },
-    {
-      title: 'Recursos',
-      url: '#',
-      icon: BookOpen,
-      subItems: [
-        {
-          title: t('resources.help_center'),
-          url: ROUTES.APP.HELP_CENTER.ROOT,
-          icon: BookOpen,
-          description: t('resources.help_center_desc'),
-        },
-        {
-          title: t('resources.blog'),
-          url: ROUTES.APP.BLOG.ROOT,
-          icon: BookOpen,
-          description: t('resources.blog_desc'),
-        },
-        {
-          title: "FAQs",
-          url: ROUTES.APP.FAQ,
-          icon: HelpCircle,
-          description: t('resources.faqs_desc'),
-        },
-      ],
-    },
-  ];
-};
 
 const getClientMenuItems = (t: TFunction): MenuItem[] => {
   return [
@@ -315,7 +224,6 @@ const getAdminServices = (t: TFunction): MenuItem[] => {
   ];
 }
 export {
-  getAppMenuItems,
   getClientMenuItems,
   getClientServices,
   getAdminServices,
