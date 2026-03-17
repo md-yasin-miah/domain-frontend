@@ -61,7 +61,12 @@ export interface TranslationBulkUpdateRequest {
 export interface TranslationBulkUpdateResponse {
   key: string;
   updated_count: number;
-  translations: Array<{ id: number; key: string; locale: string; value: string }>;
+  translations: Array<{
+    id: number;
+    key: string;
+    locale: string;
+    value: string;
+  }>;
 }
 
 export const i18nApi = apiSlice.injectEndpoints({
@@ -103,17 +108,22 @@ export const i18nApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Language", "Translation"],
     }),
 
-    getTranslationsByLocale: builder.query<TranslationsByLocaleResponse, string>({
+    getTranslationsByLocale: builder.query<
+      TranslationsByLocaleResponse,
+      string
+    >({
       query: (locale) => ({
         url: `/i18n/translations/${encodeURIComponent(locale)}`,
         method: "GET",
       }),
-      providesTags: (result, error, locale) => [{ type: "Translation", id: `locale-${locale}` }],
+      providesTags: (result, error, locale) => [
+        { type: "Translation", id: `locale-${locale}` },
+      ],
     }),
 
     listTranslations: builder.query<
       PaginatedResponse<TranslationItem>,
-      { locale?: string; skip?: number; limit?: number; search?: string }
+      { locale?: string; skip?: number; limit?: number; q?: string }
     >({
       query: (params) => ({
         url: "/i18n/strings",
@@ -122,30 +132,35 @@ export const i18nApi = apiSlice.injectEndpoints({
           skip: params.skip ?? 0,
           limit: params.limit ?? 200,
           ...(params.locale && { locale: params.locale }),
-          ...(params.search && { search: params.search }),
+          ...(params.q && { q: params.q }),
         },
       }),
       providesTags: (result) =>
         result
           ? [
-              ...result.items.map((r) => ({ type: "Translation" as const, id: r.id })),
+              ...result.items.map((r) => ({
+                type: "Translation" as const,
+                id: r.id,
+              })),
               { type: "Translation", id: "LIST" },
             ]
           : [{ type: "Translation", id: "LIST" }],
     }),
 
-    addTranslation: builder.mutation<TranslationItem, TranslationCreateRequest>({
-      query: (body) => ({
-        url: "/i18n/strings",
-        method: "POST",
-        body: {
-          key: body.key,
-          value: body.value,
-          locale: body.locale ?? "en",
-        },
-      }),
-      invalidatesTags: ["Translation"],
-    }),
+    addTranslation: builder.mutation<TranslationItem, TranslationCreateRequest>(
+      {
+        query: (body) => ({
+          url: "/i18n/strings",
+          method: "POST",
+          body: {
+            key: body.key,
+            value: body.value,
+            locale: body.locale ?? "en",
+          },
+        }),
+        invalidatesTags: ["Translation"],
+      },
+    ),
 
     updateTranslation: builder.mutation<
       TranslationItem,
@@ -172,6 +187,18 @@ export const i18nApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Translation"],
     }),
 
+    bulkCreateTranslations: builder.mutation<
+      TranslationBulkUpdateResponse,
+      TranslationBulkUpdateRequest
+    >({
+      query: (body) => ({
+        url: "/i18n/strings/bulk",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Translation"],
+    }),
+
     deleteTranslation: builder.mutation<
       { deleted: boolean; key: string; locale: string },
       { key: string; locale: string }
@@ -193,8 +220,8 @@ export const {
   useDeleteLanguageMutation,
   useGetTranslationsByLocaleQuery,
   useListTranslationsQuery,
-  useAddTranslationMutation,
   useUpdateTranslationMutation,
   useBulkUpdateTranslationsMutation,
+  useBulkCreateTranslationsMutation,
   useDeleteTranslationMutation,
 } = i18nApi;

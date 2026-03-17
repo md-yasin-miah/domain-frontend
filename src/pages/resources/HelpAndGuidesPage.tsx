@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
 import {
   useGetPublicGuideCategoriesQuery,
@@ -54,7 +55,6 @@ export default function GuidesPage() {
   const categories = categoriesData?.categories ?? [];
   const articles = articlesData?.items ?? [];
   const pagination = articlesData?.pagination;
-  const loading = categoriesLoading || articlesLoading;
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "";
@@ -123,7 +123,20 @@ export default function GuidesPage() {
         </div>
       </section>
 
-      {categories.length > 0 && (
+      {categoriesLoading ? (
+        <section className="py-8 px-6 border-b border-border/40">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Skeleton className="h-9 w-12 rounded-md" />
+              <Skeleton className="h-9 w-24 rounded-md" />
+              <Skeleton className="h-9 w-20 rounded-md" />
+              <Skeleton className="h-9 w-28 rounded-md" />
+              <Skeleton className="h-9 w-16 rounded-md" />
+              <Skeleton className="h-9 w-32 rounded-md" />
+            </div>
+          </div>
+        </section>
+      ) : categories.length > 0 ? (
         <section className="py-8 px-6 border-b border-border/40">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-wrap gap-2 justify-center">
@@ -149,16 +162,28 @@ export default function GuidesPage() {
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              <span className="ml-2 text-muted-foreground">
-                {t("common.loading", "Loading...")}
-              </span>
+          {articlesLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className="overflow-hidden">
+                  <CardHeader className="pb-2">
+                    <Skeleton className="h-6 w-full rounded" />
+                    <Skeleton className="h-4 w-20 mt-2 rounded" />
+                  </CardHeader>
+                  <CardContent className="pt-0 space-y-3">
+                    <Skeleton className="h-4 w-full rounded" />
+                    <Skeleton className="h-4 w-3/4 rounded" />
+                    <div className="flex justify-between pt-2">
+                      <Skeleton className="h-3 w-16 rounded" />
+                      <Skeleton className="h-3 w-10 rounded" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : articles.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">

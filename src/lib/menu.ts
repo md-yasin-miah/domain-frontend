@@ -82,7 +82,7 @@ export function useAppMenuItems(t: TFunction): MenuItem[] {
       subItems: buildCategorySubItems(types),
     },
     {
-      title: 'Servicios',
+      title: t('nav.services'),
       url: '#',
       icon: Settings,
       subItems: [
@@ -113,7 +113,7 @@ export function useAppMenuItems(t: TFunction): MenuItem[] {
       ],
     },
     {
-      title: 'Recursos',
+      title: t('nav.resources'),
       url: '#',
       icon: BookOpen,
       subItems: [

@@ -17,9 +17,9 @@ export const ROUTES = {
     },
     LISTING_DETAIL: (listingSlug: string) => `/listings/${listingSlug}`,
     HELP_GUIDES: {
-      ROOT: "/helps-and-guides",
-      CATEGORY: (slug: string) => `/helps-and-guides/category/${slug}`,
-      ARTICLE: (slug: string) => `/helps-and-guides/article/${slug}`,
+      ROOT: "/help-and-guides",
+      CATEGORY: (slug: string) => `/help-and-guides/category/${slug}`,
+      ARTICLE: (slug: string) => `/help-and-guides/article/${slug}`,
     },
     BLOG: {
       ROOT: "/blog",

@@ -48,11 +48,11 @@ const Trends = lazy(() => import("./pages/services/Trends"));
 const PremiumTrends = lazy(() => import("./pages/services/PremiumTrends"));
 const Brokers = lazy(() => import("./pages/services/Brokers"));
 const ReferralProgram = lazy(() => import("./pages/services/ReferralProgram"));
-const HelpsAndGuidesPage = lazy(
-  () => import("./pages/resources/HelpsAndGuidesPage"),
+const HelpAndGuidesPage = lazy(
+  () => import("./pages/resources/HelpAndGuidesPage"),
 );
-const HelpsAndGuidesArticlePage = lazy(
-  () => import("./pages/resources/HelpsAndGuidesArticlePage"),
+const HelpAndGuidesArticlePage = lazy(
+  () => import("./pages/resources/HelpAndGuidesArticlePage"),
 );
 const Blog = lazy(() => import("./pages/resources/Blog"));
 const BlogPostDetail = lazy(() => import("./pages/resources/BlogPostDetail"));
@@ -390,13 +390,13 @@ export const router = createBrowserRouter([
       // Resources routes
       // Guides (public API-backed)
       {
-        path: "helps-and-guides",
+        path: "help-and-guides",
         children: [
           {
             index: true,
             element: (
               <LazyComponent>
-                <HelpsAndGuidesPage />
+                <HelpAndGuidesPage />
               </LazyComponent>
             ),
           },
@@ -404,7 +404,7 @@ export const router = createBrowserRouter([
             path: "category/:slug",
             element: (
               <LazyComponent>
-                <HelpsAndGuidesPage />
+                <HelpAndGuidesPage />
               </LazyComponent>
             ),
           },
@@ -412,7 +412,7 @@ export const router = createBrowserRouter([
             path: "article/:slug",
             element: (
               <LazyComponent>
-                <HelpsAndGuidesArticlePage />
+                <HelpAndGuidesArticlePage />
               </LazyComponent>
             ),
           },

@@ -44,9 +44,9 @@ import { useToast } from "@/hooks/use-toast";
 import {
   useGetLanguagesQuery,
   useListTranslationsQuery,
-  useAddTranslationMutation,
   useUpdateTranslationMutation,
   useBulkUpdateTranslationsMutation,
+  useBulkCreateTranslationsMutation,
   useDeleteTranslationMutation,
   useCreateLanguageMutation,
   useUpdateLanguageMutation,
@@ -60,15 +60,12 @@ export default function AdminTranslationsPage() {
   const { toast } = useToast();
   const [localeFilter, setLocaleFilter] = useState<string>("all");
   const [keySearch, setKeySearch] = useState("");
-  const [addOpen, setAddOpen] = useState(false);
   const [editItem, setEditItem] = useState<TranslationItem | null>(null);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkKey, setBulkKey] = useState("");
+  const [bulkMode, setBulkMode] = useState<"create" | "update">("update");
   const [deleteItem, setDeleteItem] = useState<TranslationItem | null>(null);
 
-  const [addKey, setAddKey] = useState("");
-  const [addValue, setAddValue] = useState("");
-  const [addLocale, setAddLocale] = useState("en");
   const [editValue, setEditValue] = useState("");
   const [bulkValues, setBulkValues] = useState<Record<string, string>>({});
 
@@ -84,15 +81,15 @@ export default function AdminTranslationsPage() {
   const debouncedKeySearch = useDebouncedValue(keySearch, 300);
   const { data: listData, isLoading, refetch } = useListTranslationsQuery({
     locale: localeFilter === "all" ? undefined : localeFilter,
-    search: debouncedKeySearch.trim() || undefined,
+    q: debouncedKeySearch.trim() || undefined,
     skip: (page - 1) * pageSize,
     limit: pageSize,
   });
   const items = useMemo(() => listData?.items ?? [], [listData]);
 
-  const [addTranslation, { isLoading: isAdding }] = useAddTranslationMutation();
   const [updateTranslation, { isLoading: isUpdating }] = useUpdateTranslationMutation();
   const [bulkUpdate, { isLoading: isBulkUpdating }] = useBulkUpdateTranslationsMutation();
+  const [bulkCreate, { isLoading: isBulkCreating }] = useBulkCreateTranslationsMutation();
   const [deleteTranslation, { isLoading: isDeleting }] = useDeleteTranslationMutation();
   const [createLanguage, { isLoading: isCreatingLanguage }] = useCreateLanguageMutation();
   const [updateLanguage, { isLoading: isUpdatingLanguage }] = useUpdateLanguageMutation();
@@ -171,35 +168,15 @@ export default function AdminTranslationsPage() {
     [t, languages]
   );
 
-  const handleAdd = async () => {
-    if (!addKey.trim() || !addValue.trim()) {
-      toast({
-        title: t("admin.translations.key_value_required", "Key and value required"),
-        variant: "destructive",
-      });
-      return;
-    }
-    try {
-      await addTranslation({
-        key: addKey.trim(),
-        value: addValue.trim(),
-        locale: addLocale,
-      }).unwrap();
-      toast({
-        title: t("admin.translations.added", "Translation added"),
-      });
-      setAddOpen(false);
-      setAddKey("");
-      setAddValue("");
-      refetch();
-    } catch (err: unknown) {
-      const detail = err && typeof err === "object" && "data" in err && (err as { data?: { detail?: string } }).data?.detail;
-      toast({
-        title: t("common.error", "Error"),
-        description: typeof detail === "string" ? detail : t("common.error"),
-        variant: "destructive",
-      });
-    }
+  const handleBulkCreateOpen = () => {
+    setBulkMode("create");
+    setBulkKey("");
+    const emptyByLocale: Record<string, string> = {};
+    languages.forEach((lang) => {
+      emptyByLocale[lang.code] = "";
+    });
+    setBulkValues(emptyByLocale);
+    setBulkOpen(true);
   };
 
   const handleEditOpen = (row: TranslationItem) => {
@@ -229,6 +206,7 @@ export default function AdminTranslationsPage() {
   };
 
   const handleBulkOpen = (key: string) => {
+    setBulkMode("update");
     setBulkOpen(true);
     setBulkKey(key);
     const byLocale: Record<string, string> = {};
@@ -260,8 +238,13 @@ export default function AdminTranslationsPage() {
       return;
     }
     try {
-      await bulkUpdate({ key, translations }).unwrap();
-      toast({ title: t("admin.translations.bulk_updated", "Translations updated") });
+      if (bulkMode === "update") {
+        await bulkUpdate({ key, translations }).unwrap();
+        toast({ title: t("admin.translations.bulk_updated", "Translations updated") });
+      } else {
+        await bulkCreate({ key, translations }).unwrap();
+        toast({ title: t("admin.translations.bulk_created", "Translations created") });
+      }
       setBulkOpen(false);
       setBulkKey("");
       refetch();
@@ -476,7 +459,7 @@ export default function AdminTranslationsPage() {
                 </Button>
               )}
             </div>
-            <Button onClick={() => setAddOpen(true)}>
+            <Button onClick={handleBulkCreateOpen}>
               <Plus className="h-4 w-4 mr-2" />
               {t("admin.translations.add", "Add string")}
             </Button>
@@ -518,50 +501,6 @@ export default function AdminTranslationsPage() {
         </CardContent>
       </Card>
 
-      {/* Add dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("admin.translations.add_title", "Add translation")}</DialogTitle>
-            <DialogDescription>
-              {t("admin.translations.add_desc", "Use dot notation for key, e.g. common.save")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>{t("admin.translations.key", "Key")}</Label>
-              <Input placeholder="common.save" value={addKey} onChange={(e) => setAddKey(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>{t("admin.translations.locale", "Locale")}</Label>
-              <Select value={addLocale} onValueChange={setAddLocale}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang.code} value={lang.code}>
-                      {lang.flag} {lang.code} – {lang.native_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>{t("admin.translations.value", "Value")}</Label>
-              <Input placeholder="Save" value={addValue} onChange={(e) => setAddValue(e.target.value)} />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)} disabled={isAdding}>{t("common.cancel", "Cancel")}</Button>
-            <Button onClick={handleAdd} disabled={isAdding}>
-              {isAdding && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {t("admin.translations.add", "Add string")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Edit single dialog */}
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
         <DialogContent className="sm:max-w-md">
@@ -587,11 +526,15 @@ export default function AdminTranslationsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk edit dialog */}
+      {/* Bulk add / edit dialog */}
       <Dialog open={bulkOpen} onOpenChange={(open) => !open && (setBulkOpen(false), setBulkKey(""))}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{t("admin.translations.bulk_title", "Edit all locales")}</DialogTitle>
+            <DialogTitle>
+              {bulkMode === "update"
+                ? t("admin.translations.bulk_title", "Edit all locales")
+                : t("admin.translations.bulk_add_title", "Add translation (all locales)")}
+            </DialogTitle>
             <DialogDescription>
               {t("admin.translations.bulk_key_hint", "Edit the key and values for all locales.")}
             </DialogDescription>
@@ -604,8 +547,8 @@ export default function AdminTranslationsPage() {
                 value={bulkKey}
                 onChange={(e) => setBulkKey(e.target.value)}
                 placeholder="e.g. common.save"
-                readOnly={process.env.NODE_ENV !== "development"}
-                title={process.env.NODE_ENV !== "development" ? t("admin.translations.key_developer_only", "Key is read-only; editable only in developer mode.") : undefined}
+                readOnly={bulkMode === "update" && process.env.NODE_ENV !== "development"}
+                title={bulkMode === "update" && process.env.NODE_ENV !== "development" ? t("admin.translations.key_developer_only", "Key is read-only; editable only in developer mode.") : undefined}
               />
             </div>
             {languages.map((lang) => (
@@ -622,9 +565,20 @@ export default function AdminTranslationsPage() {
             ))}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setBulkOpen(false); setBulkKey(""); }} disabled={isBulkUpdating}>{t("common.cancel", "Cancel")}</Button>
-            <Button onClick={handleBulkSave} disabled={isBulkUpdating}>
-              {isBulkUpdating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            <Button
+              variant="outline"
+              onClick={() => {
+                setBulkOpen(false);
+                setBulkKey("");
+              }}
+              disabled={isBulkUpdating || isBulkCreating}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button onClick={handleBulkSave} disabled={isBulkUpdating || isBulkCreating}>
+              {(isBulkUpdating || isBulkCreating) && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
               {t("common.save", "Save")}
             </Button>
           </DialogFooter>
