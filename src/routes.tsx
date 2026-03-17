@@ -101,6 +101,9 @@ const AdminUploadsPage = lazy(() => import("./pages/admin/AdminUploadsPage"));
 const AdminVerificationsPage = lazy(
   () => import("./pages/admin/AdminVerificationsPage"),
 );
+const AdminVerificationDetailPage = lazy(
+  () => import("./pages/admin/AdminVerificationDetailPage"),
+);
 const AdminDisputesPage = lazy(() => import("./pages/admin/AdminDisputesPage"));
 const AdminValuationsPage = lazy(
   () => import("./pages/admin/AdminValuationsPage"),
@@ -781,19 +784,47 @@ export const router = createBrowserRouter([
       },
       {
         path: "users",
-        element: (
-          <LazyComponent>
-            <UserManagement />
-          </LazyComponent>
-        ),
-      },
-      {
-        path: "users/:id",
-        element: (
-          <LazyComponent>
-            <AdminUserDetailPage />
-          </LazyComponent>
-        ),
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: (
+              <LazyComponent>
+                <UserManagement />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: ":id/details",
+            element: (
+              <LazyComponent>
+                <AdminUserDetailPage />
+              </LazyComponent>
+            ),
+          },
+          {
+            path: "verifications",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: (
+                  <LazyComponent>
+                    <AdminVerificationsPage />
+                  </LazyComponent>
+                ),
+              },
+              {
+                path: ":id",
+                element: (
+                  <LazyComponent>
+                    <AdminVerificationDetailPage />
+                  </LazyComponent>
+                ),
+              },
+            ],
+          },
+        ],
       },
       {
         path: "profile",
@@ -1054,14 +1085,6 @@ export const router = createBrowserRouter([
         element: (
           <LazyComponent>
             <AdminUploadsPage />
-          </LazyComponent>
-        ),
-      },
-      {
-        path: "verifications",
-        element: (
-          <LazyComponent>
-            <AdminVerificationsPage />
           </LazyComponent>
         ),
       },

@@ -23,6 +23,7 @@ export interface UserVerificationRequest {
   reviewed_by_id: number | null;
   admin_notes: string | null;
   created_at: string;
+  user?: UserResponse;
 }
 
 export interface VerificationRequestsParams {

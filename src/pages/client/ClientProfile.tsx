@@ -21,7 +21,16 @@ import {
   Verified,
   Loader2,
   Send,
+  FileUp,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/store/hooks/useAuth";
 import {
@@ -33,6 +42,7 @@ import {
   useGetMyVerificationStatusQuery,
   useRequestVerificationMutation,
 } from "@/store/api/verificationApi";
+import { useUploadFileForVerificationMutation } from "@/store/api/uploadApi";
 
 export default function ClientProfile() {
   const { t } = useTranslation();
@@ -49,11 +59,21 @@ export default function ClientProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
 
-  const { data: verificationStatus } = useGetMyVerificationStatusQuery(undefined, {
-    skip: !user,
-  });
+  const { data: verificationStatus, refetch: refetchVerificationStatus } =
+    useGetMyVerificationStatusQuery(undefined, {
+      skip: !user,
+    });
   const [requestVerification, { isLoading: requestingVerification }] =
     useRequestVerificationMutation();
+  const [uploadFileForVerification] = useUploadFileForVerificationMutation();
+
+  const [verificationModalOpen, setVerificationModalOpen] = useState(false);
+  const [idDocumentFile, setIdDocumentFile] = useState<File | null>(null);
+  const [utilityBillFile, setUtilityBillFile] = useState<File | null>(null);
+  const [isSubmittingVerification, setIsSubmittingVerification] = useState(false);
+
+  const ACCEPT_ID = ".pdf,.png,.jpg,.jpeg";
+  const ACCEPT_UTILITY = ".pdf,.png,.jpg,.jpeg";
 
   const [formData, setFormData] = useState<ClientProfile>({
     first_name: "",
@@ -115,9 +135,36 @@ export default function ClientProfile() {
     }
   }, [profileError, toast, t]);
 
-  const handleRequestVerification = async () => {
+  const handleOpenVerificationModal = () => {
+    setIdDocumentFile(null);
+    setUtilityBillFile(null);
+    setVerificationModalOpen(true);
+  };
+
+  const handleSubmitVerificationRequest = async () => {
+    if (!idDocumentFile || !utilityBillFile) {
+      toast({
+        title: t("profile.client.verification_files_required", "Documents required"),
+        description: t(
+          "profile.client.verification_files_required_desc",
+          "Please upload both Identification document and Utility bill."
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSubmittingVerification(true);
     try {
-      await requestVerification().unwrap();
+      const request = await requestVerification().unwrap();
+      const requestId = request.id;
+      const formId = new FormData();
+      formId.append("file", idDocumentFile);
+      const formUtility = new FormData();
+      formUtility.append("file", utilityBillFile);
+      await uploadFileForVerification({ formData: formId, related_entity_id: requestId }).unwrap();
+      await uploadFileForVerification({ formData: formUtility, related_entity_id: requestId }).unwrap();
+      setVerificationModalOpen(false);
+      refetchVerificationStatus();
       toast({
         title: t("profile.client.verification_requested", "Verification requested"),
         description: t(
@@ -131,6 +178,8 @@ export default function ClientProfile() {
           ? String((e as { data?: { detail?: string } }).data?.detail)
           : t("common.error", "Error");
       toast({ title: msg, variant: "destructive" });
+    } finally {
+      setIsSubmittingVerification(false);
     }
   };
 
@@ -285,6 +334,7 @@ export default function ClientProfile() {
 
       {/* Account verification */}
       {verificationStatus && (
+        <>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -326,18 +376,87 @@ export default function ClientProfile() {
             </div>
             {!verificationStatus.is_verified && !verificationStatus.pending_request && (
               <Button
-                onClick={handleRequestVerification}
-                disabled={requestingVerification}
+                onClick={handleOpenVerificationModal}
+                disabled={isSubmittingVerification}
               >
-                {requestingVerification && (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                )}
-                <Send className="h-4 w-4 mr-2" />
+                <FileUp className="h-4 w-4 mr-2" />
                 {t("profile.client.request_verification", "Request verification")}
               </Button>
             )}
           </CardContent>
         </Card>
+
+        {/* Request verification modal: ID + utility bill uploads */}
+        <Dialog open={verificationModalOpen} onOpenChange={setVerificationModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {t("profile.client.request_verification", "Request verification")}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="verification-id-doc">
+                  {t(
+                    "profile.client.verification_id_doc",
+                    "Identification document (NID, Passport, Driving licence)"
+                  )}
+                </Label>
+                <Input
+                  id="verification-id-doc"
+                  type="file"
+                  accept={ACCEPT_ID}
+                  onChange={(e) => setIdDocumentFile(e.target.files?.[0] ?? null)}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "profile.client.verification_id_doc_info",
+                    "Upload a clear copy of your National ID, Passport, or Driving licence. Accepted formats: PDF, PNG, JPG, JPEG."
+                  )}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="verification-utility-bill">
+                  {t("profile.client.verification_utility_bill", "Utility bill")}
+                </Label>
+                <Input
+                  id="verification-utility-bill"
+                  type="file"
+                  accept={ACCEPT_UTILITY}
+                  onChange={(e) => setUtilityBillFile(e.target.files?.[0] ?? null)}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "profile.client.verification_utility_bill_info",
+                    "Upload a recent utility bill (e.g. electricity, gas, water). Accepted formats: PDF, PNG, JPG, JPEG."
+                  )}
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setVerificationModalOpen(false)}
+                disabled={isSubmittingVerification}
+              >
+                {t("common.cancel", "Cancel")}
+              </Button>
+              <Button
+                onClick={handleSubmitVerificationRequest}
+                disabled={isSubmittingVerification || !idDocumentFile || !utilityBillFile}
+              >
+                {isSubmittingVerification && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
+                <Send className="h-4 w-4 mr-2" />
+                {t("profile.client.submit_verification", "Submit request")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        </>
       )}
 
       <div className="grid gap-6 lg:grid-cols-2">

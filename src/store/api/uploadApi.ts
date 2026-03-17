@@ -1,5 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
 
 export interface Upload {
   id: number;
@@ -29,6 +28,12 @@ export interface MultipleUploadResponse {
   files: UploadResponse[];
 }
 
+/** Params for uploading a file linked to a verification request */
+export interface UploadForVerificationParams {
+  formData: FormData;
+  related_entity_id: number;
+}
+
 export const uploadApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     uploadFile: builder.mutation<UploadResponse, FormData>({
@@ -39,6 +44,19 @@ export const uploadApi = apiSlice.injectEndpoints({
         formData: true,
       }),
       invalidatesTags: ['User'],
+    }),
+    /** Upload a file and link it to a verification request (uses query params). */
+    uploadFileForVerification: builder.mutation<UploadResponse, UploadForVerificationParams>({
+      query: ({ formData, related_entity_id }) => ({
+        url: '/uploads',
+        method: 'POST',
+        body: formData,
+        params: {
+          related_entity_type: 'user_verification_request',
+          related_entity_id,
+        },
+      }),
+      invalidatesTags: ['User', 'Verification'],
     }),
     uploadMultipleFiles: builder.mutation<MultipleUploadResponse, FormData>({
       query: (formData) => ({
@@ -83,6 +101,7 @@ export const uploadApi = apiSlice.injectEndpoints({
 
 export const {
   useUploadFileMutation,
+  useUploadFileForVerificationMutation,
   useUploadMultipleFilesMutation,
   useGetUploadsQuery,
   useGetUploadQuery,

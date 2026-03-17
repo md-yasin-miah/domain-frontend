@@ -27,7 +27,9 @@ import {
   MapPin,
   Building,
   Eye,
+  Verified,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -593,7 +595,7 @@ export default function UserManagement() {
       <Button
         size="sm"
         variant="outline"
-        onClick={() => navigate(ROUTES.ADMIN.USER_DETAILS(user.id))}
+        onClick={() => navigate(ROUTES.ADMIN.USERS.DETAILS(Number(user.id)))}
       >
         <Eye className="h-4 w-4" />
       </Button>
@@ -637,203 +639,218 @@ export default function UserManagement() {
               {t("admin.user_management.description")}
             </p>
           </div>
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogTrigger asChild>
-              <Button onClick={() => resetForm()}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                {t("admin.user_management.create_user")}
+          <div>
+            <Link to={ROUTES.ADMIN.USERS.VERIFICATIONS.LIST} className="mr-4">
+              <Button>
+                <Verified className="h-4 w-4 mr-2" />
+                Verifications
               </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {t("admin.user_management.create_dialog.title")}
-                </DialogTitle>
-                <DialogDescription>
-                  {t("admin.user_management.create_dialog.description")}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+            </Link>
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+              <DialogTrigger asChild>
+                <Button onClick={() => resetForm()}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  {t("admin.user_management.create_user")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("admin.user_management.create_dialog.title")}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {t("admin.user_management.create_dialog.description")}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="create-email">
+                        {t("admin.user_management.create_dialog.email")} *
+                      </Label>
+                      <Input
+                        id="create-email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        placeholder="user@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="create-username">
+                        {t("admin.user_management.create_dialog.username")} *
+                      </Label>
+                      <Input
+                        id="create-username"
+                        value={formData.username}
+                        onChange={(e) =>
+                          setFormData({ ...formData, username: e.target.value })
+                        }
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="create-password">
+                        {t("admin.user_management.create_dialog.password")} *
+                      </Label>
+                      <Input
+                        id="create-password"
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) =>
+                          setFormData({ ...formData, password: e.target.value })
+                        }
+                        placeholder="••••••••"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="create-role">
+                        {t("admin.user_management.create_dialog.initial_role")}
+                      </Label>
+                      <Select
+                        value={formData.role_id}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, role_id: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t(
+                              "admin.user_management.create_dialog.select_role",
+                            )}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {rolesData.map((role: Role) => (
+                            <SelectItem
+                              key={role.id}
+                              value={role.id.toString()}
+                            >
+                              {role.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                   <div className="space-y-2">
-                    <Label htmlFor="create-email">
-                      {t("admin.user_management.create_dialog.email")} *
+                    <Label htmlFor="create-full-name">
+                      {t("admin.user_management.create_dialog.full_name")} *
                     </Label>
                     <Input
-                      id="create-email"
-                      type="email"
-                      value={formData.email}
+                      id="create-full-name"
+                      value={formData.full_name}
                       onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
+                        setFormData({ ...formData, full_name: e.target.value })
                       }
-                      placeholder="user@example.com"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="create-phone">
+                        {t("admin.user_management.create_dialog.phone_number")}{" "}
+                        *
+                      </Label>
+                      <Input
+                        id="create-phone"
+                        value={formData.phone_number}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            phone_number: e.target.value,
+                          })
+                        }
+                        placeholder="+1234567890"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="create-address">
+                      {t("admin.user_management.create_dialog.address")} *
+                    </Label>
+                    <Textarea
+                      id="create-address"
+                      value={formData.address}
+                      onChange={(e) =>
+                        setFormData({ ...formData, address: e.target.value })
+                      }
+                      placeholder="123 Main St, City, State, ZIP"
+                      rows={2}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="create-username">
-                      {t("admin.user_management.create_dialog.username")} *
+                    <Label htmlFor="create-company-name">
+                      {t("admin.user_management.create_dialog.company_name")}
                     </Label>
                     <Input
-                      id="create-username"
-                      value={formData.username}
-                      onChange={(e) =>
-                        setFormData({ ...formData, username: e.target.value })
-                      }
-                      placeholder="username"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="create-password">
-                      {t("admin.user_management.create_dialog.password")} *
-                    </Label>
-                    <Input
-                      id="create-password"
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
-                      placeholder="••••••••"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="create-role">
-                      {t("admin.user_management.create_dialog.initial_role")}
-                    </Label>
-                    <Select
-                      value={formData.role_id}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, role_id: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t(
-                            "admin.user_management.create_dialog.select_role",
-                          )}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {rolesData.map((role: Role) => (
-                          <SelectItem key={role.id} value={role.id.toString()}>
-                            {role.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create-full-name">
-                    {t("admin.user_management.create_dialog.full_name")} *
-                  </Label>
-                  <Input
-                    id="create-full-name"
-                    value={formData.full_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, full_name: e.target.value })
-                    }
-                    placeholder="John Doe"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="create-phone">
-                      {t("admin.user_management.create_dialog.phone_number")} *
-                    </Label>
-                    <Input
-                      id="create-phone"
-                      value={formData.phone_number}
+                      id="create-company-name"
+                      value={formData.company_name}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          phone_number: e.target.value,
+                          company_name: e.target.value,
                         })
                       }
-                      placeholder="+1234567890"
+                      placeholder="Company Inc."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="create-company-address">
+                      {t("admin.user_management.create_dialog.company_address")}
+                    </Label>
+                    <Textarea
+                      id="create-company-address"
+                      value={formData.company_address}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          company_address: e.target.value,
+                        })
+                      }
+                      placeholder="Company address"
+                      rows={2}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="create-company-details">
+                      {t("admin.user_management.create_dialog.company_details")}
+                    </Label>
+                    <Textarea
+                      id="create-company-details"
+                      value={formData.company_details}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          company_details: e.target.value,
+                        })
+                      }
+                      placeholder="Additional company information"
+                      rows={3}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create-address">
-                    {t("admin.user_management.create_dialog.address")} *
-                  </Label>
-                  <Textarea
-                    id="create-address"
-                    value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
-                    placeholder="123 Main St, City, State, ZIP"
-                    rows={2}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create-company-name">
-                    {t("admin.user_management.create_dialog.company_name")}
-                  </Label>
-                  <Input
-                    id="create-company-name"
-                    value={formData.company_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company_name: e.target.value })
-                    }
-                    placeholder="Company Inc."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create-company-address">
-                    {t("admin.user_management.create_dialog.company_address")}
-                  </Label>
-                  <Textarea
-                    id="create-company-address"
-                    value={formData.company_address}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        company_address: e.target.value,
-                      })
-                    }
-                    placeholder="Company address"
-                    rows={2}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create-company-details">
-                    {t("admin.user_management.create_dialog.company_details")}
-                  </Label>
-                  <Textarea
-                    id="create-company-details"
-                    value={formData.company_details}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        company_details: e.target.value,
-                      })
-                    }
-                    placeholder="Additional company information"
-                    rows={3}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCreateDialog(false)}
-                >
-                  {t("admin.user_management.create_dialog.cancel")}
-                </Button>
-                <Button onClick={handleCreateUser} disabled={formLoading}>
-                  {formLoading ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : null}
-                  {t("admin.user_management.create_dialog.create")}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCreateDialog(false)}
+                  >
+                    {t("admin.user_management.create_dialog.cancel")}
+                  </Button>
+                  <Button onClick={handleCreateUser} disabled={formLoading}>
+                    {formLoading ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : null}
+                    {t("admin.user_management.create_dialog.create")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
@@ -879,7 +896,12 @@ export default function UserManagement() {
                 }}
               >
                 <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder={t("admin.user_management.filter_by_role", "Filter by role")} />
+                  <SelectValue
+                    placeholder={t(
+                      "admin.user_management.filter_by_role",
+                      "Filter by role",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t("common.all", "All")}</SelectItem>
@@ -909,7 +931,10 @@ export default function UserManagement() {
             onPageSizeChange={handlePageSizeChange}
             error={usersError}
             errorTitle={t("common.error.title", "Error")}
-            errorDescription={t("common.error.description", "Something went wrong.")}
+            errorDescription={t(
+              "common.error.description",
+              "Something went wrong.",
+            )}
             errorIcon={<Users className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>

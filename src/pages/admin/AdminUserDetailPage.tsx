@@ -171,7 +171,7 @@ export default function AdminUserDetailPage() {
   if (!isValidId) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS)}>
+        <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("common.back", "Back")}
         </Button>
@@ -203,7 +203,7 @@ export default function AdminUserDetailPage() {
   if (isError && !is404) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS)}>
+        <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("common.back", "Back")}
         </Button>
@@ -219,7 +219,7 @@ export default function AdminUserDetailPage() {
   if (is404) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS)}>
+        <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("common.back", "Back")}
         </Button>
@@ -250,7 +250,7 @@ export default function AdminUserDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(ROUTES.ADMIN.USERS)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate(ROUTES.ADMIN.USERS.LIST)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>

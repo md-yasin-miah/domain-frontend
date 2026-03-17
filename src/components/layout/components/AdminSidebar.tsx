@@ -40,7 +40,7 @@ export function AdminSidebar() {
       {
         title: t("admin.sidebar.user_management", "User Management"),
         icon: Users,
-        url: ROUTES.ADMIN.USERS,
+        url: ROUTES.ADMIN.USERS.LIST,
       },
       {
         title: t("admin.sidebar.blog_manager", "Blog Manager"),

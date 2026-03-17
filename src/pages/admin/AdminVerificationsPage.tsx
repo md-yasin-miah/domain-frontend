@@ -173,11 +173,13 @@ export default function AdminVerificationsPage() {
         header: t("admin.verifications.user", "User"),
         cell: ({ row }) => (
           <Link
-            to={ROUTES.ADMIN.USER_DETAILS(row.user_id)}
+            to={ROUTES.ADMIN.USERS.DETAILS(Number(row.user_id))}
             className="text-primary hover:underline flex items-center gap-1"
           >
             <User className="h-4 w-4" />
-            #{row.user_id}
+            {
+              row.user?.name || row.user?.username || row.user?.email || `User #${row.user_id}`
+            }
           </Link>
         ),
       },
