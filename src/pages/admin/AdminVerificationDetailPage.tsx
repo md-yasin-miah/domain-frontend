@@ -13,6 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Verified,
   Loader2,
   CheckCircle,
@@ -21,7 +27,6 @@ import {
   User,
   Mail,
   FileText,
-  ExternalLink,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/lib/routes";
@@ -44,19 +49,37 @@ function formatDate(dateStr: string | null): string {
   });
 }
 
-function DocumentLink({ doc }: { doc: VerificationDocumentSummary }) {
-  const href = doc.file_url.startsWith("http") ? doc.file_url : `${API_BASE}${doc.file_url}`;
+function getPreviewUrl(doc: VerificationDocumentSummary): string {
+  const token = localStorage.getItem("auth_token");
+  const url = doc.preview_url;
+  return url.startsWith("http") ? url : `${API_BASE}${url}?token=${token}`;
+}
+
+function isImageFilename(filename: string): boolean {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  return ["png", "jpg", "jpeg", "gif", "webp"].includes(ext || "");
+}
+
+function isPdfFilename(filename: string): boolean {
+  return filename.toLowerCase().endsWith(".pdf");
+}
+
+function DocumentLink({
+  doc,
+  onPreview,
+}: {
+  doc: VerificationDocumentSummary;
+  onPreview: (doc: VerificationDocumentSummary) => void;
+}) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+    <button
+      type="button"
+      onClick={() => onPreview(doc)}
+      className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline text-left"
     >
       <FileText className="h-4 w-4 shrink-0" />
       <span className="truncate max-w-[200px]">{doc.original_filename}</span>
-      <ExternalLink className="h-3 w-3 shrink-0" />
-    </a>
+    </button>
   );
 }
 
@@ -73,6 +96,7 @@ export default function AdminVerificationDetailPage() {
   });
   const [approveUser, { isLoading: isApproving }] = useApproveUserVerificationMutation();
   const [rejectUser, { isLoading: isRejecting }] = useRejectUserVerificationMutation();
+  const [previewDoc, setPreviewDoc] = useState<VerificationDocumentSummary | null>(null);
 
   const handleApprove = async (request: UserVerificationRequest, adminNotes: string) => {
     try {
@@ -251,6 +275,7 @@ export default function AdminVerificationDetailPage() {
                 t={(key, fallback) => t(key, { defaultValue: fallback })}
                 onApprove={handleApprove}
                 onReject={handleReject}
+                onPreview={setPreviewDoc}
                 isApproving={isApproving}
                 isRejecting={isRejecting}
               />
@@ -258,6 +283,57 @@ export default function AdminVerificationDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Document preview popup */}
+      <Dialog open={!!previewDoc} onOpenChange={(open) => !open && setPreviewDoc(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="truncate pr-8">
+              {previewDoc?.original_filename ?? t("admin.verifications.document_preview", "Document preview")}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 overflow-auto rounded-md border bg-muted/30">
+            {previewDoc && (
+              <DocumentPreview doc={previewDoc} />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function DocumentPreview({ doc }: { doc: VerificationDocumentSummary }) {
+  const url = getPreviewUrl(doc);
+  if (isImageFilename(doc.original_filename)) {
+    return (
+      <img
+        src={url}
+        alt={doc.original_filename}
+        className="w-full h-auto object-contain max-h-[70vh] mx-auto block"
+      />
+    );
+  }
+  if (isPdfFilename(doc.original_filename)) {
+    return (
+      <iframe
+        src={url}
+        title={doc.original_filename}
+        className="w-full h-[70vh] border-0 rounded-md"
+      />
+    );
+  }
+  return (
+    <div className="p-6 text-center text-muted-foreground">
+      <p className="mb-2">{doc.original_filename}</p>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-primary hover:underline"
+      >
+        {url}
+      </a>
     </div>
   );
 }
@@ -268,6 +344,7 @@ function RequestBlock({
   t,
   onApprove,
   onReject,
+  onPreview,
   isApproving,
   isRejecting,
 }: {
@@ -276,6 +353,7 @@ function RequestBlock({
   t: (key: string, fallback?: string) => string;
   onApprove: (req: UserVerificationRequest, notes: string) => void;
   onReject: (req: UserVerificationRequest, notes: string) => void;
+  onPreview: (doc: VerificationDocumentSummary) => void;
   isApproving: boolean;
   isRejecting: boolean;
 }) {
@@ -312,7 +390,7 @@ function RequestBlock({
           <ul className="mt-1.5 flex flex-wrap gap-3 list-none">
             {request.document_files.map((doc) => (
               <li key={doc.file_upload_id}>
-                <DocumentLink doc={doc} />
+                <DocumentLink doc={doc} onPreview={onPreview} />
               </li>
             ))}
           </ul>

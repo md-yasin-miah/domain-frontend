@@ -18,6 +18,7 @@ export interface VerificationDocumentSummary {
   file_upload_id: number;
   file_url: string;
   original_filename: string;
+  preview_url: string;
 }
 
 /** Single verification request (admin list / detail) */
