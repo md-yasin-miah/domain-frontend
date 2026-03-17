@@ -25,9 +25,37 @@ import {
 import { useTranslation } from "react-i18next";
 import { FlipWords } from "@/components/ui/flip-words";
 import { ROUTES } from "@/lib/routes";
+import {
+  useGetMarketplaceListingTypesQuery,
+  type ListingType,
+} from "@/store/api/marketplaceApi";
+
+const slugToIcon: Record<string, typeof Globe> = {
+  domains: Globe,
+  domain: Globe,
+  websites: Monitor,
+  website: Monitor,
+  apps: Smartphone,
+  app: Smartphone,
+  ecommerce: ShoppingBag,
+  store: ShoppingBag,
+  mobile_apps: Smartphone,
+  channels: Play,
+  content: Play,
+  software: Code,
+  saas: Code,
+  databases: Database,
+  database: Database,
+};
 
 const Index = () => {
   const { t } = useTranslation();
+  const { data: listingTypesData } = useGetMarketplaceListingTypesQuery({
+    is_active: true,
+  });
+  const listingTypes: ListingType[] = Array.isArray(listingTypesData)
+    ? listingTypesData
+    : [];
 
   // Dynamic words for FlipWords animation
   const dynamicWords = t("hero.title").includes("futuro")
@@ -216,162 +244,36 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-slide-up">
-            <Link
-              to={ROUTES.APP.CATEGORIES.DOMAINS.ROOT}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Globe className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                {t("categories.domains")}
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                {t("categories.domains_desc")}
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">
-                  {t("common.from")} $299+
-                </span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
-
-            <Link
-              to={ROUTES.APP.CATEGORIES.DOMAINS.ROOT}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Monitor className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                {t("categories.websites")}
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                Webs con ingresos recurrentes y analytics verificados.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">$1,499+</span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
-
-            <Link
-              to={ROUTES.APP.MARKETPLACE}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Database className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                Servidores y Hostings
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                Infraestructura web completa con clientes y facturación
-                recurrente.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">$599+</span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
-
-            <Link
-              to={ROUTES.APP.MARKETPLACE}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <ShoppingBag className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                Ecommerce
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                Tiendas completas con inventario y sistemas establecidos.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">$4,999+</span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
-
-            <Link
-              to={ROUTES.APP.MARKETPLACE}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Smartphone className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                {t("categories.mobile_apps")}
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                {t("categories.mobile_apps_desc")}
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">$2,999+</span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
-
-            <Link
-              to={ROUTES.APP.MARKETPLACE}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Play className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                Canales Digitales
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                YouTube, TikTok y redes sociales con audiencia establecida.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">$799+</span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
-
-            <Link
-              to={ROUTES.APP.MARKETPLACE}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Code className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                Software/SaaS
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                Aplicaciones web con suscriptores y código fuente completo.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">$9,999+</span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
-
-            <Link
-              to={ROUTES.APP.MARKETPLACE}
-              className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Database className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
-                {t("categories.databases")}
-              </h3>
-              <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
-                {t("categories.databases_desc")}
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">
-                  {t("common.from")} $199+
-                </span>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </Link>
+            {listingTypes.length > 0
+              ? listingTypes.map((type) => {
+                  const Icon = slugToIcon[type.slug] ?? Globe;
+                  return (
+                    <Link
+                      key={type.id}
+                      to={ROUTES.APP.CATEGORIES.BY_SLUG(type.slug)}
+                      className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
+                    >
+                      <div className="w-20 h-20 bg-gradient-to-br from-primary to secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <Icon className="w-10 h-10 text-white" />
+                      </div>
+                      <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
+                        {type.name}
+                      </h3>
+                      {type.description && (
+                        <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
+                          {type.description}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {t("categories.explore_listings", "Explore listings")}
+                        </span>
+                        <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                    </Link>
+                  );
+                })
+              : null}
           </div>
         </div>
       </section>
@@ -449,23 +351,23 @@ const Index = () => {
               <ul className="space-y-4 font-roboto">
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.buyers_reqs.0", "Create an account and complete verification to access the marketplace.")}</span>
+                  <span>{t("requirements.buyers_reqs.0")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.buyers_reqs.1", "Browse domains, websites, and apps by category; filter by price, traffic, or metrics.")}</span>
+                  <span>{t("requirements.buyers_reqs.1")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.buyers_reqs.2", "Make offers or buy at listed price; participate in auctions when available.")}</span>
+                  <span>{t("requirements.buyers_reqs.2")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.buyers_reqs.3", "Pay securely through escrow; funds are released only after the asset is transferred to you.")}</span>
+                  <span>{t("requirements.buyers_reqs.3")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.buyers_reqs.4", "Track orders, invoices, and payouts from your dashboard; contact support if needed.")}</span>
+                  <span>{t("requirements.buyers_reqs.4")}</span>
                 </li>
               </ul>
             </div>
@@ -478,23 +380,23 @@ const Index = () => {
               <ul className="space-y-4 font-roboto">
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.sellers_reqs.0", "Register and verify your account to list domains, websites, or apps.")}</span>
+                  <span>{t("requirements.sellers_reqs.0")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.sellers_reqs.1", "Add listings with title, description, price, and optional metrics (DA, traffic, revenue).")}</span>
+                  <span>{t("requirements.sellers_reqs.1")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.sellers_reqs.2", "Receive and manage offers; accept or decline; run auctions for your listings.")}</span>
+                  <span>{t("requirements.sellers_reqs.2")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.sellers_reqs.3", "Get paid via escrow after you transfer the asset to the buyer; funds go to your wallet.")}</span>
+                  <span>{t("requirements.sellers_reqs.3")}</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
-                  <span>{t("requirements.sellers_reqs.4", "Manage listings, orders, and payouts from your dashboard; use support for disputes.")}</span>
+                  <span>{t("requirements.sellers_reqs.4")}</span>
                 </li>
               </ul>
             </div>

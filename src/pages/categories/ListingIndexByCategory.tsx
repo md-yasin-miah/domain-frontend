@@ -38,43 +38,8 @@ const DomainsPage = () => {
     useMarketplaceListingsById(listing_type_id);
   const incrementViews = useIncrementViews();
 
-  const categories = [
-    { key: "technology", count: 47, color: "bg-primary" },
-    { key: "business", count: 89, color: "bg-primary/80" },
-    { key: "finance", count: 34, color: "bg-secondary" },
-    { key: "health", count: 23, color: "bg-primary/90" },
-    { key: "education", count: 56, color: "bg-secondary/80" },
-    { key: "entertainment", count: 78, color: "bg-primary/70" },
-  ];
-
   return (
     <div className="md:p-6 lg:p-8 p-4 container mx-auto space-y-8">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-8 border">
-        <div className="max-w-4xl">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            {t("marketplace_domains.hero.title")}
-          </h1>
-          <p className="text-xl text-muted-foreground mb-6">
-            {t("marketplace_domains.hero.subtitle")}
-          </p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              {t("marketplace_domains.hero.bullets.secure_transfer")}
-            </div>
-            <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-yellow-500" />
-              {t("marketplace_domains.hero.bullets.verified_domains")}
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-blue-500" />
-              {t("marketplace_domains.hero.bullets.real_valuations")}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Search and Filters */}
       <div className="bg-card rounded-lg border p-6 shadow-sm">
         <div className="flex flex-col lg:flex-row gap-4">
@@ -126,37 +91,6 @@ const DomainsPage = () => {
           >
             {t("marketplace_domains.quick_filters.short")}
           </Badge>
-        </div>
-      </div>
-
-      {/* Categories */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">
-          {t("marketplace_domains.categories.title")}
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category) => (
-            <Card
-              key={category.key}
-              className="hover:shadow-md transition-shadow cursor-pointer group"
-            >
-              <CardContent className="p-4 text-center">
-                <div
-                  className={`w-12 h-12 ${category.color} rounded-full mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform`}
-                >
-                  <Globe className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <h3 className="font-medium text-sm">
-                  {t(`marketplace_domains.categories.items.${category.key}`)}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {t("marketplace_domains.categories.count", {
-                    count: category.count,
-                  })}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
         </div>
       </div>
 
@@ -221,10 +155,10 @@ const DomainsPage = () => {
               <div className="col-span-full text-center py-12">
                 <Globe className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  {t("marketplace_domains.empty.title")}
+                  {t("marketplace.empty.title")}
                 </h3>
                 <p className="text-muted-foreground">
-                  {t("marketplace_domains.empty.description")}
+                  {t("marketplace.empty.description")}
                 </p>
               </div>
             )}
