@@ -13,7 +13,14 @@ export interface UserVerificationStatus {
   pending_request: boolean;
 }
 
-/** Single verification request (admin list) */
+/** Uploaded document summary for a verification request */
+export interface VerificationDocumentSummary {
+  file_upload_id: number;
+  file_url: string;
+  original_filename: string;
+}
+
+/** Single verification request (admin list / detail) */
 export interface UserVerificationRequest {
   id: number;
   user_id: number;
@@ -23,7 +30,50 @@ export interface UserVerificationRequest {
   reviewed_by_id: number | null;
   admin_notes: string | null;
   created_at: string;
-  user?: UserResponse;
+  user?: UserWithProfile;
+  document_files?: VerificationDocumentSummary[] | null;
+}
+
+/** Profile as returned in verification user detail */
+export interface UserProfileResponse {
+  id: number;
+  user_id: number;
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  address_line1: string | null;
+  address_line2?: string | null;
+  city: string | null;
+  state?: string | null;
+  country: string | null;
+  postal_code: string | null;
+  company_name: string | null;
+  website: string | null;
+  social_links?: Record<string, string> | null;
+  is_verified: boolean;
+  verification_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** User with profile (for admin verification detail) */
+export interface UserWithProfile {
+  id: number;
+  username: string;
+  email: string;
+  name?: string | null;
+  is_active: boolean;
+  roles: string[];
+  profile: UserProfileResponse | null;
+  is_profile_complete: boolean;
+}
+
+/** Response for GET /verifications/users/{user_id} (admin) */
+export interface VerificationUserDetailResponse {
+  user: UserWithProfile;
+  verification_requests: UserVerificationRequest[];
 }
 
 export interface VerificationRequestsParams {
@@ -54,6 +104,15 @@ export const verificationApi = apiSlice.injectEndpoints({
         method: 'POST',
       }),
       invalidatesTags: ['Verification', 'User'],
+    }),
+
+    /** Admin: get full user details and all verification requests (GET /verifications/users/{user_id}) */
+    getVerificationUserDetail: builder.query<VerificationUserDetailResponse, number>({
+      query: (userId) => ({
+        url: `/verifications/users/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: (_result, _error, userId) => [{ type: 'Verification', id: `user-${userId}` }, 'Verification'],
     }),
 
     /** Admin: list user verification requests */
@@ -102,6 +161,7 @@ export const {
   useGetMyVerificationStatusQuery,
   useRequestVerificationMutation,
   useGetVerificationRequestsQuery,
+  useGetVerificationUserDetailQuery,
   useApproveUserVerificationMutation,
   useRejectUserVerificationMutation,
 } = verificationApi;

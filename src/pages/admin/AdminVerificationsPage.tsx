@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -18,29 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Verified,
-  Loader2,
-  CheckCircle,
-  XCircle,
-  User,
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Verified, User, Eye } from "lucide-react";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import { type ColumnDef } from "@/components/ui/data-table";
 import { usePagination } from "@/hooks/usePagination";
 import {
   useGetVerificationRequestsQuery,
-  useApproveUserVerificationMutation,
-  useRejectUserVerificationMutation,
   type UserVerificationRequest,
 } from "@/store/api/verificationApi";
 import { ROUTES } from "@/lib/routes";
@@ -64,13 +45,7 @@ function formatDate(dateStr: string | null): string {
 
 export default function AdminVerificationsPage() {
   const { t } = useTranslation();
-  const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [actionDialog, setActionDialog] = useState<{
-    type: "approve" | "reject";
-    request: UserVerificationRequest;
-  } | null>(null);
-  const [adminNotes, setAdminNotes] = useState("");
 
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
@@ -106,51 +81,6 @@ export default function AdminVerificationsPage() {
     [total, page, size, hasMore, list.length]
   );
 
-  const [approveUser, { isLoading: isApproving }] =
-    useApproveUserVerificationMutation();
-  const [rejectUser, { isLoading: isRejecting }] =
-    useRejectUserVerificationMutation();
-
-  const handleApprove = async () => {
-    if (!actionDialog || actionDialog.type !== "approve") return;
-    try {
-      await approveUser({
-        user_id: actionDialog.request.user_id,
-        body: adminNotes.trim() ? { admin_notes: adminNotes.trim() } : undefined,
-      }).unwrap();
-      toast({ title: t("admin.verifications.verified", "User verified") });
-      setActionDialog(null);
-      setAdminNotes("");
-      refetch();
-    } catch (e: unknown) {
-      const msg =
-        e && typeof e === "object" && "data" in e
-          ? String((e as { data?: { detail?: string } }).data?.detail)
-          : t("common.error", "Error");
-      toast({ title: msg, variant: "destructive" });
-    }
-  };
-
-  const handleReject = async () => {
-    if (!actionDialog || actionDialog.type !== "reject") return;
-    try {
-      await rejectUser({
-        user_id: actionDialog.request.user_id,
-        body: adminNotes.trim() ? { admin_notes: adminNotes.trim() } : undefined,
-      }).unwrap();
-      toast({ title: t("admin.verifications.rejected", "Request rejected") });
-      setActionDialog(null);
-      setAdminNotes("");
-      refetch();
-    } catch (e: unknown) {
-      const msg =
-        e && typeof e === "object" && "data" in e
-          ? String((e as { data?: { detail?: string } }).data?.detail)
-          : t("common.error", "Error");
-      toast({ title: msg, variant: "destructive" });
-    }
-  };
-
   const getStatusVariant = (status: string) => {
     if (status === "approved") return "default";
     if (status === "rejected") return "destructive";
@@ -171,17 +101,21 @@ export default function AdminVerificationsPage() {
         id: "user_id",
         accessorKey: "user_id",
         header: t("admin.verifications.user", "User"),
-        cell: ({ row }) => (
-          <Link
-            to={ROUTES.ADMIN.USERS.DETAILS(Number(row.user_id))}
-            className="text-primary hover:underline flex items-center gap-1"
-          >
-            <User className="h-4 w-4" />
-            {
-              row.user?.name || row.user?.username || row.user?.email || `User #${row.user_id}`
-            }
-          </Link>
-        ),
+        cell: ({ row }) => {
+          const name =
+            row.user?.profile?.first_name || row.user?.profile?.last_name
+              ? [row.user.profile?.first_name, row.user.profile?.last_name].filter(Boolean).join(" ")
+              : row.user?.name || row.user?.username || row.user?.email || `User #${row.user_id}`;
+          return (
+            <Link
+              to={ROUTES.ADMIN.USERS.DETAILS(Number(row.user_id))}
+              className="text-primary hover:underline flex items-center gap-1"
+            >
+              <User className="h-4 w-4" />
+              {name}
+            </Link>
+          );
+        },
       },
       {
         id: "status",
@@ -284,36 +218,16 @@ export default function AdminVerificationsPage() {
             emptyIcon={<Verified className="h-12 w-12 mx-auto opacity-50" />}
             getRowId={(row) => String(row.id)}
             renderActions={(row) => (
-              <div className="flex items-center gap-1">
-                {row.status === "pending" && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-green-600 hover:text-green-700"
-                      onClick={() =>
-                        setActionDialog({ type: "approve", request: row })
-                      }
-                      disabled={isApproving}
-                      title={t("admin.verifications.approve", "Approve")}
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                      onClick={() =>
-                        setActionDialog({ type: "reject", request: row })
-                      }
-                      disabled={isRejecting}
-                      title={t("admin.verifications.reject", "Reject")}
-                    >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
-              </div>
+              <Link to={ROUTES.ADMIN.USERS.VERIFICATIONS.DETAILS(String(row.user_id))}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  title={t("admin.verifications.view_review", "View & review")}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </Link>
             )}
             actionsColumnHeader={t("common.actions")}
             enableSorting={false}
@@ -327,85 +241,6 @@ export default function AdminVerificationsPage() {
           />
         </CardContent>
       </Card>
-
-      <Dialog
-        open={!!actionDialog}
-        onOpenChange={(open) => {
-          if (!open) {
-            setActionDialog(null);
-            setAdminNotes("");
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {actionDialog?.type === "approve"
-                ? t("admin.verifications.approve_title", "Approve verification")
-                : t("admin.verifications.reject_title", "Reject verification")}
-            </DialogTitle>
-            <DialogDescription>
-              {actionDialog && (
-                <>
-                  {t("admin.verifications.user_id", "User")}: #{actionDialog.request.user_id}
-                  {actionDialog.type === "approve"
-                    ? " — " +
-                      t(
-                        "admin.verifications.approve_desc",
-                        "This will mark the user's profile as verified."
-                      )
-                    : " — " +
-                      t(
-                        "admin.verifications.reject_desc",
-                        "The user's verification request will be rejected."
-                      )}
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2 py-2">
-            <Label htmlFor="admin_notes">
-              {t("admin.verifications.admin_notes_optional", "Admin notes (optional)")}
-            </Label>
-            <Textarea
-              id="admin_notes"
-              value={adminNotes}
-              onChange={(e) => setAdminNotes(e.target.value)}
-              placeholder={t("admin.verifications.admin_notes_placeholder", "Notes for the user...")}
-              rows={3}
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setActionDialog(null);
-                setAdminNotes("");
-              }}
-            >
-              {t("common.cancel")}
-            </Button>
-            {actionDialog?.type === "approve" ? (
-              <Button
-                onClick={handleApprove}
-                disabled={isApproving}
-              >
-                {isApproving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {t("admin.verifications.approve", "Approve")}
-              </Button>
-            ) : (
-              <Button
-                variant="destructive"
-                onClick={handleReject}
-                disabled={isRejecting}
-              >
-                {isRejecting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {t("admin.verifications.reject", "Reject")}
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
