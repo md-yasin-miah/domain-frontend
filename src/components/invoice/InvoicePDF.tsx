@@ -5,9 +5,11 @@ import {
   Text,
   View,
   StyleSheet,
-  Font,
+  Image,
 } from "@react-pdf/renderer";
 import { formatCurrency, timeFormat } from "@/lib/helperFun";
+import logo1 from "@/assets/ADOMINIOZ.png";
+import logo2 from "@/assets/Logo_Rocwwa.png";
 
 // Register fonts if needed (optional)
 // Font.register({
@@ -241,29 +243,39 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ order, invoice }) => {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <View>
-              <Text style={styles.title}>INVOICE</Text>
-              <Text style={styles.subtitle}>Invoice Number: {invoiceNumber}</Text>
-              {invoice && (
-                <Text style={styles.status}>
-                  Status: <Text style={styles.statusValue}>{status}</Text>
-                </Text>
-              )}
+          <View>
+            <View style={styles.headerRow}>
+              <Image src={logo1} style={{ width: 97, height: 50 }} />
+              <Image src={logo2} style={{ width: 88, height: 50 }} />
             </View>
-            <View style={styles.headerRight}>
-              <Text style={styles.label}>Date Issued:</Text>
-              <Text style={styles.value}>
-                {timeFormat(invoiceDate, "MMM DD, YYYY")}
-              </Text>
-              {dueDate && (
-                <>
-                  <Text style={[styles.label, { marginTop: 8 }]}>Due Date:</Text>
-                  <Text style={styles.value}>
-                    {timeFormat(dueDate, "MMM DD, YYYY")}
+            <View style={styles.headerRow}>
+              <View>
+                <Text style={styles.title}>INVOICE</Text>
+                <Text style={styles.subtitle}>
+                  Invoice Number: {invoiceNumber}
+                </Text>
+                {invoice && (
+                  <Text style={styles.status}>
+                    Status: <Text style={styles.statusValue}>{status}</Text>
                   </Text>
-                </>
-              )}
+                )}
+              </View>
+              <View style={styles.headerRight}>
+                <Text style={styles.label}>Date Issued:</Text>
+                <Text style={styles.value}>
+                  {timeFormat(invoiceDate, "MMM DD, YYYY")}
+                </Text>
+                {dueDate && (
+                  <>
+                    <Text style={[styles.label, { marginTop: 8 }]}>
+                      Due Date:
+                    </Text>
+                    <Text style={styles.value}>
+                      {timeFormat(dueDate, "MMM DD, YYYY")}
+                    </Text>
+                  </>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -423,7 +435,8 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ order, invoice }) => {
           </View>
           <View style={styles.footerNote}>
             <Text>
-              This is an automatically generated invoice from Adominoz Marketplace
+              This is an automatically generated invoice from Adominoz
+              Marketplace
             </Text>
             <Text style={{ marginTop: 4 }}>
               Generated on{" "}
@@ -437,4 +450,3 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ order, invoice }) => {
 };
 
 export default InvoicePDF;
-
