@@ -16,11 +16,7 @@ import {
   User,
   Building,
   Globe,
-  Phone,
-  Mail,
   Calendar,
-  Image,
-  MapPin,
   Link2,
   Verified,
   Loader2,
@@ -183,32 +179,6 @@ export default function ClientProfile() {
         description: `${t("profile.client.error_update_desc")}: ${error.message || t("common.error")}`,
         variant: "destructive",
       });
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "default";
-      case "pending":
-        return "secondary";
-      case "inactive":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getPlanName = (plan: string) => {
-    switch (plan) {
-      case "basic":
-        return "Básico";
-      case "pro":
-        return "Profesional";
-      case "enterprise":
-        return "Empresarial";
-      default:
-        return "Básico";
     }
   };
 
