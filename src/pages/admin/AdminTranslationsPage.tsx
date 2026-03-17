@@ -79,7 +79,7 @@ export default function AdminTranslationsPage() {
   const { data: languagesData, refetch: refetchLanguages, isLoading: loadingLanguages } = useGetLanguagesQuery();
   const languages = useMemo(() => languagesData?.languages ?? [], [languagesData]);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(50);
   const { data: listData, isLoading, refetch } = useListTranslationsQuery({
     locale: localeFilter === "all" ? undefined : localeFilter,
     search: keySearch,

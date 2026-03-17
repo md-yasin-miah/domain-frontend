@@ -34,7 +34,7 @@ export function TablePagination({
   className,
   showInfo = true,
   showPageSizeSelector = true,
-  pageSizeOptions = [10, 20, 30, 50, 100],
+  pageSizeOptions = [10, 20, 30, 50, 100, 200],
   translationKey = 'common.pagination',
 }: TablePaginationProps) {
   const { t } = useTranslation();

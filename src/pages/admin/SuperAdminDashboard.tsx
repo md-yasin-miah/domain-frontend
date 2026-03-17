@@ -1,18 +1,21 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { 
-  Shield, 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
+import { useGetAdminDashboardQuery } from "@/store/api/dashboardApi"
+import { ROUTES } from "@/lib/routes"
+import {
+  Shield,
+  Users,
+  DollarSign,
+  TrendingUp,
   AlertTriangle,
   Settings,
   Eye,
@@ -21,165 +24,148 @@ import {
   XCircle,
   Clock,
   ArrowUpRight,
-  ArrowDownRight,
   MoreHorizontal,
   Flag,
-  Edit,
-  Trash2,
   Download,
-  Upload,
   Search,
   Filter,
   RefreshCw,
-  Lock,
-  Unlock,
   MessageSquare,
   Package,
   CreditCard,
   Activity,
   Database,
-  Server
+  Server,
+  Loader2,
 } from "lucide-react"
 
+const PERIOD_DAYS = 30
+const LIMIT_RECENT = 10
+
+const STATUS_TO_KEY: Record<string, string> = {
+  Verificado: "status_verified",
+  Pendiente: "status_pending",
+  Suspendido: "status_suspended",
+  Revisión: "status_review",
+  Reportado: "status_reported",
+  "En investigación": "status_investigation",
+  Mediación: "status_mediation",
+}
+
 const SuperAdminDashboard = () => {
+  const { t } = useTranslation()
   const [systemStatus, setSystemStatus] = useState({
     maintenanceMode: false,
     newRegistrations: true,
     paymentProcessing: true,
-    emailNotifications: true
+    emailNotifications: true,
   })
 
-  // Mock data - En producción vendría de Supabase con datos reales
-  const systemStats = {
-    totalUsers: 2847,
-    activeListings: 1243,
-    totalTransactions: 892,
-    pendingVerifications: 23,
-    totalRevenue: 1247680,
-    systemUptime: "99.9%",
-    dailyActiveUsers: 423,
-    conversionRate: 3.2
-  }
+  const { data, isLoading, isError, refetch } = useGetAdminDashboardQuery({
+    days: PERIOD_DAYS,
+    limit_recent: LIMIT_RECENT,
+  })
 
-  const recentUsers = [
-    {
-      id: 1,
-      name: "Juan García",
-      email: "juan@email.com",
-      type: "Vendedor",
-      status: "Verificado",
-      registered: "2024-01-15",
-      revenue: 15600,
-      flagged: false
-    },
-    {
-      id: 2,
-      name: "María López",
-      email: "maria@email.com", 
-      type: "Comprador",
-      status: "Pendiente",
-      registered: "2024-01-14",
-      spent: 8500,
-      flagged: true
-    },
-    {
-      id: 3,
-      name: "Tech Startup Inc",
-      email: "contact@techstartup.com",
-      type: "Vendedor",
-      status: "Suspendido",
-      registered: "2024-01-12",
-      revenue: 45200,
-      flagged: true
-    }
-  ]
+  const stats = data?.stats
+  const recentListings = data?.recent_listings ?? []
+  const recentOrders = data?.recent_orders ?? []
+  const recentSupportTickets = data?.recent_support_tickets ?? []
+  const recentDisputes = data?.recent_disputes ?? []
 
-  const pendingListings = [
-    {
-      id: 1,
-      title: "luxury-brands.com",
-      seller: "Premium Domains",
-      type: "Dominio",
-      price: 25000,
-      status: "Revisión",
-      submitted: "2024-01-15 14:30",
-      flags: ["Alto valor", "Requiere verificación"]
-    },
-    {
-      id: 2,
-      title: "Crypto Trading Bot",
-      seller: "AI Developers",
-      type: "Software",
-      price: 8500,
-      status: "Reportado",
-      submitted: "2024-01-14 09:15",
-      flags: ["Contenido dudoso", "Usuario reportado"]
+  const systemAlerts = useMemo(() => {
+    const alerts: Array<{
+      id: number | string
+      type: string
+      severity: "high" | "medium" | "low"
+      message: string
+      time: string
+      resolved: boolean
+    }> = []
+    if (stats) {
+      if (stats.open_support_tickets > 0) {
+        alerts.push({
+          id: "support",
+          type: "support",
+          severity: stats.open_support_tickets > 5 ? "high" : "medium",
+          message: t("super_admin.support_tickets_alert", { count: stats.open_support_tickets }),
+          time: "",
+          resolved: false,
+        })
+      }
+      if (stats.open_disputes > 0) {
+        alerts.push({
+          id: "disputes",
+          type: "dispute",
+          severity: "high",
+          message: t("super_admin.disputes_alert", { count: stats.open_disputes }),
+          time: "",
+          resolved: false,
+        })
+      }
+      if (stats.pending_withdrawals > 0) {
+        alerts.push({
+          id: "withdrawals",
+          type: "payment",
+          severity: "medium",
+          message: t("super_admin.withdrawals_alert", { count: stats.pending_withdrawals }),
+          time: "",
+          resolved: false,
+        })
+      }
+      if (alerts.length === 0) {
+        alerts.push({
+          id: "ok",
+          type: "system",
+          severity: "low",
+          message: t("super_admin.no_critical_alerts"),
+          time: "",
+          resolved: true,
+        })
+      }
     }
-  ]
+    return alerts
+  }, [stats, t])
 
-  const systemAlerts = [
-    {
-      id: 1,
-      type: "security",
-      severity: "high",
-      message: "Múltiples intentos de acceso fallidos detectados",
-      time: "hace 15 min",
-      resolved: false
-    },
-    {
-      id: 2,
-      type: "payment",
-      severity: "medium", 
-      message: "Transacción de €50,000 requiere aprobación manual",
-      time: "hace 2 horas",
-      resolved: false
-    },
-    {
-      id: 3,
-      type: "system",
-      severity: "low",
-      message: "Backup automático completado exitosamente",
-      time: "hace 4 horas", 
-      resolved: true
+  const recentActivityUsers = useMemo(() => {
+    const orders = data?.recent_orders ?? []
+    const seen = new Set<number>()
+    const list: Array<{ id: number; name: string; email: string; role: "buyer" | "seller" }> = []
+    for (const o of orders) {
+      if (o.buyer && !seen.has(o.buyer.id)) {
+        seen.add(o.buyer.id)
+        list.push({
+          id: o.buyer.id,
+          name: o.buyer.username,
+          email: o.buyer.email ?? "",
+          role: "buyer",
+        })
+      }
+      if (o.seller && !seen.has(o.seller.id)) {
+        seen.add(o.seller.id)
+        list.push({
+          id: o.seller.id,
+          name: o.seller.username,
+          email: o.seller.email ?? "",
+          role: "seller",
+        })
+      }
     }
-  ]
-
-  const disputesCases = [
-    {
-      id: "DIS001",
-      buyer: "carlos.silva@email.com",
-      seller: "WebShop Masters", 
-      asset: "ecommerce-starter.com",
-      amount: 5200,
-      issue: "Activo no transferido",
-      status: "En investigación",
-      created: "2024-01-14",
-      priority: "Alta"
-    },
-    {
-      id: "DIS002",
-      buyer: "ana.torres@email.com",
-      seller: "Digital Assets Pro",
-      asset: "marketing-tools.com",
-      amount: 1800,
-      issue: "Descripción incorrecta",
-      status: "Mediación",
-      created: "2024-01-13",
-      priority: "Media"
-    }
-  ]
+    return list.slice(0, 10)
+  }, [data?.recent_orders])
 
   const getStatusBadge = (status: string) => {
-    const variants = {
-      "Verificado": "default",
-      "Pendiente": "secondary",
-      "Suspendido": "destructive",
-      "Revisión": "secondary",
-      "Reportado": "destructive",
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      Verificado: "default",
+      Pendiente: "secondary",
+      Suspendido: "destructive",
+      Revisión: "secondary",
+      Reportado: "destructive",
       "En investigación": "secondary",
-      "Mediación": "outline"
+      Mediación: "outline",
     }
-    return <Badge variant={variants[status] || "secondary"}>{status}</Badge>
+    const key = STATUS_TO_KEY[status]
+    const label = key ? t(`super_admin.${key}`) : status
+    return <Badge variant={variants[status] || "secondary"}>{label}</Badge>
   }
 
   const getSeverityColor = (severity: string) => {
@@ -199,6 +185,31 @@ const SuperAdminDashboard = () => {
     console.log(`Acción ${action} aplicada al listado ${listingId}`)
   }
 
+  const formatDate = (s: string | null) =>
+    s ? new Date(s).toLocaleDateString(undefined, { dateStyle: "short" }) : "—"
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="space-y-4">
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+          <p className="text-destructive font-medium">{t("super_admin.error_load_panel")}</p>
+          <Button variant="outline" size="sm" className="mt-2" onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            {t("super_admin.retry")}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header with Security Warning */}
@@ -206,9 +217,9 @@ const SuperAdminDashboard = () => {
         <div className="flex items-center gap-3">
           <Shield className="h-6 w-6 text-destructive" />
           <div>
-            <h2 className="font-semibold text-destructive">Panel de Super Administrador</h2>
+            <h2 className="font-semibold text-destructive">{t("super_admin.panel_title")}</h2>
             <p className="text-sm text-destructive/80">
-              Acceso restringido. Todas las acciones quedan registradas en logs de auditoría.
+              {t("super_admin.panel_audit_notice")}
             </p>
           </div>
         </div>
@@ -219,13 +230,13 @@ const SuperAdminDashboard = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Controles del Sistema
+            {t("super_admin.system_controls")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-center justify-between">
-              <Label htmlFor="maintenance">Modo Mantenimiento</Label>
+              <Label htmlFor="maintenance">{t("super_admin.maintenance_mode")}</Label>
               <Switch
                 id="maintenance"
                 checked={systemStatus.maintenanceMode}
@@ -235,7 +246,7 @@ const SuperAdminDashboard = () => {
               />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="registrations">Nuevos Registros</Label>
+              <Label htmlFor="registrations">{t("super_admin.new_registrations")}</Label>
               <Switch
                 id="registrations"
                 checked={systemStatus.newRegistrations}
@@ -245,7 +256,7 @@ const SuperAdminDashboard = () => {
               />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="payments">Procesamiento Pagos</Label>
+              <Label htmlFor="payments">{t("super_admin.payment_processing")}</Label>
               <Switch
                 id="payments"
                 checked={systemStatus.paymentProcessing}
@@ -255,7 +266,7 @@ const SuperAdminDashboard = () => {
               />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="emails">Notificaciones Email</Label>
+              <Label htmlFor="emails">{t("super_admin.email_notifications")}</Label>
               <Switch
                 id="emails"
                 checked={systemStatus.emailNotifications}
@@ -272,112 +283,109 @@ const SuperAdminDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Usuarios Totales</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("super_admin.total_users")}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemStats.totalUsers.toLocaleString()}</div>
-            <div className="flex items-center text-xs text-green-600">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              +12.3%
+            <div className="text-2xl font-bold">{(stats?.total_users ?? 0).toLocaleString()}</div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              {t("super_admin.last_days", { count: data.period_days })}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Listados Activos</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("super_admin.active_listings")}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemStats.activeListings.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{(stats?.active_listings ?? 0).toLocaleString()}</div>
             <div className="flex items-center text-xs text-blue-600">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              +8.7%
+              {t("super_admin.of_total", { total: stats?.total_listings ?? 0 })}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Transacciones</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("super_admin.transactions")}</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemStats.totalTransactions.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{(stats?.total_orders ?? 0).toLocaleString()}</div>
             <div className="flex items-center text-xs text-green-600">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              +15.2%
+              {t("super_admin.completed_count", { count: stats?.completed_orders ?? 0 })}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Verificaciones</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{t("super_admin.support_open")}</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemStats.pendingVerifications}</div>
+            <div className="text-2xl font-bold">{(stats?.open_support_tickets ?? 0)}</div>
             <div className="flex items-center text-xs text-orange-600">
-              <Clock className="h-3 w-3 mr-1" />
-              Pendientes
+              {t("super_admin.of_tickets", { count: stats?.total_support_tickets ?? 0 })}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("super_admin.revenue_period")}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">€{(systemStats.totalRevenue / 1000).toFixed(0)}K</div>
+            <div className="text-2xl font-bold">
+              {stats?.revenue_in_period != null
+                ? `${(stats.revenue_in_period / 1000).toFixed(1)}K`
+                : "—"}
+            </div>
             <div className="flex items-center text-xs text-green-600">
               <ArrowUpRight className="h-3 w-3 mr-1" />
-              +23.1%
+              {t("super_admin.days", { count: data.period_days })}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Uptime Sistema</CardTitle>
-            <Server className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{t("super_admin.disputes_open")}</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemStats.systemUptime}</div>
-            <div className="flex items-center text-xs text-green-600">
-              <Activity className="h-3 w-3 mr-1" />
-              Estable
+            <div className="text-2xl font-bold">{(stats?.open_disputes ?? 0)}</div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              {t("super_admin.of_total", { total: stats?.total_disputes ?? 0 })}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Usuarios Activos</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{systemStats.dailyActiveUsers}</div>
-            <div className="flex items-center text-xs text-blue-600">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              Hoy
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversión</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("super_admin.pending_offers")}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemStats.conversionRate}%</div>
-            <div className="flex items-center text-xs text-green-600">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              +0.3%
+            <div className="text-2xl font-bold">{(stats?.pending_offers ?? 0)}</div>
+            <div className="flex items-center text-xs text-blue-600">
+              {t("super_admin.of_offers", { count: stats?.total_offers ?? 0 })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t("super_admin.reviews")}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{(stats?.total_reviews ?? 0)}</div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              {t("super_admin.total")}
             </div>
           </CardContent>
         </Card>
@@ -388,12 +396,15 @@ const SuperAdminDashboard = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-orange-500" />
-            Alertas del Sistema
+            {t("super_admin.system_alerts")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {systemAlerts.map((alert) => (
+            {systemAlerts.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("super_admin.loading_alerts")}</p>
+            ) : (
+            systemAlerts.map((alert) => (
               <div key={alert.id} className={`p-3 rounded-lg border ${
                 alert.resolved ? 'bg-muted/30 border-muted' : 'bg-orange-50 border-orange-200'
               }`}>
@@ -412,12 +423,13 @@ const SuperAdminDashboard = () => {
                     {alert.resolved ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
-                      <Button variant="ghost" size="sm">Resolver</Button>
+                      <Button variant="ghost" size="sm">{t("super_admin.resolve")}</Button>
                     )}
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </CardContent>
       </Card>
@@ -425,24 +437,30 @@ const SuperAdminDashboard = () => {
       {/* Main Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="users">Gestión Usuarios</TabsTrigger>
-          <TabsTrigger value="listings">Moderación Listados</TabsTrigger>
-          <TabsTrigger value="disputes">Disputas</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics Avanzado</TabsTrigger>
+          <TabsTrigger value="users">{t("super_admin.tab_users")}</TabsTrigger>
+          <TabsTrigger value="listings">{t("super_admin.tab_listings")}</TabsTrigger>
+          <TabsTrigger value="disputes">{t("super_admin.tab_disputes")}</TabsTrigger>
+          <TabsTrigger value="analytics">{t("super_admin.tab_analytics")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
           <Card>
             <CardHeader>
-              <CardTitle>Gestión de Usuarios</CardTitle>
-              <CardDescription>Administra usuarios, verificaciones y permisos</CardDescription>
+              <CardTitle>{t("super_admin.user_management")}</CardTitle>
+              <CardDescription>
+                {t("super_admin.user_management_desc", { count: (stats?.total_users ?? 0) })}
+              </CardDescription>
               <div className="flex items-center gap-2">
-                <Input placeholder="Buscar usuarios..." className="max-w-sm" />
+                <Input placeholder={t("super_admin.search_users_placeholder")} className="max-w-sm" />
                 <Button variant="outline">
                   <Search className="h-4 w-4" />
                 </Button>
                 <Button variant="outline">
                   <Filter className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => refetch()}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {t("super_admin.refresh")}
                 </Button>
               </div>
             </CardHeader>
@@ -450,62 +468,54 @@ const SuperAdminDashboard = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Usuario</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Registro</TableHead>
-                    <TableHead>Actividad</TableHead>
-                    <TableHead>Flags</TableHead>
-                    <TableHead>Acciones</TableHead>
+                    <TableHead>{t("super_admin.user")}</TableHead>
+                    <TableHead>{t("super_admin.type")}</TableHead>
+                    <TableHead>{t("super_admin.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{user.type}</Badge>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(user.status)}</TableCell>
-                      <TableCell>{user.registered}</TableCell>
-                      <TableCell>
-                        {user.type === "Vendedor" ? (
-                          <span className="text-green-600">€{user.revenue?.toLocaleString()}</span>
-                        ) : (
-                          <span className="text-blue-600">€{user.spent?.toLocaleString()}</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {user.flagged && <Flag className="h-4 w-4 text-red-600" />}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleUserAction(user.id, 'view')}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleUserAction(user.id, 'suspend')}
-                          >
-                            <Ban className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </div>
+                  {recentActivityUsers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                        {t("super_admin.no_recent_orders_activity")}
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    recentActivityUsers.map((user) => (
+                      <TableRow key={`${user.id}-${user.role}`}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{user.role === "seller" ? t("super_admin.seller") : t("super_admin.buyer")}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUserAction(user.id, "view")}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUserAction(user.id, "suspend")}
+                            >
+                              <Ban className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -515,57 +525,64 @@ const SuperAdminDashboard = () => {
         <TabsContent value="listings">
           <Card>
             <CardHeader>
-              <CardTitle>Moderación de Listados</CardTitle>
-              <CardDescription>Revisa y aprueba listados pendientes</CardDescription>
+              <CardTitle>{t("super_admin.listing_moderation")}</CardTitle>
+              <CardDescription>{t("super_admin.recent_listings_count", { count: recentListings.length })}</CardDescription>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                {t("super_admin.refresh")}
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {pendingListings.map((listing) => (
-                  <Card key={listing.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2 flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold">{listing.title}</h4>
-                            {getStatusBadge(listing.status)}
+                {recentListings.length === 0 ? (
+                  <p className="text-muted-foreground py-8 text-center">{t("super_admin.no_recent_listings")}</p>
+                ) : (
+                  recentListings.map((listing) => (
+                    <Card key={listing.id}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <Link
+                                to={`${ROUTES.ADMIN.LISTINGS_MANAGEMENT}/view/${listing.id}`}
+                                className="font-semibold hover:underline"
+                              >
+                                {listing.title}
+                              </Link>
+                              {getStatusBadge(listing.status)}
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span>{t("super_admin.seller_id", { id: listing.seller_id })}</span>
+                              <span>{formatDate(listing.created_at)}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>Vendedor: {listing.seller}</span>
-                            <span>Tipo: {listing.type}</span>
-                            <span>{listing.submitted}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {listing.flags.map((flag, index) => (
-                              <Badge key={index} variant="destructive" className="text-xs">
-                                {flag}
-                              </Badge>
-                            ))}
+                          <div className="text-right space-y-2">
+                            <div className="text-2xl font-bold">
+                              {listing.currency} {listing.price.toLocaleString()}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleListingAction(listing.id, "reject")}
+                              >
+                                <XCircle className="h-4 w-4 mr-1" />
+                                {t("super_admin.reject")}
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleListingAction(listing.id, "approve")}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                {t("super_admin.approve")}
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right space-y-2">
-                          <div className="text-2xl font-bold">€{listing.price.toLocaleString()}</div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => handleListingAction(listing.id, 'reject')}
-                            >
-                              <XCircle className="h-4 w-4 mr-1" />
-                              Rechazar
-                            </Button>
-                            <Button 
-                              size="sm"
-                              onClick={() => handleListingAction(listing.id, 'approve')}
-                            >
-                              <CheckCircle className="h-4 w-4 mr-1" />
-                              Aprobar
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -574,57 +591,63 @@ const SuperAdminDashboard = () => {
         <TabsContent value="disputes">
           <Card>
             <CardHeader>
-              <CardTitle>Gestión de Disputas</CardTitle>
-              <CardDescription>Resuelve conflictos entre compradores y vendedores</CardDescription>
+              <CardTitle>{t("super_admin.dispute_management")}</CardTitle>
+              <CardDescription>
+                {t("super_admin.recent_disputes_open", { count: stats?.open_disputes ?? 0 })}
+              </CardDescription>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                {t("super_admin.refresh")}
+              </Button>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID Disputa</TableHead>
-                    <TableHead>Partes Involucradas</TableHead>
-                    <TableHead>Activo</TableHead>
-                    <TableHead>Monto</TableHead>
-                    <TableHead>Problema</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Prioridad</TableHead>
-                    <TableHead>Acciones</TableHead>
+                    <TableHead>{t("super_admin.dispute_id")}</TableHead>
+                    <TableHead>{t("super_admin.order")}</TableHead>
+                    <TableHead>{t("super_admin.state")}</TableHead>
+                    <TableHead>{t("super_admin.date")}</TableHead>
+                    <TableHead>{t("super_admin.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {disputesCases.map((dispute) => (
-                    <TableRow key={dispute.id}>
-                      <TableCell className="font-mono">{dispute.id}</TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>Comprador: {dispute.buyer}</div>
-                          <div>Vendedor: {dispute.seller}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">{dispute.asset}</TableCell>
-                      <TableCell className="font-semibold">€{dispute.amount.toLocaleString()}</TableCell>
-                      <TableCell>{dispute.issue}</TableCell>
-                      <TableCell>{getStatusBadge(dispute.status)}</TableCell>
-                      <TableCell>
-                        <Badge variant={dispute.priority === "Alta" ? "destructive" : "secondary"}>
-                          {dispute.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm">
-                            <MessageSquare className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <CheckCircle className="h-4 w-4" />
-                          </Button>
-                        </div>
+                  {recentDisputes.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                        {t("super_admin.no_recent_disputes")}
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    recentDisputes.map((dispute) => (
+                      <TableRow key={dispute.id}>
+                        <TableCell className="font-mono">{dispute.id}</TableCell>
+                        <TableCell>
+                          <Link
+                            to={ROUTES.ADMIN.ORDERS.DETAILS(dispute.order_id)}
+                            className="text-primary hover:underline"
+                          >
+                            {t("super_admin.order_number", { id: dispute.order_id })}
+                          </Link>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(dispute.status)}</TableCell>
+                        <TableCell>{formatDate(dispute.created_at)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm">
+                              <MessageSquare className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -634,60 +657,104 @@ const SuperAdminDashboard = () => {
         <TabsContent value="analytics">
           <Card>
             <CardHeader>
-              <CardTitle>Analytics Avanzado</CardTitle>
-              <CardDescription>Métricas detalladas del sistema y comportamiento de usuarios</CardDescription>
+              <CardTitle>{t("super_admin.analytics_title")}</CardTitle>
+              <CardDescription>
+                {t("super_admin.analytics_desc", { count: data.period_days })}
+              </CardDescription>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                {t("super_admin.refresh_data")}
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h4 className="font-semibold">Métricas de Rendimiento</h4>
+                  <h4 className="font-semibold">{t("super_admin.period_summary")}</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Tiempo promedio de carga</span>
-                      <span className="font-medium">1.2s</span>
+                      <span>{t("super_admin.total_users")}</span>
+                      <span className="font-medium">{(stats?.total_users ?? 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Tasa de error</span>
-                      <span className="font-medium text-green-600">0.02%</span>
+                      <span>{t("super_admin.total_listings_active")}</span>
+                      <span className="font-medium">
+                        {(stats?.total_listings ?? 0)} / {(stats?.active_listings ?? 0)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Uptime mensual</span>
-                      <span className="font-medium">99.97%</span>
+                      <span>{t("super_admin.completed_orders")}</span>
+                      <span className="font-medium text-green-600">
+                        {(stats?.completed_orders ?? 0)} {t("super_admin.of_payments", { total: stats?.total_orders ?? 0 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>{t("super_admin.revenue_period_label")}</span>
+                      <span className="font-medium">
+                        {stats?.revenue_in_period != null
+                          ? `${stats.revenue_in_period.toLocaleString()}`
+                          : "—"}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="font-semibold">Métricas de Negocio</h4>
+                  <h4 className="font-semibold">{t("super_admin.support_disputes")}</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Comisión promedio</span>
-                      <span className="font-medium">€187</span>
+                      <span>{t("super_admin.open_tickets")}</span>
+                      <span className="font-medium">{(stats?.open_support_tickets ?? 0)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Tiempo resolución disputas</span>
-                      <span className="font-medium">2.3 días</span>
+                      <span>{t("super_admin.open_disputes")}</span>
+                      <span className="font-medium">{(stats?.open_disputes ?? 0)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Satisfacción usuarios</span>
-                      <span className="font-medium text-green-600">4.7/5</span>
+                      <span>{t("super_admin.payments_paid")}</span>
+                      <span className="font-medium text-green-600">
+                        {(stats?.paid_payments ?? 0)} {t("super_admin.of_payments", { total: stats?.total_payments ?? 0 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>{t("super_admin.pending_withdrawals")}</span>
+                      <span className="font-medium">{(stats?.pending_withdrawals ?? 0)}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {data.graphs && (
+                <div className="mt-6 space-y-2">
+                  <h4 className="font-semibold">{t("super_admin.time_series_daily")}</h4>
+                  <div className="flex flex-wrap gap-2 text-sm">
+                    <span className="text-muted-foreground">
+                      {t("super_admin.users_days_data", { count: data.graphs.users?.length ?? 0 })}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t("super_admin.listings_days", { count: data.graphs.listings?.length ?? 0 })}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t("super_admin.orders_days", { count: data.graphs.orders?.length ?? 0 })}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t("super_admin.revenue_days", { count: data.graphs.revenue?.length ?? 0 })}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <div className="mt-6 flex gap-4">
                 <Button variant="outline">
                   <Download className="h-4 w-4 mr-2" />
-                  Exportar Reporte
+                  {t("super_admin.export_report")}
                 </Button>
                 <Button variant="outline">
                   <Database className="h-4 w-4 mr-2" />
-                  Backup Sistema
+                  {t("super_admin.system_backup")}
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => refetch()}>
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Actualizar Datos
+                  {t("super_admin.refresh_data")}
                 </Button>
               </div>
             </CardContent>
