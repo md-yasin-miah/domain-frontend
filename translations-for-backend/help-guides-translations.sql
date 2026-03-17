@@ -1,0 +1,45 @@
+-- Help & Guides page (HelpsAndGuidesPage) – en + es
+-- Run against your DB. ON DUPLICATE KEY UPDATE = safe to re-run.
+
+INSERT INTO translations (`key`, locale, value) VALUES
+-- Guides section (shared with guides)
+('guides.title','en','Guides & Help'),
+('guides.title','es','Guías y Ayuda'),
+('guides.subtitle','en','Browse categories and articles to get started.'),
+('guides.subtitle','es','Explora categorías y artículos para comenzar.'),
+('guides.search_placeholder','en','Search articles...'),
+('guides.search_placeholder','es','Buscar artículos...'),
+('guides.all_categories','en','All'),
+('guides.all_categories','es','Todos'),
+('guides.no_articles','en','No articles found.'),
+('guides.no_articles','es','No se encontraron artículos.'),
+('guides.read','en','Read'),
+('guides.read','es','Leer'),
+('common.previous','en','Previous'),
+('common.previous','es','Anterior'),
+('common.next','en','Next'),
+('common.next','es','Siguiente'),
+-- Help & Guides page – contact / support
+('help_guides.create_support_ticket','en','Create Support Ticket'),
+('help_guides.create_support_ticket','es','Crear Ticket de Soporte'),
+('help_guides.live_chat','en','Live Chat'),
+('help_guides.live_chat','es','Chat en Vivo'),
+('help_guides.need_more_help','en','Need More Help?'),
+('help_guides.need_more_help','es','¿Necesitas Más Ayuda?'),
+('help_guides.support_team_desc','en','Our specialized support team is available 24/7 to help you with any specific inquiry.'),
+('help_guides.support_team_desc','es','Nuestro equipo de soporte especializado está disponible 24/7 para ayudarte con cualquier consulta específica.'),
+('help_guides.live_chat_desc','en','Immediate response for urgent inquiries'),
+('help_guides.live_chat_desc','es','Respuesta inmediata para consultas urgentes'),
+('help_guides.start_chat','en','Start Chat'),
+('help_guides.start_chat','es','Iniciar Chat'),
+('help_guides.email','en','Email'),
+('help_guides.email','es','Email'),
+('help_guides.send_email','en','Send Email'),
+('help_guides.send_email','es','Enviar Email'),
+('help_guides.tickets','en','Tickets'),
+('help_guides.tickets','es','Tickets'),
+('help_guides.tickets_desc','en','Ticket system for detailed follow-up'),
+('help_guides.tickets_desc','es','Sistema de tickets para seguimiento detallado'),
+('help_guides.create_ticket','en','Create Ticket'),
+('help_guides.create_ticket','es','Crear Ticket')
+ON DUPLICATE KEY UPDATE value = VALUES(value), updated_at = CURRENT_TIMESTAMP;

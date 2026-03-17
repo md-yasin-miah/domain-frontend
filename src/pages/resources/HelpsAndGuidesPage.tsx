@@ -106,7 +106,7 @@ export default function GuidesPage() {
                 className="bg-gradient-to-r from-primary to-secondary hover:shadow-xl"
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                Crear Ticket de Soporte
+                {t("help_guides.create_support_ticket", "Create Support Ticket")}
               </Button>
             </Link>
             <Link to={ROUTES.CLIENT.CHAT.ROOT}>
@@ -116,7 +116,7 @@ export default function GuidesPage() {
                 className="border-primary/20 hover:bg-primary/5"
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                Chat en Vivo
+                {t("help_guides.live_chat", "Live Chat")}
               </Button>
             </Link>
           </div>
@@ -239,49 +239,63 @@ export default function GuidesPage() {
       <section className="py-20 px-6 bg-gradient-to-r from-primary/10 via-background to-secondary/10">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-roboto font-bold text-foreground mb-6">
-            ¿Necesitas Más Ayuda?
+            {t("help_guides.need_more_help", "Need More Help?")}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Nuestro equipo de soporte especializado está disponible 24/7 para
-            ayudarte con cualquier consulta específica.
+            {t(
+              "help_guides.support_team_desc",
+              "Our specialized support team is available 24/7 to help you with any specific inquiry."
+            )}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="text-center p-6">
               <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Chat en Vivo</h3>
+              <h3 className="font-semibold mb-2">
+                {t("help_guides.live_chat", "Live Chat")}
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Respuesta inmediata para consultas urgentes
+                {t(
+                  "help_guides.live_chat_desc",
+                  "Immediate response for urgent inquiries"
+                )}
               </p>
               <Link to={ROUTES.CLIENT.CHAT.ROOT}>
                 <Button variant="outline" size="sm">
-                  Start Chat
+                  {t("help_guides.start_chat", "Start Chat")}
                 </Button>
               </Link>
             </Card>
 
             <Card className="text-center p-6">
               <Mail className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Email</h3>
+              <h3 className="font-semibold mb-2">
+                {t("help_guides.email", "Email")}
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
                 support@adominioz.com
               </p>
               <Link to={`mailto:support@adominioz.com`}>
                 <Button variant="outline" size="sm">
-                  Send Email
+                  {t("help_guides.send_email", "Send Email")}
                 </Button>
               </Link>
             </Card>
 
             <Card className="text-center p-6">
               <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Tickets</h3>
+              <h3 className="font-semibold mb-2">
+                {t("help_guides.tickets", "Tickets")}
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Sistema de tickets para seguimiento detallado
+                {t(
+                  "help_guides.tickets_desc",
+                  "Ticket system for detailed follow-up"
+                )}
               </p>
               <Link to={ROUTES.CLIENT.SUPPORT}>
                 <Button variant="outline" size="sm">
-                  Create Ticket
+                  {t("help_guides.create_ticket", "Create Ticket")}
                 </Button>
               </Link>
             </Card>

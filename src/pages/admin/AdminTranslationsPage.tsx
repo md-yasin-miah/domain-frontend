@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -38,7 +39,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { type ColumnDef } from "@/components/ui/data-table";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
-import { Languages, Loader2, Plus, Pencil, Trash2, Globe } from "lucide-react";
+import { Languages, Loader2, Plus, Pencil, Trash2, Globe, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   useGetLanguagesQuery,
@@ -80,9 +81,10 @@ export default function AdminTranslationsPage() {
   const languages = useMemo(() => languagesData?.languages ?? [], [languagesData]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+  const debouncedKeySearch = useDebouncedValue(keySearch, 300);
   const { data: listData, isLoading, refetch } = useListTranslationsQuery({
     locale: localeFilter === "all" ? undefined : localeFilter,
-    search: keySearch,
+    search: debouncedKeySearch.trim() || undefined,
     skip: (page - 1) * pageSize,
     limit: pageSize,
   });
@@ -96,11 +98,7 @@ export default function AdminTranslationsPage() {
   const [updateLanguage, { isLoading: isUpdatingLanguage }] = useUpdateLanguageMutation();
   const [deleteLanguage, { isLoading: isDeletingLanguage }] = useDeleteLanguageMutation();
 
-  const filteredItems = useMemo(() => {
-    if (!keySearch.trim()) return items;
-    const lower = keySearch.trim().toLowerCase();
-    return items.filter((r) => r.key.toLowerCase().includes(lower));
-  }, [items, keySearch]);
+  const filteredItems = items;
 
   const languageColumns: ColumnDef<LanguageItem>[] = useMemo(
     () => [
@@ -457,12 +455,27 @@ export default function AdminTranslationsPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Input
-              placeholder={t("admin.translations.search_key", "Search by key")}
-              value={keySearch}
-              onChange={(e) => setKeySearch(e.target.value)}
-              className="w-[200px]"
-            />
+            <div className="relative md:w-[300px]">
+              <Input
+                placeholder={t("admin.translations.search_key", "Search by key")}
+                value={keySearch}
+                onChange={(e) => setKeySearch(e.target.value)}
+                className="pr-9"
+              />
+              {keySearch && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+                  onClick={() => setKeySearch("")}
+                  title={t("admin.translations.clear_search", "Clear search")}
+                  aria-label={t("admin.translations.clear_search", "Clear search")}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
             <Button onClick={() => setAddOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               {t("admin.translations.add", "Add string")}
@@ -591,6 +604,8 @@ export default function AdminTranslationsPage() {
                 value={bulkKey}
                 onChange={(e) => setBulkKey(e.target.value)}
                 placeholder="e.g. common.save"
+                readOnly={process.env.NODE_ENV !== "development"}
+                title={process.env.NODE_ENV !== "development" ? t("admin.translations.key_developer_only", "Key is read-only; editable only in developer mode.") : undefined}
               />
             </div>
             {languages.map((lang) => (
