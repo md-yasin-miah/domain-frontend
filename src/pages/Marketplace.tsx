@@ -22,8 +22,8 @@ import {
   ArrowRight,
   CheckCircle,
   Shield,
-  Users,
   Award,
+  Search,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState, useMemo } from "react";
@@ -50,15 +50,6 @@ const LISTING_TYPE_ICONS: Record<string, typeof Globe> = {
   channel: Play,
   nft: Gem,
 };
-
-function formatPrice(price: number | string, currency: string = "USD"): string {
-  return new Intl.NumberFormat("es", {
-    style: "currency",
-    currency: currency || "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(Number(price));
-}
 
 function getPriceRangeParams(value: string): {
   min_price?: number;
@@ -201,56 +192,58 @@ const Marketplace = () => {
       <section className="py-16 px-6 bg-gradient-to-r from-primary/5 via-background to-secondary/5">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-black text-foreground mb-6 tracking-tight">
-            Marketplace de Activos Digitales
+            {t("marketplace.title")}
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            Descubre, evalúa y adquiere activos digitales verificados con
-            transparencia total.
-            {t("marketplace.from_premium")}
+            {t("marketplace.description")}
           </p>
 
           {/* Advanced Search */}
           <div className="max-w-4xl mx-auto mb-8">
-            <div className="flex flex-col md:flex-row gap-4 bg-background/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50">
-              <Input
-                placeholder="Search for a listing"
-                className="w-full h-12"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-              >
-                <SelectTrigger className="h-12 min-w-[180px]">
-                  <SelectValue placeholder="Categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    All Categories
-                  </SelectItem>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-background/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50">
+              <div className="col-span-12 md:col-span-6 relative">
+                <Input
+                  placeholder="Search for a listing"
+                  className="w-full h-12"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <Search className="absolute right-0 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer w-10 h-full hover:bg-primary/10 rounded-md p-2.5 transition-all hover:text-primary" />
+              </div>
+              <div className="col-span-12 md:col-span-3">
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="h-12 min-w-[180px]">
+                    <SelectValue placeholder="Categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-12 md:col-span-3">
+                <Select value={priceRange} onValueChange={setPriceRange}>
+                  <SelectTrigger className="h-12 min-w-[160px]">
+                    <SelectValue placeholder="Precio" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Prices</SelectItem>
+                    <SelectItem value="0-1000">$0 - $1,000</SelectItem>
+                    <SelectItem value="1000-10000">$1,000 - $10,000</SelectItem>
+                    <SelectItem value="10000-50000">
+                      $10,000 - $50,000
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={priceRange} onValueChange={setPriceRange}>
-                <SelectTrigger className="h-12 min-w-[160px]">
-                  <SelectValue placeholder="Precio" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    All Prices
-                  </SelectItem>
-                  <SelectItem value="0-1000">$0 - $1,000</SelectItem>
-                  <SelectItem value="1000-10000">$1,000 - $10,000</SelectItem>
-                  <SelectItem value="10000-50000">$10,000 - $50,000</SelectItem>
-                  <SelectItem value="50000+">$50,000+</SelectItem>
-                </SelectContent>
-              </Select>
-              
+                    <SelectItem value="50000+">$50,000+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -284,10 +277,10 @@ const Marketplace = () => {
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">
-                Activos Destacados
+                {t("marketplace.featured.title")}
               </h2>
               <p className="text-lg text-muted-foreground">
-                Selección curada de activos premium con métricas verificadas
+                {t("marketplace.featured.description")}
               </p>
             </div>
           </div>
@@ -301,13 +294,13 @@ const Marketplace = () => {
           >
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="featured" className="capitalize">
-                featured
+                {t("marketplace.tabs.featured")}
               </TabsTrigger>
               <TabsTrigger value="newest" className="capitalize">
-                newest
+                {t("marketplace.tabs.newest")}
               </TabsTrigger>
               <TabsTrigger value="trending" className="capitalize">
-                trending
+                {t("marketplace.tabs.trending")}
               </TabsTrigger>
             </TabsList>
 
@@ -318,10 +311,10 @@ const Marketplace = () => {
                 <div className="text-center py-16 text-muted-foreground">
                   <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p className="text-lg font-medium">
-                    No hay activos en esta sección
+                    {t("marketplace.empty.title")}
                   </p>
                   <p className="text-sm mt-1">
-                    Prueba otros filtros o categorías
+                    {t("marketplace.empty.description")}
                   </p>
                 </div>
               );
@@ -390,10 +383,10 @@ const Marketplace = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">
-              Explore by categories
+              {t("marketplace.categories.title")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Find the perfect digital asset for your portfolio or business
+              {t("marketplace.categories.description")}
             </p>
           </div>
 

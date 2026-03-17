@@ -1,5 +1,4 @@
 import { apiSlice } from './apiSlice';
-import type { PaginationParams } from './types';
 
 /** Matches backend VerificationResponse / VerificationStatus (pending, verified, failed) */
 export interface Verification {

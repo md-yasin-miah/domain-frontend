@@ -279,7 +279,7 @@ export default function AdminVerificationsPage() {
             getRowId={(row) => String(row.id)}
             renderActions={(row) => (
               <div className="flex items-center gap-1">
-                {row.status === "pending" && (
+                {/* {row.status === "pending" && ( */}
                   <>
                     <Button
                       variant="ghost"
@@ -302,7 +302,7 @@ export default function AdminVerificationsPage() {
                       <XCircle className="h-4 w-4" />
                     </Button>
                   </>
-                )}
+                {/* )} */}
                 <Button
                   variant="ghost"
                   size="icon"

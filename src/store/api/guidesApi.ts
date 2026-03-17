@@ -1,32 +1,9 @@
 import { apiSlice } from './apiSlice';
-
-/**
- * Guides API: public/app endpoints for the app route (/guides), admin endpoints for admin route (/admin/guides/*).
- *
- * App (public-facing):
- *   - getPublicGuideCategories, getPublicGuideArticles, getPublicGuideArticleBySlug: no auth, public-only content.
- *   - getGuideArticles, getGuideArticleBySlug: optional auth; when logged in returns all published (including requires_auth).
- *
- * Admin (/admin/guides/categories, /admin/guides/articles):
- *   - getAdminGuideCategories, createGuideCategory, updateGuideCategory, deleteGuideCategory.
- *   - getAdminGuideArticles, getAdminGuideArticleById, createGuideArticle, updateGuideArticle, deleteGuideArticle.
- */
-/** Public (app) – no auth. List active guide categories. */
 const publicCategoriesUrl = '/guides/public/categories';
-
-/** Public (app) – no auth. List published public articles. */
 const publicArticlesUrl = '/guides/public/articles';
-
-/** App – optional auth. List published articles (all if logged in, public-only if not). */
 const appArticlesUrl = '/guides/articles';
-
-/** Admin – list categories (paginated). */
 const adminCategoriesUrl = '/guides/categories';
-
-/** Admin – list/get/update/delete articles (paginated, filters). */
-const adminArticlesUrl = '/guides/admin/articles';
-
-/** Admin – create article (POST only; list/get/update/delete use adminArticlesUrl). */
+const adminArticlesUrl = '/guides/articles';
 const adminArticleCreateUrl = '/guides/articles';
 
 export const guidesApi = apiSlice.injectEndpoints({
@@ -89,12 +66,12 @@ export const guidesApi = apiSlice.injectEndpoints({
     // -------- Admin – categories --------
     getAdminGuideCategories: builder.query<
       PaginatedResponse<GuideCategory>,
-      { skip?: number; limit?: number; is_active?: boolean }
+      { skip?: number; limit?: number; is_active?: boolean, q?: string }
     >({
       query: (params) => ({
         url: adminCategoriesUrl,
         method: 'GET',
-        params: { skip: params.skip ?? 0, limit: params.limit ?? 100, is_active: params.is_active },
+        params: { skip: params.skip ?? 0, limit: params.limit ?? 100, is_active: params.is_active, q: params.q },
       }),
       providesTags: ['GuideCategory'],
     }),

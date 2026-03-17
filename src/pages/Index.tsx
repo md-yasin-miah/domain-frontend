@@ -12,8 +12,6 @@ import {
   Users,
   Award,
   Wallet,
-  Zap,
-  FileText,
   UserCheck,
   CreditCard,
   Bitcoin,
@@ -338,7 +336,10 @@ const Index = () => {
               {t("requirements.title", "Requirements to participate")}
             </h2>
             <p className="text-lg text-muted-foreground font-roboto max-w-2xl mx-auto">
-              {t("requirements.subtitle", "What you need to buy or sell domains, websites, and digital assets on our marketplace.")}
+              {t(
+                "requirements.subtitle",
+                "What you need to buy or sell domains, websites, and digital assets on our marketplace.",
+              )}
             </p>
           </div>
 
@@ -456,14 +457,16 @@ const Index = () => {
               {t("cta.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <button className="btn-primary text-lg flex items-center space-x-3">
-                <Wallet className="w-5 h-5" />
-                <span>{t("cta.register")}</span>
-              </button>
-              <button className="btn-secondary text-lg flex items-center space-x-3">
+              <Link to={ROUTES.AUTH.INDEX}>
+                <button className="btn-primary text-lg flex items-center space-x-3">
+                  <Wallet className="w-5 h-5" />
+                  <span>{t("cta.register")}</span>
+                </button>
+              </Link>
+              {/* <button className="btn-secondary text-lg flex items-center space-x-3">
                 <Play className="w-5 h-5" />
                 <span>{t("cta.demo")}</span>
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import {
   Edit,
   Trash2,
   ArrowLeft,
+  X,
 } from "lucide-react";
 import {
   Dialog,
@@ -82,6 +84,9 @@ export default function AdminGuideCategoriesPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedQ = useDebouncedValue(searchTerm, 300);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("create");
   const [selectedCategory, setSelectedCategory] = useState<GuideCategory | null>(null);
@@ -90,23 +95,16 @@ export default function AdminGuideCategoriesPage() {
   const [categoryToDelete, setCategoryToDelete] = useState<GuideCategory | null>(null);
 
   const { data, isLoading, error, refetch } = useGetAdminGuideCategoriesQuery({
-    limit: 200,
+    skip: (page - 1) * pageSize,
+    limit: pageSize,
+    q: debouncedQ.trim() || undefined,
   });
   const [createCategory, { isLoading: isCreating }] = useCreateGuideCategoryMutation();
   const [updateCategory, { isLoading: isUpdating }] = useUpdateGuideCategoryMutation();
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteGuideCategoryMutation();
 
   const categories = useMemo(() => data?.items ?? [], [data]);
-  const filtered = useMemo(
-    () =>
-      categories.filter(
-        (c) =>
-          c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          c.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (c.description ?? "").toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [categories, searchTerm]
-  );
+  const pagination = data?.pagination;
 
   const resetForm = () => setFormData(defaultFormData);
 
@@ -173,10 +171,8 @@ export default function AdminGuideCategoriesPage() {
       closeModal();
       refetch();
     } catch (err: unknown) {
-      const msg =
-        err && typeof err === "object" && "data" in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as Error).message)
-          : String(err);
+      const detail = err && typeof err === "object" && "data" in err ? (err as { data?: { detail?: string } }).data?.detail : undefined;
+      const msg = typeof detail === "string" ? detail : (err instanceof Error ? err.message : String(err));
       toast({ title: t("common.error"), description: msg, variant: "destructive" });
     }
   };
@@ -190,10 +186,8 @@ export default function AdminGuideCategoriesPage() {
       setCategoryToDelete(null);
       refetch();
     } catch (err: unknown) {
-      const msg =
-        err && typeof err === "object" && "data" in err
-          ? String((err as { data?: { detail?: string } }).data?.detail ?? (err as Error).message)
-          : String(err);
+      const detail = err && typeof err === "object" && "data" in err ? (err as { data?: { detail?: string } }).data?.detail : undefined;
+      const msg = typeof detail === "string" ? detail : (err instanceof Error ? err.message : String(err));
       toast({ title: t("common.error"), description: msg, variant: "destructive" });
     }
   };
@@ -300,15 +294,33 @@ export default function AdminGuideCategoriesPage() {
 
       <Card>
         <CardContent className="pt-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-wrap items-center gap-4 mb-4">
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder={t("common.search")}
+                placeholder={t("common.search", "Search")}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
+                className="pl-9 pr-9"
               />
+              {searchTerm && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setPage(1);
+                  }}
+                  aria-label={t("admin.translations.clear_search", "Clear search")}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
           {isLoading ? (
@@ -321,6 +333,7 @@ export default function AdminGuideCategoriesPage() {
               {"data" in (error as object) ? String((error as { data?: { detail?: string } }).data?.detail) : String(error)}
             </p>
           ) : (
+            <>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -332,7 +345,7 @@ export default function AdminGuideCategoriesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((cat) => (
+                {categories.map((cat) => (
                   <TableRow key={cat.id}>
                     <TableCell className="font-medium">{cat.name}</TableCell>
                     <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
@@ -363,8 +376,34 @@ export default function AdminGuideCategoriesPage() {
                 ))}
               </TableBody>
             </Table>
+            {pagination && (pagination.has_next || pagination.has_previous) && (
+              <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t">
+                <p className="text-sm text-muted-foreground">
+                  {t("common.page", "Page")} {pagination.page + 1} {t("common.of", "of")} {pagination.total_pages} ({pagination.total} {t("admin.guides.total_categories", "categories")})
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!pagination.has_previous}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  >
+                    {t("common.previous", "Previous")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!pagination.has_next}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    {t("common.next", "Next")}
+                  </Button>
+                </div>
+              </div>
+            )}
+            </>
           )}
-          {!isLoading && !error && filtered.length === 0 && (
+          {!isLoading && !error && categories.length === 0 && (
             <p className="text-center text-muted-foreground py-8">{t("admin.guides.no_categories")}</p>
           )}
         </CardContent>
