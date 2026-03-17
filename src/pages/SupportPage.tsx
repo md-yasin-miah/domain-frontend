@@ -82,6 +82,7 @@ const SupportPage = () => {
       title: "",
       description: "",
       category_id: "",
+      priority: "medium",
     },
   });
 
@@ -92,6 +93,7 @@ const SupportPage = () => {
       title: "",
       message: "",
       category_id: "",
+      priority: "medium",
     },
   });
 
@@ -178,6 +180,9 @@ const SupportPage = () => {
         description: validatedData.description,
         msg: validatedData.description,
         category_id: parseInt(validatedData.category_id),
+        ...(validatedData.priority && {
+          priority: validatedData.priority as "low" | "medium" | "high",
+        }),
       };
       await createTicket(ticketData).unwrap();
 
@@ -220,6 +225,9 @@ const SupportPage = () => {
         description: data.message,
         msg: data.message,
         category_id: parseInt(data.category_id),
+        ...(data.priority && {
+          priority: data.priority as "low" | "medium" | "high",
+        }),
       };
       await createTicket(ticketData).unwrap();
 
@@ -401,6 +409,9 @@ const SupportPage = () => {
                                   >
                                     {getStatusLabel(ticket.status)}
                                   </Badge>
+                                  <Badge variant="outline" className="text-xs">
+                                    {ticket.priority}
+                                  </Badge>
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2 flex-wrap">
                                   <span>#{ticket.id}</span>
@@ -534,6 +545,39 @@ const SupportPage = () => {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={ticketForm.control}
+                      name="priority"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {t("support.detail.priority", "Priority")}
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value ?? "medium"}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="low">
+                                {t("support.priority.low", "Low")}
+                              </SelectItem>
+                              <SelectItem value="medium">
+                                {t("support.priority.medium", "Medium")}
+                              </SelectItem>
+                              <SelectItem value="high">
+                                {t("support.priority.high", "High")}
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     {categories.length > 0 && (
                       <FormField
                         control={ticketForm.control}
@@ -662,6 +706,39 @@ const SupportPage = () => {
                     )}
                   />
 
+                  <FormField
+                    control={contactForm.control}
+                    name="priority"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t("support.detail.priority", "Priority")}
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value ?? "medium"}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="low">
+                              {t("support.priority.low", "Low")}
+                            </SelectItem>
+                            <SelectItem value="medium">
+                              {t("support.priority.medium", "Medium")}
+                            </SelectItem>
+                            <SelectItem value="high">
+                              {t("support.priority.high", "High")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   {categories.length > 0 && (
                     <FormField
                       control={contactForm.control}

@@ -220,6 +220,9 @@ export default function SupportTicketConversationPage() {
         >
           {getStatusLabel(ticket.status)}
         </Badge>
+        <Badge variant="outline" className="text-xs">
+          {ticket.priority}
+        </Badge>
       </header>
 
       {/* Messages area */}

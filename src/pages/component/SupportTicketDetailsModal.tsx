@@ -89,6 +89,18 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
 
           <Separator />
 
+          {/* Priority */}
+          <div>
+            <h3 className="text-sm font-semibold mb-2">
+              {t("support.detail.priority", "Priority")}
+            </h3>
+            <p className="text-sm text-muted-foreground capitalize">
+              {ticket.priority ?? "medium"}
+            </p>
+          </div>
+
+          <Separator />
+
           {/* Dates */}
           <div className="grid grid-cols-2 gap-4">
             <div>

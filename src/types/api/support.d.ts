@@ -3,6 +3,7 @@ interface SupportTicket {
   description: string;
   category_id: number | null;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high';
   id: number;
   created_by_id: number;
   assigned_to_id: number | null;
@@ -34,7 +35,7 @@ interface TicketCreateRequest {
   description: string;
   msg?: string;
   category_id: number;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  priority?: 'low' | 'medium' | 'high';
   assigned_to_id?: number | null;
   user_id?: number | null;
 }
@@ -43,12 +44,14 @@ interface TicketUpdateRequest {
   title?: string;
   description?: string;
   status?: 'open' | 'in_progress' | 'resolved' | 'closed';
+  priority?: 'low' | 'medium' | 'high';
   category_id?: number | null;
   assigned_to_id?: number | null;
 }
 
 interface SupportTicketFilters extends PaginationParams {
   status?: string;
+  priority?: string;
   category_id?: number;
   created_by_id?: number;
   assigned_to_id?: number;

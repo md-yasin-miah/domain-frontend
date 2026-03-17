@@ -105,6 +105,9 @@ const AdminUserDetailPage = lazy(
 const AdminAnalyticsPage = lazy(
   () => import("./pages/admin/AdminAnalyticsPage"),
 );
+const AdminReportsPage = lazy(
+  () => import("./pages/admin/AdminReportsPage"),
+);
 const AdminOrderDetailPage = lazy(
   () => import("./pages/admin/orders/AdminOrderDetailPage"),
 );
@@ -740,6 +743,24 @@ export const router = createBrowserRouter([
             <AdminAnalyticsPage />
           </LazyComponent>
         ),
+      },
+      {
+        path: "reports",
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={ROUTES.ADMIN.REPORTS.OVERVIEW} replace />,
+          },
+          {
+            path: ":reportType",
+            element: (
+              <LazyComponent>
+                <AdminReportsPage />
+              </LazyComponent>
+            ),
+          },
+        ],
       },
       {
         path: "roles-and-permissions",

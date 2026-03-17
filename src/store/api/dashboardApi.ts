@@ -59,6 +59,7 @@ export interface AdminDashboardRecentSupportTicket {
   id: number;
   title: string;
   status: string;
+  priority?: string;
   created_by_id: number;
   created_by?: { id: number; username: string; email: string | null };
   assigned_to_id: number | null;

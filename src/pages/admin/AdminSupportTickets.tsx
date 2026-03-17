@@ -74,6 +74,13 @@ const STATUS_OPTIONS = [
   { value: "closed", labelKey: "common.status.closed" },
 ] as const;
 
+const PRIORITY_OPTIONS = [
+  { value: "all", labelKey: "common.all" },
+  { value: "low", labelKey: "support.priority.low" },
+  { value: "medium", labelKey: "support.priority.medium" },
+  { value: "high", labelKey: "support.priority.high" },
+] as const;
+
 export default function AdminSupportTickets() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -81,6 +88,7 @@ export default function AdminSupportTickets() {
   const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedTicketForDetail, setSelectedTicketForDetail] =
     useState<SupportTicket | null>(null);
@@ -88,6 +96,7 @@ export default function AdminSupportTickets() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<string>("");
+  const [updatePriority, setUpdatePriority] = useState<string>("medium");
   const [updateAssignedToId, setUpdateAssignedToId] = useState<string>("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
@@ -97,6 +106,7 @@ export default function AdminSupportTickets() {
       title: "",
       description: "",
       category_id: "",
+      priority: "medium",
       user_id: "",
       assigned_to_id: user?.id?.toString() ?? "",
     },
@@ -106,6 +116,7 @@ export default function AdminSupportTickets() {
     skip: (page - 1) * PAGE_SIZE,
     limit: PAGE_SIZE,
     ...(statusFilter !== "all" && { status: statusFilter }),
+    ...(priorityFilter !== "all" && { priority: priorityFilter }),
     ...(categoryFilter !== "all" && { category_id: Number(categoryFilter) }),
   };
 
@@ -152,6 +163,7 @@ export default function AdminSupportTickets() {
     setSelectedTicketId(ticket.id);
     setUpdateDialogOpen(true);
     setUpdateStatus(ticket.status);
+    setUpdatePriority(ticket.priority ?? "medium");
     setUpdateAssignedToId(ticket.assigned_to_id?.toString() ?? "unassigned");
   };
 
@@ -159,6 +171,7 @@ export default function AdminSupportTickets() {
     if (!selectedTicketId) return;
     const data: TicketUpdateRequest = {
       status: updateStatus as SupportTicket["status"],
+      priority: updatePriority as SupportTicket["priority"],
       assigned_to_id:
         updateAssignedToId === "unassigned" || updateAssignedToId === ""
           ? null
@@ -198,6 +211,7 @@ export default function AdminSupportTickets() {
         description: validatedData.description,
         msg: validatedData.description,
         category_id: parseInt(validatedData.category_id),
+        priority: (validatedData.priority as "low" | "medium" | "high") ?? "medium",
         user_id: validatedData.user_id ? parseInt(validatedData.user_id) : null,
         assigned_to_id: validatedData.assigned_to_id
           ? parseInt(validatedData.assigned_to_id)
@@ -278,6 +292,20 @@ export default function AdminSupportTickets() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue
+                  placeholder={t("support.detail.priority", "Priority")}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {PRIORITY_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {t(opt.labelKey)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue
@@ -313,6 +341,7 @@ export default function AdminSupportTickets() {
                     <TableHead className="w-16">ID</TableHead>
                     <TableHead>{t("common.title", "Title")}</TableHead>
                     <TableHead>{t("common.status.status", "Status")}</TableHead>
+                    <TableHead>{t("support.detail.priority", "Priority")}</TableHead>
                     <TableHead>{t("support.detail.category")}</TableHead>
                     <TableHead>{t("support.detail.created")} By</TableHead>
                     <TableHead>{t("support.detail.assigned_to")}</TableHead>
@@ -337,6 +366,11 @@ export default function AdminSupportTickets() {
                           className={getStatusColor(ticket.status)}
                         >
                           {t(`common.status.${ticket.status}`) || ticket.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground capitalize">
+                        <Badge variant="outline" className="text-xs">
+                          {ticket.priority}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
@@ -464,6 +498,23 @@ export default function AdminSupportTickets() {
               </Select>
             </div>
             <div className="grid gap-2">
+              <Label>{t("support.detail.priority", "Priority")}</Label>
+              <Select value={updatePriority} onValueChange={setUpdatePriority}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRIORITY_OPTIONS.filter((o) => o.value !== "all").map(
+                    (opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {t(opt.labelKey)}
+                      </SelectItem>
+                    ),
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
               <Label>{t("support.detail.assigned_to")}</Label>
               <Select
                 value={updateAssignedToId}
@@ -527,6 +578,39 @@ export default function AdminSupportTickets() {
                           placeholder={t("support.create.title_placeholder")}
                           {...field}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={ticketForm.control}
+                  name="priority"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("support.detail.priority", "Priority")}
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value ?? "medium"}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="low">
+                              {t("support.priority.low", "Low")}
+                            </SelectItem>
+                            <SelectItem value="medium">
+                              {t("support.priority.medium", "Medium")}
+                            </SelectItem>
+                            <SelectItem value="high">
+                              {t("support.priority.high", "High")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
