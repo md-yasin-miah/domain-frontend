@@ -1,112 +1,106 @@
+/**
+ * User account verification API (profile verification).
+ * - User: GET my status, POST request verification.
+ * - Admin: GET list requests, POST approve/reject by user_id.
+ * Aligned with backend app/routers/verifications.py.
+ */
 import { apiSlice } from './apiSlice';
 
-/** Matches backend VerificationResponse / VerificationStatus (pending, verified, failed) */
-export interface Verification {
+/** Current user's verification status (GET /verifications/me) */
+export interface UserVerificationStatus {
+  is_verified: boolean;
+  verification_date: string | null;
+  pending_request: boolean;
+}
+
+/** Single verification request (admin list) */
+export interface UserVerificationRequest {
   id: number;
-  listing_id: number;
-  verification_type: string;
-  verification_method: string | null;
-  verification_token: string | null;
-  verification_code: string | null;
+  user_id: number;
   status: string;
-  verified_at: string | null;
-  verified_by_id: number | null;
-  expires_at: string | null;
+  requested_at: string;
+  reviewed_at: string | null;
+  reviewed_by_id: number | null;
+  admin_notes: string | null;
   created_at: string;
-  updated_at: string;
 }
 
-export interface VerificationCreateRequest {
-  listing_id: number;
-  verification_type: string;
-  verification_method?: string | null;
-  verification_token?: string | null;
-  verification_code?: string | null;
+export interface VerificationRequestsParams {
+  status_filter?: string;
+  skip?: number;
+  limit?: number;
 }
 
-export interface VerificationUpdateRequest {
-  status?: string;
-  verification_method?: string | null;
-  verification_token?: string | null;
-  verification_code?: string | null;
-  expires_at?: string | null;
-}
-
-export interface VerificationFilters extends PaginationParams {
-  listing_id?: number;
-  status?: string;
-  verification_type?: string;
+export interface ApproveRejectBody {
+  admin_notes?: string | null;
 }
 
 export const verificationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getVerifications: builder.query<Verification[], VerificationFilters>({
+    /** Current user: get my verification status and whether I have a pending request */
+    getMyVerificationStatus: builder.query<UserVerificationStatus, void>({
+      query: () => ({
+        url: '/verifications/me',
+        method: 'GET',
+      }),
+      providesTags: ['Verification', 'User'],
+    }),
+
+    /** Current user: submit a verification request (creates pending request) */
+    requestVerification: builder.mutation<UserVerificationRequest, void>({
+      query: () => ({
+        url: '/verifications/request',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Verification', 'User'],
+    }),
+
+    /** Admin: list user verification requests */
+    getVerificationRequests: builder.query<UserVerificationRequest[], VerificationRequestsParams>({
       query: (params) => ({
-        url: '/verifications',
+        url: '/verifications/requests',
         method: 'GET',
         params: {
-          skip: params.skip,
-          limit: params.limit,
-          ...(params.listing_id != null && { listing_id: params.listing_id }),
-          ...(params.status && { status: params.status }),
-          ...(params.verification_type && { verification_type: params.verification_type }),
+          status_filter: params.status_filter || undefined,
+          skip: params.skip ?? 0,
+          limit: params.limit ?? 50,
         },
       }),
-      providesTags: ['User'],
+      providesTags: ['Verification'],
     }),
-    getVerification: builder.query<Verification, number>({
-      query: (id) => ({
-        url: `/verifications/${id}`,
-        method: 'GET',
-      }),
-      providesTags: (result, error, id) => [{ type: 'User', id: `verification-${id}` }, 'User'],
-    }),
-    createVerification: builder.mutation<Verification, VerificationCreateRequest>({
-      query: (data) => ({
-        url: '/verifications',
+
+    /** Admin: approve a user's verification (sets profile.is_verified = true) */
+    approveUserVerification: builder.mutation<
+      { ok: boolean; message: string; user_id: number; is_verified: boolean; verification_date: string | null },
+      { user_id: number; body?: ApproveRejectBody }
+    >({
+      query: ({ user_id, body }) => ({
+        url: `/verifications/users/${user_id}/approve`,
         method: 'POST',
-        body: data,
+        body: body ?? {},
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['Verification', 'User'],
     }),
-    updateVerification: builder.mutation<Verification, { id: number; data: VerificationUpdateRequest }>({
-      query: ({ id, data }) => ({
-        url: `/verifications/${id}`,
-        method: 'PUT',
-        body: data,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id: `verification-${id}` }, 'User'],
-    }),
-    verifyVerification: builder.mutation<Verification, number>({
-      query: (id) => ({
-        url: `/verifications/${id}/verify`,
+
+    /** Admin: reject a user's verification request */
+    rejectUserVerification: builder.mutation<
+      { ok: boolean; message: string; user_id: number; requests_updated: number },
+      { user_id: number; body?: ApproveRejectBody }
+    >({
+      query: ({ user_id, body }) => ({
+        url: `/verifications/users/${user_id}/reject`,
         method: 'POST',
+        body: body ?? {},
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'User', id: `verification-${id}` }, 'User'],
-    }),
-    rejectVerification: builder.mutation<Verification, number>({
-      query: (id) => ({
-        url: `/verifications/${id}/reject`,
-        method: 'POST',
-      }),
-      invalidatesTags: (result, error, id) => [{ type: 'User', id: `verification-${id}` }, 'User'],
-    }),
-    deleteVerification: builder.mutation<void, number>({
-      query: (id) => ({
-        url: `/verifications/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['Verification', 'User'],
     }),
   }),
 });
 
 export const {
-  useGetVerificationsQuery,
-  useGetVerificationQuery,
-  useCreateVerificationMutation,
-  useUpdateVerificationMutation,
-  useVerifyVerificationMutation,
-  useRejectVerificationMutation,
-  useDeleteVerificationMutation,
+  useGetMyVerificationStatusQuery,
+  useRequestVerificationMutation,
+  useGetVerificationRequestsQuery,
+  useApproveUserVerificationMutation,
+  useRejectUserVerificationMutation,
 } = verificationApi;

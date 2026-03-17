@@ -37,15 +37,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
+import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
+import { type ColumnDef } from "@/components/ui/data-table";
+import { usePagination } from "@/hooks/usePagination";
 import {
   useGetAdminGuideCategoriesQuery,
   useCreateGuideCategoryMutation,
@@ -85,8 +80,10 @@ export default function AdminGuideCategoriesPage() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedQ = useDebouncedValue(searchTerm, 300);
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
+  });
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("create");
   const [selectedCategory, setSelectedCategory] = useState<GuideCategory | null>(null);
@@ -95,8 +92,8 @@ export default function AdminGuideCategoriesPage() {
   const [categoryToDelete, setCategoryToDelete] = useState<GuideCategory | null>(null);
 
   const { data, isLoading, error, refetch } = useGetAdminGuideCategoriesQuery({
-    skip: (page - 1) * pageSize,
-    limit: pageSize,
+    skip: (page - 1) * size,
+    limit: size,
     q: debouncedQ.trim() || undefined,
   });
   const [createCategory, { isLoading: isCreating }] = useCreateGuideCategoryMutation();
@@ -105,6 +102,39 @@ export default function AdminGuideCategoriesPage() {
 
   const categories = useMemo(() => data?.items ?? [], [data]);
   const pagination = data?.pagination;
+
+  const columns: ColumnDef<GuideCategory>[] = useMemo(
+    () => [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: t("admin.guides.name", "Name"),
+        cell: ({ row }) => <span className="font-medium">{row.name}</span>,
+      },
+      {
+        id: "slug",
+        accessorKey: "slug",
+        header: t("admin.guides.slug", "Slug"),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{row.slug}</span>
+        ),
+      },
+      {
+        id: "order",
+        accessorKey: "order",
+        header: t("admin.guides.order", "Order"),
+        cell: ({ row }) => row.order,
+      },
+      {
+        id: "is_active",
+        accessorKey: "is_active",
+        header: t("admin.guides.active", "Active"),
+        cell: ({ row }) =>
+          row.is_active ? t("common.yes") : t("common.no"),
+      },
+    ],
+    [t]
+  );
 
   const resetForm = () => setFormData(defaultFormData);
 
@@ -302,7 +332,7 @@ export default function AdminGuideCategoriesPage() {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  setPage(1);
+                  handlePageChange(1);
                 }}
                 className="pl-9 pr-9"
               />
@@ -314,7 +344,7 @@ export default function AdminGuideCategoriesPage() {
                   className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
                   onClick={() => {
                     setSearchTerm("");
-                    setPage(1);
+                    handlePageChange(1);
                   }}
                   aria-label={t("admin.translations.clear_search", "Clear search")}
                 >
@@ -323,89 +353,45 @@ export default function AdminGuideCategoriesPage() {
               )}
             </div>
           </div>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : error ? (
-            <p className="text-destructive py-4">
-              {t("common.error")}:{" "}
-              {"data" in (error as object) ? String((error as { data?: { detail?: string } }).data?.detail) : String(error)}
-            </p>
-          ) : (
-            <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("admin.guides.name", "Name")}</TableHead>
-                  <TableHead>{t("admin.guides.slug", "Slug")}</TableHead>
-                  <TableHead>{t("admin.guides.order", "Order")}</TableHead>
-                  <TableHead>{t("admin.guides.active", "Active")}</TableHead>
-                  <TableHead className="w-[120px]">{t("common.actions")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {categories.map((cat) => (
-                  <TableRow key={cat.id}>
-                    <TableCell className="font-medium">{cat.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
-                    <TableCell>{cat.order}</TableCell>
-                    <TableCell>{cat.is_active ? t("common.yes") : t("common.no")}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openModal("edit", cat)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setCategoryToDelete(cat);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            {pagination && (pagination.has_next || pagination.has_previous) && (
-              <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t">
-                <p className="text-sm text-muted-foreground">
-                  {t("common.page", "Page")} {pagination.page + 1} {t("common.of", "of")} {pagination.total_pages} ({pagination.total} {t("admin.guides.total_categories", "categories")})
-                </p>
+          <DataTableWithPagination<GuideCategory>
+              data={categories}
+              columns={columns}
+              pagination={pagination}
+              isLoading={isLoading}
+              emptyMessage={t("admin.guides.no_categories")}
+              emptyIcon={<BookOpen className="h-12 w-12 mx-auto opacity-50" />}
+              getRowId={(row) => String(row.id)}
+              renderActions={(cat) => (
                 <div className="flex gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pagination.has_previous}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => openModal("edit", cat)}
                   >
-                    {t("common.previous", "Previous")}
+                    <Edit className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pagination.has_next}
-                    onClick={() => setPage((p) => p + 1)}
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setCategoryToDelete(cat);
+                      setDeleteDialogOpen(true);
+                    }}
                   >
-                    {t("common.next", "Next")}
+                    <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
-              </div>
-            )}
-            </>
-          )}
-          {!isLoading && !error && categories.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">{t("admin.guides.no_categories")}</p>
-          )}
+              )}
+              actionsColumnHeader={t("common.actions")}
+              enableSorting={false}
+              pageSize={size}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              error={error}
+              errorTitle={t("common.error.title", "Error")}
+              errorDescription={t("common.error.description", "Something went wrong.")}
+              errorIcon={<BookOpen className="w-16 h-16 text-muted-foreground" />}
+            />
         </CardContent>
       </Card>
 

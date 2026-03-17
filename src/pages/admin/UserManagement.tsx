@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import {
   Users,
   Shield,
@@ -54,7 +55,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
+import { type ColumnDef } from "@/components/ui/data-table";
 import {
   useGetUsersQuery,
   useGetRolesQuery,
@@ -66,6 +68,7 @@ import {
 } from "@/store/api/userApi";
 import { ROUTES } from "@/lib/routes";
 import { MultiSelect } from "@/components/common/MultiSelect";
+import { usePagination } from "@/hooks/usePagination";
 
 // Local User interface matching the component's needs
 interface User {
@@ -103,13 +106,26 @@ export default function UserManagement() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("");
+  const debouncedSearch = useDebouncedValue(searchTerm, 300);
 
   // RTK Query hooks
   const {
     data: usersData,
     isLoading: isLoadingUsers,
+    error: usersError,
     refetch: refetchUsers,
-  } = useGetUsersQuery({});
+  } = useGetUsersQuery({
+    skip: (page - 1) * size,
+    limit: size,
+    search: debouncedSearch.trim() || undefined,
+    role: roleFilter.trim() || undefined,
+  });
   const { data: rolesData, isLoading: isLoadingRoles } = useGetRolesQuery();
   const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
   const [updateClientProfile] = useUpdateClientProfileMutation();
@@ -118,7 +134,6 @@ export default function UserManagement() {
   const [removeRole] = useRemoveRoleMutation();
 
   // Local state
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
@@ -137,6 +152,21 @@ export default function UserManagement() {
     company_details: "",
     role_id: "",
   });
+
+  // Pagination from API (getUsers returns PaginatedResponse)
+  const pagination = useMemo(() => {
+    if (!usersData || Array.isArray(usersData)) return undefined;
+    const p = usersData.pagination;
+    return p
+      ? {
+          total: p.total,
+          page: p.page,
+          total_pages: p.total_pages,
+          has_next: p.has_next,
+          has_previous: p.has_previous,
+        }
+      : undefined;
+  }, [usersData]);
 
   // Transform API response to local User format
   const users: User[] = useMemo(() => {
@@ -356,12 +386,6 @@ export default function UserManagement() {
     setSelectedUser(null);
     setSelectedRoleIds([]);
   };
-
-  const filteredUsers = users.filter(
-    (user) =>
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.profile?.full_name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   const getRoleBadgeColor = (roleName: string) => {
     switch (roleName) {
@@ -815,38 +839,78 @@ export default function UserManagement() {
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-            <div>
-              <CardTitle>{t("admin.user_management.all_users")}</CardTitle>
-              <CardDescription>
-                {filteredUsers.length}{" "}
-                {filteredUsers.length === 1
-                  ? t("admin.user_management.users_found")
-                  : t("admin.user_management.users_found_plural")}
-              </CardDescription>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+              <div>
+                <CardTitle>{t("admin.user_management.all_users")}</CardTitle>
+                <CardDescription>
+                  {pagination
+                    ? `${pagination.total} ${
+                        pagination.total === 1
+                          ? t("admin.user_management.users_found")
+                          : t("admin.user_management.users_found_plural")
+                      }`
+                    : `${users.length} ${
+                        users.length === 1
+                          ? t("admin.user_management.users_found")
+                          : t("admin.user_management.users_found_plural")
+                      }`}
+                </CardDescription>
+              </div>
             </div>
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t("admin.user_management.search_placeholder")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+              <div className="relative flex-1 min-w-0 max-w-sm">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={t("admin.user_management.search_placeholder")}
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    handlePageChange(1);
+                  }}
+                  className="pl-10"
+                />
+              </div>
+              <Select
+                value={roleFilter || "all"}
+                onValueChange={(v) => {
+                  setRoleFilter(v === "all" ? "" : v);
+                  handlePageChange(1);
+                }}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder={t("admin.user_management.filter_by_role", "Filter by role")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("common.all", "All")}</SelectItem>
+                  {(rolesData ?? []).map((role: Role) => (
+                    <SelectItem key={role.id} value={role.name}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <DataTable
-            data={filteredUsers}
+          <DataTableWithPagination<User>
+            data={users}
             columns={columns}
+            pagination={pagination}
             isLoading={loading}
             emptyMessage={t("admin.user_management.no_users")}
             getRowId={(row) => row.id}
             renderActions={renderUserActions}
             actionsColumnHeader={t("admin.user_management.actions")}
-            actionsColumnClassName="text-right"
             enableSorting={true}
+            pageSize={size}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            error={usersError}
+            errorTitle={t("common.error.title", "Error")}
+            errorDescription={t("common.error.description", "Something went wrong.")}
+            errorIcon={<Users className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>
       </Card>

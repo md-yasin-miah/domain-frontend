@@ -22,6 +22,9 @@ import {
   Image,
   MapPin,
   Link2,
+  Verified,
+  Loader2,
+  Send,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/store/hooks/useAuth";
@@ -30,6 +33,10 @@ import {
   useUpdateProfileMutation,
   type ClientProfile,
 } from "@/store/api/profileApi";
+import {
+  useGetMyVerificationStatusQuery,
+  useRequestVerificationMutation,
+} from "@/store/api/verificationApi";
 
 export default function ClientProfile() {
   const { t } = useTranslation();
@@ -45,6 +52,12 @@ export default function ClientProfile() {
   const [updateProfile, { isLoading: saving }] = useUpdateProfileMutation();
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
+
+  const { data: verificationStatus } = useGetMyVerificationStatusQuery(undefined, {
+    skip: !user,
+  });
+  const [requestVerification, { isLoading: requestingVerification }] =
+    useRequestVerificationMutation();
 
   const [formData, setFormData] = useState<ClientProfile>({
     first_name: "",
@@ -105,6 +118,25 @@ export default function ClientProfile() {
       });
     }
   }, [profileError, toast, t]);
+
+  const handleRequestVerification = async () => {
+    try {
+      await requestVerification().unwrap();
+      toast({
+        title: t("profile.client.verification_requested", "Verification requested"),
+        description: t(
+          "profile.client.verification_requested_desc",
+          "An admin will review your request shortly."
+        ),
+      });
+    } catch (e: unknown) {
+      const msg =
+        e && typeof e === "object" && "data" in e
+          ? String((e as { data?: { detail?: string } }).data?.detail)
+          : t("common.error", "Error");
+      toast({ title: msg, variant: "destructive" });
+    }
+  };
 
   const handleSave = async () => {
     if (!profile || !user) return;
@@ -280,6 +312,63 @@ export default function ClientProfile() {
           )}
         </div>
       </div>
+
+      {/* Account verification */}
+      {verificationStatus && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Verified className="h-5 w-5 text-muted-foreground" />
+              {t("profile.client.account_verification", "Account verification")}
+            </CardTitle>
+            <CardDescription>
+              {t(
+                "profile.client.account_verification_desc",
+                "Request account verification so admins can verify your profile."
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {verificationStatus.is_verified ? (
+                <>
+                  <Badge variant="default" className="bg-green-600">
+                    {t("profile.client.verified", "Verified")}
+                  </Badge>
+                  {verificationStatus.verification_date && (
+                    <span className="text-sm text-muted-foreground">
+                      {t("profile.client.verified_on", "Verified on")}{" "}
+                      {new Date(verificationStatus.verification_date).toLocaleDateString(undefined, {
+                        dateStyle: "medium",
+                      })}
+                    </span>
+                  )}
+                </>
+              ) : verificationStatus.pending_request ? (
+                <Badge variant="secondary">
+                  {t("profile.client.verification_pending", "Request pending")}
+                </Badge>
+              ) : (
+                <Badge variant="secondary">
+                  {t("profile.client.not_verified", "Not verified")}
+                </Badge>
+              )}
+            </div>
+            {!verificationStatus.is_verified && !verificationStatus.pending_request && (
+              <Button
+                onClick={handleRequestVerification}
+                disabled={requestingVerification}
+              >
+                {requestingVerification && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
+                <Send className="h-4 w-4 mr-2" />
+                {t("profile.client.request_verification", "Request verification")}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Company Information */}
