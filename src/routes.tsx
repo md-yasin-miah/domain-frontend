@@ -43,7 +43,6 @@ const ListingCreateEdit = lazy(() => import("./pages/admin/ListingCreateEdit"));
 const AdminListingDetail = lazy(() => import("./pages/admin/ListingDetail"));
 const AdminConfig = lazy(() => import("./pages/admin/AdminConfig"));
 const AdminUsuarios = lazy(() => import("./pages/admin/AdminUsuarios"));
-const Valuations = lazy(() => import("./pages/services/Valuations"));
 const Trends = lazy(() => import("./pages/services/Trends"));
 const PremiumTrends = lazy(() => import("./pages/services/PremiumTrends"));
 const Brokers = lazy(() => import("./pages/services/Brokers"));
@@ -56,6 +55,7 @@ const HelpAndGuidesArticlePage = lazy(
 );
 const Blog = lazy(() => import("./pages/resources/Blog"));
 const BlogPostDetail = lazy(() => import("./pages/resources/BlogPostDetail"));
+const AppValuationsIndex = lazy(() => import("./pages/valuations/index"));
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
 const ClientProfile = lazy(() => import("./pages/client/ClientProfile"));
 const ProfileSetup = lazy(() => import("./pages/client/ProfileSetup"));
@@ -349,14 +349,6 @@ export const router = createBrowserRouter([
         path: "services",
         children: [
           {
-            path: "valuations",
-            element: (
-              <LazyComponent>
-                <Valuations />
-              </LazyComponent>
-            ),
-          },
-          {
             path: "trends",
             element: (
               <LazyComponent>
@@ -390,8 +382,15 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      // Resources routes
-      // Guides (public API-backed)
+      // Valuations routes
+      {
+        path: "valuations",
+        element: (
+          <LazyComponent>
+            <AppValuationsIndex />
+          </LazyComponent>
+        ),
+      },
       {
         path: "help-and-guides",
         children: [
@@ -705,20 +704,6 @@ export const router = createBrowserRouter([
           </LazyComponent>
         ),
       },
-    ],
-  },
-  // Protected routes with AppLayout (for other protected routes)
-  {
-    path: "/",
-    element: (
-      <ProtectedRoute>
-        <AppLayout>
-          <Outlet />
-        </AppLayout>
-      </ProtectedRoute>
-    ),
-    children: [
-      // Other protected routes can go here
     ],
   },
   // Admin routes - Nested under /admin

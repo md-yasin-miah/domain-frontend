@@ -85,7 +85,7 @@ export function useAppMenuItems(t: TFunction): MenuItem[] {
       subItems: [
         {
           title: t('services.valuations'),
-          url: '/services/valuations',
+          url: ROUTES.APP.VALUATION.ROOT,
           icon: Server,
           description: t('services.valuations_desc'),
         },
