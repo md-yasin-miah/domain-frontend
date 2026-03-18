@@ -95,18 +95,18 @@ export function useAppMenuItems(t: TFunction): MenuItem[] {
           icon: TrendingUp,
           description: t('services.market_trends_desc'),
         },
-        {
-          title: t('services.brokers_network'),
-          url: '/services/brokers',
-          icon: Users,
-          description: t('services.brokers_network_desc'),
-        },
-        {
-          title: t('services.referral_program'),
-          url: '/services/referrals',
-          icon: Users,
-          description: t('services.referral_program_desc'),
-        },
+        // {
+        //   title: t('services.brokers_network'),
+        //   url: '/services/brokers',
+        //   icon: Users,
+        //   description: t('services.brokers_network_desc'),
+        // },
+        // {
+        //   title: t('services.referral_program'),
+        //   url: '/services/referrals',
+        //   icon: Users,
+        //   description: t('services.referral_program_desc'),
+        // },
       ],
     },
     {

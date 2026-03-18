@@ -126,7 +126,11 @@ export const ROUTES = {
     NOTIFICATIONS: "/admin/notifications",
     UPLOADS: "/admin/uploads",
     DISPUTES: "/admin/disputes",
-    VALUATIONS: "/admin/valuations",
+    VALUATIONS: {
+      LISTINGS: "/admin/valuations/listings",
+      COMPARABLE_SALES: "/admin/valuations/comparable-sales",
+      MARKET_TRENDS: "/admin/valuations/market-trends",
+    },
     SOCIAL: "/admin/social",
     PROFILE: "/admin/profile",
     SECURE_BOX: "/admin/secure-box",

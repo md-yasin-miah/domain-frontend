@@ -18,6 +18,7 @@ import {
   LockIcon,
   CreditCard,
   Languages,
+  BarChart3,
 } from "lucide-react";
 import { AppSidebar, MenuItem } from "./AppSidebar";
 import { ROUTES } from "@/lib/routes";
@@ -120,6 +121,16 @@ export function AdminSidebar() {
         title: t("admin.sidebar.social", "Social"),
         icon: Globe,
         url: ROUTES.ADMIN.SOCIAL,
+      },
+      {
+        title: t("admin.sidebar.valuations", "Valuation"),
+        icon: BarChart3,
+        url: ROUTES.ADMIN.VALUATIONS.LISTINGS,
+        subItems: [
+          { title: t("admin.sidebar.valuations_all", "All Valuations"), url: ROUTES.ADMIN.VALUATIONS.LISTINGS },
+          // { title: t("admin.sidebar.valuations_comparable", "Comparable Sales"), url: ROUTES.ADMIN.VALUATIONS.COMPARABLE_SALES },
+          { title: t("admin.sidebar.valuations_trends", "Market Trends"), url: ROUTES.ADMIN.VALUATIONS.MARKET_TRENDS },
+        ],
       },
       {
         title: t("admin.sidebar.disputes", "Disputes"),

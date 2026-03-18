@@ -127,6 +127,22 @@ export interface MarketTrendUpdateRequest {
   trend_data?: Record<string, unknown> | null;
 }
 
+/** GET /valuations/market-trends/insights */
+export interface MarketTrendInsightsResponse {
+  summary: string;
+  key_trends: string[];
+  extension_highlights: { extension: string; insight: string }[];
+  recommendations: string[];
+  generated_at: string;
+  data_used?: Record<string, unknown> | null;
+}
+
+export interface MarketTrendInsightsParams {
+  limit_sales?: number;
+  limit_trends?: number;
+  include_data_used?: boolean;
+}
+
 /** Params for POST /valuations/calculate (query params) */
 export interface ValuationCalculateParams {
   domain_name: string;
@@ -246,6 +262,14 @@ export const valuationApi = apiSlice.injectEndpoints({
       query: (id) => ({ url: `/valuations/market-trends/${id}`, method: 'DELETE' }),
       invalidatesTags: ['User'],
     }),
+    getMarketTrendsInsights: builder.query<MarketTrendInsightsResponse, MarketTrendInsightsParams | void>({
+      query: (params) => ({
+        url: '/valuations/market-trends/insights',
+        method: 'GET',
+        params: params ?? {},
+      }),
+      providesTags: ['User'],
+    }),
   }),
 });
 
@@ -266,4 +290,5 @@ export const {
   useCreateMarketTrendMutation,
   useUpdateMarketTrendMutation,
   useDeleteMarketTrendMutation,
+  useGetMarketTrendsInsightsQuery,
 } = valuationApi;

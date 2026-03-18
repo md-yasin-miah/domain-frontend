@@ -217,7 +217,7 @@ export function DataTable<TData = any>({
         }}
         onClick={() => canSort && handleSort(columnId)}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-fit">
           {enableRowSelection && index === 0 && (
             <input
               type="checkbox"

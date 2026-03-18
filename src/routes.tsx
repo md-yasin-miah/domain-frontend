@@ -106,7 +106,13 @@ const AdminVerificationDetailPage = lazy(
 );
 const AdminDisputesPage = lazy(() => import("./pages/admin/AdminDisputesPage"));
 const AdminValuationsPage = lazy(
-  () => import("./pages/admin/AdminValuationsPage"),
+  () => import("./pages/admin/valuations/AdminValuationsPage"),
+);
+// const AdminComparableSalesPage = lazy(
+//   () => import("./pages/admin/valuations/AdminComparableSalesPage"),
+// );
+const AdminMarketTrendsPage = lazy(
+  () => import("./pages/admin/valuations/AdminMarketTrendsPage"),
 );
 const AdminSocialPage = lazy(() => import("./pages/admin/AdminSocialPage"));
 const AdminSecureBoxPage = lazy(
@@ -1083,11 +1089,37 @@ export const router = createBrowserRouter([
       },
       {
         path: "valuations",
-        element: (
-          <LazyComponent>
-            <AdminValuationsPage />
-          </LazyComponent>
-        ),
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={ROUTES.ADMIN.VALUATIONS.LISTINGS} replace />,
+          },
+          {
+            path: "listings",
+            element: (
+              <LazyComponent>
+                <AdminValuationsPage />
+              </LazyComponent>
+            ),
+          },
+          // {
+          //   path: "comparable-sales",
+          //   element: (
+          //     <LazyComponent>
+          //       <AdminComparableSalesPage />
+          //     </LazyComponent>
+          //   ),
+          // },
+          {
+            path: "market-trends",
+            element: (
+              <LazyComponent>
+                <AdminMarketTrendsPage />
+              </LazyComponent>
+            ),
+          },
+        ],
       },
       {
         path: "social",
