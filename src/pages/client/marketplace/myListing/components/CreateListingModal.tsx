@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,76 +6,110 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { useCreateListingFromVerificationMutation } from '@/store/api/productVerification';
-import { useGetMarketplaceListingTypesQuery } from '@/store/api/marketplaceApi';
-import { useGetProductVerificationsQuery } from '@/store/api/productVerification';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useCreateListingFromVerificationMutation } from "@/store/api/productVerification";
+import { useGetMarketplaceListingTypesQuery } from "@/store/api/marketplaceApi";
+import { useGetProductVerificationsQuery } from "@/store/api/productVerification";
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useLazyGetAutoValuationQuery } from "@/store/api/valuationsApi";
 
 interface CreateListingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenChange }) => {
+const CreateListingModal: React.FC<CreateListingModalProps> = ({
+  open,
+  onOpenChange,
+}) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
 
   // Form state
   const [verificationId, setVerificationId] = useState<number | null>(null);
-  const [formData, setFormData] = useState<CreateListingFromVerificationRequest>({
-    title: '',
-    description: '',
-    short_description: '',
-    price: '',
-    currency: 'USD',
-    is_price_negotiable: false,
-    listing_type_id: 0,
-    status: 'draft',
-  });
+  const [formData, setFormData] =
+    useState<CreateListingFromVerificationRequest>({
+      title: "",
+      description: "",
+      short_description: "",
+      price: "",
+      currency: "USD",
+      is_price_negotiable: false,
+      listing_type_id: 0,
+      status: "draft",
+    });
 
   // API hooks
-  const { data: verifications, isLoading: loadingVerifications } = useGetProductVerificationsQuery({
-    status: 'verified',
-  });
-  const { data: listingTypes, isLoading: loadingTypes } = useGetMarketplaceListingTypesQuery();
-  const [createListing, { isLoading: creating }] = useCreateListingFromVerificationMutation();
-
+  const { data: verifications, isLoading: loadingVerifications } =
+    useGetProductVerificationsQuery({
+      status: "verified",
+    });
+  const { data: listingTypes, isLoading: loadingTypes } =
+    useGetMarketplaceListingTypesQuery();
+  const [createListing, { isLoading: creating }] =
+    useCreateListingFromVerificationMutation();
+  const [
+    fetchValuation,
+    { data: valuationData, isFetching: isValuationLoading },
+  ] = useLazyGetAutoValuationQuery();
+  useEffect(() => {
+    if (valuationData) {
+      console.log({ valuationData });
+      setFormData((prev: any) => ({
+        ...prev,
+        domain_age_years: valuationData.domain_age_years,
+        domain_authority: valuationData.domain_info?.registrar,
+        website_traffic_monthly: valuationData.monthly_traffic,
+        website_revenue_monthly: valuationData.monthly_revenue,
+        domain_backlinks: valuationData.backlinks_count,
+      }));
+    }
+  }, [valuationData]);
   // Filter verified verifications that don't have listings yet
-  const availableVerifications = verifications?.filter(v => v.status === 'verified' && !v.listing_id) || [];
+  const availableVerifications =
+    verifications?.filter((v) => v.status === "verified" && !v.listing_id) ||
+    [];
 
-  const handleInputChange = (field: keyof CreateListingFromVerificationRequest, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (
+    field: keyof CreateListingFromVerificationRequest,
+    value: any,
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
     if (!verificationId) {
       toast({
-        title: 'Error',
-        description: 'Please select a verified product',
-        variant: 'destructive',
+        title: "Error",
+        description: "Please select a verified product",
+        variant: "destructive",
       });
       return;
     }
 
-    if (!formData.title || !formData.description || !formData.price || !formData.listing_type_id) {
+    if (
+      !formData.title ||
+      !formData.description ||
+      !formData.price ||
+      !formData.listing_type_id
+    ) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all required fields',
-        variant: 'destructive',
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
       });
       return;
     }
@@ -87,34 +121,36 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
       }).unwrap();
 
       toast({
-        title: 'Success',
-        description: 'Listing created successfully!',
+        title: "Success",
+        description: "Listing created successfully!",
       });
 
       // Reset form and close modal
       setFormData({
-        title: '',
-        description: '',
-        short_description: '',
-        price: '',
-        currency: 'USD',
+        title: "",
+        description: "",
+        short_description: "",
+        price: "",
+        currency: "USD",
         is_price_negotiable: false,
         listing_type_id: 0,
-        status: 'draft',
+        status: "draft",
       });
       setVerificationId(null);
       setStep(1);
       onOpenChange(false);
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error?.data?.message || 'Failed to create listing',
-        variant: 'destructive',
+        title: "Error",
+        description: error?.data?.message || "Failed to create listing",
+        variant: "destructive",
       });
     }
   };
 
-  const selectedVerification = availableVerifications.find(v => v.id === verificationId);
+  const selectedVerification = availableVerifications.find(
+    (v) => v.id === verificationId,
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -122,7 +158,8 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
         <DialogHeader>
           <DialogTitle>Create New Listing</DialogTitle>
           <DialogDescription>
-            Create a marketplace listing from your verified product (Step {step} of 2)
+            Create a marketplace listing from your verified product (Step {step}{" "}
+            of 2)
           </DialogDescription>
         </DialogHeader>
 
@@ -139,7 +176,9 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <div className="flex items-center gap-2 p-4 border rounded-lg bg-muted/50">
                   <AlertCircle className="w-5 h-5 text-orange-500" />
                   <div>
-                    <p className="font-medium">No verified products available</p>
+                    <p className="font-medium">
+                      No verified products available
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       Please verify a product first before creating a listing
                     </p>
@@ -151,13 +190,25 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   onValueChange={(value) => {
                     const id = parseInt(value);
                     setVerificationId(id);
-                    const verification = availableVerifications.find(v => v.id === id);
+                    const verification = availableVerifications.find(
+                      (v) => v.id === id,
+                    );
                     if (verification) {
                       // Auto-fill title based on verification
                       const title = verification.domain_name
-                        ? `${verification.domain_name}${verification.domain_extension || ''}`
-                        : verification.website_url || '';
-                      setFormData(prev => ({ ...prev, title }));
+                        ? `${verification.domain_name}`
+                        : verification.website_url || "";
+                      const listing_type_id = listingTypes?.find(
+                        (type) => type.slug === verification.product_type,
+                      )?.id;
+                      setFormData((prev) => ({
+                        ...prev,
+                        title,
+                        listing_type_id,
+                      }));
+                      if (verification.product_type === "domain") {
+                        fetchValuation({ domain: verification.domain_name });
+                      }
                     }
                   }}
                 >
@@ -166,12 +217,15 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   </SelectTrigger>
                   <SelectContent>
                     {availableVerifications.map((verification) => (
-                      <SelectItem key={verification.id} value={verification.id.toString()}>
+                      <SelectItem
+                        key={verification.id}
+                        value={verification.id.toString()}
+                      >
                         <div className="flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-green-500" />
                           <span>
                             {verification.domain_name
-                              ? `${verification.domain_name}${verification.domain_extension || ''}`
+                              ? `${verification.domain_name}`
                               : verification.website_url}
                           </span>
                           <span className="text-xs text-muted-foreground">
@@ -187,16 +241,22 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
 
             {selectedVerification && (
               <div className="p-4 border rounded-lg bg-muted/30 space-y-2">
-                <h4 className="font-semibold text-sm">Selected Product Details</h4>
+                <h4 className="font-semibold text-sm">
+                  Selected Product Details
+                </h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-muted-foreground">Type:</span>
-                    <span className="ml-2 font-medium capitalize">{selectedVerification.product_type}</span>
+                    <span className="ml-2 font-medium capitalize">
+                      {selectedVerification.product_type}
+                    </span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Verified:</span>
                     <span className="ml-2 font-medium">
-                      {new Date(selectedVerification.verified_at!).toLocaleDateString()}
+                      {new Date(
+                        selectedVerification.verified_at!,
+                      ).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
@@ -216,7 +276,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
                   placeholder="Enter listing title"
                 />
               </div>
@@ -231,7 +291,10 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 ) : (
                   <Select
                     value={formData.listing_type_id?.toString()}
-                    onValueChange={(value) => handleInputChange('listing_type_id', parseInt(value))}
+                    onValueChange={(value) =>
+                      handleInputChange("listing_type_id", parseInt(value))
+                    }
+                    disabled={true}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select listing type" />
@@ -251,8 +314,10 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <Label htmlFor="short_description">Short Description</Label>
                 <Input
                   id="short_description"
-                  value={formData.short_description || ''}
-                  onChange={(e) => handleInputChange('short_description', e.target.value)}
+                  value={formData.short_description || ""}
+                  onChange={(e) =>
+                    handleInputChange("short_description", e.target.value)
+                  }
                   placeholder="Brief description (optional)"
                 />
               </div>
@@ -262,7 +327,9 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   placeholder="Detailed description of your listing"
                   rows={4}
                 />
@@ -280,7 +347,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                     id="price"
                     type="number"
                     value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    onChange={(e) => handleInputChange("price", e.target.value)}
                     placeholder="0.00"
                   />
                 </div>
@@ -289,7 +356,9 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Label htmlFor="currency">Currency</Label>
                   <Select
                     value={formData.currency}
-                    onValueChange={(value) => handleInputChange('currency', value)}
+                    onValueChange={(value) =>
+                      handleInputChange("currency", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -307,7 +376,9 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <Switch
                   id="negotiable"
                   checked={formData.is_price_negotiable}
-                  onCheckedChange={(checked) => handleInputChange('is_price_negotiable', checked)}
+                  onCheckedChange={(checked) =>
+                    handleInputChange("is_price_negotiable", checked)
+                  }
                 />
                 <Label htmlFor="negotiable" className="cursor-pointer">
                   Price is negotiable
@@ -317,7 +388,9 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
 
             {/* Optional Metrics */}
             <div className="space-y-4">
-              <h3 className="font-semibold">Additional Information (Optional)</h3>
+              <h3 className="font-semibold">
+                Additional Information (Optional)
+              </h3>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -325,8 +398,14 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Input
                     id="domain_age"
                     type="number"
-                    value={formData.domain_age_years || ''}
-                    onChange={(e) => handleInputChange('domain_age_years', e.target.value ? parseInt(e.target.value) : null)}
+                    value={formData.domain_age_years || ""}
+                    disabled={!formData.domain_age_years}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "domain_age_years",
+                        e.target.value ? parseInt(e.target.value) : null,
+                      )
+                    }
                     placeholder="0"
                   />
                 </div>
@@ -335,10 +414,15 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Label htmlFor="domain_authority">Domain Authority</Label>
                   <Input
                     id="domain_authority"
-                    type="number"
-                    value={formData.domain_authority || ''}
-                    onChange={(e) => handleInputChange('domain_authority', e.target.value ? parseInt(e.target.value) : null)}
-                    placeholder="0-100"
+                    type="text"
+                    value={formData.domain_authority || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "domain_authority",
+                        e.target.value ? parseInt(e.target.value) : null,
+                      )
+                    }
+                    disabled={!!formData.domain_authority}
                   />
                 </div>
 
@@ -347,9 +431,15 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Input
                     id="traffic"
                     type="number"
-                    value={formData.website_traffic_monthly || ''}
-                    onChange={(e) => handleInputChange('website_traffic_monthly', e.target.value ? parseInt(e.target.value) : null)}
+                    value={formData.website_traffic_monthly || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "website_traffic_monthly",
+                        e.target.value ? parseInt(e.target.value) : null,
+                      )
+                    }
                     placeholder="0"
+                    disabled={!!Number(formData.website_traffic_monthly)}
                   />
                 </div>
 
@@ -358,9 +448,15 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Input
                     id="revenue"
                     type="number"
-                    value={formData.website_revenue_monthly || ''}
-                    onChange={(e) => handleInputChange('website_revenue_monthly', e.target.value)}
+                    value={formData.website_revenue_monthly || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "website_revenue_monthly",
+                        e.target.value,
+                      )
+                    }
                     placeholder="0.00"
+                    disabled={!!Number(formData.website_revenue_monthly)}
                   />
                 </div>
 
@@ -369,9 +465,15 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Input
                     id="profit"
                     type="number"
-                    value={formData.website_profit_monthly || ''}
-                    onChange={(e) => handleInputChange('website_profit_monthly', e.target.value)}
+                    value={formData.website_profit_monthly || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "website_profit_monthly",
+                        e.target.value,
+                      )
+                    }
                     placeholder="0.00"
+                    disabled={!!Number(formData.website_profit_monthly)}
                   />
                 </div>
 
@@ -380,9 +482,15 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Input
                     id="backlinks"
                     type="number"
-                    value={formData.domain_backlinks || ''}
-                    onChange={(e) => handleInputChange('domain_backlinks', e.target.value ? parseInt(e.target.value) : null)}
+                    value={formData.domain_backlinks || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "domain_backlinks",
+                        e.target.value ? parseInt(e.target.value) : null,
+                      )
+                    }
                     placeholder="0"
+                    disabled={!formData.domain_backlinks}
                   />
                 </div>
 
@@ -390,8 +498,10 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                   <Label htmlFor="technology">Website Technology</Label>
                   <Input
                     id="technology"
-                    value={formData.website_technology || ''}
-                    onChange={(e) => handleInputChange('website_technology', e.target.value)}
+                    value={formData.website_technology || ""}
+                    onChange={(e) =>
+                      handleInputChange("website_technology", e.target.value)
+                    }
                     placeholder="e.g., WordPress, React, etc."
                   />
                 </div>
@@ -406,8 +516,10 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <Label htmlFor="primary_image">Primary Image URL</Label>
                 <Input
                   id="primary_image"
-                  value={formData.primary_image_url || ''}
-                  onChange={(e) => handleInputChange('primary_image_url', e.target.value)}
+                  value={formData.primary_image_url || ""}
+                  onChange={(e) =>
+                    handleInputChange("primary_image_url", e.target.value)
+                  }
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
@@ -416,22 +528,32 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <Label htmlFor="image_urls">Additional Image URLs</Label>
                 <Input
                   id="image_urls"
-                  value={formData.image_urls?.join(', ') || ''}
+                  value={formData.image_urls?.join(", ") || ""}
                   onChange={(e) => {
-                    const urls = e.target.value.split(',').map(url => url.trim()).filter(url => url);
-                    handleInputChange('image_urls', urls.length > 0 ? urls : null);
+                    const urls = e.target.value
+                      .split(",")
+                      .map((url) => url.trim())
+                      .filter((url) => url);
+                    handleInputChange(
+                      "image_urls",
+                      urls.length > 0 ? urls : null,
+                    );
                   }}
                   placeholder="Comma-separated URLs"
                 />
-                <p className="text-xs text-muted-foreground">Separate multiple URLs with commas</p>
+                <p className="text-xs text-muted-foreground">
+                  Separate multiple URLs with commas
+                </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="meta_title">Meta Title</Label>
                 <Input
                   id="meta_title"
-                  value={formData.meta_title || ''}
-                  onChange={(e) => handleInputChange('meta_title', e.target.value)}
+                  value={formData.meta_title || ""}
+                  onChange={(e) =>
+                    handleInputChange("meta_title", e.target.value)
+                  }
                   placeholder="SEO title for search engines"
                 />
               </div>
@@ -440,8 +562,10 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
                 <Label htmlFor="meta_description">Meta Description</Label>
                 <Textarea
                   id="meta_description"
-                  value={formData.meta_description || ''}
-                  onChange={(e) => handleInputChange('meta_description', e.target.value)}
+                  value={formData.meta_description || ""}
+                  onChange={(e) =>
+                    handleInputChange("meta_description", e.target.value)
+                  }
                   placeholder="SEO description for search engines"
                   rows={2}
                 />
@@ -453,7 +577,9 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: any) => handleInputChange('status', value)}
+                onValueChange={(value: any) =>
+                  handleInputChange("status", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -473,10 +599,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onOpenCha
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button
-                onClick={() => setStep(2)}
-                disabled={!verificationId}
-              >
+              <Button onClick={() => setStep(2)} disabled={!verificationId}>
                 Next
               </Button>
             </>
