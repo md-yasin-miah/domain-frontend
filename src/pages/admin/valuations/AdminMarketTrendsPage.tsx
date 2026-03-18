@@ -52,11 +52,7 @@ import {
   useUpdateMarketTrendMutation,
   useDeleteMarketTrendMutation,
   useGetMarketTrendsInsightsQuery,
-  type MarketTrend,
-  type MarketTrendFilters,
-  type MarketTrendCreateRequest,
-  type MarketTrendUpdateRequest,
-} from "@/store/api/valuationApi";
+} from "@/store/api/valuationsApi";
 
 const PAGE_SIZE = 10;
 const TREND_TYPES = ["domain_extension", "category"];

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -28,6 +28,7 @@ import {
   useCreateMarketplaceListingMutation,
   useUpdateMarketplaceListingMutation,
 } from "@/store/api/marketplaceApi";
+import { useLazyGetAutoValuationQuery } from "@/store/api/valuationsApi";
 
 function generateSlug(title: string): string {
   return title
@@ -47,12 +48,12 @@ const DEFAULT_FORM = {
   price: 0,
   currency: "USD",
   is_price_negotiable: false,
-  status: "draft" as const,
+  status: "draft" as "draft" | "active" | "pending" | "sold",
   is_featured: false,
   domain_name: "",
   domain_extension: "",
   domain_age_years: undefined as number | undefined,
-  domain_authority: undefined as number | undefined,
+  domain_authority: '',
   domain_backlinks: undefined as number | undefined,
   website_url: "",
   website_traffic_monthly: undefined as number | undefined,
@@ -88,6 +89,52 @@ export default function ListingCreateEdit() {
     useCreateMarketplaceListingMutation();
   const [updateListing, { isLoading: isUpdating }] =
     useUpdateMarketplaceListingMutation();
+  const [fetchValuation, { data: valuationData, isFetching: isValuationLoading }] =
+    useLazyGetAutoValuationQuery();
+
+  const normalizeDomain = (value: string): string => {
+    return value.trim().toLowerCase().replace(/^https?:\/\//, "") || "";
+  };
+
+  const handleDomainBlur = () => {
+    const raw = formData.domain_name.trim();
+    if (!raw) return;
+    const domain = normalizeDomain(raw);
+    console.log({domain});
+    if (!domain || !domain.includes(".")) {
+      toast({
+        title: t("admin.listings.form.domain_invalid") ?? "Invalid domain",
+        description: t("admin.listings.form.domain_invalid_desc") ?? "Enter a full domain like example.com",
+        variant: "destructive",
+      });
+      return;
+    }
+    fetchValuation({ domain });
+  };
+
+  useEffect(() => {
+    if (!valuationData) return;
+    setFormData((prev) => ({
+      ...prev,
+      domain_name: valuationData.domain ?? prev.domain_name,
+      domain_extension: valuationData.domain_extension ?? prev.domain_extension,
+      domain_age_years: valuationData.domain_age_years ?? valuationData.domain_info?.domain_age_years ?? prev.domain_age_years,
+      domain_authority: valuationData.domain_info?.registrar ?? prev.domain_authority,
+      domain_backlinks: valuationData.backlinks_count ?? prev.domain_backlinks,
+      website_traffic_monthly: valuationData.monthly_traffic ?? prev.website_traffic_monthly,
+      website_revenue_monthly:
+        valuationData.monthly_revenue != null
+          ? Number(valuationData.monthly_revenue)
+          : prev.website_revenue_monthly,
+      ...(prev.price === 0 && valuationData.estimated_value != null
+        ? { price: Number(valuationData.estimated_value) }
+        : {}),
+    }));
+    toast({
+      title: t("admin.listings.form.valuation_loaded") ?? "Domain data loaded",
+      description: t("admin.listings.form.valuation_loaded_desc") ?? "Fields filled from valuation.",
+    });
+  }, [valuationData, t, toast]);
 
   useEffect(() => {
     if (listing && isEditing) {
@@ -97,17 +144,15 @@ export default function ListingCreateEdit() {
         description: listing.description ?? "",
         short_description: listing.short_description ?? "",
         listing_type_id: listing.listing_type_id ?? 0,
-        price: Number(listing.price) ?? 0,
+        price: Number(listing.price) || 0,
         currency: listing.currency ?? "USD",
         is_price_negotiable: listing.is_price_negotiable ?? false,
-        status:
-          (listing.status as "draft" | "active" | "pending" | "sold") ??
-          "draft",
+        status: (listing.status ?? "draft") as "draft" | "active" | "pending" | "sold",
         is_featured: listing.is_featured ?? false,
         domain_name: listing.domain_name ?? "",
         domain_extension: listing.domain_extension ?? "",
         domain_age_years: listing.domain_age_years ?? undefined,
-        domain_authority: listing.domain_authority ?? undefined,
+        domain_authority: listing.domain_authority?.toString() ?? '',
         domain_backlinks: listing.domain_backlinks ?? undefined,
         website_url: listing.website_url ?? "",
         website_traffic_monthly: listing.website_traffic_monthly ?? undefined,
@@ -152,7 +197,7 @@ export default function ListingCreateEdit() {
       domain_name: formData.domain_name.trim() || undefined,
       domain_extension: formData.domain_extension.trim() || undefined,
       domain_age_years: formData.domain_age_years,
-      domain_authority: formData.domain_authority,
+      domain_authority: formData.domain_authority ?? '',
       domain_backlinks: formData.domain_backlinks,
       website_url: formData.website_url.trim() || undefined,
       website_traffic_monthly: formData.website_traffic_monthly,
@@ -481,19 +526,32 @@ export default function ListingCreateEdit() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="domain_name">
-                    {t("admin.listings.form.domain_name") ?? "Domain name"}
+                    {t("admin.listings.form.domain_name") ?? "Domain"}
                   </Label>
-                  <Input
-                    id="domain_name"
-                    value={formData.domain_name}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        domain_name: e.target.value,
-                      }))
-                    }
-                    placeholder="example.com"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="domain_name"
+                      value={formData.domain_name}
+                      onChange={(e) =>
+                        setFormData((p) => ({
+                          ...p,
+                          domain_name: e.target.value,
+                        }))
+                      }
+                      onBlur={handleDomainBlur}
+                      placeholder="example.com"
+                      disabled={isValuationLoading}
+                      className="pr-9"
+                    />
+                    {isValuationLoading && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t("admin.listings.form.domain_blur_hint") ?? "Enter full domain (e.g. example.com). Blur to auto-fill from valuation."}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="domain_extension">
@@ -501,14 +559,9 @@ export default function ListingCreateEdit() {
                   </Label>
                   <Input
                     id="domain_extension"
-                    value={formData.domain_extension}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        domain_extension: e.target.value,
-                      }))
-                    }
-                    placeholder=".com"
+                    value={formData.domain_extension ? `.${formData.domain_extension}` : ""}
+                    readOnly
+                    className="bg-muted"
                   />
                 </div>
               </div>
@@ -523,14 +576,8 @@ export default function ListingCreateEdit() {
                     type="number"
                     min={0}
                     value={formData.domain_age_years ?? ""}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        domain_age_years: e.target.value
-                          ? parseInt(e.target.value, 10)
-                          : undefined,
-                      }))
-                    }
+                    readOnly
+                    className="bg-muted"
                   />
                 </div>
                 <div className="space-y-2">
@@ -540,18 +587,9 @@ export default function ListingCreateEdit() {
                   </Label>
                   <Input
                     id="domain_authority"
-                    type="number"
-                    min={0}
-                    max={100}
                     value={formData.domain_authority ?? ""}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        domain_authority: e.target.value
-                          ? parseInt(e.target.value, 10)
-                          : undefined,
-                      }))
-                    }
+                    readOnly
+                    className="bg-muted"
                   />
                 </div>
                 <div className="space-y-2">
@@ -560,17 +598,9 @@ export default function ListingCreateEdit() {
                   </Label>
                   <Input
                     id="domain_backlinks"
-                    type="number"
-                    min={0}
                     value={formData.domain_backlinks ?? ""}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        domain_backlinks: e.target.value
-                          ? parseInt(e.target.value, 10)
-                          : undefined,
-                      }))
-                    }
+                    readOnly
+                    className="bg-muted"
                   />
                 </div>
               </div>
@@ -581,11 +611,9 @@ export default function ListingCreateEdit() {
                 <Input
                   id="website_url"
                   type="url"
-                  value={formData.website_url}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, website_url: e.target.value }))
-                  }
-                  placeholder="https://..."
+                  value={`https://${formData.domain_name}`}
+                  readOnly
+                  className="bg-muted"
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -597,16 +625,9 @@ export default function ListingCreateEdit() {
                   <Input
                     id="website_traffic_monthly"
                     type="number"
-                    min={0}
                     value={formData.website_traffic_monthly ?? ""}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        website_traffic_monthly: e.target.value
-                          ? parseInt(e.target.value, 10)
-                          : undefined,
-                      }))
-                    }
+                    readOnly
+                    className="bg-muted"
                   />
                 </div>
                 <div className="space-y-2">

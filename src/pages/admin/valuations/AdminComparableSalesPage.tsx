@@ -49,12 +49,8 @@ import {
   useGetComparableSalesQuery,
   useCreateComparableSaleMutation,
   useUpdateComparableSaleMutation,
-  useDeleteComparableSaleMutation,
-  type ComparableSale,
-  type ComparableSaleFilters,
-  type ComparableSaleCreateRequest,
-  type ComparableSaleUpdateRequest,
-} from "@/store/api/valuationApi";
+  useDeleteComparableSaleMutation
+} from "@/store/api/valuationsApi";
 
 const PAGE_SIZE = 10;
 const EXTENSIONS = ["com", "net", "org", "io", "co", "app", "dev"];

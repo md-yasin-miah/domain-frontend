@@ -31,9 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   useGetValuationsQuery,
   useDeleteValuationMutation,
-  type Valuation,
-  type ValuationFilters,
-} from "@/store/api/valuationApi";
+} from "@/store/api/valuationsApi";
 import { ROUTES } from "@/lib/routes";
 import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
 import { usePagination } from "@/hooks/usePagination";

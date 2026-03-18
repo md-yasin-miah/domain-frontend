@@ -82,7 +82,7 @@ interface ListingCreateRequest {
   domain_name?: string;
   domain_extension?: string;
   domain_age_years?: number;
-  domain_authority?: number;
+  domain_authority?: string;
   domain_backlinks?: number;
   website_url?: string;
   website_traffic_monthly?: number;

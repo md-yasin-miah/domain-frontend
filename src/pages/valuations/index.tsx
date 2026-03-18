@@ -8,7 +8,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLazyGetAutoValuationQuery } from "@/store/api/valuationsApi";
 import { formatCurrency, formatNumber } from "@/lib/helperFun";
-import type { AutoValuationResponse } from "@/types/api/valuations";
 import moment from "moment";
 
 const normalizeDomain = (value: string): string => {
