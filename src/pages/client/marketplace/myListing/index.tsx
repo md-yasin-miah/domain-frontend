@@ -1,5 +1,5 @@
 import { useGetMyMarketListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ColumnDef } from '@/components/ui/data-table';
 import { DataTableWithPagination } from '@/components/common/DataTableWithPagination';
@@ -33,6 +33,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import EditListingModal from './components/EditListingModal';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 const MyListing = () => {
   const { t } = useTranslation();
@@ -41,6 +43,7 @@ const MyListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [listingToEdit, setListingToEdit] = useState<MarketplaceListing | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [shouldRunTutorial, setShouldRunTutorial] = useState(false);
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
     initialPageSize: 10,
@@ -56,6 +59,53 @@ const MyListing = () => {
 
   const { data, isLoading, error } = useGetMyMarketListingQuery(queryParams);
   const [updateStatus] = useUpdateMarketplaceListingStatusMutation();
+
+  useEffect(() => {
+    const tutorialPending = localStorage.getItem("seller_listing_tutorial_pending") === "1";
+    const tutorialCompleted = localStorage.getItem("seller_listing_tutorial_completed") === "1";
+    if (tutorialPending && !tutorialCompleted) {
+      setShouldRunTutorial(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!shouldRunTutorial) return;
+
+    const timer = window.setTimeout(() => {
+      const guide = driver({
+        showProgress: true,
+        allowClose: true,
+        nextBtnText: "Next",
+        prevBtnText: "Back",
+        doneBtnText: "Go to create page",
+        steps: [
+          {
+            element: "[data-tour='my-listings-title']",
+            popover: {
+              title: "Seller listing flow",
+              description:
+                "You can manage all of your marketplace listings from here.",
+              side: "bottom",
+              align: "start",
+            },
+          },
+          {
+            element: "[data-tour='create-listing-button']",
+            popover: {
+              title: "Start creating a listing",
+              description:
+                "Click this button, then the guided tutorial will continue on the create page.",
+              side: "left",
+              align: "center",
+            },
+          },
+        ],
+      });
+      guide.drive();
+    }, 400);
+
+    return () => window.clearTimeout(timer);
+  }, [shouldRunTutorial]);
 
   // Filter data based on search term (client-side filtering for now)
   const filteredData = React.useMemo(() => {
@@ -209,13 +259,13 @@ const MyListing = () => {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <Package className="w-8 h-8 text-primary" />
-            My Listings
+            <span data-tour="my-listings-title">My Listings</span>
           </h1>
           <p className="text-muted-foreground mt-2">
             Manage and track your marketplace listings
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90" asChild>
+        <Button className="bg-primary hover:bg-primary/90" asChild data-tour="create-listing-button">
           <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_CREATE}>
             <Package className="w-4 h-4 mr-2" />
             Create New Listing

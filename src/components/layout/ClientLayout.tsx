@@ -5,6 +5,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { useTranslation } from "react-i18next";
 import { getAdminServices, getClientMenuItems, getClientServices } from "@/lib/menu";
 import { useAuth } from "@/store/hooks/useAuth";
+import TutorialSettingsFab from "@/components/tutorial/TutorialSettingsFab";
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
       <main className="min-h-screen md:p-6 lg:p-8 p-4 container mx-auto">
         {children}
       </main>
+      <TutorialSettingsFab />
       <Footer />
       <LiveChat />
     </div>

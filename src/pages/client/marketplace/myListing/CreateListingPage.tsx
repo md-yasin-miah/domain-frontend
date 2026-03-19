@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -34,13 +34,20 @@ import { useToast } from "@/hooks/use-toast";
 import { useLazyGetAutoValuationQuery } from "@/store/api/valuationsApi";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { ReturnBack } from "@/components/common/ReturnBack";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+import {
+  SELLER_LISTING_TUTORIAL_COMPLETED_KEY,
+  SELLER_LISTING_TUTORIAL_PENDING_KEY,
+} from "@/lib/tutorialStorage";
 
 export default function CreateListingPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [verificationId, setVerificationId] = useState<number | null>(null);
+  const [runTutorial, setRunTutorial] = useState(false);
   const [formData, setFormData] =
     useState<CreateListingFromVerificationRequest>({
       title: "",
@@ -84,6 +91,121 @@ export default function CreateListingPage() {
         valuationData.backlinks_count ?? prev.domain_backlinks ?? undefined,
     }));
   }, [valuationData]);
+
+  useEffect(() => {
+    const tutorialPending =
+      localStorage.getItem(SELLER_LISTING_TUTORIAL_PENDING_KEY) === "1";
+    const tutorialCompleted =
+      localStorage.getItem(SELLER_LISTING_TUTORIAL_COMPLETED_KEY) === "1";
+    const tutorialFromQuery = searchParams.get("tutorial") === "1";
+    if ((tutorialPending || tutorialFromQuery) && !tutorialCompleted) {
+      setRunTutorial(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!runTutorial) return;
+
+    const timer = window.setTimeout(() => {
+      const hasNoVerifiedProducts =
+        !loadingVerifications &&
+        (verifications?.filter((v) => v.status === "verified" && !v.listing_id)
+          .length ?? 0) === 0;
+      const tourSteps = hasNoVerifiedProducts
+        ? [
+            {
+              element: "[data-tour='listing-stepper']",
+              popover: {
+                title: "Listing creation requires verification",
+                description:
+                  "First verify your domain or website, then return here to create your listing.",
+                side: "bottom" as const,
+                align: "center" as const,
+              },
+            },
+            {
+              element: "[data-tour='go-verify-product']",
+              popover: {
+                title: "Go to product verification",
+                description:
+                  "Use this button to add and verify a product before creating a listing.",
+                side: "top" as const,
+                align: "start" as const,
+              },
+            },
+          ]
+        : [
+            {
+              element: "[data-tour='listing-stepper']",
+              popover: {
+                title: "Step-by-step listing form",
+                description:
+                  "Create listing is split into two steps: select a verified product, then complete listing details.",
+                side: "bottom" as const,
+                align: "center" as const,
+              },
+            },
+            {
+              element: "[data-tour='verification-select']",
+              popover: {
+                title: "Select verified product",
+                description:
+                  "Pick a verified domain/website first. This links ownership and pre-fills listing details.",
+                side: "bottom" as const,
+                align: "start" as const,
+              },
+            },
+            {
+              element: "[data-tour='listing-title-input']",
+              popover: {
+                title: "Add core listing details",
+                description:
+                  "Set title, description, and pricing. Required fields must be filled before submission.",
+                side: "bottom" as const,
+                align: "start" as const,
+              },
+            },
+            {
+              element: "[data-tour='create-listing-submit']",
+              popover: {
+                title: "Create and publish later",
+                description:
+                  "Click Create Listing to save. You can keep it draft or set status to active before submit.",
+                side: "top" as const,
+                align: "end" as const,
+              },
+            },
+          ];
+
+      const guide = driver({
+        showProgress: true,
+        allowClose: true,
+        nextBtnText: "Next",
+        prevBtnText: "Back",
+        doneBtnText: "Done",
+        onNextClick: (_element, _step, context) => {
+          const currentIndex = context.state.activeIndex ?? 0;
+          if (!hasNoVerifiedProducts && currentIndex === 1 && step === 1) {
+            setStep(2);
+            window.setTimeout(() => {
+              context.driver.moveNext();
+            }, 350);
+            return;
+          }
+          context.driver.moveNext();
+        },
+        onDestroyed: () => {
+          localStorage.setItem(SELLER_LISTING_TUTORIAL_COMPLETED_KEY, "1");
+          localStorage.removeItem(SELLER_LISTING_TUTORIAL_PENDING_KEY);
+          setRunTutorial(false);
+        },
+        steps: tourSteps,
+      });
+      guide.drive();
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [runTutorial, step, loadingVerifications, verifications]);
 
   const availableVerifications =
     verifications?.filter((v) => v.status === "verified" && !v.listing_id) ??
@@ -144,6 +266,7 @@ export default function CreateListingPage() {
   const selectedVerification = availableVerifications.find(
     (v) => v.id === verificationId,
   );
+
   const steps = [
     { number: 1, label: "Select product" },
     { number: 2, label: "Listing details" },
@@ -178,7 +301,7 @@ export default function CreateListingPage() {
       </div>
 
       {/* Stepper */}
-      <div className="w-full max-w-2xl mb-8">
+      <div className="w-full max-w-2xl mb-8" data-tour="listing-stepper">
         <div className="flex items-center justify-center gap-0">
           {steps.map((s, index) => (
             <React.Fragment key={s.number}>
@@ -242,15 +365,22 @@ export default function CreateListingPage() {
                     Loading verified products...
                   </div>
                 ) : availableVerifications.length === 0 ? (
-                  <div className="flex items-center gap-2 p-4 border rounded-lg bg-muted/50">
-                    <AlertCircle className="w-5 h-5 text-orange-500 shrink-0" />
-                    <div>
+                  <div className="flex items-start gap-2 p-4 border rounded-lg bg-muted/50">
+                    <AlertCircle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                    <div className="space-y-3">
                       <p className="font-medium">
                         No verified products available
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Please verify a product first before creating a listing
                       </p>
+                      <Button asChild size="sm" className="h-8" data-tour="go-verify-product">
+                        <Link
+                          to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}
+                        >
+                          Add Verified Product
+                        </Link>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -284,7 +414,7 @@ export default function CreateListingPage() {
                       }
                     }}
                   >
-                    <SelectTrigger id="verification">
+                    <SelectTrigger id="verification" data-tour="verification-select">
                       <SelectValue placeholder="Select a verified product" />
                     </SelectTrigger>
                     <SelectContent>
@@ -340,6 +470,7 @@ export default function CreateListingPage() {
                   <Label htmlFor="title">Title *</Label>
                   <Input
                     id="title"
+                    data-tour="listing-title-input"
                     value={formData.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
                     placeholder="Enter listing title"
@@ -655,7 +786,7 @@ export default function CreateListingPage() {
                 <Button variant="outline" onClick={() => setStep(1)}>
                   Back
                 </Button>
-                <Button onClick={handleSubmit} disabled={creating}>
+                <Button onClick={handleSubmit} disabled={creating} data-tour="create-listing-submit">
                   {creating && (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   )}
@@ -666,6 +797,7 @@ export default function CreateListingPage() {
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 }

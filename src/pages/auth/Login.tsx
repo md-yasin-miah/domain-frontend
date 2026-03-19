@@ -172,6 +172,14 @@ export default function Login() {
             : (r?.name || "").toLowerCase(),
         );
 
+        // Queue seller listing tutorial after login.
+        const shouldQueueSellerTutorial = roleNames.some(
+          (roleName: string) => roleName === "seller" || roleName === "customer",
+        );
+        if (shouldQueueSellerTutorial) {
+          localStorage.setItem("seller_listing_tutorial_pending", "1");
+        }
+
         // Prioritize admin role
         const adminRole = roleNames.find((r: string) => r === "admin");
         const primaryRole = adminRole || roleNames[0] || "customer";
@@ -192,6 +200,7 @@ export default function Login() {
             break;
         }
       } else {
+        localStorage.setItem("seller_listing_tutorial_pending", "1");
         // Fallback: if no roles, go to client dashboard
         navigate("/client/dashboard", { replace: true });
       }

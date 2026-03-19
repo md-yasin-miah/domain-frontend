@@ -203,6 +203,7 @@ const getClientMenuItems = (t: TFunction): MenuItem[] => {
 
 const getClientServices = (t: TFunction): MenuItem[] => {
   return [
+    { title: t('nav.dashboard'), url: ROUTES.CLIENT.DASHBOARD, icon: LayoutDashboard },
     { title: t('nav.profile'), url: ROUTES.CLIENT.PROFILE, icon: User },
     { title: t('nav.settings'), url: ROUTES.CLIENT.PROFILE, icon: Settings },
     { title: t('nav.wallet'), url: ROUTES.CLIENT.WALLET(), icon: Wallet },
@@ -215,6 +216,7 @@ const getClientServices = (t: TFunction): MenuItem[] => {
 
 const getAdminServices = (t: TFunction): MenuItem[] => {
   return [
+    { title: t('nav.dashboard'), url: ROUTES.ADMIN.DASHBOARD, icon: LayoutDashboard },
     { title: t('nav.profile'), url: ROUTES.ADMIN.PROFILE, icon: User },
     { title: t('nav.settings'), url: ROUTES.ADMIN.SETTINGS, icon: Settings },
     { title: t('nav.dashboard'), url: ROUTES.ADMIN.DASHBOARD, icon: LayoutDashboard },
