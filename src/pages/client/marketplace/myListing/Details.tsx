@@ -604,7 +604,7 @@ const Details = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Actions - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+            {/* <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
               <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
@@ -660,7 +660,7 @@ const Details = () => {
                   </>
                 )}
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Timeline - Clean Design */}
             <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
@@ -754,23 +754,23 @@ const Details = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <User className="h-3.5 w-3.5 text-muted-foreground" />
                       <label className="text-xs font-medium text-muted-foreground">
-                        Username
+                        Name
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground">
-                      {listing.seller.username}
+                      {listing.seller.name}
                     </p>
                   </div>
                   <div className="p-3 rounded-lg bg-muted/30 border border-border">
                     <div className="flex items-center gap-2 mb-1">
                       <FileText className="h-3.5 w-3.5 text-muted-foreground" />
                       <label className="text-xs font-medium text-muted-foreground">
-                        Email
+                        Username
                       </label>
                     </div>
-                    <CopyToClipboard textToCopy={listing.seller.email}>
+                    <CopyToClipboard textToCopy={listing.seller.username}>
                       <p className="text-sm font-semibold text-foreground">
-                        {listing.seller.email}
+                        {listing.seller.username}
                       </p>
                     </CopyToClipboard>
                   </div>
@@ -779,7 +779,7 @@ const Details = () => {
             </Card>
 
             {/* Additional Actions - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+            {/* <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
               <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
@@ -805,7 +805,7 @@ const Details = () => {
                   <ExternalLink className="w-3.5 h-3.5 ml-auto" />
                 </Button>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>

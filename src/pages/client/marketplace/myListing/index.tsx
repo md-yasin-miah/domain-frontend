@@ -1,6 +1,6 @@
 import { useGetMyMarketListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ColumnDef } from '@/components/ui/data-table';
 import { DataTableWithPagination } from '@/components/common/DataTableWithPagination';
 import { usePagination } from '@/hooks/usePagination';
@@ -32,7 +32,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import CreateListingModal from './components/CreateListingModal';
 import EditListingModal from './components/EditListingModal';
 
 const MyListing = () => {
@@ -40,7 +39,6 @@ const MyListing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [listingToEdit, setListingToEdit] = useState<MarketplaceListing | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
@@ -217,9 +215,11 @@ const MyListing = () => {
             Manage and track your marketplace listings
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90" onClick={() => setIsModalOpen(true)}>
-          <Package className="w-4 h-4 mr-2" />
-          Create New Listing
+        <Button className="bg-primary hover:bg-primary/90" asChild>
+          <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_CREATE}>
+            <Package className="w-4 h-4 mr-2" />
+            Create New Listing
+          </Link>
         </Button>
       </div>
 
@@ -320,9 +320,6 @@ const MyListing = () => {
           />
         </CardContent>
       </Card>
-
-      {/* Create Listing Modal */}
-      <CreateListingModal open={isModalOpen} onOpenChange={setIsModalOpen} />
 
       {/* Edit Listing Modal */}
       <EditListingModal

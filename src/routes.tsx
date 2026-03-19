@@ -176,6 +176,9 @@ const MyListing = lazy(() => import("./pages/client/marketplace/myListing"));
 const MyListingDetails = lazy(
   () => import("./pages/client/marketplace/myListing/Details"),
 );
+const CreateListingPage = lazy(
+  () => import("./pages/client/marketplace/myListing/CreateListingPage"),
+);
 const ClientChatPage = lazy(() => import("./pages/client/chat"));
 const ClientReviews = lazy(() => import("./pages/client/Reviews"));
 const Conversation = lazy(() => import("./pages/client/chat/Conversation"));
@@ -573,6 +576,14 @@ export const router = createBrowserRouter([
                 element: (
                   <LazyComponent>
                     <MyListing />
+                  </LazyComponent>
+                ),
+              },
+              {
+                path: "create",
+                element: (
+                  <LazyComponent>
+                    <CreateListingPage />
                   </LazyComponent>
                 ),
               },
