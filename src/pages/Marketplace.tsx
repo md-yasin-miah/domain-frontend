@@ -91,6 +91,11 @@ const Marketplace = () => {
     };
   }, [debouncedSearchQuery, selectedCategory, priceRange]);
 
+  const hasAdvancedSearch =
+    debouncedSearchQuery.trim() !== "" ||
+    selectedCategory !== "all" ||
+    priceRange !== "all";
+
   const { data: listingTypes = [], isLoading: typesLoading } =
     useGetMarketplaceListingTypesQuery(undefined, { skip: false });
 
@@ -285,28 +290,8 @@ const Marketplace = () => {
             </div>
           </div>
 
-          <Tabs
-            value={listingsTab}
-            onValueChange={(v) =>
-              setListingsTab(v as "featured" | "newest" | "trending")
-            }
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="featured" className="capitalize">
-                {t("marketplace.tabs.featured")}
-              </TabsTrigger>
-              <TabsTrigger value="newest" className="capitalize">
-                {t("marketplace.tabs.newest")}
-              </TabsTrigger>
-              <TabsTrigger value="trending" className="capitalize">
-                {t("marketplace.tabs.trending")}
-              </TabsTrigger>
-            </TabsList>
-
-            {(() => {
-              const loading = listingsLoading;
-              const list = listingsByTab;
+          {hasAdvancedSearch ? (
+            (() => {
               const empty = (
                 <div className="text-center py-16 text-muted-foreground">
                   <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -316,18 +301,6 @@ const Marketplace = () => {
                   <p className="text-sm mt-1">
                     {t("marketplace.empty.description")}
                   </p>
-                </div>
-              );
-              const grid = (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {list.map((listing: MarketplaceListing) => (
-                    <MarketplaceListingCard
-                      key={listing.id}
-                      listing={listing}
-                      detailUrl={ROUTES.APP.LISTING_DETAIL(listing.slug)}
-                      onViewClick={incrementViews}
-                    />
-                  ))}
                 </div>
               );
               const skeleton = (
@@ -347,34 +320,118 @@ const Marketplace = () => {
                 </div>
               );
               return (
-                <>
-                  <TabsContent value="featured" className="space-y-8">
-                    {listingsTab === "featured" && featuredLoading
-                      ? skeleton
-                      : listingsTab === "featured" &&
-                          featuredListings.length === 0
-                        ? empty
-                        : grid}
-                  </TabsContent>
-                  <TabsContent value="newest" className="space-y-8">
-                    {listingsTab === "newest" && newestLoading
-                      ? skeleton
-                      : listingsTab === "newest" && newestListings.length === 0
-                        ? empty
-                        : grid}
-                  </TabsContent>
-                  <TabsContent value="trending" className="space-y-8">
-                    {listingsTab === "trending" && trendingLoading
-                      ? skeleton
-                      : listingsTab === "trending" &&
-                          trendingListings.length === 0
-                        ? empty
-                        : grid}
-                  </TabsContent>
-                </>
+                <div className="space-y-8">
+                  {newestLoading
+                    ? skeleton
+                    : newestListings.length === 0
+                      ? empty
+                      : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {newestListings.map((listing: MarketplaceListing) => (
+                              <MarketplaceListingCard
+                                key={listing.id}
+                                listing={listing}
+                                detailUrl={ROUTES.APP.LISTING_DETAIL(listing.slug)}
+                                onViewClick={incrementViews}
+                              />
+                            ))}
+                          </div>
+                        )}
+                </div>
               );
-            })()}
-          </Tabs>
+            })()
+          ) : (
+            <Tabs
+              value={listingsTab}
+              onValueChange={(v) =>
+                setListingsTab(v as "featured" | "newest" | "trending")
+              }
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-3 mb-8">
+                <TabsTrigger value="featured" className="capitalize">
+                  {t("marketplace.tabs.featured")}
+                </TabsTrigger>
+                <TabsTrigger value="newest" className="capitalize">
+                  {t("marketplace.tabs.newest")}
+                </TabsTrigger>
+                <TabsTrigger value="trending" className="capitalize">
+                  {t("marketplace.tabs.trending")}
+                </TabsTrigger>
+              </TabsList>
+
+              {(() => {
+                const loading = listingsLoading;
+                const list = listingsByTab;
+                const empty = (
+                  <div className="text-center py-16 text-muted-foreground">
+                    <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium">
+                      {t("marketplace.empty.title")}
+                    </p>
+                    <p className="text-sm mt-1">
+                      {t("marketplace.empty.description")}
+                    </p>
+                  </div>
+                );
+                const grid = (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {list.map((listing: MarketplaceListing) => (
+                      <MarketplaceListingCard
+                        key={listing.id}
+                        listing={listing}
+                        detailUrl={ROUTES.APP.LISTING_DETAIL(listing.slug)}
+                        onViewClick={incrementViews}
+                      />
+                    ))}
+                  </div>
+                );
+                const skeleton = (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <Card key={i} className="animate-pulse">
+                        <CardHeader>
+                          <div className="h-6 bg-muted rounded w-2/3 mb-2" />
+                          <div className="h-4 bg-muted rounded w-1/2" />
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="h-5 bg-muted rounded w-full" />
+                          <div className="h-10 bg-muted rounded w-full" />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                );
+                return (
+                  <>
+                    <TabsContent value="featured" className="space-y-8">
+                      {listingsTab === "featured" && featuredLoading
+                        ? skeleton
+                        : listingsTab === "featured" &&
+                            featuredListings.length === 0
+                          ? empty
+                          : grid}
+                    </TabsContent>
+                    <TabsContent value="newest" className="space-y-8">
+                      {listingsTab === "newest" && newestLoading
+                        ? skeleton
+                        : listingsTab === "newest" && newestListings.length === 0
+                          ? empty
+                          : grid}
+                    </TabsContent>
+                    <TabsContent value="trending" className="space-y-8">
+                      {listingsTab === "trending" && trendingLoading
+                        ? skeleton
+                        : listingsTab === "trending" &&
+                            trendingListings.length === 0
+                          ? empty
+                          : grid}
+                    </TabsContent>
+                  </>
+                );
+              })()}
+            </Tabs>
+          )}
         </div>
       </section>
 
