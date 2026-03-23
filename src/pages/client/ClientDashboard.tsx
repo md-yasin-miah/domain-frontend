@@ -119,8 +119,8 @@ export default function ClientDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">{t("client_dashboard.title")}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="md:text-3xl text-2xl font-bold">{t("client_dashboard.title")}</h1>
+        <p className="text-muted-foreground md:text-base text-sm">
           {t("client_dashboard.subtitle")}
         </p>
       </div>
@@ -152,7 +152,7 @@ export default function ClientDashboard() {
               {t("common.loading", "Loading...")}
             </div>
           ) : balance ? (
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               <div className="text-2xl font-bold">
                 {formatBalance(balance.total_balance, balance.currency)}
               </div>
@@ -162,31 +162,31 @@ export default function ClientDashboard() {
                   "Total balance (wallet + earnings)",
                 )}
               </p>
-              <div className="flex flex-wrap gap-4 pt-2 text-xs text-muted-foreground">
-                <span>
+              <div className="flex flex-wrap gap-2 md:pt-2 pt-1 text-xs text-muted-foreground">
+                <Badge variant="outline">
                   {t("client_dashboard.balance.wallet", "Wallet")}:{" "}
                   {formatBalance(balance.wallet_balance, balance.currency)}
-                </span>
-                <span>
+                </Badge>
+                <Badge variant="outline">
                   {t(
                     "client_dashboard.balance.earnings_available",
                     "Earnings available",
                   )}
                   :{" "}
                   {formatBalance(balance.earnings_available, balance.currency)}
-                </span>
-                <span>
+                </Badge>
+                <Badge variant="outline">
                   {t("client_dashboard.balance.total_earned", "Total earned")}:{" "}
                   {formatBalance(balance.total_earned, balance.currency)}
-                </span>
-                <span>
+                </Badge>
+                <Badge variant="outline">
                   {t("client_dashboard.balance.total_withdrawn", "Withdrawn")}:{" "}
                   {formatBalance(balance.total_withdrawn, balance.currency)}
-                </span>
-                <span>
+                </Badge>
+                <Badge variant="outline">
                   {t("client_dashboard.balance.pending", "Pending")}:{" "}
                   {formatBalance(balance.pending_balance, balance.currency)}
-                </span>
+                </Badge>
               </div>
             </div>
           ) : (

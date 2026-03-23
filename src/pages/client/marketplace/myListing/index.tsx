@@ -1,12 +1,15 @@
-import { useGetMyMarketListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
-import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ColumnDef } from '@/components/ui/data-table';
-import { DataTableWithPagination } from '@/components/common/DataTableWithPagination';
-import { usePagination } from '@/hooks/usePagination';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {
+  useGetMyMarketListingQuery,
+  useUpdateMarketplaceListingStatusMutation,
+} from "@/store/api/marketplaceApi";
+import React, { useEffect, useState, useMemo } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { ColumnDef } from "@/components/ui/data-table";
+import { DataTableWithPagination } from "@/components/common/DataTableWithPagination";
+import { usePagination } from "@/hooks/usePagination";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Eye,
   Heart,
@@ -16,14 +19,21 @@ import {
   Search,
   Package,
   ExternalLink,
-  Power
-} from 'lucide-react';
-import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
-import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
-import { ROUTES } from '@/lib/routes';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent } from '@/components/ui/card';
+  Power,
+} from "lucide-react";
+import {
+  formatCurrency,
+  formatNumber,
+  getStatusColor,
+  getStatusLabel,
+  timeFormat,
+  getStatusBadgeVariant,
+} from "@/lib/helperFun";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import { ROUTES } from "@/lib/routes";
+import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,8 +41,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import EditListingModal from './components/EditListingModal';
+} from "@/components/ui/dropdown-menu";
+import EditListingModal from "./components/EditListingModal";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
@@ -40,8 +50,10 @@ const MyListing = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [listingToEdit, setListingToEdit] = useState<MarketplaceListing | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [listingToEdit, setListingToEdit] = useState<MarketplaceListing | null>(
+    null,
+  );
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [shouldRunTutorial, setShouldRunTutorial] = useState(false);
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
@@ -61,8 +73,10 @@ const MyListing = () => {
   const [updateStatus] = useUpdateMarketplaceListingStatusMutation();
 
   useEffect(() => {
-    const tutorialPending = localStorage.getItem("seller_listing_tutorial_pending") === "1";
-    const tutorialCompleted = localStorage.getItem("seller_listing_tutorial_completed") === "1";
+    const tutorialPending =
+      localStorage.getItem("seller_listing_tutorial_pending") === "1";
+    const tutorialCompleted =
+      localStorage.getItem("seller_listing_tutorial_completed") === "1";
     if (tutorialPending && !tutorialCompleted) {
       setShouldRunTutorial(true);
     }
@@ -112,31 +126,39 @@ const MyListing = () => {
     if (!data?.items) return [];
     if (!searchTerm) return data.items;
 
-    return data.items.filter((listing) =>
-      listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      listing.listing_type.name.toLowerCase().includes(searchTerm.toLowerCase())
+    return data.items.filter(
+      (listing) =>
+        listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.listing_type.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()),
     );
   }, [data?.items, searchTerm]);
 
   // Handle status toggle
-  const handleStatusToggle = async (listing: MarketplaceListing, e: React.MouseEvent) => {
+  const handleStatusToggle = async (
+    listing: MarketplaceListing,
+    e: React.MouseEvent,
+  ) => {
     e.stopPropagation();
-    const newStatus = listing.status === 'active' ? 'draft' : 'active';
+    const newStatus = listing.status === "active" ? "draft" : "active";
     try {
       await updateStatus({ id: listing.id, new_status: newStatus }).unwrap();
 
       toast({
-        title: 'Success',
-        description: `Listing ${newStatus === 'active' ? 'published' : 'unpublished'} successfully`,
+        title: "Success",
+        description: `Listing ${newStatus === "active" ? "published" : "unpublished"} successfully`,
       });
     } catch (error: unknown) {
       console.log({ error });
-      const errorMessage = (error as ApiError)?.data?.detail || 'Failed to update listing status';
+      const errorMessage =
+        (error as ApiError)?.data?.detail || "Failed to update listing status";
 
       toast({
-        title: 'Error',
-        description: errorMessage as string || 'Failed to update listing status',
-        variant: 'destructive',
+        title: "Error",
+        description:
+          (errorMessage as string) || "Failed to update listing status",
+        variant: "destructive",
       });
     }
   };
@@ -144,9 +166,9 @@ const MyListing = () => {
   // Define table columns
   const columns: ColumnDef<MarketplaceListing>[] = [
     {
-      id: 'title',
-      accessorKey: 'title',
-      header: 'Title',
+      id: "title",
+      accessorKey: "title",
+      header: "Title",
       cell: ({ row }) => (
         <div className="flex flex-col gap-1">
           <span className="font-medium">{row.title}</span>
@@ -161,9 +183,9 @@ const MyListing = () => {
       enableSorting: true,
     },
     {
-      id: 'listing_type',
+      id: "listing_type",
       accessorKey: (row) => row.listing_type.name,
-      header: 'Type',
+      header: "Type",
       cell: ({ row }) => (
         <Badge variant="outline" className="font-normal">
           {row.listing_type.name}
@@ -172,9 +194,9 @@ const MyListing = () => {
       enableSorting: true,
     },
     {
-      id: 'price',
-      accessorKey: 'price',
-      header: 'Price',
+      id: "price",
+      accessorKey: "price",
+      header: "Price",
       cell: ({ row }) => (
         <div className="flex flex-col gap-1">
           <span className="font-semibold">{formatCurrency(row.price)}</span>
@@ -188,12 +210,14 @@ const MyListing = () => {
       enableSorting: true,
     },
     {
-      id: 'status',
-      accessorKey: 'status',
-      header: 'Status',
+      id: "status",
+      accessorKey: "status",
+      header: "Status",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <div className={cn('w-2 h-2 rounded-full', getStatusColor(row.status))} />
+          <div
+            className={cn("w-2 h-2 rounded-full", getStatusColor(row.status))}
+          />
           <Badge variant={getStatusBadgeVariant(row.status)}>
             {getStatusLabel(row.status, t)}
           </Badge>
@@ -207,9 +231,9 @@ const MyListing = () => {
       enableSorting: true,
     },
     {
-      id: 'views',
-      accessorKey: 'view_count',
-      header: 'Views',
+      id: "views",
+      accessorKey: "view_count",
+      header: "Views",
       cell: ({ row }) => (
         <div className="flex items-center gap-2 text-muted-foreground">
           <Eye className="w-4 h-4" />
@@ -219,9 +243,9 @@ const MyListing = () => {
       enableSorting: true,
     },
     {
-      id: 'favorites',
-      accessorKey: 'favorite_count',
-      header: 'Favorites',
+      id: "favorites",
+      accessorKey: "favorite_count",
+      header: "Favorites",
       cell: ({ row }) => (
         <div className="flex items-center gap-2 text-muted-foreground">
           <Heart className="w-4 h-4" />
@@ -231,21 +255,23 @@ const MyListing = () => {
       enableSorting: true,
     },
     {
-      id: 'created_at',
-      accessorKey: 'created_at',
-      header: 'Created',
+      id: "created_at",
+      accessorKey: "created_at",
+      header: "Created",
       cell: ({ row }) => (
-        <span className="text-sm">{timeFormat(row.created_at, 'MMM DD, YYYY')}</span>
+        <span className="text-sm">
+          {timeFormat(row.created_at, "MMM DD, YYYY")}
+        </span>
       ),
       enableSorting: true,
     },
     {
-      id: 'expires_at',
-      accessorKey: 'expires_at',
-      header: 'Expires',
+      id: "expires_at",
+      accessorKey: "expires_at",
+      header: "Expires",
       cell: ({ row }) => (
         <span className="text-sm">
-          {row.expires_at ? timeFormat(row.expires_at, 'MMM DD, YYYY') : '---'}
+          {row.expires_at ? timeFormat(row.expires_at, "MMM DD, YYYY") : "---"}
         </span>
       ),
       enableSorting: true,
@@ -255,26 +281,32 @@ const MyListing = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Package className="w-8 h-8 text-primary" />
-            <span data-tour="my-listings-title">My Listings</span>
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage and track your marketplace listings
-          </p>
+      <div className="">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="md:text-3xl text-2xl font-bold flex items-center gap-3">
+              <Package className="md:w-8 md:h-8 w-6 h-6 text-primary" />
+              <span data-tour="my-listings-title">My Listings</span>
+            </h1>
+          </div>
+          <Button
+            className="bg-primary hover:bg-primary/90"
+            asChild
+            data-tour="create-listing-button"
+          >
+            <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_CREATE}>
+              <Package className="w-4 h-4 mr-2" />
+              Create New Listing
+            </Link>
+          </Button>
         </div>
-        <Button className="bg-primary hover:bg-primary/90" asChild data-tour="create-listing-button">
-          <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_CREATE}>
-            <Package className="w-4 h-4 mr-2" />
-            Create New Listing
-          </Link>
-        </Button>
+        <p className="text-muted-foreground mt-2">
+          Manage and track your marketplace listings
+        </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-card border rounded-lg p-4">
           <div className="text-sm text-muted-foreground">Total Listings</div>
           <div className="text-2xl font-bold mt-1">
@@ -284,19 +316,27 @@ const MyListing = () => {
         <div className="bg-card border rounded-lg p-4">
           <div className="text-sm text-muted-foreground">Active</div>
           <div className="text-2xl font-bold mt-1 text-green-600">
-            {data?.items?.filter(item => item.status === 'active').length || 0}
+            {data?.items?.filter((item) => item.status === "active").length ||
+              0}
           </div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-sm text-muted-foreground">Total Views</div>
           <div className="text-2xl font-bold mt-1">
-            {formatNumber(data?.items?.reduce((acc, item) => acc + item.view_count, 0) || 0)}
+            {formatNumber(
+              data?.items?.reduce((acc, item) => acc + item.view_count, 0) || 0,
+            )}
           </div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-sm text-muted-foreground">Total Favorites</div>
           <div className="text-2xl font-bold mt-1 text-red-600">
-            {formatNumber(data?.items?.reduce((acc, item) => acc + item.favorite_count, 0) || 0)}
+            {formatNumber(
+              data?.items?.reduce(
+                (acc, item) => acc + item.favorite_count,
+                0,
+              ) || 0,
+            )}
           </div>
         </div>
       </div>
@@ -313,63 +353,67 @@ const MyListing = () => {
       </div>
 
       {/* Data Table */}
-      <Card>
-        <CardContent className="pt-6">
-          <DataTableWithPagination
-            data={filteredData}
-            columns={columns}
-            pagination={data?.pagination}
-            isLoading={isLoading}
-            emptyMessage="No listings found. Create your first listing to get started!"
-            emptyIcon={<Package className="w-16 h-16" />}
-            enableSorting={true}
-            onRowClick={(row) => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}
-            renderActions={(row) => (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))}>
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View Listing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => handleStatusToggle(row, e)}>
-                    <Power className="w-4 h-4 mr-2" />
-                    {row.status === 'active' ? 'Unpublish' : 'Publish'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setListingToEdit(row);
-                      setEditModalOpen(true);
-                    }}
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            actionsColumnHeader="Actions"
-            pageSize={size}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            error={error}
-            errorTitle="Error Loading Listings"
-            errorDescription="Failed to load your listings. Please try again later."
-            errorIcon={<Package className="w-16 h-16 text-muted-foreground" />}
-          />
-        </CardContent>
-      </Card>
+      <DataTableWithPagination
+        data={filteredData}
+        columns={columns}
+        pagination={data?.pagination}
+        isLoading={isLoading}
+        emptyMessage="No listings found. Create your first listing to get started!"
+        emptyIcon={<Package className="w-16 h-16" />}
+        enableSorting={true}
+        onRowClick={(row) =>
+          navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))
+        }
+        renderActions={(row) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() =>
+                  navigate(
+                    ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id),
+                  )
+                }
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                View Listing
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => handleStatusToggle(row, e)}>
+                <Power className="w-4 h-4 mr-2" />
+                {row.status === "active" ? "Unpublish" : "Publish"}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setListingToEdit(row);
+                  setEditModalOpen(true);
+                }}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        actionsColumnHeader="Actions"
+        pageSize={size}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        error={error}
+        errorTitle="Error Loading Listings"
+        errorDescription="Failed to load your listings. Please try again later."
+        errorIcon={<Package className="w-16 h-16 text-muted-foreground" />}
+      />
 
       {/* Edit Listing Modal */}
       <EditListingModal

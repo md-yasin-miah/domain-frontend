@@ -152,13 +152,16 @@ const ClientProductsVerificationsPage = () => {
     navigator.clipboard.writeText(text);
     toast({
       title: t("common.copied") || "Copied",
-      description: `${label} ${t("common.copied_to_clipboard") || "copied to clipboard"
-        }`,
+      description: `${label} ${
+        t("common.copied_to_clipboard") || "copied to clipboard"
+      }`,
     });
   };
 
   const handleViewDetails = (verification: ProductVerification) => {
-    navigate(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(verification.id));
+    navigate(
+      ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(verification.id),
+    );
   };
 
   const handleCreateClick = () => {
@@ -173,7 +176,7 @@ const ClientProductsVerificationsPage = () => {
 
   const handleFormChange = (
     field: keyof ProductVerificationCreateRequest,
-    value: string
+    value: string,
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -183,7 +186,8 @@ const ClientProductsVerificationsPage = () => {
       // Validate required fields
       if (!formData.product_type) {
         toast({
-          title: t("productsVerification.create.error.title") || "Validation Error",
+          title:
+            t("productsVerification.create.error.title") || "Validation Error",
           description:
             t("productsVerification.create.error.product_type_required") ||
             "Product type is required",
@@ -194,7 +198,7 @@ const ClientProductsVerificationsPage = () => {
 
       // Validate domain fields if product type is domain
       const selectedType = listingTypes?.find(
-        (type) => type.slug === formData.product_type
+        (type) => type.slug === formData.product_type,
       );
       const isDomainType =
         selectedType?.slug === "domain" || formData.product_type === "domain";
@@ -202,7 +206,9 @@ const ClientProductsVerificationsPage = () => {
       if (isDomainType) {
         if (!formData.domain_name) {
           toast({
-            title: t("productsVerification.create.error.title") || "Validation Error",
+            title:
+              t("productsVerification.create.error.title") ||
+              "Validation Error",
             description:
               t("productsVerification.create.error.domain_name_required") ||
               "Domain name is required",
@@ -214,7 +220,9 @@ const ClientProductsVerificationsPage = () => {
         // For website type
         if (!formData.website_url) {
           toast({
-            title: t("productsVerification.create.error.title") || "Validation Error",
+            title:
+              t("productsVerification.create.error.title") ||
+              "Validation Error",
             description:
               t("productsVerification.create.error.website_url_required") ||
               "Website URL is required",
@@ -235,7 +243,9 @@ const ClientProductsVerificationsPage = () => {
       refetch();
       // Navigate to details page
       if (response?.id) {
-        navigate(ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(response.id));
+        navigate(
+          ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(response.id),
+        );
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -254,7 +264,7 @@ const ClientProductsVerificationsPage = () => {
   };
 
   const selectedListingType = listingTypes?.find(
-    (type) => type.slug === formData.product_type
+    (type) => type.slug === formData.product_type,
   );
   const isDomainType =
     selectedListingType?.slug === "domain" ||
@@ -281,7 +291,8 @@ const ClientProductsVerificationsPage = () => {
           <AlertTriangle className="w-16 h-16 text-destructive" />
           <div>
             <h3 className="text-lg font-semibold">
-              {t("productsVerification.error.title") || "Error loading listings"}
+              {t("productsVerification.error.title") ||
+                "Error loading listings"}
             </h3>
             <p className="text-muted-foreground">
               {t("productsVerification.error.description") ||
@@ -296,21 +307,23 @@ const ClientProductsVerificationsPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <FileText className="w-8 h-8 text-primary" />
-            {t("nav.productsVerification") || "Products Verification"}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            {t("productsVerification.subtitle") ||
-              "Manage and track your product verifications"}
-          </p>
+      <div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="md:text-3xl text-lg font-bold flex items-center gap-3">
+              <FileText className="md:w-8 md:h-8 w-6 h-6 text-primary" />
+              {t("nav.productsVerification") || "Products Verification"}
+            </h1>
+          </div>
+          <Button onClick={handleCreateClick}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t("productsVerification.create_verification")}
+          </Button>
         </div>
-        <Button onClick={handleCreateClick}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t("productsVerification.create_verification")}
-        </Button>
+        <p className="text-muted-foreground md:mt-6 mt-4">
+          {t("productsVerification.subtitle") ||
+            "Manage and track your product verifications"}
+        </p>
       </div>
 
       {/* Filters */}
@@ -338,7 +351,8 @@ const ClientProductsVerificationsPage = () => {
               <SelectTrigger className="w-[180px]">
                 <SelectValue
                   placeholder={
-                    t("productsVerification.filter_by_status") || "Filter by status"
+                    t("productsVerification.filter_by_status") ||
+                    "Filter by status"
                   }
                 />
               </SelectTrigger>
@@ -405,12 +419,12 @@ const ClientProductsVerificationsPage = () => {
               </h3>
               <p className="text-muted-foreground">
                 {searchTerm ||
-                  statusFilter !== "all" ||
-                  productTypeFilter !== "all"
+                statusFilter !== "all" ||
+                productTypeFilter !== "all"
                   ? t("productsVerification.empty.filtered") ||
-                  "No listings match your filters"
+                    "No listings match your filters"
                   : t("productsVerification.empty.description") ||
-                  "You haven't created any listings yet."}
+                    "You haven't created any listings yet."}
               </p>
             </div>
           </CardContent>
@@ -429,20 +443,21 @@ const ClientProductsVerificationsPage = () => {
                     <div
                       className={cn(
                         "w-3 h-3 rounded-full",
-                        getStatusColor(verification.status)
+                        getStatusColor(verification.status),
                       )}
                     />
                     <div className="flex-1">
                       <CardTitle className="text-lg">
                         {verification.product_type === "domain"
                           ? verification.domain_name
-                            ? `${verification.domain_name}${verification.domain_extension || ""
-                            }`
+                            ? `${verification.domain_name}${
+                                verification.domain_extension || ""
+                              }`
                             : t("productsVerification.unknown_domain") ||
-                            "Unknown Domain"
+                              "Unknown Domain"
                           : verification.website_url ||
-                          t("productsVerification.unknown_website") ||
-                          "Unknown Website"}
+                            t("productsVerification.unknown_website") ||
+                            "Unknown Website"}
                       </CardTitle>
                       <CardDescription className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-xs">
@@ -454,7 +469,7 @@ const ClientProductsVerificationsPage = () => {
                           variant={getStatusBadgeVariant(verification.status)}
                           className={cn(
                             "text-xs flex items-center gap-1",
-                            getStatusColor(verification.status)
+                            getStatusColor(verification.status),
                           )}
                         >
                           <StatusIcon status={verification.status} />
@@ -469,12 +484,15 @@ const ClientProductsVerificationsPage = () => {
                 <div className="space-y-3">
                   <div className="text-sm">
                     <span className="text-muted-foreground">
-                      {t("productsVerification.verification_method") || "Method"}:
+                      {t("productsVerification.verification_method") ||
+                        "Method"}
+                      :
                     </span>
                     <span className="ml-2 font-medium">
                       {verification.verification_method === "dns"
                         ? "DNS"
-                        : t("productsVerification.file_upload") || "File Upload"}
+                        : t("productsVerification.file_upload") ||
+                          "File Upload"}
                     </span>
                   </div>
                   <div className="text-sm">
@@ -512,13 +530,13 @@ const ClientProductsVerificationsPage = () => {
         </div>
       )}
 
-
       {/* Create Verification Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {t("productsVerification.create.title") || "Create Product Verification"}
+              {t("productsVerification.create.title") ||
+                "Create Product Verification"}
             </DialogTitle>
             <DialogDescription>
               {t("productsVerification.create.description") ||
@@ -529,7 +547,9 @@ const ClientProductsVerificationsPage = () => {
             {/* Product Type */}
             <div className="space-y-2">
               <Label htmlFor="product_type">
-                {t("productsVerification.create.product_type") || "Product Type"} *
+                {t("productsVerification.create.product_type") ||
+                  "Product Type"}{" "}
+                *
               </Label>
               <Select
                 value={formData.product_type}
@@ -543,8 +563,9 @@ const ClientProductsVerificationsPage = () => {
                     placeholder={
                       listingTypesLoading
                         ? t("common.loading") || "Loading..."
-                        : t("productsVerification.create.select_product_type") ||
-                        "Select product type"
+                        : t(
+                            "productsVerification.create.select_product_type",
+                          ) || "Select product type"
                     }
                   />
                 </SelectTrigger>
@@ -570,7 +591,9 @@ const ClientProductsVerificationsPage = () => {
               <>
                 <div className="space-y-2">
                   <Label htmlFor="domain_name">
-                    {t("productsVerification.create.domain_name") || "Domain Name"} *
+                    {t("productsVerification.create.domain_name") ||
+                      "Domain Name"}{" "}
+                    *
                   </Label>
                   <Input
                     id="domain_name"
@@ -606,7 +629,9 @@ const ClientProductsVerificationsPage = () => {
             {isWebsiteType && (
               <div className="space-y-2">
                 <Label htmlFor="website_url">
-                  {t("productsVerification.create.website_url") || "Website URL"} *
+                  {t("productsVerification.create.website_url") ||
+                    "Website URL"}{" "}
+                  *
                 </Label>
                 <Input
                   id="website_url"

@@ -275,40 +275,37 @@ export default function CreateListingPage() {
   return (
     <div className="flex flex-col items-center">
       {/* Header with back */}
-      <div className="w-full flex items-center justify-between">
-        <div className=" flex items-center gap-4 mb-10">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Package className="h-6 w-6 text-primary" />
-              Create New Listing
-            </h1>
-            <p className="text-muted-foreground text-sm mt-0.5">
-              Create a marketplace listing from your verified product
-            </p>
+      <div className="w-full">
+        <div className="flex items-center justify-between gap-4">
+          <div className=" flex items-center gap-4">
+            <div>
+              <h1 className="md:text-2xl text-lg font-bold flex items-center gap-2">
+                <Package className="md:h-8 md:w-8 h-6 w-6 text-primary" />
+                Create New Listing
+              </h1>
+            </div>
           </div>
+          <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
+            <Button variant="outline">
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          </Link>
         </div>
-        <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
-          <Button variant="outline">
-            <ArrowLeft className="h-4 w-4" />
-            Back to My Listings
-          </Button>
-        </Link>
+        <p className="text-muted-foreground text-sm md:mt-6 mt-4">
+          Create a marketplace listing from your verified product
+        </p>
       </div>
 
       {/* Stepper */}
-      <div className="w-full max-w-2xl mb-8" data-tour="listing-stepper">
+      <div className="w-full max-w-2xl md:my-8 my-6" data-tour="listing-stepper">
         <div className="flex items-center justify-center gap-0">
           {steps.map((s, index) => (
             <React.Fragment key={s.number}>
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
+                    "flex md:h-10 md:w-10 h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
                     step === s.number
                       ? "border-primary bg-primary text-primary-foreground"
                       : step > s.number
@@ -320,7 +317,7 @@ export default function CreateListingPage() {
                 </div>
                 <span
                   className={cn(
-                    "mt-2 text-xs font-medium",
+                    "md:mt-2 mt-1 text-xs font-medium",
                     step === s.number
                       ? "text-foreground"
                       : "text-muted-foreground",
@@ -374,7 +371,12 @@ export default function CreateListingPage() {
                       <p className="text-sm text-muted-foreground">
                         Please verify a product first before creating a listing
                       </p>
-                      <Button asChild size="sm" className="h-8" data-tour="go-verify-product">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="h-8"
+                        data-tour="go-verify-product"
+                      >
                         <Link
                           to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}
                         >
@@ -414,7 +416,10 @@ export default function CreateListingPage() {
                       }
                     }}
                   >
-                    <SelectTrigger id="verification" data-tour="verification-select">
+                    <SelectTrigger
+                      id="verification"
+                      data-tour="verification-select"
+                    >
                       <SelectValue placeholder="Select a verified product" />
                     </SelectTrigger>
                     <SelectContent>
@@ -786,7 +791,11 @@ export default function CreateListingPage() {
                 <Button variant="outline" onClick={() => setStep(1)}>
                   Back
                 </Button>
-                <Button onClick={handleSubmit} disabled={creating} data-tour="create-listing-submit">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={creating}
+                  data-tour="create-listing-submit"
+                >
                   {creating && (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   )}
@@ -797,7 +806,6 @@ export default function CreateListingPage() {
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }

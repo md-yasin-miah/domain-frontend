@@ -11,67 +11,66 @@ import {
   HelpCircle,
   Star,
   MessageSquare,
-} from 'lucide-react';
-import { AppSidebar, MenuItem } from './AppSidebar';
+} from "lucide-react";
+import { AppSidebar, MenuItem } from "./AppSidebar";
 
 const clientMenuItems: MenuItem[] = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     icon: LayoutDashboard,
-    url: '/client/dashboard',
+    url: "/client/dashboard",
   },
   {
-    title: 'Marketplace Listing',
+    title: "Marketplace Listing",
     icon: ShoppingCart,
-    url: '/client/marketplace-listing',
+    url: "/client/marketplace-listing",
   },
   {
-    title: 'Offers',
+    title: "Offers",
     icon: Handshake,
-    url: '/client/offers',
+    url: "/client/offers",
   },
   {
-    title: 'Auctions',
+    title: "Auctions",
     icon: Gavel,
-    url: '/client/auctions',
+    url: "/client/auctions",
   },
   {
-    title: 'Saved Search',
+    title: "Saved Search",
     icon: Search,
-    url: '/client/saved-search',
+    url: "/client/saved-search",
   },
   {
-    title: 'Orders',
+    title: "Orders",
     icon: Package,
-    url: '/client/orders',
+    url: "/client/orders",
     subItems: [
-      { title: 'Orders', url: '/client/orders' },
-      { title: 'Invoice', url: '/client/invoice' },
-      { title: 'Payment', url: '/client/payment' },
-      { title: 'Escrows', url: '/client/escrows' },
+      { title: "Orders", url: "/client/orders" },
+      { title: "Invoice", url: "/client/invoice" },
+      { title: "Payment", url: "/client/payment" },
+      { title: "Escrows", url: "/client/escrows" },
     ],
   },
   {
-    title: 'Support',
+    title: "Support",
     icon: MessageSquare,
-    url: '/client/support',
+    url: "/client/support",
   },
   {
-    title: 'FAQs',
+    title: "FAQs",
     icon: HelpCircle,
-    url: '/client/faq',
+    url: "/client/faq",
   },
   {
-    title: 'Reviews',
+    title: "Reviews",
     icon: Star,
-    url: '/client/reviews',
+    url: "/client/reviews",
   },
 ];
 
 export function ClientSidebar() {
   return (
     <AppSidebar
-      title="Client Portal"
       menuItems={clientMenuItems}
       footerType="user-profile"
       collapsible="icon"

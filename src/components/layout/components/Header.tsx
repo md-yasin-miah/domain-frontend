@@ -455,7 +455,7 @@ export function Header({
               })}
 
               {/* User Services - If Logged In */}
-              {user && userServices && userServices.length > 0 && (
+              {/* {user && userServices && userServices.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="text-xs font-semibold text-primary uppercase tracking-wider px-2">
                     {t("nav.profile") || "Mis Servicios"}
@@ -493,7 +493,7 @@ export function Header({
                     })}
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Authentication Buttons - Mobile Only */}
               {!user && (
