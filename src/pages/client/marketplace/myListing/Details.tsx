@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -24,7 +24,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Power,
-  MessageSquare,
   Loader2,
   User,
   ExternalLink,
@@ -34,7 +33,6 @@ import {
 } from "lucide-react";
 import {
   useGetMarketplaceListingBySlugQuery,
-  useGetMarketplaceListingQuery,
   useUpdateMarketplaceListingStatusMutation,
 } from "@/store/api/marketplaceApi";
 import {
@@ -52,17 +50,13 @@ import { useToast } from "@/hooks/use-toast";
 import { ReturnBack } from "@/components/common/ReturnBack";
 import { CopyToClipboard } from "@/components/common/CopyToClipboard";
 import { useAuth } from "@/store/hooks/useAuth";
-import MakeOfferModal from "./components/MakeOfferModal";
 import EditListingModal from "./components/EditListingModal";
-import { ROUTES } from "@/lib/routes";
-import { useGetProfileCompletionQuery } from "@/store/api/profileApi";
 
 const Details = () => {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
   const {
     data: listing,
     isLoading,
@@ -70,68 +64,8 @@ const Details = () => {
   } = useGetMarketplaceListingBySlugQuery(slug);
   const [updateStatus, { isLoading: isUpdatingStatus }] =
     useUpdateMarketplaceListingStatusMutation();
-  const [makeOfferModalOpen, setMakeOfferModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const navigate = useNavigate();
-
-  // Check profile completion if user is logged in
-  const { data: profileCompletion, isLoading: profileCompletionLoading } =
-    useGetProfileCompletionQuery(undefined, {
-      skip: !user,
-    });
-
-  // Check if we should open the offer modal automatically (from URL param)
-  useEffect(() => {
-    const openOffer = searchParams.get("openOffer");
-    if (openOffer === "true" && user && listing && !profileCompletionLoading) {
-      // Check if profile is complete
-      if (profileCompletion?.is_complete) {
-        // Profile is complete, open modal
-        setMakeOfferModalOpen(true);
-        // Remove the query param
-        const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.delete("openOffer");
-        setSearchParams(newSearchParams, { replace: true });
-      } else if (profileCompletion?.is_complete === false) {
-        // Profile is not complete, redirect to profile setup with return URL
-        const returnUrl = `${window.location.pathname}?openOffer=true`;
-        navigate(
-          `${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`,
-          { replace: true },
-        );
-      }
-    }
-  }, [
-    user,
-    listing,
-    profileCompletion,
-    profileCompletionLoading,
-    searchParams,
-    setSearchParams,
-    navigate,
-  ]);
-
-  // Handle make offer
-  const handleMakeOffer = () => {
-    if (!user) {
-      // Store the current URL with openOffer flag for redirect after login
-      const returnUrl = `${window.location.pathname}?openOffer=true`;
-      navigate(
-        `${ROUTES.AUTH.INDEX}?tab=login&returnUrl=${encodeURIComponent(returnUrl)}`,
-      );
-    } else {
-      // Check if profile is complete
-      if (profileCompletion?.is_complete) {
-        setMakeOfferModalOpen(true);
-      } else {
-        // Profile is not complete, redirect to profile setup with return URL
-        const returnUrl = `${window.location.pathname}?openOffer=true`;
-        navigate(
-          `${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`,
-        );
-      }
-    }
-  };
 
   // Handle status toggle
   const handleStatusToggle = async () => {
@@ -862,16 +796,6 @@ const Details = () => {
           </div>
         </div>
       </div>
-
-      {/* Make Offer Modal */}
-      {listing && (
-        <MakeOfferModal
-          open={makeOfferModalOpen}
-          onOpenChange={setMakeOfferModalOpen}
-          listing={listing}
-          onSuccess={() => setMakeOfferModalOpen(false)}
-        />
-      )}
 
       {/* Edit Listing Modal */}
       {listing && (

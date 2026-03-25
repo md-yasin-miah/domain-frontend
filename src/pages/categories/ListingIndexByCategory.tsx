@@ -1,17 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import {
-  Search,
-  Filter,
-  Globe,
-  ArrowRight,
-  TrendingUp,
-  Award,
-  CheckCircle,
-} from "lucide-react";
+import { Search, Filter, Globe, ArrowRight } from "lucide-react";
 import MarketplaceListingCard from "@/components/marketplace/MarketplaceListingCard";
 import {
   useMarketplaceListingsById,
@@ -19,10 +11,10 @@ import {
 } from "@/store/hooks/useMarketplace";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useGetMarketplaceListingTypesQuery } from "@/store/api/marketplaceApi";
 
-const DomainsPage = () => {
+const ListingIndexByCategory = () => {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { data: listingTypes } = useGetMarketplaceListingTypesQuery(
@@ -169,4 +161,4 @@ const DomainsPage = () => {
   );
 };
 
-export default DomainsPage;
+export default ListingIndexByCategory;

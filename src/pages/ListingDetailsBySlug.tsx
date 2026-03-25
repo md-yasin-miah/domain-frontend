@@ -1,5 +1,6 @@
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   Eye,
@@ -24,11 +24,17 @@ import { useGetMarketplaceListingBySlugQuery } from "@/store/api/marketplaceApi"
 import { ROUTES } from "@/lib/routes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatNumber } from "@/lib/helperFun";
+import { useAuth } from "@/store/hooks/useAuth";
+import MakeOfferModal from "@/pages/client/marketplace/myListing/components/MakeOfferModal";
+import { toast } from "sonner";
 
 export default function ListingDetailsBySlug() {
   const { listingSlug } = useParams<{ listingSlug: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
+  const [makeOfferModalOpen, setMakeOfferModalOpen] = useState(false);
   const { data: listing, isLoading, error } = useGetMarketplaceListingBySlugQuery(
     listingSlug,
     { skip: !listingSlug }
@@ -43,6 +49,46 @@ export default function ListingDetailsBySlug() {
     listing?.domain_name ||
     listing?.slug ||
     (listing ? `#${listing.id}` : "");
+  const canMakeOffer = !user || (listing ? listing.seller_id !== user.id : true);
+
+  useEffect(() => {
+    const shouldOpenOffer = searchParams.get("openOffer") === "true";
+    if (!shouldOpenOffer) return;
+    if (!listing) return;
+
+    if (!user) {
+      const returnUrl = `${window.location.pathname}?openOffer=true`;
+      navigate(
+        `${ROUTES.AUTH.INDEX}?tab=login&returnUrl=${encodeURIComponent(returnUrl)}`,
+        { replace: true },
+      );
+      return;
+    }
+
+    if (listing.seller_id === user.id) return;
+
+    setMakeOfferModalOpen(true);
+    const next = new URLSearchParams(searchParams);
+    next.delete("openOffer");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, listing, user, navigate, setSearchParams]);
+
+  const handleMakeOffer = () => {
+    if (!user) {
+      const returnUrl = `${window.location.pathname}?openOffer=true`;
+      navigate(
+        `${ROUTES.AUTH.INDEX}?tab=login&returnUrl=${encodeURIComponent(returnUrl)}`,
+      );
+      return;
+    }
+
+    if (!canMakeOffer) {
+      toast.error(t("offers.create.own_listing", "You cannot offer on your own listing"));
+      return;
+    }
+    setMakeOfferModalOpen(true);
+  };
+
   if (!listingSlug) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -344,10 +390,10 @@ export default function ListingDetailsBySlug() {
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-4">
-        <Button asChild>
-          <Link to={ROUTES.APP.MARKETPLACE}>
-            {t("marketplace_domains.actions.make_offer", "Make an offer")}
-          </Link>
+        <Button onClick={handleMakeOffer} disabled={!canMakeOffer}>
+          {!canMakeOffer
+            ? t("offers.create.own_listing", "You cannot offer on your own listing")
+            : t("marketplace_domains.actions.make_offer", "Make an offer")}
         </Button>
         {/* {listing.public_url && (
           <Button variant="outline" asChild>
@@ -367,6 +413,13 @@ export default function ListingDetailsBySlug() {
           {t("marketplace_domains.actions.back_to_list", "Back to list")}
         </Button>
       </div>
+
+      <MakeOfferModal
+        open={makeOfferModalOpen}
+        onOpenChange={setMakeOfferModalOpen}
+        listing={listing}
+        onSuccess={() => setMakeOfferModalOpen(false)}
+      />
     </div>
   );
 }

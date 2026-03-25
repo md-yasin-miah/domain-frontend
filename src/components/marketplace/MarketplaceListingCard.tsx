@@ -30,12 +30,11 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
   const { t } = useTranslation();
 
   const price =
-    typeof listing.price === "string" ? parseFloat(listing.price) : listing.price;
+    typeof listing.price === "string"
+      ? parseFloat(listing.price)
+      : listing.price;
   const displayTitle =
-    listing.title ||
-    listing.domain_name ||
-    listing.slug ||
-    "#" + listing.id;
+    listing.title || listing.domain_name || listing.slug || "#" + listing.id;
 
   const handleCardClick = () => {
     onViewClick?.(listing.id);
@@ -135,24 +134,22 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
                 <p className="font-medium">{listing.domain_name}</p>
               </div>
             )}
-            {listing.domain_age_years != null && listing.domain_age_years > 0 && (
-              <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
-                <span className="text-muted-foreground">
-                  {t("marketplace_domains.labels.age", "Age")}:
-                </span>
-                <p className="font-medium">
-                  {listing.domain_age_years} {t("common.years", "yrs")}
-                </p>
-              </div>
-            )}
+            {listing.domain_age_years != null &&
+              listing.domain_age_years > 0 && (
+                <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
+                  <span className="text-muted-foreground">
+                    {t("marketplace_domains.labels.age", "Age")}:
+                  </span>
+                  <p className="font-medium">
+                    {listing.domain_age_years} {t("common.years", "yrs")}
+                  </p>
+                </div>
+              )}
             {listing.domain_authority != null &&
               listing.domain_authority > 0 && (
                 <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
                   <span className="text-muted-foreground">
-                    {t(
-                      "marketplace_domains.labels.domain_authority",
-                      "DA"
-                    )}:
+                    {t("marketplace_domains.labels.domain_authority", "DA")}:
                   </span>
                   <p className="font-medium">{listing.domain_authority}</p>
                 </div>
@@ -161,10 +158,7 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
               listing.domain_backlinks > 0 && (
                 <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
                   <span className="text-muted-foreground">
-                    {t(
-                      "marketplace_domains.labels.backlinks",
-                      "Backlinks"
-                    )}:
+                    {t("marketplace_domains.labels.backlinks", "Backlinks")}:
                   </span>
                   <p className="font-medium">{listing.domain_backlinks}</p>
                 </div>
@@ -192,10 +186,7 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
               Number(listing.website_revenue_monthly) > 0 && (
                 <div className="flex flex-wrap items-center gap-1 w-fit border rounded-md px-3">
                   <span className="text-muted-foreground">
-                    {t(
-                      "marketplace_domains.labels.revenue",
-                      "Revenue"
-                    )}:
+                    {t("marketplace_domains.labels.revenue", "Revenue")}:
                   </span>
                   <p className="font-medium">
                     {typeof listing.website_revenue_monthly === "string"
@@ -240,7 +231,10 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
               {t("marketplace_domains.actions.view_details")}
             </Button>
           </Link>
-          <Link to={detailUrl} onClick={(e) => e.stopPropagation()}>
+          <Link
+            to={detailUrl + "?openOffer=true"}
+            onClick={(e) => e.stopPropagation()}
+          >
             <Button variant="outline" className="w-full">
               {t("marketplace_domains.actions.make_offer")}
             </Button>

@@ -14,9 +14,6 @@ const Marketplace = lazy(() => import("./pages/Marketplace"));
 const ListingIndexByCategory = lazy(
   () => import("./pages/categories/ListingIndexByCategory"),
 );
-const ListingDetailsByCategory = lazy(
-  () => import("./pages/categories/ListingDetailsByCategory"),
-);
 const ListingDetailsBySlug = lazy(() => import("./pages/ListingDetailsBySlug"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Terminos = lazy(() => import("./pages/legal/Terminos"));
@@ -242,7 +239,7 @@ export const router = createBrowserRouter([
                 path: ":listingSlug",
                 element: (
                   <LazyComponent>
-                    <ListingDetailsByCategory />
+                    <ListingDetailsBySlug />
                   </LazyComponent>
                 ),
               },
