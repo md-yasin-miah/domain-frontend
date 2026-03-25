@@ -1,4 +1,5 @@
 import LiveChat from '@/components/LiveChat';
+import ScrollToTop from '@/components/ScrollToTop';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+      <ScrollToTop />
       <Header menuItems={menuItems} userServices={userServices} navigationType="client" />
         <main className="min-h-screen">
           {children}

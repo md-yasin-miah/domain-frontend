@@ -1,4 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import ScrollToTop from '@/components/ScrollToTop';
 import { AdminSidebar } from './components/AdminSidebar';
 import { Header } from './components/Header';
 import { ROUTES } from '@/lib/routes';
@@ -27,6 +28,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/20">
+        <ScrollToTop />
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <Header
@@ -37,7 +39,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             }
             navigationType="admin"
           />
-          <main className="flex-1 overflow-auto custom-scrollbar p-6 lg:p-8">
+          <main
+            data-scroll-root
+            className="flex-1 overflow-auto custom-scrollbar p-6 lg:p-8"
+          >
             <div className="mx-auto max-w-7xl">
               {children}
             </div>

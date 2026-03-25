@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { ROUTES } from "./lib/routes";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 import AppLayout from "./components/layout/AppLayout";
 import AdminLayout from "./components/layout/AdminLayout";
 import ClientLayout from "./components/layout/ClientLayout";
@@ -456,6 +457,7 @@ export const router = createBrowserRouter([
     element: (
       <>
         <AuthRedirectHandler />
+        <ScrollToTop />
         <Login />
       </>
     ),
@@ -1221,9 +1223,12 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: (
-      <LazyComponent>
-        <NotFound />
-      </LazyComponent>
+      <>
+        <ScrollToTop />
+        <LazyComponent>
+          <NotFound />
+        </LazyComponent>
+      </>
     ),
   },
 ]);
