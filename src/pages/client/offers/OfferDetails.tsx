@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -43,6 +45,8 @@ import {
 } from "@/lib/helperFun";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/routes";
+import { getOfferDetailsTutorialSteps } from "@/lib/offerTutorialDrive";
+import { completeClientOffersTutorial } from "@/lib/tutorialStorage";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -62,6 +66,8 @@ const OfferDetails = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const detailTutorialStartedRef = useRef(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -91,6 +97,38 @@ const OfferDetails = () => {
   const [counterDialogOpen, setCounterDialogOpen] = useState(false);
   const [counterAmount, setCounterAmount] = useState("");
   const [counterMessage, setCounterMessage] = useState("");
+
+  useEffect(() => {
+    if (isLoading || error || !offer) return;
+    const fromQuery = searchParams.get("tutorial") === "offer-detail";
+    if (!fromQuery) return;
+
+    detailTutorialStartedRef.current = false;
+
+    const timer = window.setTimeout(() => {
+      if (detailTutorialStartedRef.current) return;
+      detailTutorialStartedRef.current = true;
+      const guide = driver({
+        showProgress: true,
+        allowClose: true,
+        nextBtnText: "Next",
+        prevBtnText: "Back",
+        doneBtnText: "Done",
+        steps: getOfferDetailsTutorialSteps(),
+        onDestroyed: () => {
+          completeClientOffersTutorial();
+          const next = new URLSearchParams(searchParams);
+          next.delete("tutorial");
+          setSearchParams(next, { replace: true });
+        },
+      });
+      guide.drive();
+    }, 400);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [isLoading, error, offer, searchParams, setSearchParams]);
 
   // Get status label
   const getStatusLabel = (status: string) => {
@@ -202,7 +240,7 @@ const OfferDetails = () => {
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2" data-tour="offer-detail-actions">
               {canAccept && (
                 <Button
                   onClick={onAccept}
@@ -263,7 +301,10 @@ const OfferDetails = () => {
         </div>
 
         {/* Stats Cards - Subtle Design */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"
+          data-tour="offer-detail-stats"
+        >
           <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -348,7 +389,10 @@ const OfferDetails = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Offer Information - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+            <Card
+              className="border border-border/50 bg-card shadow-sm overflow-hidden"
+              data-tour="offer-detail-info"
+            >
               <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
@@ -494,7 +538,10 @@ const OfferDetails = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Actions - Clean Design */}
-            <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
+            <Card
+              className="border border-border/50 bg-card shadow-sm overflow-hidden"
+              data-tour="offer-detail-quick-actions"
+            >
               <CardHeader className="border-b border-border bg-secondary/10">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">

@@ -2,8 +2,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/lib/routes";
 import {
   clearAllTutorialStorageKeys,
+  markClientOffersTutorialPending,
   markSellerListingTutorialPending,
-  resetSellerListingTutorialProgress,
 } from "@/lib/tutorialStorage";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,16 +14,44 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eraser, PlayCircle, RotateCcw, Settings2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {
+  Eraser,
+  Handshake,
+  PlayCircle,
+  RotateCcw,
+  Settings2,
+} from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function TutorialSettingsFab() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const replayCreateListingTutorial = () => {
     markSellerListingTutorialPending();
     navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS);
+  };
+
+  const replayOffersListTutorial = () => {
+    markClientOffersTutorialPending();
+    navigate(`${ROUTES.CLIENT.OFFERS.INDEX}?tutorial=offer`);
+  };
+
+  const replayOfferDetailTutorial = () => {
+    const match = /^\/client\/offers\/(\d+)$/.exec(location.pathname);
+    if (!match) {
+      toast({
+        title: "Open an offer first",
+        description:
+          "Go to Offers, open any offer from the table, then use this menu again to replay the detail-page tour.",
+      });
+      return;
+    }
+    navigate({
+      pathname: location.pathname,
+      search: "?tutorial=offer-detail",
+    });
   };
 
   const clearAllTutorialKeys = () => {
@@ -56,7 +84,15 @@ export default function TutorialSettingsFab() {
             <PlayCircle className="mr-2 h-4 w-4" />
             Replay Create Listing Tutorial
           </DropdownMenuItem>
-          <DropdownMenuSeparator  className="bg-border"/>
+          <DropdownMenuItem onClick={replayOffersListTutorial}>
+            <Handshake className="mr-2 h-4 w-4" />
+            Replay Offers List Tutorial
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={replayOfferDetailTutorial}>
+            <Handshake className="mr-2 h-4 w-4" />
+            Replay Offer Detail Tutorial
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-border" />
           <DropdownMenuItem onClick={clearAllTutorialKeys}>
             <Eraser className="mr-2 h-4 w-4" />
             Clear all tutorial keys

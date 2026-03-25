@@ -1,9 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Eye,
   Heart,
@@ -24,21 +30,32 @@ import {
   ExternalLink,
   FileText,
   Sparkles,
-  Clock
-} from 'lucide-react';
-import { useGetMarketplaceListingBySlugQuery, useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
-import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
-import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
-import { ReturnBack } from '@/components/common/ReturnBack';
-import { CopyToClipboard } from '@/components/common/CopyToClipboard';
-import { useAuth } from '@/store/hooks/useAuth';
-import MakeOfferModal from './components/MakeOfferModal';
-import EditListingModal from './components/EditListingModal';
-import { ROUTES } from '@/lib/routes';
-import { useGetProfileCompletionQuery } from '@/store/api/profileApi';
+  Clock,
+} from "lucide-react";
+import {
+  useGetMarketplaceListingBySlugQuery,
+  useGetMarketplaceListingQuery,
+  useUpdateMarketplaceListingStatusMutation,
+} from "@/store/api/marketplaceApi";
+import {
+  formatCurrency,
+  formatNumber,
+  getStatusColor,
+  getStatusLabel,
+  timeFormat,
+  getStatusBadgeVariant,
+} from "@/lib/helperFun";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { ReturnBack } from "@/components/common/ReturnBack";
+import { CopyToClipboard } from "@/components/common/CopyToClipboard";
+import { useAuth } from "@/store/hooks/useAuth";
+import MakeOfferModal from "./components/MakeOfferModal";
+import EditListingModal from "./components/EditListingModal";
+import { ROUTES } from "@/lib/routes";
+import { useGetProfileCompletionQuery } from "@/store/api/profileApi";
 
 const Details = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -46,43 +63,62 @@ const Details = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: listing, isLoading, error } = useGetMarketplaceListingBySlugQuery(slug);
-  const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateMarketplaceListingStatusMutation();
+  const {
+    data: listing,
+    isLoading,
+    error,
+  } = useGetMarketplaceListingBySlugQuery(slug);
+  const [updateStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateMarketplaceListingStatusMutation();
   const [makeOfferModalOpen, setMakeOfferModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const navigate = useNavigate();
-  
+
   // Check profile completion if user is logged in
-  const { data: profileCompletion, isLoading: profileCompletionLoading } = useGetProfileCompletionQuery(undefined, {
-    skip: !user,
-  });
+  const { data: profileCompletion, isLoading: profileCompletionLoading } =
+    useGetProfileCompletionQuery(undefined, {
+      skip: !user,
+    });
 
   // Check if we should open the offer modal automatically (from URL param)
   useEffect(() => {
-    const openOffer = searchParams.get('openOffer');
-    if (openOffer === 'true' && user && listing && !profileCompletionLoading) {
+    const openOffer = searchParams.get("openOffer");
+    if (openOffer === "true" && user && listing && !profileCompletionLoading) {
       // Check if profile is complete
       if (profileCompletion?.is_complete) {
         // Profile is complete, open modal
         setMakeOfferModalOpen(true);
         // Remove the query param
         const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.delete('openOffer');
+        newSearchParams.delete("openOffer");
         setSearchParams(newSearchParams, { replace: true });
       } else if (profileCompletion?.is_complete === false) {
         // Profile is not complete, redirect to profile setup with return URL
         const returnUrl = `${window.location.pathname}?openOffer=true`;
-        navigate(`${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`, { replace: true });
+        navigate(
+          `${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`,
+          { replace: true },
+        );
       }
     }
-  }, [user, listing, profileCompletion, profileCompletionLoading, searchParams, setSearchParams, navigate]);
+  }, [
+    user,
+    listing,
+    profileCompletion,
+    profileCompletionLoading,
+    searchParams,
+    setSearchParams,
+    navigate,
+  ]);
 
   // Handle make offer
   const handleMakeOffer = () => {
     if (!user) {
       // Store the current URL with openOffer flag for redirect after login
       const returnUrl = `${window.location.pathname}?openOffer=true`;
-      navigate(`${ROUTES.AUTH.INDEX}?tab=login&returnUrl=${encodeURIComponent(returnUrl)}`);
+      navigate(
+        `${ROUTES.AUTH.INDEX}?tab=login&returnUrl=${encodeURIComponent(returnUrl)}`,
+      );
     } else {
       // Check if profile is complete
       if (profileCompletion?.is_complete) {
@@ -90,7 +126,9 @@ const Details = () => {
       } else {
         // Profile is not complete, redirect to profile setup with return URL
         const returnUrl = `${window.location.pathname}?openOffer=true`;
-        navigate(`${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`);
+        navigate(
+          `${ROUTES.CLIENT.PROFILE_SETUP}?returnUrl=${encodeURIComponent(returnUrl)}`,
+        );
       }
     }
   };
@@ -98,19 +136,21 @@ const Details = () => {
   // Handle status toggle
   const handleStatusToggle = async () => {
     if (!listing) return;
-    const newStatus = listing.status === 'active' ? 'draft' : 'active';
+    const newStatus = listing.status === "active" ? "draft" : "active";
     try {
       await updateStatus({ id: listing.id, new_status: newStatus }).unwrap();
 
       toast({
-        title: 'Success',
-        description: `Listing ${newStatus === 'active' ? 'published' : 'unpublished'} successfully`,
+        title: "Success",
+        description: `Listing ${newStatus === "active" ? "published" : "unpublished"} successfully`,
       });
     } catch (error: unknown) {
       toast({
-        title: 'Error',
-        description: (error as ApiError)?.data?.detail || 'Failed to update listing status',
-        variant: 'destructive',
+        title: "Error",
+        description:
+          (error as ApiError)?.data?.detail ||
+          "Failed to update listing status",
+        variant: "destructive",
       });
     }
   };
@@ -149,74 +189,84 @@ const Details = () => {
   }
 
   return (
-    <div className="min-h-screen container mx-auto">
-      <div className="space-y-6 p-6">
+    <div>
+      <div className="space-y-6">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2">
           <ReturnBack label="Back" />
           <span className="text-muted-foreground">•</span>
-          <span className="text-sm text-muted-foreground">
-            {listing.title}
-          </span>
+          <span className="text-sm text-muted-foreground">{listing.title}</span>
         </div>
 
         {/* Premium Header - Subtle Design */}
         <div className="relative overflow-hidden rounded-xl bg-primary/10 border border-border/50 p-6 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted/50 border border-border">
-                <Package className="h-5 w-5 text-muted-foreground" />
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted/50 border border-border max-sm:hidden">
+                  <Package className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <h1 className="md:text-2xl text-xl font-semibold tracking-tight mb-1 text-foreground">
+                    {listing.title}
+                  </h1>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight mb-1 text-foreground">
-                  {listing.title}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Listing Details and Management
-                </p>
-              </div>
-            </div>
-            {user && listing.seller_id === user.id && (
-              <div className="flex gap-2">
-                {listing && (
+              {user && listing.seller_id === user.id && (
+                <div className="flex gap-2">
+                  {listing && (
+                    <Button
+                      variant={
+                        listing.status === "active" ? "outline" : "default"
+                      }
+                      onClick={handleStatusToggle}
+                      disabled={isUpdatingStatus}
+                      size="sm"
+                    >
+                      {isUpdatingStatus ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      ) : (
+                        <Power className="w-3.5 h-3.5 mr-2" />
+                      )}
+                      {listing.status === "active" ? "Unpublish" : "Publish"}
+                    </Button>
+                  )}
                   <Button
-                    variant={listing.status === 'active' ? 'outline' : 'default'}
-                    onClick={handleStatusToggle}
-                    disabled={isUpdatingStatus}
+                    variant="outline"
                     size="sm"
+                    onClick={() => setEditModalOpen(true)}
                   >
-                    {isUpdatingStatus ? (
-                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-                    ) : (
-                      <Power className="w-3.5 h-3.5 mr-2" />
-                    )}
-                    {listing.status === 'active' ? 'Unpublish' : 'Publish'}
+                    <Edit className="w-3.5 h-3.5 mr-2" />
+                    Edit Listing
                   </Button>
-                )}
-                <Button variant="outline" size="sm" onClick={() => setEditModalOpen(true)}>
-                  <Edit className="w-3.5 h-3.5 mr-2" />
-                  Edit Listing
-                </Button>
-                <Button variant="destructive" size="sm">
-                  <Trash2 className="w-3.5 h-3.5 mr-2" />
-                  Delete
-                </Button>
-              </div>
-            )}
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="w-3.5 h-3.5 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Listing Details and Management
+            </p>
           </div>
         </div>
 
         {/* Stats Cards - Subtle Design */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Listing Price</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Listing Price
+                  </p>
                   <p className="text-xl font-semibold text-foreground">
                     {formatCurrency(listing.price)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{listing.currency}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {listing.currency}
+                  </p>
                 </div>
                 <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -229,7 +279,9 @@ const Details = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Total Views</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Total Views
+                  </p>
                   <p className="text-xl font-semibold text-foreground">
                     {formatNumber(listing.view_count)}
                   </p>
@@ -246,7 +298,9 @@ const Details = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Favorites</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Favorites
+                  </p>
                   <p className="text-xl font-semibold text-foreground">
                     {formatNumber(listing.favorite_count)}
                   </p>
@@ -269,7 +323,7 @@ const Details = () => {
                     className={cn(
                       "capitalize text-xs font-medium px-2 py-0.5 mt-1",
                       getStatusColor(listing.status),
-                      "text-white border-0"
+                      "text-white border-0",
                     )}
                   >
                     {getStatusLabel(listing.status, t)}
@@ -294,13 +348,17 @@ const Details = () => {
                     <Package className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-semibold">Listing Information</CardTitle>
-                    <CardDescription className="text-xs">Complete details about this listing</CardDescription>
+                    <CardTitle className="text-lg font-semibold">
+                      Listing Information
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Complete details about this listing
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-4 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {/* Listing Type */}
                   <div className="p-3 rounded-lg bg-muted/30 border border-border">
                     <div className="flex items-center gap-2 mb-1">
@@ -327,7 +385,7 @@ const Details = () => {
                       className={cn(
                         "capitalize text-xs font-medium px-2 py-0.5",
                         getStatusColor(listing.status),
-                        "text-white border-0"
+                        "text-white border-0",
                       )}
                     >
                       {getStatusLabel(listing.status, t)}
@@ -345,7 +403,9 @@ const Details = () => {
                     <p className="text-sm font-semibold text-foreground">
                       {formatCurrency(listing.price)}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{listing.currency}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {listing.currency}
+                    </p>
                   </div>
 
                   {/* Featured */}
@@ -357,7 +417,10 @@ const Details = () => {
                           Featured
                         </label>
                       </div>
-                      <Badge variant="default" className="bg-gradient-to-r from-primary to-secondary text-xs">
+                      <Badge
+                        variant="default"
+                        className="bg-gradient-to-r from-primary to-secondary text-xs"
+                      >
                         <Star className="w-3 h-3 mr-1" />
                         Featured Listing
                       </Badge>
@@ -413,7 +476,8 @@ const Details = () => {
             </Card>
 
             {/* Performance Metrics - Clean Design */}
-            {(listing.website_traffic_monthly > 0 || listing.domain_authority) && (
+            {(listing.website_traffic_monthly > 0 ||
+              listing.domain_authority) && (
               <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
                 <CardHeader className="border-b border-border bg-secondary/10">
                   <div className="flex items-center gap-2">
@@ -421,8 +485,12 @@ const Details = () => {
                       <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-semibold">Performance Metrics</CardTitle>
-                      <CardDescription className="text-xs">Key performance indicators</CardDescription>
+                      <CardTitle className="text-lg font-semibold">
+                        Performance Metrics
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Key performance indicators
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -468,8 +536,12 @@ const Details = () => {
                       <Globe className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-semibold">Asset Details</CardTitle>
-                      <CardDescription className="text-xs">Domain and website information</CardDescription>
+                      <CardTitle className="text-lg font-semibold">
+                        Asset Details
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Domain and website information
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -485,7 +557,8 @@ const Details = () => {
                         </div>
                         <CopyToClipboard textToCopy={listing.domain_name}>
                           <p className="text-sm font-semibold text-foreground">
-                            {listing.domain_name}{listing.domain_extension}
+                            {listing.domain_name}
+                            {listing.domain_extension}
                           </p>
                         </CopyToClipboard>
                       </div>
@@ -554,7 +627,8 @@ const Details = () => {
             )}
 
             {/* Financial Information - Clean Design */}
-            {(listing.website_revenue_monthly || listing.website_profit_monthly) && (
+            {(listing.website_revenue_monthly ||
+              listing.website_profit_monthly) && (
               <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
                 <CardHeader className="border-b border-border bg-secondary/10">
                   <div className="flex items-center gap-2">
@@ -562,8 +636,12 @@ const Details = () => {
                       <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-semibold">Financial Information</CardTitle>
-                      <CardDescription className="text-xs">Revenue and profit details</CardDescription>
+                      <CardTitle className="text-lg font-semibold">
+                        Financial Information
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Revenue and profit details
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -669,7 +747,9 @@ const Details = () => {
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg font-semibold">Timeline</CardTitle>
+                  <CardTitle className="text-lg font-semibold">
+                    Timeline
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-4 space-y-3">
@@ -681,10 +761,10 @@ const Details = () => {
                     </label>
                   </div>
                   <p className="text-sm font-semibold text-foreground">
-                    {timeFormat(listing.created_at, 'MMM DD, YYYY')}
+                    {timeFormat(listing.created_at, "MMM DD, YYYY")}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {timeFormat(listing.created_at, 'HH:mm')}
+                    {timeFormat(listing.created_at, "HH:mm")}
                   </p>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border border-border">
@@ -695,10 +775,10 @@ const Details = () => {
                     </label>
                   </div>
                   <p className="text-sm font-semibold text-foreground">
-                    {timeFormat(listing.updated_at, 'MMM DD, YYYY')}
+                    {timeFormat(listing.updated_at, "MMM DD, YYYY")}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {timeFormat(listing.updated_at, 'HH:mm')}
+                    {timeFormat(listing.updated_at, "HH:mm")}
                   </p>
                 </div>
                 {listing.expires_at && (
@@ -710,10 +790,10 @@ const Details = () => {
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground">
-                      {timeFormat(listing.expires_at, 'MMM DD, YYYY')}
+                      {timeFormat(listing.expires_at, "MMM DD, YYYY")}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {timeFormat(listing.expires_at, 'HH:mm')}
+                      {timeFormat(listing.expires_at, "HH:mm")}
                     </p>
                   </div>
                 )}
@@ -726,7 +806,7 @@ const Details = () => {
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground">
-                      {timeFormat(listing.sold_at, 'MMM DD, YYYY')}
+                      {timeFormat(listing.sold_at, "MMM DD, YYYY")}
                     </p>
                     {listing.sold_price && (
                       <p className="text-sm font-semibold text-green-600 mt-0.5">
@@ -745,7 +825,9 @@ const Details = () => {
                   <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                     <User className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg font-semibold">Seller Information</CardTitle>
+                  <CardTitle className="text-lg font-semibold">
+                    Seller Information
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-4">

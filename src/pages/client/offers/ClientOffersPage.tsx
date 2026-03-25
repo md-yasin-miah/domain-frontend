@@ -1,6 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -63,6 +65,11 @@ import { cn } from "@/lib/utils";
 import { usePagination } from "@/hooks/usePagination";
 import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/lib/routes";
+import { getClientOffersListTutorialSteps } from "@/lib/offerTutorialDrive";
+import {
+  clearClientOffersTutorialPendingOnly,
+  CLIENT_OFFERS_TUTORIAL_PENDING_KEY,
+} from "@/lib/tutorialStorage";
 import CustomTooltip from "@/components/common/CustomTooltip";
 import { offerCounterSchema, type OfferCounterFormData } from "@/schemas/marketplace/offer.schema";
 
@@ -78,6 +85,8 @@ const ClientOffersPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const listTutorialStartedRef = useRef(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OfferStatus | "all">("all");
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
@@ -127,6 +136,41 @@ const ClientOffersPage = () => {
   } = useOfferActions({
     onSuccess: () => refetch(),
   });
+
+  useEffect(() => {
+    const fromQuery = searchParams.get("tutorial") === "offer";
+    const fromPending =
+      localStorage.getItem(CLIENT_OFFERS_TUTORIAL_PENDING_KEY) === "1";
+    if (!fromQuery && !fromPending) return;
+
+    listTutorialStartedRef.current = false;
+
+    const timer = window.setTimeout(() => {
+      if (listTutorialStartedRef.current) return;
+      listTutorialStartedRef.current = true;
+      const guide = driver({
+        showProgress: true,
+        allowClose: true,
+        nextBtnText: "Next",
+        prevBtnText: "Back",
+        doneBtnText: "Done",
+        steps: getClientOffersListTutorialSteps(),
+        onDestroyed: () => {
+          clearClientOffersTutorialPendingOnly();
+          if (fromQuery) {
+            const next = new URLSearchParams(searchParams);
+            next.delete("tutorial");
+            setSearchParams(next, { replace: true });
+          }
+        },
+      });
+      guide.drive();
+    }, 400);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [searchParams, setSearchParams]);
 
   // Define table columns
   const columns: ColumnDef<Offer>[] = useMemo(() => {
@@ -358,7 +402,10 @@ const ClientOffersPage = () => {
       <Card>
         <CardHeader>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="col-span-12 md:col-span-6 flex flex-col gap-2">
+            <div
+              className="col-span-12 md:col-span-6 flex flex-col gap-2"
+              data-tour="offers-page-header"
+            >
               <CardTitle>{t("offers.all_offers")}</CardTitle>
               <CardDescription>
                 {t("offers.description")}{" "}
@@ -371,7 +418,10 @@ const ClientOffersPage = () => {
             {/* Filters and Search */}
             <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-                <div className="flex-1 w-full md:w-auto">
+                <div
+                  className="flex-1 w-full md:w-auto"
+                  data-tour="offers-search"
+                >
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -385,7 +435,10 @@ const ClientOffersPage = () => {
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div
+                  className="flex items-center gap-2"
+                  data-tour="offers-status-filter"
+                >
                   <Select
                     value={statusFilter}
                     onValueChange={(value) => {
@@ -424,7 +477,10 @@ const ClientOffersPage = () => {
         </CardHeader>
         <CardContent>
           {error ? (
-            <div className="flex items-center justify-center py-12">
+            <div
+              data-tour="offers-table"
+              className="flex items-center justify-center py-12"
+            >
               <div className="flex flex-col items-center gap-4 text-center">
                 <Handshake className="w-16 h-16 text-muted-foreground" />
                 <div>
@@ -438,6 +494,7 @@ const ClientOffersPage = () => {
               </div>
             </div>
           ) : (
+            <div data-tour="offers-table">
             <DataTableWithPagination
               data={offersData?.items || []}
               columns={columns}
@@ -457,6 +514,7 @@ const ClientOffersPage = () => {
               errorDescription={t("offers.error.description")}
               errorIcon={<Handshake className="w-16 h-16 text-muted-foreground" />}
             />
+            </div>
           )}
         </CardContent>
       </Card>

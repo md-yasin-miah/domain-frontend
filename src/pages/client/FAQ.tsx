@@ -75,7 +75,7 @@ export default function FAQ({ publicPage = false }: { publicPage?: boolean }) {
   const uncategorizedFAQs = faqs.filter((faq) => !faq.category);
 
   return (
-    <div className="container mx-auto max-w-4xl">
+    <div className="md:container mx-auto md:max-w-4xl">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-3xl">
