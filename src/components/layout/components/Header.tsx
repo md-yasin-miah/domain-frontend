@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import CurrencySwitcher from "@/components/CurrencySwitcher";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
@@ -225,22 +225,12 @@ export function Header({
               /* Enhanced User Menu */
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`flex items-center space-x-2 px-3 py-2 border transition-all bg-gray-100 ${
-                      isUserMenuActive()
-                        ? "bg-primary/10 text-primary border-primary/20"
-                        : "hover:bg-muted/60 border-transparent"
-                    }`}
-                  >
-                    <Avatar className="w-7 h-7">
+                    <Avatar className="w-9 h-9 cursor-pointer">
                       <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
                         {user.email?.charAt(0).toUpperCase()}
                       </AvatarFallback>
+                      <AvatarImage src={user?.profile?.avatar_url} />
                     </Avatar>
-                    <ChevronDown className="w-3 h-3 hidden sm:block transition-transform data-[state=open]:rotate-180" />
-                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
@@ -453,48 +443,6 @@ export function Header({
                   </Link>
                 );
               })}
-
-              {/* User Services - If Logged In */}
-              {/* {user && userServices && userServices.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider px-2">
-                    {t("nav.profile") || "Mis Servicios"}
-                  </h3>
-                  <div className="space-y-1">
-                    {userServices.map((item) => {
-                      const isActive = location.pathname === item.url;
-                      return (
-                        <Link
-                          key={item.title}
-                          to={item.url}
-                          className={`flex items-center space-x-3 px-4 py-3 text-sm rounded-xl transition-all ${
-                            isActive
-                              ? "bg-primary/10 text-primary border border-primary/20"
-                              : "bg-primary/5 hover:bg-primary/10 border border-primary/20"
-                          }`}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <div
-                            className={`p-2 rounded-lg shrink-0 ${
-                              isActive ? "bg-primary/20" : "bg-primary/10"
-                            }`}
-                          >
-                            <item.icon className="w-4 h-4 text-primary" />
-                          </div>
-                          <span
-                            className={`font-medium ${
-                              isActive ? "text-primary" : ""
-                            }`}
-                          >
-                            {item.title}
-                          </span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )} */}
-
               {/* Authentication Buttons - Mobile Only */}
               {!user && (
                 <div className="pt-4 border-t border-border/40">

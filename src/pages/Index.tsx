@@ -60,9 +60,9 @@ const Index = () => {
     ? ["futuro", "presente", "poder", "éxito"]
     : ["future", "present", "power", "success"];
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
       {/* Hero Banner - Futuristic Commerce */}
-      <section className="relative min-h-screen py-16 flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[92vh] sm:min-h-screen py-14 sm:py-16 flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
@@ -71,15 +71,16 @@ const Index = () => {
             className="w-full h-full object-cover"
           />
           {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute inset-0 bg-black/60"></div>
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-secondary/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-black/35 to-secondary/20"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_35%),radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.08),transparent_40%)]" />
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <div className="animate-fade-in">
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-roboto font-black text-white mb-8 tracking-tight leading-none">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-roboto font-black text-white mb-6 sm:mb-8 tracking-tight leading-[0.95]">
               {t("hero.title").includes("futuro") ? (
                 <>
                   El <FlipWords words={dynamicWords} className="text-primary" />{" "}
@@ -93,21 +94,21 @@ const Index = () => {
                 </>
               )}
             </h1>
-            <p className="text-xl md:text-3xl text-white/90 mb-8 font-roboto max-w-4xl mx-auto leading-relaxed font-light">
+            <p className="text-base sm:text-lg md:text-2xl text-white/90 mb-8 font-roboto max-w-4xl mx-auto leading-relaxed font-light">
               {t("hero.subtitle")}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-12">
               <Link
                 to="/auth"
-                className="btn-primary flex items-center space-x-3 text-xl px-12 py-4 shadow-2xl hover:shadow-primary/25"
+                className="btn-primary w-full sm:w-auto justify-center flex items-center space-x-3 text-base sm:text-lg px-7 sm:px-10 py-3.5 sm:py-4 shadow-2xl hover:shadow-primary/25"
               >
                 <Wallet className="w-6 h-6" />
                 <span>{t("hero.cta_start")}</span>
               </Link>
               <Link
                 to="/marketplace"
-                className="glass border-white/30 text-white hover:bg-white/20 flex items-center space-x-3 text-xl px-12 py-4 rounded-xl font-medium transition-all duration-300"
+                className="glass w-full sm:w-auto justify-center border-white/30 text-white hover:bg-white/20 flex items-center space-x-3 text-base sm:text-lg px-7 sm:px-10 py-3.5 sm:py-4 rounded-xl font-medium transition-all duration-300"
               >
                 <TrendingUp className="w-6 h-6" />
                 <span>{t("hero.cta_explore")}</span>
@@ -115,51 +116,51 @@ const Index = () => {
             </div>
 
             {/* Stats Banner */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
-              <div className="text-center animate-scale-in">
-                <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-10 sm:mt-16">
+              <div className="text-center animate-scale-in rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm p-4 sm:p-5">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-roboto font-black text-white mb-1 sm:mb-2">
                   $2.4M
                 </div>
-                <div className="text-white/80 font-roboto text-sm">
+                <div className="text-white/80 font-roboto text-xs sm:text-sm">
                   {t("stats.transactions")}
                 </div>
               </div>
               <div
-                className="text-center animate-scale-in"
+                className="text-center animate-scale-in rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm p-4 sm:p-5"
                 style={{ animationDelay: "0.1s" }}
               >
-                <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-roboto font-black text-white mb-1 sm:mb-2">
                   15K+
                 </div>
-                <div className="text-white/80 font-roboto text-sm">
+                <div className="text-white/80 font-roboto text-xs sm:text-sm">
                   {t("stats.users")}
                 </div>
               </div>
               <div
-                className="text-center animate-scale-in"
+                className="text-center animate-scale-in rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm p-4 sm:p-5"
                 style={{ animationDelay: "0.2s" }}
               >
-                <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-roboto font-black text-white mb-1 sm:mb-2">
                   2,247
                 </div>
-                <div className="text-white/80 font-roboto text-sm">
+                <div className="text-white/80 font-roboto text-xs sm:text-sm">
                   {t("stats.assets")}
                 </div>
               </div>
               <div
-                className="text-center animate-scale-in"
+                className="text-center animate-scale-in rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm p-4 sm:p-5"
                 style={{ animationDelay: "0.3s" }}
               >
-                <div className="text-3xl md:text-4xl font-roboto font-black text-white mb-2">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-roboto font-black text-white mb-1 sm:mb-2">
                   98%
                 </div>
-                <div className="text-white/80 font-roboto text-sm">
+                <div className="text-white/80 font-roboto text-xs sm:text-sm">
                   {t("stats.satisfaction")}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-center space-x-8 mt-12 text-white/80">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-8 sm:mt-12 text-white/80">
               <div className="flex items-center space-x-2">
                 <Bitcoin className="w-6 h-6 text-primary" />
                 <span className="font-roboto">
@@ -189,9 +190,9 @@ const Index = () => {
       </section>
 
       {/* Trust Indicators Section */}
-      <section className="py-24 px-6 bg-background">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-background">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-slide-up">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 animate-slide-up">
             <div className="card-professional text-center group">
               <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Shield className="w-8 h-8 text-primary" />
@@ -230,18 +231,18 @@ const Index = () => {
       </section>
 
       {/* Categories Section - Professional Layout */}
-      <section className="py-24 px-6">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-5xl font-roboto font-black text-foreground mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-roboto font-black text-foreground mb-4 sm:mb-6">
               {t("categories.title")}
             </h2>
-            <p className="text-xl text-muted-foreground font-roboto max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-roboto max-w-3xl mx-auto">
               {t("categories.subtitle")}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-slide-up">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 lg:gap-8 animate-slide-up">
             {listingTypes.length > 0
               ? listingTypes.map((type) => {
                   const Icon = slugToIcon[type.slug] ?? Globe;
@@ -249,16 +250,16 @@ const Index = () => {
                     <Link
                       key={type.id}
                       to={ROUTES.APP.CATEGORIES.BY_SLUG(type.slug)}
-                      className="card-professional group cursor-pointer hover:scale-105 transition-all duration-300"
+                      className="card-professional group cursor-pointer hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
                     >
-                      <div className="w-20 h-20 bg-gradient-to-br from-primary to secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-6 sm:mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                         <Icon className="w-10 h-10 text-white" />
                       </div>
-                      <h3 className="text-xl font-roboto font-bold mb-4 group-hover:text-primary transition-colors">
+                      <h3 className="text-lg sm:text-xl font-roboto font-bold mb-3 sm:mb-4 group-hover:text-primary transition-colors">
                         {type.name}
                       </h3>
                       {type.description && (
-                        <p className="text-muted-foreground font-roboto mb-6 leading-relaxed text-sm">
+                        <p className="text-muted-foreground font-roboto mb-4 sm:mb-6 leading-relaxed text-sm">
                           {type.description}
                         </p>
                       )}
@@ -277,18 +278,18 @@ const Index = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-24 px-6 bg-muted/30">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-roboto font-black text-foreground mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-roboto font-black text-foreground mb-4 sm:mb-6">
               {t("how_it_works.title")}
             </h2>
-            <p className="text-xl text-muted-foreground font-roboto max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-roboto max-w-3xl mx-auto">
               {t("how_it_works.subtitle")}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6">
                 <UserCheck className="w-10 h-10 text-white" />
@@ -329,13 +330,13 @@ const Index = () => {
       </section>
 
       {/* Requirements Section */}
-      <section className="py-24 px-6">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-roboto font-black text-foreground mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-roboto font-black text-foreground mb-4 sm:mb-6">
               {t("requirements.title", "Requirements to participate")}
             </h2>
-            <p className="text-lg text-muted-foreground font-roboto max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground font-roboto max-w-2xl mx-auto">
               {t(
                 "requirements.subtitle",
                 "What you need to buy or sell domains, websites, and digital assets on our marketplace.",
@@ -343,7 +344,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
             {/* For Buyers */}
             <div className="card-professional">
               <h3 className="text-3xl font-roboto font-bold mb-8 text-primary">
@@ -406,16 +407,16 @@ const Index = () => {
       </section>
 
       {/* Payment Methods */}
-      <section className="py-24 px-6 bg-muted/30">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-roboto font-black text-foreground mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-roboto font-black text-foreground mb-4 sm:mb-6">
             {t("payments.title")}
           </h2>
-          <p className="text-xl text-muted-foreground font-roboto max-w-3xl mx-auto mb-16">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-roboto max-w-3xl mx-auto mb-10 sm:mb-16">
             {t("payments.subtitle")}
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             <div className="card-professional text-center">
               <Bitcoin className="w-12 h-12 text-primary mx-auto mb-4" />
               <h4 className="font-roboto font-bold">{t("payments.bitcoin")}</h4>
@@ -447,13 +448,13 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="card-professional animate-scale-in">
-            <h2 className="text-4xl md:text-5xl font-roboto font-black text-foreground mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-roboto font-black text-foreground mb-4 sm:mb-6">
               {t("cta.title")}
             </h2>
-            <p className="text-xl text-muted-foreground mb-10 font-roboto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10 font-roboto">
               {t("cta.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -463,19 +464,15 @@ const Index = () => {
                   <span>{t("cta.register")}</span>
                 </button>
               </Link>
-              {/* <button className="btn-secondary text-lg flex items-center space-x-3">
-                <Play className="w-5 h-5" />
-                <span>{t("cta.demo")}</span>
-              </button> */}
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-6 bg-muted/30">
+      <section className="py-14 sm:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
             <div className="animate-fade-in">
               <div className="text-4xl font-roboto font-black text-primary mb-2">
                 2,247
