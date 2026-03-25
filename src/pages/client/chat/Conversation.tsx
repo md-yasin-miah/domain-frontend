@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
   Send,
@@ -16,11 +16,11 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
-} from 'lucide-react';
-import { timeFormat } from '@/lib/helperFun';
-import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
-import { ROUTES } from '@/lib/routes';
+} from "lucide-react";
+import { timeFormat } from "@/lib/helperFun";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import { ROUTES } from "@/lib/routes";
 import {
   useGetConversationQuery,
   useGetMessagesQuery,
@@ -28,10 +28,10 @@ import {
   useMarkMessageAsReadMutation,
   useSyncMessagesMutation,
   useUpdateActivityMutation,
-} from '@/store/api/messagingApi';
-import { useAppSelector } from '@/store/hooks';
-import { useToast } from '@/hooks/use-toast';
-import { extractErrorMessage } from '@/lib/errorHandler';
+} from "@/store/api/messagingApi";
+import { useAppSelector } from "@/store/hooks";
+import { useToast } from "@/hooks/use-toast";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 // Polling intervals (in milliseconds)
 const MESSAGE_POLL_INTERVAL = 5000; // Poll messages every 5 seconds (reduced server load)
@@ -44,7 +44,7 @@ const Conversation = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const currentUser = useAppSelector((state) => state.auth.user);
-  const [messageContent, setMessageContent] = useState('');
+  const [messageContent, setMessageContent] = useState("");
   const [isTabVisible, setIsTabVisible] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -53,14 +53,16 @@ const Conversation = () => {
   const conversationId = Number(id);
 
   // Fetch conversation details
-  const { data: conversation, isLoading: isLoadingConversation } = useGetConversationQuery(
-    conversationId,
-    { skip: !conversationId }
-  );
+  const { data: conversation, isLoading: isLoadingConversation } =
+    useGetConversationQuery(conversationId, { skip: !conversationId });
 
   // Fetch all messages with polling enabled
   // Polling pauses when tab is hidden to reduce server load
-  const { data: messagesData, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery(
+  const {
+    data: messagesData,
+    isLoading: isLoadingMessages,
+    refetch: refetchMessages,
+  } = useGetMessagesQuery(
     {
       conversationId,
       params: { skip: 0, limit: 1000 }, // Fetch all messages (backend supports up to 1000)
@@ -68,10 +70,12 @@ const Conversation = () => {
     {
       skip: !conversationId,
       // Adaptive polling: faster when tab is visible, slower when hidden
-      pollingInterval: isTabVisible ? MESSAGE_POLL_INTERVAL : MESSAGE_POLL_INTERVAL_SLOW,
+      pollingInterval: isTabVisible
+        ? MESSAGE_POLL_INTERVAL
+        : MESSAGE_POLL_INTERVAL_SLOW,
       // Pause polling when tab is not visible (reduces server load)
       skipPollingIfUnfocused: true,
-    }
+    },
   );
 
   const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
@@ -83,7 +87,7 @@ const Conversation = () => {
   const messages = React.useMemo(() => {
     if (!messagesData) return [];
     if (Array.isArray(messagesData)) return messagesData;
-    if ('items' in messagesData) return messagesData.items;
+    if ("items" in messagesData) return messagesData.items;
     return [];
   }, [messagesData]);
 
@@ -102,11 +106,11 @@ const Conversation = () => {
       setIsTabVisible(!document.hidden);
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     setIsTabVisible(!document.hidden);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -116,14 +120,14 @@ const Conversation = () => {
 
     // Update activity immediately
     updateActivity(conversationId).catch((error) => {
-      console.error('Error updating activity:', error);
+      console.error("Error updating activity:", error);
     });
 
     // Then update every 10-15 seconds
     activityUpdateIntervalRef.current = setInterval(() => {
       if (isTabVisible) {
         updateActivity(conversationId).catch((error) => {
-          console.error('Error updating activity:', error);
+          console.error("Error updating activity:", error);
         });
       }
     }, ACTIVITY_UPDATE_INTERVAL);
@@ -144,17 +148,17 @@ const Conversation = () => {
       try {
         await syncMessages(conversationId).unwrap();
       } catch (error) {
-        console.error('Error syncing messages:', error);
+        console.error("Error syncing messages:", error);
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       // Also sync when component unmounts
       syncMessages(conversationId).catch((error) => {
-        console.error('Error syncing messages on unmount:', error);
+        console.error("Error syncing messages on unmount:", error);
       });
     };
   }, [conversationId, syncMessages]);
@@ -168,14 +172,14 @@ const Conversation = () => {
   useEffect(() => {
     if (messages.length > 0 && currentUser) {
       const unreadMessages = messages.filter(
-        (msg) => !msg.is_read && msg.sender_id !== currentUser.id
+        (msg) => !msg.is_read && msg.sender_id !== currentUser.id,
       );
 
       if (unreadMessages.length > 0) {
         // Mark each message as read via REST API
         unreadMessages.forEach((msg) => {
           markAsRead({ messageId: msg.id, conversationId }).catch((error) => {
-            console.error('Error marking message as read:', error);
+            console.error("Error marking message as read:", error);
           });
         });
       }
@@ -184,10 +188,11 @@ const Conversation = () => {
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
     } else {
       // Fallback to scrollIntoView if container ref is not available
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -195,7 +200,7 @@ const Conversation = () => {
     if (!messageContent.trim() || isSending) return;
 
     const content = messageContent.trim();
-    setMessageContent('');
+    setMessageContent("");
 
     try {
       await sendMessage({
@@ -209,12 +214,13 @@ const Conversation = () => {
     } catch (error: unknown) {
       // Use the error handler utility to properly extract error messages
       // This handles validation errors (arrays of objects) and other error formats
-      const errorMessage = extractErrorMessage(error) || 'Failed to send message';
+      const errorMessage =
+        extractErrorMessage(error) || "Failed to send message";
 
       toast({
-        title: 'Error',
+        title: "Error",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
 
       // Restore message content on error
@@ -223,7 +229,7 @@ const Conversation = () => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -278,7 +284,9 @@ const Conversation = () => {
             </div>
             <div className="flex flex-col">
               <span className="font-semibold">
-                {otherParticipant?.username || otherParticipant?.email || 'Unknown User'}
+                {otherParticipant?.username ||
+                  otherParticipant?.email ||
+                  "Unknown User"}
               </span>
               {conversation.listing && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -298,14 +306,16 @@ const Conversation = () => {
             </Badge>
           </div>
           {conversation.listing && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/marketplace/${conversation.listing?.slug}`)}
+            <Link
+              to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(
+                conversation.listing?.slug,
+              )}
             >
-              <Package className="w-4 h-4 mr-2" />
-              View Listing
-            </Button>
+              <Button variant="outline" size="sm">
+                <Package className="w-4 h-4 mr-2" />
+                View Listing
+              </Button>
+            </Link>
           )}
         </div>
       </div>
@@ -334,8 +344,8 @@ const Conversation = () => {
               <div
                 key={message.id}
                 className={cn(
-                  'flex gap-3',
-                  isOwnMessage ? 'justify-end' : 'justify-start'
+                  "flex gap-3",
+                  isOwnMessage ? "justify-end" : "justify-start",
                 )}
               >
                 {/* Avatar (only for received messages) */}
@@ -350,8 +360,8 @@ const Conversation = () => {
                 {/* Message Content */}
                 <div
                   className={cn(
-                    'flex flex-col gap-1 max-w-[70%]',
-                    isOwnMessage ? 'items-end' : 'items-start'
+                    "flex flex-col gap-1 max-w-[70%]",
+                    isOwnMessage ? "items-end" : "items-start",
                   )}
                 >
                   {/* Sender Name (only for received messages) */}
@@ -364,13 +374,15 @@ const Conversation = () => {
                   {/* Message Bubble */}
                   <div
                     className={cn(
-                      'rounded-lg px-4 py-2 shadow-sm',
+                      "rounded-lg px-4 py-2 shadow-sm",
                       isOwnMessage
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-card border text-foreground'
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card border text-foreground",
                     )}
                   >
-                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words">
+                      {message.content}
+                    </p>
 
                     {/* Attachments */}
                     {message.attachments && message.attachments.length > 0 && (
@@ -380,7 +392,7 @@ const Conversation = () => {
                             key={attachment.id}
                             className="flex items-center gap-2 p-2 rounded bg-background/50"
                           >
-                            {attachment.file_type?.startsWith('image/') ? (
+                            {attachment.file_type?.startsWith("image/") ? (
                               <ImageIcon className="h-4 w-4" />
                             ) : (
                               <Paperclip className="h-4 w-4" />
@@ -402,11 +414,13 @@ const Conversation = () => {
                   {/* Timestamp and Read Status */}
                   <div
                     className={cn(
-                      'flex items-center gap-2 text-xs text-muted-foreground px-2',
-                      isOwnMessage ? 'flex-row-reverse' : 'flex-row'
+                      "flex items-center gap-2 text-xs text-muted-foreground px-2",
+                      isOwnMessage ? "flex-row-reverse" : "flex-row",
                     )}
                   >
-                    <span>{timeFormat(message.created_at, 'MMM DD, HH:mm')}</span>
+                    <span>
+                      {timeFormat(message.created_at, "MMM DD, HH:mm")}
+                    </span>
                     {isOwnMessage && (
                       <span>
                         {message.is_read ? (

@@ -50,8 +50,8 @@ export const ROUTES = {
       ROOT: "/client/marketplace",
       MY_LISTINGS: "/client/marketplace/my-listings",
       MY_LISTINGS_CREATE: "/client/marketplace/my-listings/create",
-      MY_LISTINGS_DETAILS: (id: number) =>
-        `/client/marketplace/my-listings/${id}`,
+      MY_LISTINGS_DETAILS: (slug: string) =>
+        `/client/marketplace/my-listings/${slug}`,
       PRODUCTS_VERIFICATION: "/client/marketplace/products-verification",
       PRODUCTS_VERIFICATION_DETAILS: (id: number) =>
         `/client/marketplace/products-verification/${id}`,

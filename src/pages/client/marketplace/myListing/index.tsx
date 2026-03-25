@@ -362,7 +362,7 @@ const MyListing = () => {
         emptyIcon={<Package className="w-16 h-16" />}
         enableSorting={true}
         onRowClick={(row) =>
-          navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id))
+          navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.slug))
         }
         renderActions={(row) => (
           <DropdownMenu>
@@ -377,7 +377,7 @@ const MyListing = () => {
               <DropdownMenuItem
                 onClick={() =>
                   navigate(
-                    ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.id),
+                    ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(row.slug),
                   )
                 }
               >

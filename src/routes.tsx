@@ -588,7 +588,7 @@ export const router = createBrowserRouter([
                 ),
               },
               {
-                path: ":id",
+                path: ":slug",
                 element: (
                   <LazyComponent>
                     <MyListingDetails />

@@ -26,7 +26,7 @@ import {
   Sparkles,
   Clock
 } from 'lucide-react';
-import { useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
+import { useGetMarketplaceListingBySlugQuery, useGetMarketplaceListingQuery, useUpdateMarketplaceListingStatusMutation } from '@/store/api/marketplaceApi';
 import { formatCurrency, formatNumber, getStatusColor, getStatusLabel, timeFormat, getStatusBadgeVariant } from '@/lib/helperFun';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -41,12 +41,12 @@ import { ROUTES } from '@/lib/routes';
 import { useGetProfileCompletionQuery } from '@/store/api/profileApi';
 
 const Details = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const { t } = useTranslation();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: listing, isLoading, error } = useGetMarketplaceListingQuery(Number(id));
+  const { data: listing, isLoading, error } = useGetMarketplaceListingBySlugQuery(slug);
   const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateMarketplaceListingStatusMutation();
   const [makeOfferModalOpen, setMakeOfferModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -153,7 +153,7 @@ const Details = () => {
       <div className="space-y-6 p-6">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2">
-          <ReturnBack label="Back to My Listings" />
+          <ReturnBack label="Back" />
           <span className="text-muted-foreground">•</span>
           <span className="text-sm text-muted-foreground">
             {listing.title}
@@ -777,35 +777,6 @@ const Details = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Additional Actions - Clean Design */}
-            {/* <Card className="border border-border/50 bg-card shadow-sm overflow-hidden">
-              <CardHeader className="border-b border-border bg-secondary/10">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
-                    <Sparkles className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold">Additional Actions</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 space-y-2">
-                <Button variant="outline" className="w-full justify-start" size="sm">
-                  <Eye className="w-3.5 h-3.5 mr-2" />
-                  View Public Page
-                  <ExternalLink className="w-3.5 h-3.5 ml-auto" />
-                </Button>
-                <Button variant="outline" className="w-full justify-start" size="sm">
-                  <DollarSign className="w-3.5 h-3.5 mr-2" />
-                  View Offers
-                  <ExternalLink className="w-3.5 h-3.5 ml-auto" />
-                </Button>
-                <Button variant="outline" className="w-full justify-start" size="sm">
-                  <TrendingUp className="w-3.5 h-3.5 mr-2" />
-                  View Analytics
-                  <ExternalLink className="w-3.5 h-3.5 ml-auto" />
-                </Button>
-              </CardContent>
-            </Card> */}
           </div>
         </div>
       </div>
