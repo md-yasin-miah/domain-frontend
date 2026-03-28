@@ -1,9 +1,4 @@
-import { apiSlice } from './apiSlice';
-import type {
-  UserProfile,
-  ProfileCreateRequest,
-  ProfileCompletionResponse,
-} from './types';
+import { apiSlice } from "./apiSlice";
 
 // ClientProfile type from API response
 export interface ClientProfile {
@@ -35,40 +30,40 @@ export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getMyProfile: builder.query<ClientProfile, void>({
       query: () => ({
-        url: '/profile/me',
-        method: 'GET',
+        url: "/profile/me",
+        method: "GET",
       }),
-      providesTags: ['User'],
+      providesTags: ["User"],
     }),
     createProfile: builder.mutation<ClientProfile, ProfileCreateRequest>({
       query: (data) => ({
-        url: '/profile/me',
-        method: 'POST',
+        url: "/profile/me",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: ['User', 'Auth'],
+      invalidatesTags: ["User", "Auth"],
     }),
     updateProfile: builder.mutation<ClientProfile, Partial<ClientProfile>>({
       query: (data) => ({
-        url: '/profile/me',
-        method: 'PUT',
+        url: "/profile/me",
+        method: "PUT",
         body: data,
       }),
-      invalidatesTags: ['User', 'Auth'],
+      invalidatesTags: ["User", "Auth"],
     }),
     getProfileCompletion: builder.query<ProfileCompletionResponse, void>({
       query: () => ({
-        url: '/profile/me/completion',
-        method: 'GET',
+        url: "/profile/me/completion",
+        method: "GET",
       }),
-      providesTags: ['User'],
+      providesTags: ["User"],
     }),
     getPublicProfile: builder.query<ClientProfile, number>({
       query: (userId) => ({
         url: `/profile/${userId}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, userId) => [{ type: 'User', id: userId }],
+      providesTags: (result, error, userId) => [{ type: "User", id: userId }],
     }),
     updateUserProfileAdmin: builder.mutation<
       ClientProfile,
@@ -76,10 +71,13 @@ export const profileApi = apiSlice.injectEndpoints({
     >({
       query: ({ userId, data }) => ({
         url: `/profile/${userId}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, { userId }) => [{ type: 'User', id: userId }, 'User'],
+      invalidatesTags: (result, error, { userId }) => [
+        { type: "User", id: userId },
+        "User",
+      ],
     }),
   }),
 });
@@ -92,4 +90,3 @@ export const {
   useGetPublicProfileQuery,
   useUpdateUserProfileAdminMutation,
 } = profileApi;
-

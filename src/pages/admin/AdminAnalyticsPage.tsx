@@ -78,13 +78,13 @@ export default function AdminAnalyticsPage() {
             {t("admin.analytics.title", "Analytics")}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {t("admin.analytics.description", "Platform overview and key metrics.")}
+            {t(
+              "admin.analytics.description",
+              "Platform overview and key metrics.",
+            )}
           </p>
         </div>
-        <Select
-          value={String(days)}
-          onValueChange={(v) => setDays(Number(v))}
-        >
+        <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
           <SelectTrigger className="w-[160px]">
             <SelectValue />
           </SelectTrigger>
@@ -120,7 +120,7 @@ export default function AdminAnalyticsPage() {
                   {t("admin.analytics.registered_users")}
                 </p>
                 <Link
-                  to={ROUTES.ADMIN.USERS}
+                  to={ROUTES.ADMIN.USERS.LIST}
                   className="text-xs text-primary hover:underline mt-2 inline-block"
                 >
                   {t("admin.analytics.view_users")} →
@@ -186,7 +186,9 @@ export default function AdminAnalyticsPage() {
                   {formatCurrency(data.total_revenue)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {t("admin.analytics.platform_fees_period", { days: data.period_days })}
+                  {t("admin.analytics.platform_fees_period", {
+                    days: data.period_days,
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -228,7 +230,8 @@ export default function AdminAnalyticsPage() {
                 <p className="text-xs text-muted-foreground mt-1">
                   <span
                     className={cn(
-                      data.open_disputes > 0 && "text-amber-600 dark:text-amber-500 font-medium"
+                      data.open_disputes > 0 &&
+                        "text-amber-600 dark:text-amber-500 font-medium",
                     )}
                   >
                     {data.open_disputes} {t("admin.analytics.open")}
@@ -251,7 +254,9 @@ export default function AdminAnalyticsPage() {
                 {t("admin.analytics.summary")}
               </CardTitle>
               <CardDescription>
-                {t("admin.analytics.summary_description", { days: data.period_days })}
+                {t("admin.analytics.summary_description", {
+                  days: data.period_days,
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -260,19 +265,25 @@ export default function AdminAnalyticsPage() {
                   <span className="text-muted-foreground">
                     {t("admin.analytics.total_users")}
                   </span>
-                  <span className="font-medium">{formatNumber(data.total_users)}</span>
+                  <span className="font-medium">
+                    {formatNumber(data.total_users)}
+                  </span>
                 </li>
                 <li className="flex justify-between py-2 border-b">
                   <span className="text-muted-foreground">
                     {t("admin.analytics.active_listings")}
                   </span>
-                  <span className="font-medium">{formatNumber(data.active_listings)}</span>
+                  <span className="font-medium">
+                    {formatNumber(data.active_listings)}
+                  </span>
                 </li>
                 <li className="flex justify-between py-2 border-b">
                   <span className="text-muted-foreground">
                     {t("admin.analytics.completed_orders")}
                   </span>
-                  <span className="font-medium">{formatNumber(data.completed_orders)}</span>
+                  <span className="font-medium">
+                    {formatNumber(data.completed_orders)}
+                  </span>
                 </li>
                 <li className="flex justify-between py-2 border-b">
                   <span className="text-muted-foreground">
@@ -289,7 +300,8 @@ export default function AdminAnalyticsPage() {
                   <span
                     className={cn(
                       "font-medium",
-                      data.open_disputes > 0 && "text-amber-600 dark:text-amber-500"
+                      data.open_disputes > 0 &&
+                        "text-amber-600 dark:text-amber-500",
                     )}
                   >
                     {formatNumber(data.open_disputes)}

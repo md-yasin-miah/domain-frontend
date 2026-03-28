@@ -1,4 +1,4 @@
-import { apiSlice } from './apiSlice';
+import { apiSlice } from "./apiSlice";
 
 export interface PaymentOrderInfo {
   id: number;
@@ -62,73 +62,77 @@ export interface PaymentMethodInfo {
   requires_redirect: boolean;
 }
 
-export interface PaymentListResponse {
-  items: Payment[];
-  pagination: {
-    total: number;
-    page?: number;
-    page_size?: number;
-    total_pages?: number;
-    has_next?: boolean;
-    has_previous?: boolean;
-  };
-}
-
 export const paymentsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPayments: builder.query<PaymentListResponse, PaymentListParams | void>({
-      query: (params = {}) => ({
-        url: '/payments',
-        method: 'GET',
+    getPayments: builder.query<PaginatedResponse<Payment>, PaymentListParams>({
+      query: (params) => ({
+        url: "/payments",
+        method: "GET",
         params: {
           skip: params?.skip ?? 0,
           limit: params?.limit ?? 50,
           ...(params?.status && { status: params.status }),
-          ...(params?.payment_method && { payment_method: params.payment_method }),
+          ...(params?.payment_method && {
+            payment_method: params.payment_method,
+          }),
         },
       }),
       providesTags: (result) =>
         result
           ? [
-              ...result.items.map((p) => ({ type: 'Payment' as const, id: p.id })),
-              { type: 'Payment', id: 'LIST' },
+              ...result.items.map((p) => ({
+                type: "Payment" as const,
+                id: p.id,
+              })),
+              { type: "Payment", id: "LIST" },
             ]
-          : [{ type: 'Payment', id: 'LIST' }],
+          : [{ type: "Payment", id: "LIST" }],
     }),
     getPayment: builder.query<Payment, number>({
       query: (id) => ({
         url: `/payments/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'Payment', id }],
+      providesTags: (result, error, id) => [{ type: "Payment", id }],
     }),
     createPayment: builder.mutation<Payment, PaymentCreateRequest>({
       query: (data) => ({
-        url: '/payments',
-        method: 'POST',
+        url: "/payments",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: [{ type: 'Payment', id: 'LIST' }],
+      invalidatesTags: [{ type: "Payment", id: "LIST" }],
     }),
-    updatePayment: builder.mutation<Payment, { id: number; data: PaymentUpdateRequest }>({
+    updatePayment: builder.mutation<
+      Payment,
+      { id: number; data: PaymentUpdateRequest }
+    >({
       query: ({ id, data }) => ({
         url: `/payments/${id}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Payment', id }, { type: 'Payment', id: 'LIST' }],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Payment", id },
+        { type: "Payment", id: "LIST" },
+      ],
     }),
     getPaymentByOrder: builder.query<Payment | null, number>({
       query: (orderId) => ({
         url: `/payments/order/${orderId}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, orderId) => [{ type: 'Payment', id: `order-${orderId}` }],
+      providesTags: (result, error, orderId) => [
+        { type: "Payment", id: `order-${orderId}` },
+      ],
     }),
-    getPaymentMethods: builder.query<{ payment_methods: PaymentMethodInfo[] }, void>({
+    getPaymentMethods: builder.query<
+      { payment_methods: PaymentMethodInfo[] },
+      void
+    >({
       query: () => ({
-        url: '/payments/methods',
-        method: 'GET',
+        url: "/payments/methods",
+        method: "GET",
       }),
     }),
   }),

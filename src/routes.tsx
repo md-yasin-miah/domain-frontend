@@ -17,12 +17,12 @@ const ListingIndexByCategory = lazy(
 );
 const ListingDetailsBySlug = lazy(() => import("./pages/ListingDetailsBySlug"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Terminos = lazy(() => import("./pages/legal/Terminos"));
-const Privacidad = lazy(() => import("./pages/legal/Privacidad"));
-const AML = lazy(() => import("./pages/legal/AML"));
+const TermsConditions = lazy(() => import("./pages/legal/TermsConditions"));
+const PrivacyPolicy = lazy(() => import("./pages/legal/PrivacyPolicy"));
+const AMLKYCPolicy = lazy(() => import("./pages/legal/AMLKYCPolicy"));
 const Cookies = lazy(() => import("./pages/legal/Cookies"));
-const AvisoLegal = lazy(() => import("./pages/legal/AvisoLegal"));
-const ProteccionDatos = lazy(() => import("./pages/legal/ProteccionDatos"));
+const LegalNotice = lazy(() => import("./pages/legal/LegalNotice"));
+const DataProtection = lazy(() => import("./pages/legal/DataProtection"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const SellerDashboard = lazy(() => import("./pages/admin/SellerDashboard"));
 const BuyerDashboard = lazy(() => import("./pages/admin/BuyerDashboard"));
@@ -42,7 +42,6 @@ const AdminListingDetail = lazy(() => import("./pages/admin/ListingDetail"));
 const AdminConfig = lazy(() => import("./pages/admin/AdminConfig"));
 const AdminUsuarios = lazy(() => import("./pages/admin/AdminUsuarios"));
 const Trends = lazy(() => import("./pages/services/Trends"));
-const PremiumTrends = lazy(() => import("./pages/services/PremiumTrends"));
 const Brokers = lazy(() => import("./pages/services/Brokers"));
 const ReferralProgram = lazy(() => import("./pages/services/ReferralProgram"));
 const HelpAndGuidesPage = lazy(
@@ -58,8 +57,6 @@ const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
 const ClientProfile = lazy(() => import("./pages/client/ClientProfile"));
 const ProfileSetup = lazy(() => import("./pages/client/ProfileSetup"));
 const FAQ = lazy(() => import("./pages/client/FAQ"));
-const AdvancedSettings = lazy(() => import("./pages/admin/AdvancedSettings"));
-const SEOSettings = lazy(() => import("./pages/admin/SEOSettings"));
 const BackupSettings = lazy(() => import("./pages/admin/BackupSettings"));
 const BlogManager = lazy(() => import("./pages/admin/BlogManager"));
 const BlogPostCreateEdit = lazy(
@@ -248,82 +245,28 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      // Legal routes - Nested
+      // Legacy legal routes
       {
-        path: "legal",
-        children: [
-          {
-            path: "terminos",
-            element: (
-              <LazyComponent>
-                <Terminos />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "privacidad",
-            element: (
-              <LazyComponent>
-                <Privacidad />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "aml",
-            element: (
-              <LazyComponent>
-                <AML />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "cookies",
-            element: (
-              <LazyComponent>
-                <Cookies />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "aviso-legal",
-            element: (
-              <LazyComponent>
-                <AvisoLegal />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "proteccion-datos",
-            element: (
-              <LazyComponent>
-                <ProteccionDatos />
-              </LazyComponent>
-            ),
-          },
-        ],
-      },
-      // Legacy legal routes for backward compatibility
-      {
-        path: "terminos",
+        path: "terms-and-conditions",
         element: (
           <LazyComponent>
-            <Terminos />
+            <TermsConditions />
           </LazyComponent>
         ),
       },
       {
-        path: "privacidad",
+        path: "privacy-policy",
         element: (
           <LazyComponent>
-            <Privacidad />
+            <PrivacyPolicy />
           </LazyComponent>
         ),
       },
       {
-        path: "aml",
+        path: "aml-kyc-policy",
         element: (
           <LazyComponent>
-            <AML />
+            <AMLKYCPolicy />
           </LazyComponent>
         ),
       },
@@ -336,18 +279,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "aviso-legal",
+        path: "legal-notice",
         element: (
           <LazyComponent>
-            <AvisoLegal />
+            <LegalNotice />
           </LazyComponent>
         ),
       },
       {
-        path: "proteccion-datos",
+        path: "data-protection",
         element: (
           <LazyComponent>
-            <ProteccionDatos />
+            <DataProtection />
           </LazyComponent>
         ),
       },
@@ -360,14 +303,6 @@ export const router = createBrowserRouter([
             element: (
               <LazyComponent>
                 <Trends />
-              </LazyComponent>
-            ),
-          },
-          {
-            path: "premium-trends",
-            element: (
-              <LazyComponent>
-                <PremiumTrends />
               </LazyComponent>
             ),
           },
@@ -912,22 +847,6 @@ export const router = createBrowserRouter([
             ),
           },
         ],
-      },
-      {
-        path: "advanced-settings",
-        element: (
-          <LazyComponent>
-            <AdvancedSettings />
-          </LazyComponent>
-        ),
-      },
-      {
-        path: "seo-settings",
-        element: (
-          <LazyComponent>
-            <SEOSettings />
-          </LazyComponent>
-        ),
       },
       {
         path: "backup-settings",

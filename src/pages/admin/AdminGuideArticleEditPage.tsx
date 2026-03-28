@@ -2,12 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -83,7 +78,7 @@ export default function AdminGuideArticleEditPage() {
   });
   const categories = useMemo(
     () => categoriesData?.items ?? [],
-    [categoriesData]
+    [categoriesData],
   );
 
   const [createArticle, { isLoading: isCreating }] =
@@ -91,7 +86,8 @@ export default function AdminGuideArticleEditPage() {
   const [updateArticle, { isLoading: isUpdating }] =
     useUpdateGuideArticleMutation();
 
-  const [formData, setFormData] = useState<GuideArticleFormData>(defaultFormData);
+  const [formData, setFormData] =
+    useState<GuideArticleFormData>(defaultFormData);
 
   useEffect(() => {
     if (!isNew && article) {
@@ -125,7 +121,7 @@ export default function AdminGuideArticleEditPage() {
         title: t("admin.guides.errors.required", "Required fields missing"),
         description: t(
           "admin.guides.errors.title_content_required",
-          "Title and content are required."
+          "Title and content are required.",
         ),
         variant: "destructive",
       });
@@ -151,13 +147,19 @@ export default function AdminGuideArticleEditPage() {
         await createArticle(payload).unwrap();
         toast({
           title: t("admin.guides.created", "Article created"),
-          description: t("admin.guides.created_desc", "Guide article was created successfully."),
+          description: t(
+            "admin.guides.created_desc",
+            "Guide article was created successfully.",
+          ),
         });
       } else if (articleId) {
         await updateArticle({ article_id: articleId, data: payload }).unwrap();
         toast({
           title: t("admin.guides.updated", "Article updated"),
-          description: t("admin.guides.updated_desc", "Guide article was updated successfully."),
+          description: t(
+            "admin.guides.updated_desc",
+            "Guide article was updated successfully.",
+          ),
         });
       }
       navigate(ROUTES.ADMIN.GUIDES.ARTICLES);
@@ -204,8 +206,14 @@ export default function AdminGuideArticleEditPage() {
             </h1>
             <p className="text-muted-foreground text-sm">
               {isNew
-                ? t("admin.guides.edit_article_create_desc", "Create a new guide article")
-                : t("admin.guides.edit_article_edit_desc", "Edit this guide article")}
+                ? t(
+                    "admin.guides.edit_article_create_desc",
+                    "Create a new guide article",
+                  )
+                : t(
+                    "admin.guides.edit_article_edit_desc",
+                    "Edit this guide article",
+                  )}
             </p>
           </div>
         </div>
@@ -213,7 +221,7 @@ export default function AdminGuideArticleEditPage() {
           {!isNew && formData.is_published && formData.slug && (
             <Button variant="outline" asChild>
               <Link
-                to={ROUTES.APP.GUIDES.ARTICLE(formData.slug)}
+                to={ROUTES.APP.HELP_GUIDES.ARTICLE(formData.slug)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -242,16 +250,23 @@ export default function AdminGuideArticleEditPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.guides.form.basic", "Basic information")}</CardTitle>
+              <CardTitle>
+                {t("admin.guides.form.basic", "Basic information")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">{t("admin.guides.title", "Title")} *</Label>
+                <Label htmlFor="title">
+                  {t("admin.guides.title", "Title")} *
+                </Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder={t("admin.guides.form.title_placeholder", "Article title")}
+                  placeholder={t(
+                    "admin.guides.form.title_placeholder",
+                    "Article title",
+                  )}
                 />
               </div>
               <div className="space-y-2">
@@ -262,29 +277,45 @@ export default function AdminGuideArticleEditPage() {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, slug: e.target.value }))
                   }
-                  placeholder={t("admin.guides.form.slug_placeholder", "url-slug")}
+                  placeholder={t(
+                    "admin.guides.form.slug_placeholder",
+                    "url-slug",
+                  )}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="excerpt">{t("admin.guides.form.excerpt", "Excerpt")}</Label>
+                <Label htmlFor="excerpt">
+                  {t("admin.guides.form.excerpt", "Excerpt")}
+                </Label>
                 <Textarea
                   id="excerpt"
                   value={formData.excerpt}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, excerpt: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      excerpt: e.target.value,
+                    }))
                   }
-                  placeholder={t("admin.guides.form.excerpt_placeholder", "Short summary")}
+                  placeholder={t(
+                    "admin.guides.form.excerpt_placeholder",
+                    "Short summary",
+                  )}
                   rows={3}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="content">{t("admin.guides.form.content", "Content")} *</Label>
+                <Label htmlFor="content">
+                  {t("admin.guides.form.content", "Content")} *
+                </Label>
                 <RichTextEditor
                   content={formData.content}
                   onChange={(content) =>
                     setFormData((prev) => ({ ...prev, content }))
                   }
-                  placeholder={t("admin.guides.form.content_placeholder", "Article content...")}
+                  placeholder={t(
+                    "admin.guides.form.content_placeholder",
+                    "Article content...",
+                  )}
                 />
               </div>
             </CardContent>
@@ -296,12 +327,17 @@ export default function AdminGuideArticleEditPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <Label htmlFor="og_image">{t("admin.guides.form.og_image", "OG / Featured image URL")}</Label>
+                <Label htmlFor="og_image">
+                  {t("admin.guides.form.og_image", "OG / Featured image URL")}
+                </Label>
                 <Input
                   id="og_image"
                   value={formData.og_image}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, og_image: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      og_image: e.target.value,
+                    }))
                   }
                   placeholder="https://..."
                 />
@@ -325,11 +361,15 @@ export default function AdminGuideArticleEditPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.guides.form.publish", "Publishing")}</CardTitle>
+              <CardTitle>
+                {t("admin.guides.form.publish", "Publishing")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="is_published">{t("admin.guides.form.is_published", "Published")}</Label>
+                <Label htmlFor="is_published">
+                  {t("admin.guides.form.is_published", "Published")}
+                </Label>
                 <Switch
                   id="is_published"
                   checked={formData.is_published}
@@ -339,7 +379,9 @@ export default function AdminGuideArticleEditPage() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="requires_auth">{t("admin.guides.form.requires_auth", "Requires login")}</Label>
+                <Label htmlFor="requires_auth">
+                  {t("admin.guides.form.requires_auth", "Requires login")}
+                </Label>
                 <Switch
                   id="requires_auth"
                   checked={formData.requires_auth}
@@ -349,7 +391,9 @@ export default function AdminGuideArticleEditPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="order">{t("admin.guides.form.order", "Order")}</Label>
+                <Label htmlFor="order">
+                  {t("admin.guides.form.order", "Order")}
+                </Label>
                 <Input
                   id="order"
                   type="number"
@@ -368,7 +412,9 @@ export default function AdminGuideArticleEditPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.guides.form.category", "Category")}</CardTitle>
+              <CardTitle>
+                {t("admin.guides.form.category", "Category")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Select
@@ -381,10 +427,17 @@ export default function AdminGuideArticleEditPage() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t("admin.guides.form.select_category", "Select category")} />
+                  <SelectValue
+                    placeholder={t(
+                      "admin.guides.form.select_category",
+                      "Select category",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">{t("admin.guides.form.no_category", "No category")}</SelectItem>
+                  <SelectItem value="none">
+                    {t("admin.guides.form.no_category", "No category")}
+                  </SelectItem>
                   {categories.map((c) => (
                     <SelectItem key={c.id} value={String(c.id)}>
                       {c.name}
@@ -401,25 +454,41 @@ export default function AdminGuideArticleEditPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="meta_title">{t("admin.guides.form.meta_title", "Meta title")}</Label>
+                <Label htmlFor="meta_title">
+                  {t("admin.guides.form.meta_title", "Meta title")}
+                </Label>
                 <Input
                   id="meta_title"
                   value={formData.meta_title}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, meta_title: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      meta_title: e.target.value,
+                    }))
                   }
-                  placeholder={t("admin.guides.form.meta_title_placeholder", "SEO title")}
+                  placeholder={t(
+                    "admin.guides.form.meta_title_placeholder",
+                    "SEO title",
+                  )}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="meta_description">{t("admin.guides.form.meta_description", "Meta description")}</Label>
+                <Label htmlFor="meta_description">
+                  {t("admin.guides.form.meta_description", "Meta description")}
+                </Label>
                 <Textarea
                   id="meta_description"
                   value={formData.meta_description}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, meta_description: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      meta_description: e.target.value,
+                    }))
                   }
-                  placeholder={t("admin.guides.form.meta_description_placeholder", "SEO description")}
+                  placeholder={t(
+                    "admin.guides.form.meta_description_placeholder",
+                    "SEO description",
+                  )}
                   rows={3}
                 />
               </div>

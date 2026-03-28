@@ -1,4 +1,4 @@
-import { apiSlice } from './apiSlice';
+import { apiSlice } from "./apiSlice";
 
 export interface PermissionBasicInfo {
   id: number;
@@ -51,9 +51,9 @@ export const endpointPermissionsApi = apiSlice.injectEndpoints({
       EndpointPermission[],
       EndpointPermissionsListParams | void
     >({
-      query: (params = {}) => ({
-        url: '/endpoint-permissions',
-        method: 'GET',
+      query: (params: EndpointPermissionsListParams) => ({
+        url: "/endpoint-permissions",
+        method: "GET",
         params: {
           skip: params?.skip ?? 0,
           limit: params?.limit ?? 100,
@@ -62,28 +62,28 @@ export const endpointPermissionsApi = apiSlice.injectEndpoints({
           permission_id: params?.permission_id,
         },
       }),
-      providesTags: ['EndpointPermission'],
+      providesTags: ["EndpointPermission"],
     }),
     getEndpointPermission: builder.query<EndpointPermission, number>({
       query: (id) => ({
         url: `/endpoint-permissions/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'EndpointPermission', id }],
+      providesTags: (result, error, id) => [{ type: "EndpointPermission", id }],
     }),
     createEndpointPermission: builder.mutation<
       EndpointPermission,
       EndpointPermissionCreateRequest
     >({
       query: (data) => ({
-        url: '/endpoint-permissions',
-        method: 'POST',
+        url: "/endpoint-permissions",
+        method: "POST",
         body: {
           ...data,
           method: data.method.toUpperCase(),
         },
       }),
-      invalidatesTags: ['EndpointPermission'],
+      invalidatesTags: ["EndpointPermission"],
     }),
     updateEndpointPermission: builder.mutation<
       EndpointPermission,
@@ -91,23 +91,23 @@ export const endpointPermissionsApi = apiSlice.injectEndpoints({
     >({
       query: ({ id, data }) => ({
         url: `/endpoint-permissions/${id}`,
-        method: 'PUT',
+        method: "PUT",
         body: {
           ...data,
           ...(data.method && { method: data.method.toUpperCase() }),
         },
       }),
       invalidatesTags: (result, error, { id }) => [
-        { type: 'EndpointPermission', id },
-        'EndpointPermission',
+        { type: "EndpointPermission", id },
+        "EndpointPermission",
       ],
     }),
     deleteEndpointPermission: builder.mutation<void, number>({
       query: (id) => ({
         url: `/endpoint-permissions/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['EndpointPermission'],
+      invalidatesTags: ["EndpointPermission"],
     }),
   }),
 });

@@ -18,7 +18,7 @@ interface NewBlogPost {
   slug: string;
   excerpt: string | null;
   content: string;
-  featured_image: string | null;
+  og_image: string | null;
   category_id: string | null;
   category?: {
     id: string;
@@ -70,7 +70,7 @@ const Blog = () => {
     slug: post.slug,
     excerpt: post.excerpt || null,
     content: post.content,
-    featured_image: post.featured_image || null,
+    og_image: post.og_image || null,
     category_id: null, // Will be set from category relationship if available
     category: undefined, // Will be populated from category relationship if available
     tags: [], // Tags not in API response
@@ -213,10 +213,10 @@ const Blog = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredPosts.slice(0, 3).map((post) => (
                 <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/blog/${post.slug}`)}>
-                  {post.featured_image && (
+                  {post.og_image && (
                     <div className="aspect-video w-full overflow-hidden bg-muted">
                       <img
-                        src={post.featured_image}
+                        src={post.og_image}
                         alt={post.title}
                         className="w-full h-full object-cover"
                       />
@@ -282,10 +282,10 @@ const Blog = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularPosts.map((post) => (
                 <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/blog/${post.slug}`)}>
-                  {post.featured_image && (
+                  {post.og_image && (
                     <div className="aspect-video w-full overflow-hidden bg-muted">
                       <img
-                        src={post.featured_image}
+                        src={post.og_image}
                         alt={post.title}
                         className="w-full h-full object-cover"
                       />

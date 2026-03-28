@@ -1,4 +1,4 @@
-const Privacidad = () => {
+const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background py-24 px-6">
       <div className="max-w-4xl mx-auto">
@@ -131,4 +131,4 @@ const Privacidad = () => {
   );
 };
 
-export default Privacidad;
+export default PrivacyPolicy;

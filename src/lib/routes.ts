@@ -138,4 +138,12 @@ export const ROUTES = {
     SETTINGS: "/admin/settings",
     TRANSLATIONS: "/admin/translations",
   },
+  LEGAL: {
+    TERMS_AND_CONDITIONS: "/terms-and-conditions",
+    PRIVACY_POLICY: "/privacy-policy",
+    AML_KYC_POLICY: "/aml-kyc-policy",
+    COOKIES: "/cookies",
+    LEGAL_NOTICE: "/legal-notice",
+    DATA_PROTECTION: "/data-protection",
+  },
 };

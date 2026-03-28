@@ -1,28 +1,27 @@
-import { apiSlice } from './apiSlice';
-import type { Listing } from './types';
+import { apiSlice } from "./apiSlice";
 
 export const favoritesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getFavoriteListings: builder.query<Listing[], void>({
+    getFavoriteListings: builder.query<MarketplaceListing[], void>({
       query: () => ({
-        url: '/favorites/listings',
-        method: 'GET',
+        url: "/favorites/listings",
+        method: "GET",
       }),
-      providesTags: ['Domain'],
+      providesTags: ["Domain"],
     }),
     addToFavorites: builder.mutation<void, number>({
       query: (listingId) => ({
         url: `/favorites/listings/${listingId}`,
-        method: 'POST',
+        method: "POST",
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ["Domain"],
     }),
     removeFromFavorites: builder.mutation<void, number>({
       query: (listingId) => ({
         url: `/favorites/listings/${listingId}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ["Domain"],
     }),
   }),
 });
@@ -32,4 +31,3 @@ export const {
   useAddToFavoritesMutation,
   useRemoveFromFavoritesMutation,
 } = favoritesApi;
-

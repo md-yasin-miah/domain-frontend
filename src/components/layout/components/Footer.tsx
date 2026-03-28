@@ -32,31 +32,31 @@ export function Footer() {
             <h4 className="font-semibold text-foreground">{t('footer.legal_title')}</h4>
             <div className="space-y-2 text-sm">
               <Link
-                to="/legal/terminos"
+                to={ROUTES.LEGAL.TERMS_AND_CONDITIONS}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 {t('footer.terms')}
               </Link>
               <Link
-                to="/legal/privacidad"
+                to={ROUTES.LEGAL.PRIVACY_POLICY}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 {t('footer.privacy')}
               </Link>
-              <Link to="/legal/aml" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link to={ROUTES.LEGAL.AML_KYC_POLICY} className="block text-muted-foreground hover:text-primary transition-colors">
                 {t('footer.aml_kyc')}
               </Link>
-              <Link to="/legal/cookies" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link to={ROUTES.LEGAL.COOKIES} className="block text-muted-foreground hover:text-primary transition-colors">
                 {t('footer.cookies')}
               </Link>
               <Link
-                to="/legal/aviso-legal"
+                to={ROUTES.LEGAL.LEGAL_NOTICE}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 {t('footer.legal_notice')}
               </Link>
               <Link
-                to="/legal/proteccion-datos"
+                to={ROUTES.LEGAL.DATA_PROTECTION}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 {t('footer.data_protection')}
@@ -75,12 +75,17 @@ export function Footer() {
                 {t('footer.help_center')}
               </Link>
               <Link
-                to="/user/soporte"
+                to={ROUTES.CLIENT.SUPPORT}
                 className="block text-muted-foreground hover:text-primary transition-colors"
               >
                 {t('footer.ticket_system')}
               </Link>
-              <span className="block text-muted-foreground">{t('footer.live_chat')}</span>
+              <Link
+                to={ROUTES.CLIENT.CHAT.ROOT}
+                className="block text-muted-foreground hover:text-primary transition-colors"
+              >
+                {t('footer.live_chat')}
+              </Link>
             </div>
           </div>
 

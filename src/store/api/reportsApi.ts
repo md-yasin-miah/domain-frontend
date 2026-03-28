@@ -118,70 +118,70 @@ type ReportParams = { days?: number };
 
 export const reportsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getReportOverview: builder.query<ReportOverview, ReportParams | void>({
+    getReportOverview: builder.query<ReportOverview, ReportParams>({
       query: (params) => ({
         url: "/reports/overview",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportRevenue: builder.query<ReportRevenue, ReportParams | void>({
+    getReportRevenue: builder.query<ReportRevenue, ReportParams>({
       query: (params) => ({
         url: "/reports/revenue",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportUsers: builder.query<ReportUsers, ReportParams | void>({
+    getReportUsers: builder.query<ReportUsers, ReportParams>({
       query: (params) => ({
         url: "/reports/users",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportListings: builder.query<ReportListings, ReportParams | void>({
+    getReportListings: builder.query<ReportListings, ReportParams>({
       query: (params) => ({
         url: "/reports/listings",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportOrders: builder.query<ReportOrders, ReportParams | void>({
+    getReportOrders: builder.query<ReportOrders, ReportParams>({
       query: (params) => ({
         url: "/reports/orders",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportPayments: builder.query<ReportPayments, ReportParams | void>({
+    getReportPayments: builder.query<ReportPayments, ReportParams>({
       query: (params) => ({
         url: "/reports/payments",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportEscrow: builder.query<ReportEscrow, void>({
+    getReportEscrow: builder.query<ReportEscrow, ReportParams>({
       query: () => ({ url: "/reports/escrow" }),
     }),
-    getReportWithdrawals: builder.query<ReportWithdrawals, ReportParams | void>({
+    getReportWithdrawals: builder.query<ReportWithdrawals, ReportParams>({
       query: (params) => ({
         url: "/reports/withdrawals",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportDisputes: builder.query<ReportDisputes, ReportParams | void>({
+    getReportDisputes: builder.query<ReportDisputes, ReportParams>({
       query: (params) => ({
         url: "/reports/disputes",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportSupport: builder.query<ReportSupport, ReportParams | void>({
+    getReportSupport: builder.query<ReportSupport, ReportParams>({
       query: (params) => ({
         url: "/reports/support",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportAuctions: builder.query<ReportAuctions, ReportParams | void>({
+    getReportAuctions: builder.query<ReportAuctions, ReportParams>({
       query: (params) => ({
         url: "/reports/auctions",
         params: { days: params?.days ?? 30 },
       }),
     }),
-    getReportInvoices: builder.query<ReportInvoices, ReportParams | void>({
+    getReportInvoices: builder.query<ReportInvoices, ReportParams>({
       query: (params) => ({
         url: "/reports/invoices",
         params: { days: params?.days ?? 30 },

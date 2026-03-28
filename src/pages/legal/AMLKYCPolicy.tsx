@@ -1,4 +1,4 @@
-const AML = () => {
+const AMLKYCPolicy = () => {
   return (
     <div className="min-h-screen bg-background py-24 px-6">
       <div className="max-w-4xl mx-auto">
@@ -111,4 +111,4 @@ const AML = () => {
   );
 };
 
-export default AML;
+export default AMLKYCPolicy;

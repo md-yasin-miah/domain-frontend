@@ -53,7 +53,9 @@ function truncateContent(content: string | null, maxLen = 80): string {
   return content.length <= maxLen ? content : `${content.slice(0, maxLen)}...`;
 }
 
-function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+function getStatusVariant(
+  status: string,
+): "default" | "secondary" | "destructive" | "outline" {
   if (status === "approved" || status === "accessed") return "default";
   if (status === "rejected") return "destructive";
   return "secondary";
@@ -63,7 +65,9 @@ export default function AdminSecureBoxPage() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [actionType, setActionType] = useState<"approved" | "rejected" | null>(null);
+  const [actionType, setActionType] = useState<"approved" | "rejected" | null>(
+    null,
+  );
   const [selectedBox, setSelectedBox] = useState<SecureBoxItem | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
@@ -80,11 +84,12 @@ export default function AdminSecureBoxPage() {
       limit: size,
       ...(statusFilter !== "all" && { status: statusFilter }),
     }),
-    [page, size, statusFilter]
+    [page, size, statusFilter],
   );
 
   const { data, isLoading, refetch, error } = useGetSecureBoxListQuery(filters);
-  const [approveSecureBox, { isLoading: isSubmitting }] = useApproveSecureBoxMutation();
+  const [approveSecureBox, { isLoading: isSubmitting }] =
+    useApproveSecureBoxMutation();
 
   const items = data?.items ?? [];
   const rawPagination = data?.pagination;
@@ -99,7 +104,7 @@ export default function AdminSecureBoxPage() {
             has_previous: rawPagination.has_previous ?? false,
           }
         : undefined,
-    [rawPagination]
+    [rawPagination],
   );
 
   const handleOpenApprove = (box: SecureBoxItem) => {
@@ -128,8 +133,14 @@ export default function AdminSecureBoxPage() {
 
     if (actionType === "rejected" && !rejectionReason.trim()) {
       toast({
-        title: t("admin.secure_box.rejection_required", "Rejection reason required"),
-        description: t("admin.secure_box.rejection_required_desc", "Please provide a reason when rejecting."),
+        title: t(
+          "admin.secure_box.rejection_required",
+          "Rejection reason required",
+        ),
+        description: t(
+          "admin.secure_box.rejection_required_desc",
+          "Please provide a reason when rejecting.",
+        ),
         variant: "destructive",
       });
       return;
@@ -141,7 +152,8 @@ export default function AdminSecureBoxPage() {
         data: {
           status: actionType,
           admin_notes: adminNotes.trim() || undefined,
-          rejection_reason: actionType === "rejected" ? rejectionReason.trim() : undefined,
+          rejection_reason:
+            actionType === "rejected" ? rejectionReason.trim() : undefined,
         },
       }).unwrap();
 
@@ -157,7 +169,11 @@ export default function AdminSecureBoxPage() {
       refetch();
     } catch (err: unknown) {
       const detail =
-        err && typeof err === "object" && "data" in err && err.data && typeof (err as { data: { detail?: string } }).data === "object"
+        err &&
+        typeof err === "object" &&
+        "data" in err &&
+        err.data &&
+        typeof (err as { data: { detail?: string } }).data === "object"
           ? (err as { data: { detail?: string } }).data?.detail
           : t("common.error");
       toast({
@@ -184,27 +200,31 @@ export default function AdminSecureBoxPage() {
         id: "buyer",
         accessorKey: (row) => row.buyer?.username ?? row.buyer?.email ?? "—",
         header: t("admin.secure_box.buyer", "Buyer"),
-        cell: ({ row }) =>{
-          return <Link
-            to={ROUTES.ADMIN.USER_DETAILS(row.buyer?.id)}
-            className="text-primary hover:underline"
-          >
-            {row.buyer?.name || row.buyer?.username || row.buyer?.email}
-          </Link>
-        }
+        cell: ({ row }) => {
+          return (
+            <Link
+              to={ROUTES.ADMIN.USERS.DETAILS(row.buyer_id)}
+              className="text-primary hover:underline"
+            >
+              {row.buyer?.name || row.buyer?.username || row.buyer?.email}
+            </Link>
+          );
+        },
       },
       {
         id: "seller",
         accessorKey: (row) => row.seller?.username ?? row.seller?.email ?? "—",
         header: t("admin.secure_box.seller", "Seller"),
-        cell: ({ row }) =>{
-          return <Link
-            to={ROUTES.ADMIN.USER_DETAILS(row.seller?.id)}
-            className="text-primary hover:underline"
-          >
-            {row.seller?.name || row.seller?.username || row.seller?.email}
-          </Link>
-        }
+        cell: ({ row }) => {
+          return (
+            <Link
+              to={ROUTES.ADMIN.USERS.DETAILS(row.seller_id)}
+              className="text-primary hover:underline"
+            >
+              {row.seller?.name || row.seller?.username || row.seller?.email}
+            </Link>
+          );
+        },
       },
       {
         id: "status",
@@ -221,9 +241,12 @@ export default function AdminSecureBoxPage() {
         accessorKey: "content",
         header: t("admin.secure_box.content", "Content"),
         cell: ({ row }) => (
-          <span 
-            className="max-w-[200px] truncate block cursor-pointer hover:text-primary transition-colors" 
-            title={t("admin.secure_box.click_to_view", "Click to view full content")}
+          <span
+            className="max-w-[200px] truncate block cursor-pointer hover:text-primary transition-colors"
+            title={t(
+              "admin.secure_box.click_to_view",
+              "Click to view full content",
+            )}
             onClick={() => setViewedContent(row.content)}
           >
             {truncateContent(row.content)}
@@ -241,7 +264,7 @@ export default function AdminSecureBoxPage() {
         ),
       },
     ],
-    [t]
+    [t],
   );
 
   return (
@@ -252,20 +275,30 @@ export default function AdminSecureBoxPage() {
           {t("admin.secure_box.title", "Secure Box")}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {t("admin.secure_box.description", "Review and approve pending secure box submissions.")}
+          {t(
+            "admin.secure_box.description",
+            "Review and approve pending secure box submissions.",
+          )}
         </p>
       </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
-            <CardTitle>{t("admin.secure_box.list_title", "All Secure Boxes")}</CardTitle>
+            <CardTitle>
+              {t("admin.secure_box.list_title", "All Secure Boxes")}
+            </CardTitle>
             <CardDescription>
-              {t("admin.secure_box.list_desc", "Full list of secure boxes. Filter by status.")}
+              {t(
+                "admin.secure_box.list_desc",
+                "Full list of secure boxes. Filter by status.",
+              )}
             </CardDescription>
           </div>
           <div className="space-y-2">
-            <Label className="sr-only">{t("admin.secure_box.filter_status", "Status")}</Label>
+            <Label className="sr-only">
+              {t("admin.secure_box.filter_status", "Status")}
+            </Label>
             <Select
               value={statusFilter}
               onValueChange={(v) => {
@@ -277,7 +310,9 @@ export default function AdminSecureBoxPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t("admin.secure_box.all_statuses", "All statuses")}</SelectItem>
+                <SelectItem value="all">
+                  {t("admin.secure_box.all_statuses", "All statuses")}
+                </SelectItem>
                 {STATUS_OPTIONS.map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
@@ -293,7 +328,10 @@ export default function AdminSecureBoxPage() {
             columns={columns}
             pagination={pagination}
             isLoading={isLoading}
-            emptyMessage={t("admin.secure_box.no_items", "No secure boxes found.")}
+            emptyMessage={t(
+              "admin.secure_box.no_items",
+              "No secure boxes found.",
+            )}
             emptyIcon={<LockIcon className="w-16 h-16 text-muted-foreground" />}
             getRowId={(row) => String(row.id)}
             renderActions={(row) =>
@@ -327,13 +365,19 @@ export default function AdminSecureBoxPage() {
             onPageSizeChange={handlePageSizeChange}
             error={error}
             errorTitle={t("common.error", "Error")}
-            errorDescription={t("admin.secure_box.error_desc", "Failed to load secure boxes.")}
+            errorDescription={t(
+              "admin.secure_box.error_desc",
+              "Failed to load secure boxes.",
+            )}
             errorIcon={<LockIcon className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedBox && !!actionType} onOpenChange={(open) => !open && handleClose()}>
+      <Dialog
+        open={!!selectedBox && !!actionType}
+        onOpenChange={(open) => !open && handleClose()}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
@@ -343,21 +387,36 @@ export default function AdminSecureBoxPage() {
             </DialogTitle>
             <DialogDescription>
               {actionType === "approved"
-                ? t("admin.secure_box.approve_desc", "This will allow the buyer to request OTP and access the secure box content.")
-                : t("admin.secure_box.reject_desc", "The seller will need to update the content and resubmit for review.")}
+                ? t(
+                    "admin.secure_box.approve_desc",
+                    "This will allow the buyer to request OTP and access the secure box content.",
+                  )
+                : t(
+                    "admin.secure_box.reject_desc",
+                    "The seller will need to update the content and resubmit for review.",
+                  )}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {selectedBox && (
               <p className="text-sm text-muted-foreground">
-                Order: <strong>{selectedBox.order?.order_number ?? `#${selectedBox.order_id}`}</strong>
+                Order:{" "}
+                <strong>
+                  {selectedBox.order?.order_number ??
+                    `#${selectedBox.order_id}`}
+                </strong>
               </p>
             )}
             <div className="space-y-2">
-              <Label htmlFor="admin_notes">{t("admin.secure_box.admin_notes", "Admin Notes")} (optional)</Label>
+              <Label htmlFor="admin_notes">
+                {t("admin.secure_box.admin_notes", "Admin Notes")} (optional)
+              </Label>
               <Textarea
                 id="admin_notes"
-                placeholder={t("admin.secure_box.admin_notes_placeholder", "Internal notes (not shown to user)")}
+                placeholder={t(
+                  "admin.secure_box.admin_notes_placeholder",
+                  "Internal notes (not shown to user)",
+                )}
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
                 rows={2}
@@ -370,7 +429,10 @@ export default function AdminSecureBoxPage() {
                 </Label>
                 <Textarea
                   id="rejection_reason"
-                  placeholder={t("admin.secure_box.rejection_reason_placeholder", "Reason shown to seller")}
+                  placeholder={t(
+                    "admin.secure_box.rejection_reason_placeholder",
+                    "Reason shown to seller",
+                  )}
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
                   rows={3}
@@ -380,15 +442,24 @@ export default function AdminSecureBoxPage() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
               {t("common.cancel", "Cancel")}
             </Button>
             <Button
               variant={actionType === "rejected" ? "destructive" : "default"}
               onClick={handleSubmit}
-              disabled={isSubmitting || (actionType === "rejected" && !rejectionReason.trim())}
+              disabled={
+                isSubmitting ||
+                (actionType === "rejected" && !rejectionReason.trim())
+              }
             >
-              {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {isSubmitting && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
               {actionType === "approved"
                 ? t("admin.secure_box.approved", "Approved")
                 : t("admin.secure_box.rejected", "Rejected")}
@@ -397,14 +468,24 @@ export default function AdminSecureBoxPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={viewedContent !== null} onOpenChange={(open) => !open && setViewedContent(null)}>
+      <Dialog
+        open={viewedContent !== null}
+        onOpenChange={(open) => !open && setViewedContent(null)}
+      >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{t("admin.secure_box.content_details", "Secure Box Content Details")}</DialogTitle>
+            <DialogTitle>
+              {t(
+                "admin.secure_box.content_details",
+                "Secure Box Content Details",
+              )}
+            </DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <div className="bg-muted p-4 rounded-lg overflow-auto max-h-[60vh]">
-              <pre className="text-sm whitespace-pre-wrap font-mono">{viewedContent}</pre>
+              <pre className="text-sm whitespace-pre-wrap font-mono">
+                {viewedContent}
+              </pre>
             </div>
           </div>
           <DialogFooter>

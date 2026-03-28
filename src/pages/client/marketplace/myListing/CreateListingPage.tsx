@@ -252,7 +252,7 @@ export default function CreateListingPage() {
         description: "Listing created successfully!",
       });
 
-      navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(listing.id));
+      navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(listing.slug));
     } catch (error: unknown) {
       const err = error as { data?: { message?: string } };
       toast({
@@ -298,7 +298,10 @@ export default function CreateListingPage() {
       </div>
 
       {/* Stepper */}
-      <div className="w-full max-w-2xl md:my-8 my-6" data-tour="listing-stepper">
+      <div
+        className="w-full max-w-2xl md:my-8 my-6"
+        data-tour="listing-stepper"
+      >
         <div className="flex items-center justify-center gap-0">
           {steps.map((s, index) => (
             <React.Fragment key={s.number}>

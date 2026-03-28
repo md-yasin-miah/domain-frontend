@@ -1,5 +1,4 @@
-import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
+import { apiSlice } from "./apiSlice";
 
 export interface Commission {
   id: number;
@@ -43,48 +42,60 @@ export interface CommissionCalculateResponse {
 
 export const commissionApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getCommissions: builder.query<PaginatedResponse<Commission> | Commission[], PaginationParams>({
+    getCommissions: builder.query<
+      PaginatedResponse<Commission> | Commission[],
+      PaginationParams
+    >({
       query: (params) => ({
-        url: '/commissions',
-        method: 'GET',
+        url: "/commissions",
+        method: "GET",
         params,
       }),
-      providesTags: ['Domain'],
+      providesTags: ["Domain"],
     }),
     getCommission: builder.query<Commission, number>({
       query: (id) => ({
         url: `/commissions/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'Domain', id }],
+      providesTags: (result, error, id) => [{ type: "Domain", id }],
     }),
     createCommission: builder.mutation<Commission, CommissionCreateRequest>({
       query: (data) => ({
-        url: '/commissions',
-        method: 'POST',
+        url: "/commissions",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ["Domain"],
     }),
-    updateCommission: builder.mutation<Commission, { id: number; data: CommissionUpdateRequest }>({
+    updateCommission: builder.mutation<
+      Commission,
+      { id: number; data: CommissionUpdateRequest }
+    >({
       query: ({ id, data }) => ({
         url: `/commissions/${id}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Domain', id }, 'Domain'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Domain", id },
+        "Domain",
+      ],
     }),
     deleteCommission: builder.mutation<void, number>({
       query: (id) => ({
         url: `/commissions/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['Domain'],
+      invalidatesTags: ["Domain"],
     }),
-    calculateCommission: builder.mutation<CommissionCalculateResponse, CommissionCalculateRequest>({
+    calculateCommission: builder.mutation<
+      CommissionCalculateResponse,
+      CommissionCalculateRequest
+    >({
       query: (data) => ({
-        url: '/commissions/calculate',
-        method: 'POST',
+        url: "/commissions/calculate",
+        method: "POST",
         body: data,
       }),
     }),
@@ -99,4 +110,3 @@ export const {
   useDeleteCommissionMutation,
   useCalculateCommissionMutation,
 } = commissionApi;
-

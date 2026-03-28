@@ -1,5 +1,4 @@
-import { apiSlice } from './apiSlice';
-import type { PaginatedResponse, PaginationParams } from './types';
+import { apiSlice } from "./apiSlice";
 
 /** Matches backend DisputeResponse */
 export interface Dispute {
@@ -56,8 +55,8 @@ export const disputesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getDisputes: builder.query<PaginatedResponse<Dispute>, DisputeFilters>({
       query: (params) => ({
-        url: '/disputes',
-        method: 'GET',
+        url: "/disputes",
+        method: "GET",
         params: {
           skip: params.skip,
           limit: params.limit,
@@ -66,44 +65,58 @@ export const disputesApi = apiSlice.injectEndpoints({
           ...(params.order_id != null && { order_id: params.order_id }),
         },
       }),
-      providesTags: ['User'],
+      providesTags: ["User"],
     }),
     getDispute: builder.query<Dispute, number>({
       query: (id) => ({
         url: `/disputes/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'User', id: `dispute-${id}` }, 'User'],
+      providesTags: (result, error, id) => [
+        { type: "User", id: `dispute-${id}` },
+        "User",
+      ],
     }),
     getDisputeComments: builder.query<
       DisputeComment[],
-      { disputeId: number; skip?: number; limit?: number; include_internal?: boolean }
+      {
+        disputeId: number;
+        skip?: number;
+        limit?: number;
+        include_internal?: boolean;
+      }
     >({
       query: ({ disputeId, skip, limit, include_internal }) => ({
         url: `/disputes/${disputeId}/comments`,
-        method: 'GET',
+        method: "GET",
         params: { skip, limit, include_internal },
       }),
       providesTags: (result, error, { disputeId }) => [
-        { type: 'User', id: `dispute-comments-${disputeId}` },
-        'User',
+        { type: "User", id: `dispute-comments-${disputeId}` },
+        "User",
       ],
     }),
     createDispute: builder.mutation<Dispute, DisputeCreateRequest>({
       query: (data) => ({
-        url: '/disputes',
-        method: 'POST',
+        url: "/disputes",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
-    updateDispute: builder.mutation<Dispute, { id: number; data: DisputeUpdateRequest }>({
+    updateDispute: builder.mutation<
+      Dispute,
+      { id: number; data: DisputeUpdateRequest }
+    >({
       query: ({ id, data }) => ({
         url: `/disputes/${id}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id: `dispute-${id}` }, 'User'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "User", id: `dispute-${id}` },
+        "User",
+      ],
     }),
     resolveDispute: builder.mutation<
       Dispute,
@@ -111,10 +124,13 @@ export const disputesApi = apiSlice.injectEndpoints({
     >({
       query: ({ id, resolution, resolution_action }) => ({
         url: `/disputes/${id}/resolve`,
-        method: 'POST',
+        method: "POST",
         params: { resolution, resolution_action },
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id: `dispute-${id}` }, 'User'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "User", id: `dispute-${id}` },
+        "User",
+      ],
     }),
     addDisputeComment: builder.mutation<
       DisputeComment,
@@ -122,21 +138,21 @@ export const disputesApi = apiSlice.injectEndpoints({
     >({
       query: ({ id, comment, is_internal }) => ({
         url: `/disputes/${id}/comments`,
-        method: 'POST',
+        method: "POST",
         body: { comment, is_internal: is_internal ?? false },
       }),
       invalidatesTags: (result, error, { id }) => [
-        { type: 'User', id: `dispute-${id}` },
-        { type: 'User', id: `dispute-comments-${id}` },
-        'User',
+        { type: "User", id: `dispute-${id}` },
+        { type: "User", id: `dispute-comments-${id}` },
+        "User",
       ],
     }),
     deleteDispute: builder.mutation<void, number>({
       query: (id) => ({
         url: `/disputes/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
   }),
 });
