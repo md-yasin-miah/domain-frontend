@@ -89,7 +89,7 @@ interface ListingCreateRequest {
   website_revenue_monthly?: number;
   website_profit_monthly?: number;
   website_technology?: string;
-  status?: 'draft' | 'active' | 'pending' | 'sold';
+  status?: 'draft' | 'active' | 'pending' | 'sold' | 'expired' | 'suspended';
   is_featured?: boolean;
   primary_image_url?: string;
   image_urls?: string[];

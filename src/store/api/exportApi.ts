@@ -9,7 +9,7 @@ export const exportApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     exportListings: builder.query<Blob, ExportParams>({
       query: (params) => ({
-        url: '/exports/listings/csv',
+        url: '/export/listings/csv',
         method: 'GET',
         params,
         responseHandler: (response) => response.blob(),
@@ -17,7 +17,7 @@ export const exportApi = apiSlice.injectEndpoints({
     }),
     exportOrders: builder.query<Blob, ExportParams>({
       query: (params) => ({
-        url: '/exports/orders/csv',
+        url: '/export/orders/csv',
         method: 'GET',
         params,
         responseHandler: (response) => response.blob(),

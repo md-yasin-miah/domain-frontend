@@ -1,23 +1,59 @@
 import { useState, useMemo } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { useGetAdminDashboardQuery } from "@/store/api/dashboardApi"
-import { ROUTES } from "@/lib/routes"
+import { useDeactivateUserMutation } from "@/store/api/userApi"
+import { useUpdateMarketplaceListingMutation } from "@/store/api/marketplaceApi"
+import { useResolveDisputeMutation } from "@/store/api/disputesApi"
 import {
-  Shield,
+  useLazyExportListingsQuery,
+  useLazyExportOrdersQuery,
+} from "@/store/api/exportApi"
+import { ROUTES } from "@/lib/routes"
+import { useToast } from "@/hooks/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Users,
   DollarSign,
   TrendingUp,
   AlertTriangle,
-  Settings,
   Eye,
   Ban,
   CheckCircle,
@@ -25,17 +61,13 @@ import {
   Clock,
   ArrowUpRight,
   MoreHorizontal,
-  Flag,
   Download,
   Search,
-  Filter,
   RefreshCw,
   MessageSquare,
   Package,
   CreditCard,
   Activity,
-  Database,
-  Server,
   Loader2,
 } from "lucide-react"
 
@@ -52,19 +84,61 @@ const STATUS_TO_KEY: Record<string, string> = {
   Mediación: "status_mediation",
 }
 
+const ADMIN_DASH_TAB_VALUES = ["users", "listings", "disputes", "analytics"] as const
+type AdminDashTab = (typeof ADMIN_DASH_TAB_VALUES)[number]
+
+function parseAdminDashTabParam(raw: string | null): AdminDashTab {
+  if (raw && (ADMIN_DASH_TAB_VALUES as readonly string[]).includes(raw)) {
+    return raw as AdminDashTab
+  }
+  return "users"
+}
+
 const SuperAdminDashboard = () => {
   const { t } = useTranslation()
-  const [systemStatus, setSystemStatus] = useState({
-    maintenanceMode: false,
-    newRegistrations: true,
-    paymentProcessing: true,
-    emailNotifications: true,
-  })
+  const { toast } = useToast()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const activeTab = useMemo(
+    () => parseAdminDashTabParam(searchParams.get("tab")),
+    [searchParams],
+  )
+
+  const setDashboardTab = (value: string) => {
+    const tab = parseAdminDashTabParam(value)
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        if (tab === "users") {
+          next.delete("tab")
+        } else {
+          next.set("tab", tab)
+        }
+        return next
+      },
+      { replace: true },
+    )
+  }
+
+  const [suspendUserId, setSuspendUserId] = useState<number | null>(null)
+  const [listingMutating, setListingMutating] = useState<{
+    id: number
+    action: "active" | "suspended"
+  } | null>(null)
+  const [resolveDisputeId, setResolveDisputeId] = useState<number | null>(null)
+  const [resolveNotes, setResolveNotes] = useState("")
+  const [resolveAction, setResolveAction] = useState<string>("")
 
   const { data, isLoading, isError, refetch } = useGetAdminDashboardQuery({
     days: PERIOD_DAYS,
     limit_recent: LIMIT_RECENT,
   })
+
+  const [deactivateUser, { isLoading: isDeactivating }] = useDeactivateUserMutation()
+  const [updateListing, { isLoading: isUpdatingListing }] = useUpdateMarketplaceListingMutation()
+  const [resolveDispute, { isLoading: isResolvingDispute }] = useResolveDisputeMutation()
+  const [triggerExportListings, { isFetching: isExportingListings }] = useLazyExportListingsQuery()
+  const [triggerExportOrders, { isFetching: isExportingOrders }] = useLazyExportOrdersQuery()
 
   const stats = data?.stats
   const recentListings = data?.recent_listings ?? []
@@ -162,9 +236,21 @@ const SuperAdminDashboard = () => {
       Reportado: "destructive",
       "En investigación": "secondary",
       Mediación: "outline",
+      // API listing / dispute statuses (backend)
+      draft: "secondary",
+      active: "default",
+      pending: "secondary",
+      sold: "outline",
+      expired: "outline",
+      suspended: "destructive",
+      open: "secondary",
+      in_review: "secondary",
+      resolved: "default",
+      closed: "outline",
+      rejected: "destructive",
     }
     const key = STATUS_TO_KEY[status]
-    const label = key ? t(`super_admin.${key}`) : status
+    const label = key ? t(`super_admin.${key}`) : status.replace(/_/g, " ")
     return <Badge variant={variants[status] || "secondary"}>{label}</Badge>
   }
 
@@ -177,12 +263,94 @@ const SuperAdminDashboard = () => {
     return colors[severity] || "text-gray-600"
   }
 
-  const handleUserAction = (userId: number, action: string) => {
-    console.log(`Acción ${action} aplicada al usuario ${userId}`)
+  const confirmDeactivateUser = async () => {
+    if (suspendUserId == null) return
+    try {
+      await deactivateUser(suspendUserId).unwrap()
+      toast({
+        title: t("super_admin.user_deactivated", "User deactivated"),
+      })
+      setSuspendUserId(null)
+      await refetch()
+    } catch {
+      toast({
+        title: t("common.error", "Error"),
+        description: t("super_admin.user_deactivate_failed", "Could not deactivate user"),
+        variant: "destructive",
+      })
+    }
   }
 
-  const handleListingAction = (listingId: number, action: string) => {
-    console.log(`Acción ${action} aplicada al listado ${listingId}`)
+  const handleListingStatus = async (listingId: number, status: "active" | "suspended") => {
+    setListingMutating({ id: listingId, action: status })
+    try {
+      await updateListing({ id: listingId, data: { status } }).unwrap()
+      toast({
+        title:
+          status === "active"
+            ? t("super_admin.listing_activated", "Listing set to active")
+            : t("super_admin.listing_suspended", "Listing suspended"),
+      })
+      await refetch()
+    } catch {
+      toast({
+        title: t("common.error", "Error"),
+        description: t("super_admin.listing_update_failed", "Could not update listing"),
+        variant: "destructive",
+      })
+    } finally {
+      setListingMutating(null)
+    }
+  }
+
+  const submitResolveDispute = async () => {
+    if (resolveDisputeId == null || !resolveNotes.trim()) return
+    try {
+      await resolveDispute({
+        id: resolveDisputeId,
+        resolution: resolveNotes.trim(),
+        resolution_action: resolveAction.trim() || undefined,
+      }).unwrap()
+      toast({ title: t("admin.disputes.resolved", "Dispute resolved") })
+      setResolveDisputeId(null)
+      setResolveNotes("")
+      setResolveAction("")
+      await refetch()
+    } catch {
+      toast({
+        title: t("common.error", "Error"),
+        variant: "destructive",
+      })
+    }
+  }
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleExportListings = async () => {
+    try {
+      const blob = await triggerExportListings({}).unwrap()
+      downloadBlob(blob, `listings_export_${Date.now()}.csv`)
+      toast({ title: t("super_admin.export_ready", "Export downloaded") })
+    } catch {
+      toast({ title: t("common.error", "Error"), variant: "destructive" })
+    }
+  }
+
+  const handleExportOrders = async () => {
+    try {
+      const blob = await triggerExportOrders({}).unwrap()
+      downloadBlob(blob, `orders_export_${Date.now()}.csv`)
+      toast({ title: t("super_admin.export_ready", "Export downloaded") })
+    } catch {
+      toast({ title: t("common.error", "Error"), variant: "destructive" })
+    }
   }
 
   const formatDate = (s: string | null) =>
@@ -212,72 +380,6 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with Security Warning */}
-      {/* <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
-        <div className="flex items-center gap-3">
-          <Shield className="h-6 w-6 text-destructive" />
-          <div>
-            <h2 className="font-semibold text-destructive">{t("super_admin.panel_title")}</h2>
-            <p className="text-sm text-destructive/80">
-              {t("super_admin.panel_audit_notice")}
-            </p>
-          </div>
-        </div>
-      </div> */}
-
-      {/* System Controls */}
-      {/* <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            {t("super_admin.system_controls")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="maintenance">{t("super_admin.maintenance_mode")}</Label>
-              <Switch
-                id="maintenance"
-                checked={systemStatus.maintenanceMode}
-                onCheckedChange={(checked) => 
-                  setSystemStatus({...systemStatus, maintenanceMode: checked})
-                }
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="registrations">{t("super_admin.new_registrations")}</Label>
-              <Switch
-                id="registrations"
-                checked={systemStatus.newRegistrations}
-                onCheckedChange={(checked) => 
-                  setSystemStatus({...systemStatus, newRegistrations: checked})
-                }
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="payments">{t("super_admin.payment_processing")}</Label>
-              <Switch
-                id="payments"
-                checked={systemStatus.paymentProcessing}
-                onCheckedChange={(checked) => 
-                  setSystemStatus({...systemStatus, paymentProcessing: checked})
-                }
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="emails">{t("super_admin.email_notifications")}</Label>
-              <Switch
-                id="emails"
-                checked={systemStatus.emailNotifications}
-                onCheckedChange={(checked) => 
-                  setSystemStatus({...systemStatus, emailNotifications: checked})
-                }
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card> */}
 
       {/* System Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 gap-4">
@@ -439,7 +541,7 @@ const SuperAdminDashboard = () => {
       </Card>
 
       {/* Main Admin Tabs */}
-      <Tabs defaultValue="users" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setDashboardTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="users">{t("super_admin.tab_users")}</TabsTrigger>
           <TabsTrigger value="listings">{t("super_admin.tab_listings")}</TabsTrigger>
@@ -454,13 +556,12 @@ const SuperAdminDashboard = () => {
               <CardDescription>
                 {t("super_admin.user_management_desc", { count: (stats?.total_users ?? 0) })}
               </CardDescription>
-              <div className="flex items-center gap-2">
-                <Input placeholder={t("super_admin.search_users_placeholder")} className="max-w-sm" />
-                <Button variant="outline">
-                  <Search className="h-4 w-4" />
-                </Button>
-                <Button variant="outline">
-                  <Filter className="h-4 w-4" />
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={ROUTES.ADMIN.USERS.LIST}>
+                    <Search className="h-4 w-4 mr-2" />
+                    {t("super_admin.open_user_directory", "Search & filter users")}
+                  </Link>
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => refetch()}>
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -498,23 +599,36 @@ const SuperAdminDashboard = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleUserAction(user.id, "view")}
-                            >
-                              <Eye className="h-4 w-4" />
+                            <Button variant="ghost" size="sm" asChild title={t("super_admin.view_profile", "View user")}>
+                              <Link to={ROUTES.ADMIN.USERS.DETAILS(user.id)}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleUserAction(user.id, "suspend")}
+                              title={t("super_admin.deactivate_user", "Deactivate user")}
+                              onClick={() => setSuspendUserId(user.id)}
                             >
                               <Ban className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" aria-label={t("super_admin.more_actions", "More")}>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link to={ROUTES.ADMIN.USERS.DETAILS(user.id)}>
+                                    {t("super_admin.user_details", "User details")}
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                  <Link to={ROUTES.ADMIN.USERS.LIST}>{t("super_admin.all_users", "All users")}</Link>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -531,10 +645,17 @@ const SuperAdminDashboard = () => {
             <CardHeader>
               <CardTitle>{t("super_admin.listing_moderation")}</CardTitle>
               <CardDescription>{t("super_admin.recent_listings_count", { count: recentListings.length })}</CardDescription>
-              <Button variant="outline" size="sm" onClick={() => refetch()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                {t("super_admin.refresh")}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={ROUTES.ADMIN.LISTINGS_MANAGEMENT}>
+                    {t("super_admin.all_listings", "All listings")}
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => refetch()}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {t("super_admin.refresh")}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -568,17 +689,41 @@ const SuperAdminDashboard = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleListingAction(listing.id, "reject")}
+                                disabled={
+                                  (listingMutating?.id === listing.id && isUpdatingListing) ||
+                                  listing.status === "suspended"
+                                }
+                                onClick={() => handleListingStatus(listing.id, "suspended")}
                               >
-                                <XCircle className="h-4 w-4 mr-1" />
-                                {t("super_admin.reject")}
+                                {listingMutating?.id === listing.id &&
+                                listingMutating.action === "suspended" &&
+                                isUpdatingListing ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <XCircle className="h-4 w-4 mr-1" />
+                                    {t("super_admin.suspend_listing", "Suspend")}
+                                  </>
+                                )}
                               </Button>
                               <Button
                                 size="sm"
-                                onClick={() => handleListingAction(listing.id, "approve")}
+                                disabled={
+                                  (listingMutating?.id === listing.id && isUpdatingListing) ||
+                                  listing.status === "active"
+                                }
+                                onClick={() => handleListingStatus(listing.id, "active")}
                               >
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                {t("super_admin.approve")}
+                                {listingMutating?.id === listing.id &&
+                                listingMutating.action === "active" &&
+                                isUpdatingListing ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    {t("super_admin.publish_active", "Set active")}
+                                  </>
+                                )}
                               </Button>
                             </div>
                           </div>
@@ -599,10 +744,15 @@ const SuperAdminDashboard = () => {
               <CardDescription>
                 {t("super_admin.recent_disputes_open", { count: stats?.open_disputes ?? 0 })}
               </CardDescription>
-              <Button variant="outline" size="sm" onClick={() => refetch()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                {t("super_admin.refresh")}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={ROUTES.ADMIN.DISPUTES}>{t("super_admin.all_disputes", "All disputes")}</Link>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => refetch()}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {t("super_admin.refresh")}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <Table>
@@ -638,15 +788,33 @@ const SuperAdminDashboard = () => {
                         <TableCell>{formatDate(dispute.created_at)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title={t("super_admin.open_dispute_thread", "Open in disputes")}
+                              onClick={() =>
+                                navigate(ROUTES.ADMIN.DISPUTES, {
+                                  state: { focusDisputeId: dispute.id },
+                                })
+                              }
+                            >
                               <MessageSquare className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4" />
+                            <Button variant="ghost" size="sm" asChild title={t("super_admin.view_order", "View order")}>
+                              <Link to={ROUTES.ADMIN.ORDERS.DETAILS(dispute.order_id)}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
                             </Button>
-                            <Button variant="ghost" size="sm">
-                              <CheckCircle className="h-4 w-4" />
-                            </Button>
+                            {dispute.status !== "resolved" ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                title={t("super_admin.resolve_dispute", "Resolve dispute")}
+                                onClick={() => setResolveDisputeId(dispute.id)}
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                              </Button>
+                            ) : null}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -747,14 +915,36 @@ const SuperAdminDashboard = () => {
                 </div>
               )}
 
-              <div className="mt-6 flex gap-4">
-                <Button variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
-                  {t("super_admin.export_report")}
+              <div className="mt-6 flex flex-wrap gap-4">
+                <Button
+                  variant="outline"
+                  disabled={isExportingListings}
+                  onClick={() => void handleExportListings()}
+                >
+                  {isExportingListings ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  {t("super_admin.export_listings_csv", "Export listings (CSV)")}
                 </Button>
-                <Button variant="outline">
-                  <Database className="h-4 w-4 mr-2" />
-                  {t("super_admin.system_backup")}
+                <Button
+                  variant="outline"
+                  disabled={isExportingOrders}
+                  onClick={() => void handleExportOrders()}
+                >
+                  {isExportingOrders ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  {t("super_admin.export_orders_csv", "Export orders (CSV)")}
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to={ROUTES.ADMIN.REPORTS.OVERVIEW}>
+                    <Activity className="h-4 w-4 mr-2" />
+                    {t("super_admin.open_reports", "Full reports")}
+                  </Link>
                 </Button>
                 <Button variant="outline" onClick={() => refetch()}>
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -765,6 +955,94 @@ const SuperAdminDashboard = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={suspendUserId != null} onOpenChange={(open) => !open && setSuspendUserId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("super_admin.confirm_deactivate", "Deactivate user?")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t(
+                "super_admin.confirm_deactivate_desc",
+                "Calls PUT /users/{id}/deactivate. The user will not be able to sign in until reactivated."
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel", "Cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void confirmDeactivateUser()} disabled={isDeactivating}>
+              {isDeactivating ? <Loader2 className="h-4 w-4 animate-spin" /> : t("super_admin.deactivate", "Deactivate")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog
+        open={resolveDisputeId != null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setResolveDisputeId(null)
+            setResolveNotes("")
+            setResolveAction("")
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("super_admin.resolve_dispute_title", "Resolve dispute")}</DialogTitle>
+            <DialogDescription>
+              {t(
+                "super_admin.resolve_dispute_api_hint",
+                "Submits POST /disputes/{id}/resolve with your resolution notes (admin only)."
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="resolve-notes">{t("admin.disputes.resolution", "Resolution")}</Label>
+              <Textarea
+                id="resolve-notes"
+                value={resolveNotes}
+                onChange={(e) => setResolveNotes(e.target.value)}
+                rows={4}
+                placeholder={t("super_admin.resolution_placeholder", "Describe the resolution…")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t("super_admin.resolution_action_optional", "Resolution action (optional)")}</Label>
+              <Select value={resolveAction || "__none__"} onValueChange={(v) => setResolveAction(v === "__none__" ? "" : v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("common.select", "Select")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">{t("common.none", "None")}</SelectItem>
+                  <SelectItem value="refund">refund</SelectItem>
+                  <SelectItem value="partial_refund">partial_refund</SelectItem>
+                  <SelectItem value="no_action">no_action</SelectItem>
+                  <SelectItem value="ban">ban</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setResolveDisputeId(null)
+                setResolveNotes("")
+                setResolveAction("")
+              }}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              disabled={!resolveNotes.trim() || isResolvingDispute}
+              onClick={() => void submitResolveDispute()}
+            >
+              {isResolvingDispute ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.disputes.resolve", "Resolve")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

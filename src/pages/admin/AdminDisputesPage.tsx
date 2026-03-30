@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -59,7 +59,7 @@ import {
   type DisputeComment,
 } from "@/store/api/disputesApi";
 import { ROUTES } from "@/lib/routes";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
@@ -81,6 +81,8 @@ function formatDate(dateStr: string): string {
 export default function AdminDisputesPage() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedDisputeId, setSelectedDisputeId] = useState<number | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -91,6 +93,14 @@ export default function AdminDisputesPage() {
   const [commentInternal, setCommentInternal] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [disputeToDelete, setDisputeToDelete] = useState<Dispute | null>(null);
+
+  useEffect(() => {
+    const focusId = (location.state as { focusDisputeId?: number } | null)?.focusDisputeId;
+    if (focusId == null) return;
+    setSelectedDisputeId(focusId);
+    setDetailOpen(true);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.state, location.pathname, navigate]);
 
   const { page, size, handlePageChange, handlePageSizeChange } = usePagination({
     initialPage: 1,
