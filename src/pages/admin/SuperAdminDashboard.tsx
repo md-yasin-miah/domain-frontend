@@ -963,7 +963,7 @@ const SuperAdminDashboard = () => {
             <AlertDialogDescription>
               {t(
                 "super_admin.confirm_deactivate_desc",
-                "Calls PUT /users/{id}/deactivate. The user will not be able to sign in until reactivated."
+                "The user will not be able to sign in until reactivated."
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
