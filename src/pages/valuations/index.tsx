@@ -150,13 +150,33 @@ const AppValuationsIndex = () => {
       )}
 
       {/* Results */}
-      {isSuccess && data && !isFetching && <ValuationResults data={data} />}
+      {isSuccess && data && !isFetching && (
+        <ValuationResults data={data} isAuthenticated={isAuthenticated} />
+      )}
     </div>
   );
 };
 
-function ValuationResults({ data }: { data: AutoValuationResponse }) {
+function ValuationResults({
+  data,
+  isAuthenticated,
+}: {
+  data: AutoValuationResponse;
+  isAuthenticated: boolean;
+}) {
   const currency = data.currency || "USD";
+  const sellFlowPath = `${ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}?from_valuation=1&product_type=domain&domain_name=${encodeURIComponent(
+    data.domain_name ?? "",
+  )}&domain_extension=${encodeURIComponent(
+    data.domain_extension ? `.${data.domain_extension}` : "",
+  )}&prefill_title=${encodeURIComponent(
+    data.domain ?? "",
+  )}&prefill_price=${encodeURIComponent(
+    String(Math.round(data.estimated_value ?? 0)),
+  )}`;
+  const sellHref = isAuthenticated
+    ? sellFlowPath
+    : `${ROUTES.AUTH.INDEX}?returnUrl=${encodeURIComponent(sellFlowPath)}`;
   const hasAnyMetric =
     data.domain_length_score != null ||
     data.domain_age_years != null ||
@@ -184,19 +204,11 @@ function ValuationResults({ data }: { data: AutoValuationResponse }) {
                 {moment(data.calculated_at).format("lll")}
               </span>
             )}
-            <Link
-              to={`${ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}?from_valuation=1&product_type=domain&domain_name=${encodeURIComponent(
-                data.domain_name ?? "",
-              )}&domain_extension=${encodeURIComponent(
-                data.domain_extension ? `.${data.domain_extension}` : "",
-              )}&prefill_title=${encodeURIComponent(
-                data.domain ?? "",
-              )}&prefill_price=${encodeURIComponent(
-                String(Math.round(data.estimated_value ?? 0)),
-              )}`}
-            >
+            <Link to={sellHref}>
               <Button size="sm" variant="outline">
-                Sell this domain
+                {isAuthenticated
+                  ? "Sell this domain"
+                  : "Sign in to sell this domain"}
               </Button>
             </Link>
           </div>
