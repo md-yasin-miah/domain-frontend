@@ -184,7 +184,7 @@ function ValuationResults({ data }: { data: AutoValuationResponse }) {
                 {moment(data.calculated_at).format("lll")}
               </span>
             )}
-            <Link to={ROUTES.CLIENT.MARKETPLACE.ROOT}>
+            <Link to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}>
               <Button size="sm" variant="outline">
                 Sell this domain
               </Button>
