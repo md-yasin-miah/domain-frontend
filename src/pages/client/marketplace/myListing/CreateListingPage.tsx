@@ -45,6 +45,7 @@ export default function CreateListingPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [prefillApplied, setPrefillApplied] = useState(false);
   const [step, setStep] = useState(1);
   const [verificationId, setVerificationId] = useState<number | null>(null);
   const [runTutorial, setRunTutorial] = useState(false);
@@ -210,6 +211,53 @@ export default function CreateListingPage() {
   const availableVerifications =
     verifications?.filter((v) => v.status === "verified" && !v.listing_id) ??
     [];
+
+  useEffect(() => {
+    if (prefillApplied) return;
+    const verificationIdFromQuery = parseInt(
+      searchParams.get("verification_id") || "",
+      10,
+    );
+    if (!verificationIdFromQuery || Number.isNaN(verificationIdFromQuery)) return;
+    if (loadingVerifications || loadingTypes) return;
+
+    const verification = availableVerifications.find(
+      (v) => v.id === verificationIdFromQuery,
+    );
+    if (!verification) return;
+
+    const listingTypeId =
+      listingTypes?.find(
+        (type) => type.slug === (searchParams.get("listing_type") || verification.product_type),
+      )?.id ?? 0;
+
+    setVerificationId(verificationIdFromQuery);
+    setFormData((prev) => ({
+      ...prev,
+      title:
+        searchParams.get("prefill_title") ||
+        verification.domain_name ||
+        verification.website_url ||
+        prev.title,
+      listing_type_id: listingTypeId || prev.listing_type_id,
+      price: searchParams.get("prefill_price") || prev.price,
+    }));
+
+    if (verification.product_type === "domain" && verification.domain_name) {
+      fetchValuation({ domain: verification.domain_name });
+    }
+
+    setStep(2);
+    setPrefillApplied(true);
+  }, [
+    prefillApplied,
+    searchParams,
+    loadingVerifications,
+    loadingTypes,
+    availableVerifications,
+    listingTypes,
+    fetchValuation,
+  ]);
 
   const handleInputChange = (
     field: keyof CreateListingFromVerificationRequest,

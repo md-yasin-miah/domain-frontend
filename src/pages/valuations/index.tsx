@@ -184,7 +184,17 @@ function ValuationResults({ data }: { data: AutoValuationResponse }) {
                 {moment(data.calculated_at).format("lll")}
               </span>
             )}
-            <Link to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}>
+            <Link
+              to={`${ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}?from_valuation=1&product_type=domain&domain_name=${encodeURIComponent(
+                data.domain_name ?? "",
+              )}&domain_extension=${encodeURIComponent(
+                data.domain_extension ? `.${data.domain_extension}` : "",
+              )}&prefill_title=${encodeURIComponent(
+                data.domain ?? "",
+              )}&prefill_price=${encodeURIComponent(
+                String(Math.round(data.estimated_value ?? 0)),
+              )}`}
+            >
               <Button size="sm" variant="outline">
                 Sell this domain
               </Button>

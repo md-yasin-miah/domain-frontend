@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -73,6 +73,8 @@ const ClientProductsVerificationsPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const prefillAppliedRef = useRef(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<VerificationStatus>("all");
   const [productTypeFilter, setProductTypeFilter] =
@@ -243,9 +245,25 @@ const ClientProductsVerificationsPage = () => {
       refetch();
       // Navigate to details page
       if (response?.id) {
-        navigate(
-          ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(response.id),
-        );
+        if (searchParams.get("from_valuation") === "1") {
+          const next = new URLSearchParams();
+          next.set("verification_id", String(response.id));
+          next.set("listing_type", searchParams.get("product_type") || "domain");
+          const prefillTitle =
+            searchParams.get("prefill_title") ||
+            response.domain_name ||
+            response.website_url ||
+            "";
+          const prefillPrice = searchParams.get("prefill_price") || "";
+          if (prefillTitle) next.set("prefill_title", prefillTitle);
+          if (prefillPrice) next.set("prefill_price", prefillPrice);
+          setSearchParams(new URLSearchParams(), { replace: true });
+          navigate(`${ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_CREATE}?${next.toString()}`);
+        } else {
+          navigate(
+            ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION_DETAILS(response.id),
+          );
+        }
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -272,6 +290,21 @@ const ClientProductsVerificationsPage = () => {
   const isWebsiteType =
     selectedListingType?.slug === "website" ||
     formData.product_type === "website";
+
+  useEffect(() => {
+    if (prefillAppliedRef.current) return;
+    if (searchParams.get("from_valuation") !== "1") return;
+    prefillAppliedRef.current = true;
+
+    setCreateDialogOpen(true);
+    setFormData((prev) => ({
+      ...prev,
+      product_type: searchParams.get("product_type") || "domain",
+      domain_name: searchParams.get("domain_name") || "",
+      domain_extension: searchParams.get("domain_extension") || "",
+      website_url: searchParams.get("website_url") || "",
+    }));
+  }, [searchParams]);
 
   if (isLoading) {
     return (
