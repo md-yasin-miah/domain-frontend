@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Valuation AI</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --browser-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 550px;
+            padding: 20px;
+        }
+
+        /* --- 1. START BOX --- */
+        #input-stage {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        input {
+            padding: 14px;
+            width: 70%;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input:focus { border-color: var(--primary); }
+
+        button {
+            padding: 14px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* --- 2. TYPING MESSAGE --- */
+        #status-message {
+            font-size: 1.25rem;
+            font-weight: 500;
+            text-align: center;
+            min-height: 1.6em;
+            margin-bottom: 25px;
+        }
+
+        /* --- 3. BROWSER UI --- */
+        .browser-window {
+            background: white;
+            border: 1px solid var(--browser-border);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .browser-header {
+            background: #f8fafc;
+            padding: 14px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--browser-border);
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .browser-body { padding: 30px; position: relative; }
+
+        /* Search Bar inside Browser */
+        .search-row {
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 50px;
+            padding: 12px 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        #fake-search-input {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Results List */
+        .results-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .result-item {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .result-item.show { opacity: 1; transform: translateX(0); }
+        .res-link { height: 10px; width: 40%; background: #bfdbfe; border-radius: 4px; }
+        .res-desc { height: 8px; width: 90%; background: #f1f5f9; border-radius: 4px; }
+
+        /* MAGNIFIER ANIMATION */
+        .scanner-glass {
+            position: absolute;
+            font-size: 30px;
+            left: 45%;
+            top: 150px;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        @keyframes scanLines {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(120px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        /* --- 4. FINAL REPORT --- */
+        .result-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-top: 5px solid #10b981;
+        }
+
+        .success-badge {
+            width: 60px; height: 60px; background: #ecfdf5; color: #10b981;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 30px; margin: 0 auto 20px;
+        }
+
+        /* Utilities */
+        .visible { display: block !important; opacity: 1 !important; transform: translateY(0) !important; }
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="input-stage">
+            <h2 style="margin-top:0">Domain Valuator</h2>
+            <p style="color: #64748b; margin-bottom: 25px;">Enter a domain to see its market value.</p>
+            <input type="text" id="domain-input" placeholder="example.com" value="google.com">
+            <button onclick="runApp()">Analyze</button>
+        </div>
+
+        <div id="status-message"></div>
+
+        <div id="browser-ui" class="browser-window">
+            <div class="browser-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="browser-body">
+                <div class="scanner-glass" id="magnifier">🔍</div>
+                
+                <div class="search-row">
+                    <span style="margin-right:10px">🔍</span>
+                    <div id="fake-search-input"></div>
+                </div>
+
+                <div class="results-list" id="results-container">
+                    </div>
+            </div>
+        </div>
+
+        <div id="result-ui" class="result-card">
+            <div class="success-badge">✓</div>
+            <h2 style="margin:0 0 10px 0;">Valuation Ready!</h2>
+            <p id="final-message" style="line-height: 1.6; color: #475569;"></p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                <span style="font-size: 24px; font-weight: 800; color: #059669;">$145,200 USD</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statusEl = document.getElementById('status-message');
+        const inputStage = document.getElementById('input-stage');
+        const browserUi = document.getElementById('browser-ui');
+        const fakeInput = document.getElementById('fake-search-input');
+        const resultsBox = document.getElementById('results-container');
+        const magnifier = document.getElementById('magnifier');
+        const resultUi = document.getElementById('result-ui');
+
+        async function runApp() {
+            const domain = document.getElementById('domain-input').value || "domain.com";
+            
+            // 1. Initial Transition
+            inputStage.classList.add('hidden');
+
+            // 2. Typing Style
+            await typeEffect(statusEl, `Hey. we are searching for valuation for ${domain}...`, 50);
+            await sleep(1200);
+
+            // 3. Delete Style
+            await deleteEffect(statusEl);
+            statusEl.classList.add('hidden');
+
+            // 4. Open Browser
+            browserUi.classList.add('visible');
+            await sleep(500);
+            
+            // 5. Type in Browser Search Bar
+            await typeEffect(fakeInput, domain, 80);
+            await sleep(500);
+
+            // 6. Generate "Searching" results
+            magnifier.style.display = "block";
+            magnifier.style.animation = "scanLines 2s ease-in-out infinite";
+
+            for(let i=0; i<4; i++) {
+                const item = document.createElement('div');
+                item.className = "result-item";
+                item.innerHTML = `<div class="res-link"></div><div class="res-desc"></div>`;
+                resultsBox.appendChild(item);
+                await sleep(400);
+                item.classList.add('show');
+            }
+
+            // Simulate "Analyzing with Gemini"
+            await sleep(2500);
+
+            // 7. Success State
+            magnifier.style.display = "none";
+            browserUi.style.opacity = "0";
+            browserUi.style.transform = "scale(0.95)";
+            
+            await sleep(400);
+            browserUi.classList.remove('visible');
+            
+            resultUi.classList.add('visible');
+            document.getElementById('final-message').innerText = `We have successfully generated the valuation report for ${domain} using our AI models.`;
+        }
+
+        // --- Logic Helpers ---
+
+        function typeEffect(element, text, speed) {
+            return new Promise(resolve => {
+                let i = 0;
+                element.innerText = "";
+                const timer = setInterval(() => {
+                    element.innerText += text[i];
+                    i++;
+                    if (i === text.length) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
+
+        function deleteEffect(element) {
+            return new Promise(resolve => {
+                let text = element.innerText;
+                const timer = setInterval(() => {
+                    text = text.slice(0, -1);
+                    element.innerText = text;
+                    if (text.length === 0) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, 25);
+            });
+        }
+
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    </script>
+</body>
+</html>
