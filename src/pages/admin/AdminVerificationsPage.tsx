@@ -100,7 +100,7 @@ export default function AdminVerificationsPage() {
       {
         id: "user_id",
         accessorKey: "user_id",
-        header: t("admin.verifications.user", "User"),
+        header: t("admin.verifications.user"),
         cell: ({ row }) => {
           const name =
             row.user?.profile?.first_name || row.user?.profile?.last_name
@@ -130,7 +130,7 @@ export default function AdminVerificationsPage() {
       {
         id: "requested_at",
         accessorKey: "requested_at",
-        header: t("admin.verifications.requested_at", "Requested"),
+        header: t("admin.verifications.requested_at"),
         cell: ({ row }) => (
           <span className="text-muted-foreground text-sm">
             {formatDate(row.requested_at)}
@@ -140,7 +140,7 @@ export default function AdminVerificationsPage() {
       {
         id: "reviewed_at",
         accessorKey: "reviewed_at",
-        header: t("admin.verifications.reviewed_at", "Reviewed"),
+        header: t("admin.verifications.reviewed_at"),
         cell: ({ row }) => (
           <span className="text-muted-foreground text-sm">
             {formatDate(row.reviewed_at)}
@@ -150,7 +150,7 @@ export default function AdminVerificationsPage() {
       {
         id: "admin_notes",
         accessorKey: "admin_notes",
-        header: t("admin.verifications.admin_notes", "Notes"),
+        header: t("admin.verifications.admin_notes"),
         cell: ({ row }) => (
           <span className="text-muted-foreground text-sm max-w-[200px] truncate block">
             {row.admin_notes || "—"}
@@ -166,13 +166,10 @@ export default function AdminVerificationsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Verified className="h-7 w-7" />
-          {t("admin.verifications.title", "Account Verifications")}
+          {t("admin.verifications.title")}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {t(
-            "admin.verifications.description",
-            "Review and approve or reject user account verification requests."
-          )}
+          {t("admin.verifications.description")}
         </p>
       </div>
 
@@ -180,13 +177,10 @@ export default function AdminVerificationsPage() {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
             <CardTitle>
-              {t("admin.verifications.list_title", "Verification Requests")}
+              {t("admin.verifications.list_title")}
             </CardTitle>
             <CardDescription>
-              {t(
-                "admin.verifications.manage",
-                "Approve or reject pending requests to verify user accounts."
-              )}
+              {t("admin.verifications.manage")}
             </CardDescription>
           </div>
           <Select
@@ -214,7 +208,7 @@ export default function AdminVerificationsPage() {
             columns={columns}
             pagination={pagination}
             isLoading={isLoading}
-            emptyMessage={t("admin.verifications.empty", "No verification requests.")}
+            emptyMessage={t("admin.verifications.empty")}
             emptyIcon={<Verified className="h-12 w-12 mx-auto opacity-50" />}
             getRowId={(row) => String(row.id)}
             renderActions={(row) => (
@@ -223,7 +217,7 @@ export default function AdminVerificationsPage() {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
-                  title={t("admin.verifications.view_review", "View & review")}
+                  title={t("admin.verifications.view_review")}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
@@ -235,8 +229,8 @@ export default function AdminVerificationsPage() {
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             error={error}
-            errorTitle={t("common.error.title", "Error")}
-            errorDescription={t("common.error.description", "Something went wrong.")}
+            errorTitle={t("common.error.title")}
+            errorDescription={t("common.error.description")}
             errorIcon={<Verified className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>

@@ -132,14 +132,14 @@ export default function AdminComparableSalesPage() {
           buyer_type: form.buyer_type ?? null,
         };
         await updateSale({ id: editing.id, data: updateData }).unwrap();
-        toast({ title: t("common.updated", "Updated") });
+        toast({ title: t("common.updated") });
       } else {
         await createSale(form).unwrap();
-        toast({ title: t("common.created", "Created") });
+        toast({ title: t("common.created") });
       }
       setDialogOpen(false);
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -150,7 +150,7 @@ export default function AdminComparableSalesPage() {
       toast({ title: t("admin.valuations.comparable_deleted") });
       setDeleteId(null);
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -161,10 +161,10 @@ export default function AdminComparableSalesPage() {
         <div className="relative flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <History className="h-7 w-7 text-primary" />
-            {t("admin.sidebar.valuations_comparable", "Comparable Sales")}
+            {t("admin.sidebar.valuations_comparable")}
           </h1>
           <p className="text-muted-foreground">
-            {t("admin.valuations.comparable_description", "Manage domain sale records used for valuations and market rank.")}
+            {t("admin.valuations.comparable_description")}
           </p>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function AdminComparableSalesPage() {
           <div>
             <CardTitle>{t("admin.valuations.tab_comparable")}</CardTitle>
             <CardDescription>
-              {t("admin.valuations.comparable_empty", "No comparable sales")} — {sales.length} {t("common.items", "items")}
+              {t("admin.valuations.comparable_empty")} — {sales.length} {t("common.items")}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">

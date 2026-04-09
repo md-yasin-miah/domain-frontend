@@ -166,27 +166,26 @@ const Marketplace = () => {
   const howItWorks = [
     {
       step: 1,
-      title: "Registro y Verificación",
-      description:
-        "Crea tu cuenta gratuita y completa la verificación de identidad",
+      title: t("marketplace.how_it_works.step1.title"),
+      description: t("marketplace.how_it_works.step1.description"),
       icon: CheckCircle,
     },
     {
       step: 2,
-      title: "Explora y Analiza",
-      description: "Navega por activos verificados con métricas transparentes",
+      title: t("marketplace.how_it_works.step2.title"),
+      description: t("marketplace.how_it_works.step2.description"),
       icon: TrendingUp,
     },
     {
       step: 3,
-      title: "Compra Segura",
-      description: "Escrow protegido durante toda la transacción",
+      title: t("marketplace.how_it_works.step3.title"),
+      description: t("marketplace.how_it_works.step3.description"),
       icon: Shield,
     },
     {
       step: 4,
-      title: "Transferencia Completa",
-      description: "Recibe todos los activos y documentación legal",
+      title: t("marketplace.how_it_works.step4.title"),
+      description: t("marketplace.how_it_works.step4.description"),
       icon: Award,
     },
   ];
@@ -208,7 +207,9 @@ const Marketplace = () => {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-background/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50">
               <div className="col-span-12 md:col-span-6 relative">
                 <Input
-                  placeholder="Search for a listing"
+                  placeholder={t(
+                    "marketplace.search.placeholder"
+                  )}
                   className="w-full h-12"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -221,10 +222,14 @@ const Marketplace = () => {
                   onValueChange={setSelectedCategory}
                 >
                   <SelectTrigger className="h-12 min-w-[180px]">
-                    <SelectValue placeholder="Categoría" />
+                    <SelectValue
+                      placeholder={t("marketplace.filters.category")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="all">
+                      {t("marketplace.filters.all_categories")}
+                    </SelectItem>
                     {categories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
                         {cat.name}
@@ -236,10 +241,14 @@ const Marketplace = () => {
               <div className="col-span-12 md:col-span-3">
                 <Select value={priceRange} onValueChange={setPriceRange}>
                   <SelectTrigger className="h-12 min-w-[160px]">
-                    <SelectValue placeholder="Precio" />
+                    <SelectValue
+                      placeholder={t("marketplace.filters.price")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Prices</SelectItem>
+                    <SelectItem value="all">
+                      {t("marketplace.filters.all_prices")}
+                    </SelectItem>
                     <SelectItem value="0-1000">$0 - $1,000</SelectItem>
                     <SelectItem value="1000-10000">$1,000 - $10,000</SelectItem>
                     <SelectItem value="10000-50000">
@@ -256,21 +265,27 @@ const Marketplace = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary mb-1">$2.4M+</div>
-              <div className="text-sm text-muted-foreground">Transacciones</div>
+              <div className="text-sm text-muted-foreground">
+                {t("marketplace.trust.transactions")}
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-primary mb-1">500+</div>
               <div className="text-sm text-muted-foreground">
-                Activos Vendidos
+                {t("marketplace.trust.assets_sold")}
               </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-primary mb-1">98%</div>
-              <div className="text-sm text-muted-foreground">Satisfacción</div>
+              <div className="text-sm text-muted-foreground">
+                {t("marketplace.trust.satisfaction")}
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-primary mb-1">24/7</div>
-              <div className="text-sm text-muted-foreground">Soporte</div>
+              <div className="text-sm text-muted-foreground">
+                {t("marketplace.trust.support")}
+              </div>
             </div>
           </div>
         </div>
@@ -475,7 +490,7 @@ const Marketplace = () => {
                           <category.icon className="w-8 h-8 text-primary" />
                         </div>
                         <Badge variant="secondary" className="text-xs">
-                          Ver categoría
+                          {t("marketplace.categories.view_category")}
                         </Badge>
                       </div>
                       <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
@@ -483,7 +498,7 @@ const Marketplace = () => {
                       </h3>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">
-                          Ver todos
+                          {t("marketplace.categories.view_all")}
                         </span>
                         <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
@@ -501,11 +516,10 @@ const Marketplace = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">
-              Cómo Funciona Nuestro Marketplace
+              {t("marketplace.how_it_works.title")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Proceso simple, seguro y transparente para comprar y vender
-              activos digitales con total confianza
+              {t("marketplace.how_it_works.subtitle")}
             </p>
           </div>
 
@@ -536,7 +550,7 @@ const Marketplace = () => {
               className="bg-gradient-to-r from-primary to-secondary hover:shadow-xl px-8 py-4"
             >
               <CheckCircle className="w-5 h-5 mr-2" />
-              Comenzar Ahora
+              {t("marketplace.how_it_works.cta")}
             </Button>
           </div>
         </div>
@@ -546,21 +560,20 @@ const Marketplace = () => {
       <section className="py-16 px-6 bg-gradient-to-r from-primary/10 via-background to-secondary/10">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-black text-foreground mb-6">
-            ¿Listo para Encontrar tu Próximo Activo Digital?
+            {t("marketplace.cta.title")}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Únete a miles de inversores que ya están construyendo su portafolio
-            de activos digitales
+            {t("marketplace.cta.subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
               className="bg-gradient-to-r from-primary to-secondary hover:shadow-xl"
             >
-              Explorar Activos
+              {t("marketplace.cta.explore_assets")}
             </Button>
             <Button size="lg" variant="outline">
-              Vender mis Activos
+              {t("marketplace.cta.sell_assets")}
             </Button>
           </div>
         </div>

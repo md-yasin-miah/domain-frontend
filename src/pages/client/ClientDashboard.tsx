@@ -130,18 +130,18 @@ export default function ClientDashboard() {
           <div className="flex items-center gap-4 md:gap-10">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <Wallet className="h-4 w-4 text-muted-foreground" />
-              {t("client_dashboard.balance.title", "Balance")}
+              {t("client_dashboard.balance.title")}
             </CardTitle>
           </div>
           <div className="flex gap-2">
             <Link to={ROUTES.CLIENT.WALLET("add-fund")}>
               <Button variant="default" size="sm">
-                Topup Balance
+                {t("client_dashboard.balance.topup_balance")}
               </Button>
             </Link>
             <Link to={ROUTES.CLIENT.WALLET()}>
               <Button variant="outline" size="sm">
-                Wallet
+                {t("client_dashboard.balance.wallet_button")}
               </Button>
             </Link>
           </div>
@@ -149,7 +149,7 @@ export default function ClientDashboard() {
         <CardContent>
           {balanceLoading ? (
             <div className="text-muted-foreground text-sm">
-              {t("common.loading", "Loading...")}
+              {t("common.loading")}
             </div>
           ) : balance ? (
             <div className="space-y-2 md:space-y-3">
@@ -157,41 +157,35 @@ export default function ClientDashboard() {
                 {formatBalance(balance.total_balance, balance.currency)}
               </div>
               <p className="text-xs text-muted-foreground">
-                {t(
-                  "client_dashboard.balance.total",
-                  "Total balance (wallet + earnings)",
-                )}
+                {t("client_dashboard.balance.total")}
               </p>
               <div className="flex flex-wrap gap-2 md:pt-2 pt-1 text-xs text-muted-foreground">
                 <Badge variant="outline">
-                  {t("client_dashboard.balance.wallet", "Wallet")}:{" "}
+                  {t("client_dashboard.balance.wallet")}:{" "}
                   {formatBalance(balance.wallet_balance, balance.currency)}
                 </Badge>
                 <Badge variant="outline">
-                  {t(
-                    "client_dashboard.balance.earnings_available",
-                    "Earnings available",
-                  )}
+                  {t("client_dashboard.balance.earnings_available")}
                   :{" "}
                   {formatBalance(balance.earnings_available, balance.currency)}
                 </Badge>
                 <Badge variant="outline">
-                  {t("client_dashboard.balance.total_earned", "Total earned")}:{" "}
+                  {t("client_dashboard.balance.total_earned")}:{" "}
                   {formatBalance(balance.total_earned, balance.currency)}
                 </Badge>
                 <Badge variant="outline">
-                  {t("client_dashboard.balance.total_withdrawn", "Withdrawn")}:{" "}
+                  {t("client_dashboard.balance.total_withdrawn")}:{" "}
                   {formatBalance(balance.total_withdrawn, balance.currency)}
                 </Badge>
                 <Badge variant="outline">
-                  {t("client_dashboard.balance.pending", "Pending")}:{" "}
+                  {t("client_dashboard.balance.pending")}:{" "}
                   {formatBalance(balance.pending_balance, balance.currency)}
                 </Badge>
               </div>
             </div>
           ) : (
             <p className="text-muted-foreground text-sm">
-              {t("client_dashboard.balance.unavailable", "Balance unavailable")}
+              {t("client_dashboard.balance.unavailable")}
             </p>
           )}
         </CardContent>

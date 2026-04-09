@@ -173,11 +173,11 @@ export default function AdminUserDetailPage() {
       <div className="space-y-6">
         <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("common.back", "Back")}
+          {t("common.back")}
         </Button>
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">{t("admin.user_detail.invalid_id", "Invalid user ID")}</p>
+            <p className="text-muted-foreground">{t("admin.user_detail.invalid_id")}</p>
           </CardContent>
         </Card>
       </div>
@@ -205,7 +205,7 @@ export default function AdminUserDetailPage() {
       <div className="space-y-6">
         <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("common.back", "Back")}
+          {t("common.back")}
         </Button>
         <Card>
           <CardContent className="py-12 text-center">
@@ -221,7 +221,7 @@ export default function AdminUserDetailPage() {
       <div className="space-y-6">
         <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN.USERS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("common.back", "Back")}
+          {t("common.back")}
         </Button>
         <Card>
           <CardHeader>

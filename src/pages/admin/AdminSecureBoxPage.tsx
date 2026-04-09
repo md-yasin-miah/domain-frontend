@@ -158,11 +158,11 @@ export default function AdminSecureBoxPage() {
       }).unwrap();
 
       toast({
-        title: t("admin.secure_box.success", "Success"),
+        title: t("admin.secure_box.success"),
         description:
           actionType === "approved"
-            ? t("admin.secure_box.approved_message", "Secure box approved.")
-            : t("admin.secure_box.rejected_message", "Secure box rejected."),
+            ? t("admin.secure_box.approved_message")
+            : t("admin.secure_box.rejected_message"),
       });
 
       handleClose();
@@ -177,7 +177,7 @@ export default function AdminSecureBoxPage() {
           ? (err as { data: { detail?: string } }).data?.detail
           : t("common.error");
       toast({
-        title: t("common.error", "Error"),
+        title: t("common.error"),
         description: String(detail),
         variant: "destructive",
       });
@@ -189,7 +189,7 @@ export default function AdminSecureBoxPage() {
       {
         id: "order",
         accessorKey: (row) => row.order?.order_number ?? row.order_id,
-        header: t("admin.secure_box.order", "Order"),
+        header: t("admin.secure_box.order"),
         cell: ({ row }) => (
           <span className="font-medium">
             {row.order?.order_number ?? `#${row.order_id}`}
@@ -199,7 +199,7 @@ export default function AdminSecureBoxPage() {
       {
         id: "buyer",
         accessorKey: (row) => row.buyer?.username ?? row.buyer?.email ?? "—",
-        header: t("admin.secure_box.buyer", "Buyer"),
+        header: t("admin.secure_box.buyer"),
         cell: ({ row }) => {
           return (
             <Link
@@ -214,7 +214,7 @@ export default function AdminSecureBoxPage() {
       {
         id: "seller",
         accessorKey: (row) => row.seller?.username ?? row.seller?.email ?? "—",
-        header: t("admin.secure_box.seller", "Seller"),
+        header: t("admin.secure_box.seller"),
         cell: ({ row }) => {
           return (
             <Link
@@ -229,7 +229,7 @@ export default function AdminSecureBoxPage() {
       {
         id: "status",
         accessorKey: "status",
-        header: t("admin.secure_box.status", "Status"),
+        header: t("admin.secure_box.status"),
         cell: ({ row }) => (
           <Badge variant={getStatusVariant(row.status)} className="capitalize">
             {row.status}
@@ -239,7 +239,7 @@ export default function AdminSecureBoxPage() {
       {
         id: "content",
         accessorKey: "content",
-        header: t("admin.secure_box.content", "Content"),
+        header: t("admin.secure_box.content"),
         cell: ({ row }) => (
           <span
             className="max-w-[200px] truncate block cursor-pointer hover:text-primary transition-colors"
@@ -256,7 +256,7 @@ export default function AdminSecureBoxPage() {
       {
         id: "created_at",
         accessorKey: "created_at",
-        header: t("admin.secure_box.created", "Created"),
+        header: t("admin.secure_box.created"),
         cell: ({ row }) => (
           <span className="text-muted-foreground text-sm">
             {formatDate(row.created_at)}
@@ -272,7 +272,7 @@ export default function AdminSecureBoxPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <LockIcon className="h-7 w-7" />
-          {t("admin.secure_box.title", "Secure Box")}
+          {t("admin.secure_box.title")}
         </h1>
         <p className="text-muted-foreground mt-1">
           {t(
@@ -286,7 +286,7 @@ export default function AdminSecureBoxPage() {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
             <CardTitle>
-              {t("admin.secure_box.list_title", "All Secure Boxes")}
+              {t("admin.secure_box.list_title")}
             </CardTitle>
             <CardDescription>
               {t(
@@ -297,7 +297,7 @@ export default function AdminSecureBoxPage() {
           </div>
           <div className="space-y-2">
             <Label className="sr-only">
-              {t("admin.secure_box.filter_status", "Status")}
+              {t("admin.secure_box.filter_status")}
             </Label>
             <Select
               value={statusFilter}
@@ -311,7 +311,7 @@ export default function AdminSecureBoxPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
-                  {t("admin.secure_box.all_statuses", "All statuses")}
+                  {t("admin.secure_box.all_statuses")}
                 </SelectItem>
                 {STATUS_OPTIONS.map((s) => (
                   <SelectItem key={s} value={s}>
@@ -343,7 +343,7 @@ export default function AdminSecureBoxPage() {
                     onClick={() => handleOpenApprove(row)}
                   >
                     <Check className="h-4 w-4 mr-1" />
-                    {t("admin.secure_box.approve", "Approve")}
+                    {t("admin.secure_box.approve")}
                   </Button>
                   <Button
                     size="sm"
@@ -351,20 +351,20 @@ export default function AdminSecureBoxPage() {
                     onClick={() => handleOpenReject(row)}
                   >
                     <X className="h-4 w-4 mr-1" />
-                    {t("admin.secure_box.reject", "Reject")}
+                    {t("admin.secure_box.reject")}
                   </Button>
                 </div>
               ) : (
                 <span className="text-muted-foreground text-sm">—</span>
               )
             }
-            actionsColumnHeader={t("admin.secure_box.actions", "Actions")}
+            actionsColumnHeader={t("admin.secure_box.actions")}
             enableSorting={true}
             pageSize={size}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             error={error}
-            errorTitle={t("common.error", "Error")}
+            errorTitle={t("common.error")}
             errorDescription={t(
               "admin.secure_box.error_desc",
               "Failed to load secure boxes.",
@@ -382,8 +382,8 @@ export default function AdminSecureBoxPage() {
           <DialogHeader>
             <DialogTitle>
               {actionType === "approved"
-                ? t("admin.secure_box.approve_title", "Approve Secure Box")
-                : t("admin.secure_box.reject_title", "Reject Secure Box")}
+                ? t("admin.secure_box.approve_title")
+                : t("admin.secure_box.reject_title")}
             </DialogTitle>
             <DialogDescription>
               {actionType === "approved"
@@ -409,7 +409,7 @@ export default function AdminSecureBoxPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="admin_notes">
-                {t("admin.secure_box.admin_notes", "Admin Notes")} (optional)
+                {t("admin.secure_box.admin_notes")} (optional)
               </Label>
               <Textarea
                 id="admin_notes"
@@ -425,7 +425,7 @@ export default function AdminSecureBoxPage() {
             {actionType === "rejected" && (
               <div className="space-y-2">
                 <Label htmlFor="rejection_reason">
-                  {t("admin.secure_box.rejection_reason", "Rejection Reason")} *
+                  {t("admin.secure_box.rejection_reason")} *
                 </Label>
                 <Textarea
                   id="rejection_reason"
@@ -447,7 +447,7 @@ export default function AdminSecureBoxPage() {
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              {t("common.cancel", "Cancel")}
+              {t("common.cancel")}
             </Button>
             <Button
               variant={actionType === "rejected" ? "destructive" : "default"}
@@ -461,8 +461,8 @@ export default function AdminSecureBoxPage() {
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               )}
               {actionType === "approved"
-                ? t("admin.secure_box.approved", "Approved")
-                : t("admin.secure_box.rejected", "Rejected")}
+                ? t("admin.secure_box.approved")
+                : t("admin.secure_box.rejected")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -490,7 +490,7 @@ export default function AdminSecureBoxPage() {
           </div>
           <DialogFooter>
             <Button onClick={() => setViewedContent(null)}>
-              {t("common.close", "Close")}
+              {t("common.close")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -156,7 +156,7 @@ export default function AdminDisputesPage() {
       setResolveResolution("");
       setResolveAction("");
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -171,7 +171,7 @@ export default function AdminDisputesPage() {
       setNewComment("");
       toast({ title: t("admin.disputes.comment_added") });
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -192,7 +192,7 @@ export default function AdminDisputesPage() {
       }
       toast({ title: t("admin.disputes.deleted") });
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -271,17 +271,17 @@ export default function AdminDisputesPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <ShieldAlert className="h-7 w-7" />
-          {t("admin.disputes.title", "Disputes")}
+          {t("admin.disputes.title")}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {t("admin.disputes.description", "View and resolve order disputes.")}
+          {t("admin.disputes.description")}
         </p>
       </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
-            <CardTitle>{t("admin.disputes.list_title", "Disputes")}</CardTitle>
+            <CardTitle>{t("admin.disputes.list_title")}</CardTitle>
             <CardDescription>{t("admin.disputes.manage")}</CardDescription>
           </div>
           <Select
@@ -336,8 +336,8 @@ export default function AdminDisputesPage() {
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             error={error}
-            errorTitle={t("common.error.title", "Error")}
-            errorDescription={t("common.error.description", "Something went wrong.")}
+            errorTitle={t("common.error.title")}
+            errorDescription={t("common.error.description")}
             errorIcon={<ShieldAlert className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>

@@ -118,7 +118,7 @@ export default function AdminGuideArticleEditPage() {
   const handleSave = async () => {
     if (!formData.title?.trim() || !formData.content?.trim()) {
       toast({
-        title: t("admin.guides.errors.required", "Required fields missing"),
+        title: t("admin.guides.errors.required"),
         description: t(
           "admin.guides.errors.title_content_required",
           "Title and content are required.",
@@ -146,7 +146,7 @@ export default function AdminGuideArticleEditPage() {
       if (isNew) {
         await createArticle(payload).unwrap();
         toast({
-          title: t("admin.guides.created", "Article created"),
+          title: t("admin.guides.created"),
           description: t(
             "admin.guides.created_desc",
             "Guide article was created successfully.",
@@ -155,7 +155,7 @@ export default function AdminGuideArticleEditPage() {
       } else if (articleId) {
         await updateArticle({ article_id: articleId, data: payload }).unwrap();
         toast({
-          title: t("admin.guides.updated", "Article updated"),
+          title: t("admin.guides.updated"),
           description: t(
             "admin.guides.updated_desc",
             "Guide article was updated successfully.",
@@ -169,7 +169,7 @@ export default function AdminGuideArticleEditPage() {
           ? (err as { data?: { detail?: string } }).data?.detail
           : String(err);
       toast({
-        title: t("admin.guides.save_error", "Save failed"),
+        title: t("admin.guides.save_error"),
         description: message,
         variant: "destructive",
       });
@@ -195,14 +195,14 @@ export default function AdminGuideArticleEditPage() {
             onClick={() => navigate(ROUTES.ADMIN.GUIDES.ARTICLES)}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("common.back", "Back")}
+            {t("common.back")}
           </Button>
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <BookOpen className="h-6 w-6" />
               {isNew
-                ? t("admin.guides.add_article", "Add Article")
-                : t("admin.guides.edit_article", "Edit Article")}
+                ? t("admin.guides.add_article")
+                : t("admin.guides.edit_article")}
             </h1>
             <p className="text-muted-foreground text-sm">
               {isNew
@@ -226,7 +226,7 @@ export default function AdminGuideArticleEditPage() {
                 rel="noopener noreferrer"
               >
                 <Eye className="h-4 w-4 mr-2" />
-                {t("admin.guides.view_article", "View")}
+                {t("admin.guides.view_article")}
               </Link>
             </Button>
           )}
@@ -234,12 +234,12 @@ export default function AdminGuideArticleEditPage() {
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("common.saving", "Saving...")}
+                {t("common.saving")}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                {t("common.save", "Save")}
+                {t("common.save")}
               </>
             )}
           </Button>
@@ -251,13 +251,13 @@ export default function AdminGuideArticleEditPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {t("admin.guides.form.basic", "Basic information")}
+                {t("admin.guides.form.basic")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">
-                  {t("admin.guides.title", "Title")} *
+                  {t("admin.guides.title")} *
                 </Label>
                 <Input
                   id="title"
@@ -270,7 +270,7 @@ export default function AdminGuideArticleEditPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="slug">{t("admin.guides.slug", "Slug")}</Label>
+                <Label htmlFor="slug">{t("admin.guides.slug")}</Label>
                 <Input
                   id="slug"
                   value={formData.slug}
@@ -285,7 +285,7 @@ export default function AdminGuideArticleEditPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="excerpt">
-                  {t("admin.guides.form.excerpt", "Excerpt")}
+                  {t("admin.guides.form.excerpt")}
                 </Label>
                 <Textarea
                   id="excerpt"
@@ -305,7 +305,7 @@ export default function AdminGuideArticleEditPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">
-                  {t("admin.guides.form.content", "Content")} *
+                  {t("admin.guides.form.content")} *
                 </Label>
                 <RichTextEditor
                   content={formData.content}
@@ -323,12 +323,12 @@ export default function AdminGuideArticleEditPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.guides.form.media", "Media")}</CardTitle>
+              <CardTitle>{t("admin.guides.form.media")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <Label htmlFor="og_image">
-                  {t("admin.guides.form.og_image", "OG / Featured image URL")}
+                  {t("admin.guides.form.og_image")}
                 </Label>
                 <Input
                   id="og_image"
@@ -362,13 +362,13 @@ export default function AdminGuideArticleEditPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {t("admin.guides.form.publish", "Publishing")}
+                {t("admin.guides.form.publish")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="is_published">
-                  {t("admin.guides.form.is_published", "Published")}
+                  {t("admin.guides.form.is_published")}
                 </Label>
                 <Switch
                   id="is_published"
@@ -380,7 +380,7 @@ export default function AdminGuideArticleEditPage() {
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="requires_auth">
-                  {t("admin.guides.form.requires_auth", "Requires login")}
+                  {t("admin.guides.form.requires_auth")}
                 </Label>
                 <Switch
                   id="requires_auth"
@@ -392,7 +392,7 @@ export default function AdminGuideArticleEditPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="order">
-                  {t("admin.guides.form.order", "Order")}
+                  {t("admin.guides.form.order")}
                 </Label>
                 <Input
                   id="order"
@@ -413,7 +413,7 @@ export default function AdminGuideArticleEditPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {t("admin.guides.form.category", "Category")}
+                {t("admin.guides.form.category")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -436,7 +436,7 @@ export default function AdminGuideArticleEditPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">
-                    {t("admin.guides.form.no_category", "No category")}
+                    {t("admin.guides.form.no_category")}
                   </SelectItem>
                   {categories.map((c) => (
                     <SelectItem key={c.id} value={String(c.id)}>
@@ -450,12 +450,12 @@ export default function AdminGuideArticleEditPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("admin.guides.form.seo", "SEO")}</CardTitle>
+              <CardTitle>{t("admin.guides.form.seo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="meta_title">
-                  {t("admin.guides.form.meta_title", "Meta title")}
+                  {t("admin.guides.form.meta_title")}
                 </Label>
                 <Input
                   id="meta_title"
@@ -474,7 +474,7 @@ export default function AdminGuideArticleEditPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="meta_description">
-                  {t("admin.guides.form.meta_description", "Meta description")}
+                  {t("admin.guides.form.meta_description")}
                 </Label>
                 <Textarea
                   id="meta_description"

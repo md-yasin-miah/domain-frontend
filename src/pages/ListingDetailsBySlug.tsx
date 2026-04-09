@@ -83,7 +83,7 @@ export default function ListingDetailsBySlug() {
     }
 
     if (!canMakeOffer) {
-      toast.error(t("offers.create.own_listing", "You cannot offer on your own listing"));
+      toast.error(t("offers.create.own_listing"));
       return;
     }
     setMakeOfferModalOpen(true);
@@ -92,7 +92,7 @@ export default function ListingDetailsBySlug() {
   if (!listingSlug) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-8">
-        <p className="text-muted-foreground">{t("common.not_found", "Not found")}</p>
+        <p className="text-muted-foreground">{t("common.not_found")}</p>
         <Button variant="link" asChild className="mt-2">
           <Link to={ROUTES.APP.MARKETPLACE}>{t("common.back")}</Link>
         </Button>
@@ -104,7 +104,7 @@ export default function ListingDetailsBySlug() {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <p className="text-destructive">
-          {t("marketplace_domains.errors.load_failed", "Failed to load listing")}
+          {t("marketplace_domains.errors.load_failed")}
         </p>
         <Button variant="outline" className="mt-4" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -168,12 +168,12 @@ export default function ListingDetailsBySlug() {
             {listing.is_featured && (
               <Badge variant="default" className="gap-1">
                 <Award className="h-3 w-3" />
-                {t("marketplace_domains.labels.featured", "Featured")}
+                {t("marketplace_domains.labels.featured")}
               </Badge>
             )}
             {listing.is_price_negotiable && (
               <Badge variant="secondary">
-                {t("marketplace_domains.labels.negotiable", "Negotiable")}
+                {t("marketplace_domains.labels.negotiable")}
               </Badge>
             )}
             {listing.domain_extension && (
@@ -188,13 +188,13 @@ export default function ListingDetailsBySlug() {
             {listing.view_count != null && (
               <span className="flex items-center gap-1 text-sm">
                 <Eye className="h-4 w-4" />
-                {formatNumber(listing.view_count)} {t("marketplace_domains.labels.views", "views")}
+                {formatNumber(listing.view_count)} {t("marketplace_domains.labels.views")}
               </span>
             )}
             {listing.favorite_count != null && listing.favorite_count > 0 && (
               <span className="flex items-center gap-1 text-sm">
                 <Heart className="h-4 w-4" />
-                {formatNumber(listing.favorite_count)} {t("common.favorites", "favorites")}
+                {formatNumber(listing.favorite_count)} {t("common.favorites")}
               </span>
             )}
           </div>
@@ -206,7 +206,7 @@ export default function ListingDetailsBySlug() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">
-              {t("marketplace_domains.labels.description", "Description")}
+              {t("marketplace_domains.labels.description")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -226,7 +226,7 @@ export default function ListingDetailsBySlug() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Globe className="h-5 w-5" />
-              {t("marketplace_domains.labels.domain_info", "Domain information")}
+              {t("marketplace_domains.labels.domain_info")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -234,7 +234,7 @@ export default function ListingDetailsBySlug() {
               {listing.domain_name && (
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">
-                    {t("marketplace_domains.labels.domain", "Domain")}
+                    {t("marketplace_domains.labels.domain")}
                   </dt>
                   <dd className="font-medium">{listing.domain_name}</dd>
                 </div>
@@ -242,7 +242,7 @@ export default function ListingDetailsBySlug() {
               {listing.domain_extension && (
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">
-                    {t("marketplace_domains.labels.extension", "Extension")}
+                    {t("marketplace_domains.labels.extension")}
                   </dt>
                   <dd className="font-medium">{listing.domain_extension}</dd>
                 </div>
@@ -250,17 +250,17 @@ export default function ListingDetailsBySlug() {
               {listing.domain_age_years != null && listing.domain_age_years > 0 && (
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">
-                    {t("marketplace_domains.labels.age", "Age")}
+                    {t("marketplace_domains.labels.age")}
                   </dt>
                   <dd className="font-medium">
-                    {listing.domain_age_years} {t("common.years", "years")}
+                    {listing.domain_age_years} {t("common.years")}
                   </dd>
                 </div>
               )}
               {listing.domain_authority != null && listing.domain_authority > 0 && (
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">
-                    {t("marketplace_domains.labels.domain_authority", "Domain authority")}
+                    {t("marketplace_domains.labels.domain_authority")}
                   </dt>
                   <dd className="font-medium">{listing.domain_authority}</dd>
                 </div>
@@ -268,7 +268,7 @@ export default function ListingDetailsBySlug() {
               {listing.domain_backlinks != null && listing.domain_backlinks > 0 && (
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">
-                    {t("marketplace_domains.labels.backlinks", "Backlinks")}
+                    {t("marketplace_domains.labels.backlinks")}
                   </dt>
                   <dd className="font-medium">{listing.domain_backlinks}</dd>
                 </div>
@@ -284,7 +284,7 @@ export default function ListingDetailsBySlug() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Globe className="h-5 w-5" />
-              {t("marketplace_domains.labels.website_info", "Website information")}
+              {t("marketplace_domains.labels.website_info")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -292,7 +292,7 @@ export default function ListingDetailsBySlug() {
               {listing.website_url && (
                 <div className="sm:col-span-2">
                   <dt className="text-xs font-medium text-muted-foreground">
-                    {t("marketplace_domains.labels.website", "Website")}
+                    {t("marketplace_domains.labels.website")}
                   </dt>
                   <dd className="font-medium break-all">
                     <a
@@ -311,7 +311,7 @@ export default function ListingDetailsBySlug() {
                 listing.website_traffic_monthly > 0 && (
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground">
-                      {t("marketplace_domains.labels.traffic", "Monthly traffic")}
+                      {t("marketplace_domains.labels.traffic")}
                     </dt>
                     <dd className="font-medium">
                       {listing.website_traffic_monthly.toLocaleString()}
@@ -322,7 +322,7 @@ export default function ListingDetailsBySlug() {
                 Number(listing.website_revenue_monthly) > 0 && (
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground">
-                      {t("marketplace_domains.labels.revenue", "Monthly revenue")}
+                      {t("marketplace_domains.labels.revenue")}
                     </dt>
                     <dd className="font-medium">
                       {typeof listing.website_revenue_monthly === "string"
@@ -335,7 +335,7 @@ export default function ListingDetailsBySlug() {
                 Number(listing.website_profit_monthly) > 0 && (
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground">
-                      {t("marketplace_domains.labels.profit", "Monthly profit")}
+                      {t("marketplace_domains.labels.profit")}
                     </dt>
                     <dd className="font-medium">
                       {typeof listing.website_profit_monthly === "string"
@@ -347,7 +347,7 @@ export default function ListingDetailsBySlug() {
               {listing.website_technology && (
                 <div className="sm:col-span-2">
                   <dt className="text-xs font-medium text-muted-foreground">
-                    {t("marketplace_domains.labels.technology", "Technology")}
+                    {t("marketplace_domains.labels.technology")}
                   </dt>
                   <dd className="font-medium">{listing.website_technology}</dd>
                 </div>
@@ -363,7 +363,7 @@ export default function ListingDetailsBySlug() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4 shrink-0" />
-              {t("marketplace_domains.labels.expires", "Expires")}: {listing.expires_at}
+              {t("marketplace_domains.labels.expires")}: {listing.expires_at}
             </div>
           </CardContent>
         </Card>
@@ -375,14 +375,14 @@ export default function ListingDetailsBySlug() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <User className="h-5 w-5" />
-              {t("marketplace_domains.labels.seller", "Seller")}
+              {t("marketplace_domains.labels.seller")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="font-medium">
               {(listing.seller as { name?: string }).name ||
                 listing.seller.username ||
-                t("marketplace_domains.labels.anonymous", "Anonymous")}
+                t("marketplace_domains.labels.anonymous")}
             </p>
           </CardContent>
         </Card>
@@ -392,8 +392,8 @@ export default function ListingDetailsBySlug() {
       <div className="flex flex-wrap gap-3 pt-4">
         <Button onClick={handleMakeOffer} disabled={!canMakeOffer}>
           {!canMakeOffer
-            ? t("offers.create.own_listing", "You cannot offer on your own listing")
-            : t("marketplace_domains.actions.make_offer", "Make an offer")}
+            ? t("offers.create.own_listing")
+            : t("marketplace_domains.actions.make_offer")}
         </Button>
         {/* {listing.public_url && (
           <Button variant="outline" asChild>
@@ -404,13 +404,13 @@ export default function ListingDetailsBySlug() {
               className="inline-flex items-center gap-2"
             >
               <Share2 className="h-4 w-4" />
-              {t("marketplace_domains.actions.share", "Share")}
+              {t("marketplace_domains.actions.share")}
             </a>
           </Button>
         )} */}
         <Button variant="ghost" onClick={() => navigate(ROUTES.APP.MARKETPLACE)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("marketplace_domains.actions.back_to_list", "Back to list")}
+          {t("marketplace_domains.actions.back_to_list")}
         </Button>
       </div>
 

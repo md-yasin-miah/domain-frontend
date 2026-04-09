@@ -104,13 +104,13 @@ export default function AdminVerificationDetailPage() {
         user_id: request.user_id,
         body: adminNotes.trim() ? { admin_notes: adminNotes.trim() } : undefined,
       }).unwrap();
-      toast({ title: t("admin.verifications.verified", "User verified") });
+      toast({ title: t("admin.verifications.verified") });
       refetch();
     } catch (e: unknown) {
       const msg =
         e && typeof e === "object" && "data" in e
           ? String((e as { data?: { detail?: string } }).data?.detail)
-          : t("common.error", "Error");
+          : t("common.error");
       toast({ title: msg, variant: "destructive" });
     }
   };
@@ -121,13 +121,13 @@ export default function AdminVerificationDetailPage() {
         user_id: request.user_id,
         body: adminNotes.trim() ? { admin_notes: adminNotes.trim() } : undefined,
       }).unwrap();
-      toast({ title: t("admin.verifications.rejected", "Request rejected") });
+      toast({ title: t("admin.verifications.rejected") });
       refetch();
     } catch (e: unknown) {
       const msg =
         e && typeof e === "object" && "data" in e
           ? String((e as { data?: { detail?: string } }).data?.detail)
-          : t("common.error", "Error");
+          : t("common.error");
       toast({ title: msg, variant: "destructive" });
     }
   };
@@ -135,10 +135,10 @@ export default function AdminVerificationDetailPage() {
   if (!isValidId) {
     return (
       <div className="space-y-6 p-6">
-        <p className="text-muted-foreground">{t("common.invalid_id", "Invalid ID")}</p>
+        <p className="text-muted-foreground">{t("common.invalid_id")}</p>
         <Button variant="outline" onClick={() => navigate(ROUTES.ADMIN.USERS.VERIFICATIONS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("admin.verifications.back_to_list", "Back to list")}
+          {t("admin.verifications.back_to_list")}
         </Button>
       </div>
     );
@@ -156,11 +156,11 @@ export default function AdminVerificationDetailPage() {
     return (
       <div className="space-y-6 p-6">
         <p className="text-destructive">
-          {t("common.error.description", "Something went wrong.")}
+          {t("common.error.description")}
         </p>
         <Button variant="outline" onClick={() => navigate(ROUTES.ADMIN.USERS.VERIFICATIONS.LIST)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("admin.verifications.back_to_list", "Back to list")}
+          {t("admin.verifications.back_to_list")}
         </Button>
       </div>
     );
@@ -183,14 +183,14 @@ export default function AdminVerificationDetailPage() {
             onClick={() => navigate(ROUTES.ADMIN.USERS.VERIFICATIONS.LIST)}
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            {t("admin.verifications.back_to_list", "Back to list")}
+            {t("admin.verifications.back_to_list")}
           </Button>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <Verified className="h-7 w-7" />
-            {t("admin.verifications.detail_title", "Verification detail")}
+            {t("admin.verifications.detail_title")}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {t("admin.verifications.detail_desc", "Review user and documents, then approve or reject.")}
+            {t("admin.verifications.detail_desc")}
           </p>
         </div>
       </div>
@@ -200,10 +200,10 @@ export default function AdminVerificationDetailPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            {t("admin.verifications.user_info", "User information")}
+            {t("admin.verifications.user_info")}
           </CardTitle>
           <CardDescription>
-            {t("admin.verifications.user_info_desc", "Profile and contact for this verification request.")}
+            {t("admin.verifications.user_info_desc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -212,7 +212,7 @@ export default function AdminVerificationDetailPage() {
               <span className="font-medium">{displayName}</span>
               {user.profile?.is_verified && (
                 <Badge variant="default" className="bg-green-600">
-                  {t("profile.client.verified", "Verified")}
+                  {t("profile.client.verified")}
                 </Badge>
               )}
             </div>
@@ -247,7 +247,7 @@ export default function AdminVerificationDetailPage() {
               size="sm"
               onClick={() => navigate(ROUTES.ADMIN.USERS.DETAILS(user.id))}
             >
-              {t("admin.verifications.view_full_profile", "View full profile")}
+              {t("admin.verifications.view_full_profile")}
             </Button>
           </div>
         </CardContent>
@@ -256,15 +256,15 @@ export default function AdminVerificationDetailPage() {
       {/* Verification requests */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("admin.verifications.requests_for_user", "Verification requests")}</CardTitle>
+          <CardTitle>{t("admin.verifications.requests_for_user")}</CardTitle>
           <CardDescription>
-            {t("admin.verifications.requests_for_user_desc", "Documents and status for each request.")}
+            {t("admin.verifications.requests_for_user_desc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {verification_requests.length === 0 ? (
             <p className="text-muted-foreground text-sm">
-              {t("admin.verifications.no_requests", "No verification requests for this user.")}
+              {t("admin.verifications.no_requests")}
             </p>
           ) : (
             verification_requests.map((req) => (
@@ -289,7 +289,7 @@ export default function AdminVerificationDetailPage() {
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="truncate pr-8">
-              {previewDoc?.original_filename ?? t("admin.verifications.document_preview", "Document preview")}
+              {previewDoc?.original_filename ?? t("admin.verifications.document_preview")}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 min-h-0 overflow-auto rounded-md border bg-muted/30">
@@ -368,16 +368,16 @@ function RequestBlock({
           </Badge>
         </div>
         <div className="text-sm text-muted-foreground">
-          {t("admin.verifications.requested_at", "Requested")}: {formatDate(request.requested_at)}
+          {t("admin.verifications.requested_at")}: {formatDate(request.requested_at)}
           {request.reviewed_at && (
-            <> · {t("admin.verifications.reviewed_at", "Reviewed")}: {formatDate(request.reviewed_at)}</>
+            <> · {t("admin.verifications.reviewed_at")}: {formatDate(request.reviewed_at)}</>
           )}
         </div>
       </div>
       {request.admin_notes && (
         <div>
           <Label className="text-muted-foreground text-xs">
-            {t("admin.verifications.admin_notes", "Notes")}
+            {t("admin.verifications.admin_notes")}
           </Label>
           <p className="text-sm mt-0.5">{request.admin_notes}</p>
         </div>
@@ -385,7 +385,7 @@ function RequestBlock({
       {request.document_files && request.document_files.length > 0 && (
         <div>
           <Label className="text-muted-foreground text-xs">
-            {t("admin.verifications.documents", "Documents")}
+            {t("admin.verifications.documents")}
           </Label>
           <ul className="mt-1.5 flex flex-wrap gap-3 list-none">
             {request.document_files.map((doc) => (
@@ -400,13 +400,13 @@ function RequestBlock({
         <div className="pt-2 border-t space-y-3">
           <div>
             <Label htmlFor={`notes-${request.id}`}>
-              {t("admin.verifications.admin_notes_optional", "Admin notes (optional)")}
+              {t("admin.verifications.admin_notes_optional")}
             </Label>
             <Textarea
               id={`notes-${request.id}`}
               value={adminNotes}
               onChange={(e) => setAdminNotes(e.target.value)}
-              placeholder={t("admin.verifications.admin_notes_placeholder", "Notes for the user...")}
+              placeholder={t("admin.verifications.admin_notes_placeholder")}
               rows={2}
               className="mt-1"
             />
@@ -420,7 +420,7 @@ function RequestBlock({
             >
               {isApproving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               <CheckCircle className="h-4 w-4 mr-2" />
-              {t("admin.verifications.approve", "Approve")}
+              {t("admin.verifications.approve")}
             </Button>
             <Button
               size="sm"
@@ -430,7 +430,7 @@ function RequestBlock({
             >
               {isRejecting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               <XCircle className="h-4 w-4 mr-2" />
-              {t("admin.verifications.reject", "Reject")}
+              {t("admin.verifications.reject")}
             </Button>
           </div>
         </div>

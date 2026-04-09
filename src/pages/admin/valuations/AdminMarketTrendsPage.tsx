@@ -147,14 +147,14 @@ export default function AdminMarketTrendsPage() {
           sales_count_change_percentage: form.sales_count_change_percentage ?? null,
         };
         await updateTrend({ id: editing.id, data: updateData }).unwrap();
-        toast({ title: t("common.updated", "Updated") });
+        toast({ title: t("common.updated") });
       } else {
         await createTrend(form).unwrap();
-        toast({ title: t("common.created", "Created") });
+        toast({ title: t("common.created") });
       }
       setDialogOpen(false);
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -165,7 +165,7 @@ export default function AdminMarketTrendsPage() {
       toast({ title: t("admin.valuations.trend_deleted") });
       setDeleteId(null);
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -176,10 +176,10 @@ export default function AdminMarketTrendsPage() {
         <div className="relative flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <TrendingUp className="h-7 w-7 text-primary" />
-            {t("admin.sidebar.valuations_trends", "Market Trends")}
+            {t("admin.sidebar.valuations_trends")}
           </h1>
           <p className="text-muted-foreground">
-            {t("admin.valuations.trends_description", "Manage market trend data by extension or category.")}
+            {t("admin.valuations.trends_description")}
           </p>
         </div>
       </div>
@@ -245,7 +245,7 @@ export default function AdminMarketTrendsPage() {
           <div>
             <CardTitle>{t("admin.valuations.tab_trends")}</CardTitle>
             <CardDescription>
-              {trends.length} {t("common.items", "items")}
+              {trends.length} {t("common.items")}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">

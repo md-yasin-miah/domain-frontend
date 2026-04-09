@@ -268,14 +268,14 @@ const SuperAdminDashboard = () => {
     try {
       await deactivateUser(suspendUserId).unwrap()
       toast({
-        title: t("super_admin.user_deactivated", "User deactivated"),
+        title: t("super_admin.user_deactivated"),
       })
       setSuspendUserId(null)
       await refetch()
     } catch {
       toast({
-        title: t("common.error", "Error"),
-        description: t("super_admin.user_deactivate_failed", "Could not deactivate user"),
+        title: t("common.error"),
+        description: t("super_admin.user_deactivate_failed"),
         variant: "destructive",
       })
     }
@@ -288,14 +288,14 @@ const SuperAdminDashboard = () => {
       toast({
         title:
           status === "active"
-            ? t("super_admin.listing_activated", "Listing set to active")
-            : t("super_admin.listing_suspended", "Listing suspended"),
+            ? t("super_admin.listing_activated")
+            : t("super_admin.listing_suspended"),
       })
       await refetch()
     } catch {
       toast({
-        title: t("common.error", "Error"),
-        description: t("super_admin.listing_update_failed", "Could not update listing"),
+        title: t("common.error"),
+        description: t("super_admin.listing_update_failed"),
         variant: "destructive",
       })
     } finally {
@@ -311,14 +311,14 @@ const SuperAdminDashboard = () => {
         resolution: resolveNotes.trim(),
         resolution_action: resolveAction.trim() || undefined,
       }).unwrap()
-      toast({ title: t("admin.disputes.resolved", "Dispute resolved") })
+      toast({ title: t("admin.disputes.resolved") })
       setResolveDisputeId(null)
       setResolveNotes("")
       setResolveAction("")
       await refetch()
     } catch {
       toast({
-        title: t("common.error", "Error"),
+        title: t("common.error"),
         variant: "destructive",
       })
     }
@@ -337,9 +337,9 @@ const SuperAdminDashboard = () => {
     try {
       const blob = await triggerExportListings({}).unwrap()
       downloadBlob(blob, `listings_export_${Date.now()}.csv`)
-      toast({ title: t("super_admin.export_ready", "Export downloaded") })
+      toast({ title: t("super_admin.export_ready") })
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" })
+      toast({ title: t("common.error"), variant: "destructive" })
     }
   }
 
@@ -347,9 +347,9 @@ const SuperAdminDashboard = () => {
     try {
       const blob = await triggerExportOrders({}).unwrap()
       downloadBlob(blob, `orders_export_${Date.now()}.csv`)
-      toast({ title: t("super_admin.export_ready", "Export downloaded") })
+      toast({ title: t("super_admin.export_ready") })
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" })
+      toast({ title: t("common.error"), variant: "destructive" })
     }
   }
 
@@ -560,7 +560,7 @@ const SuperAdminDashboard = () => {
                 <Button variant="outline" size="sm" asChild>
                   <Link to={ROUTES.ADMIN.USERS.LIST}>
                     <Search className="h-4 w-4 mr-2" />
-                    {t("super_admin.open_user_directory", "Search & filter users")}
+                    {t("super_admin.open_user_directory")}
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -599,7 +599,7 @@ const SuperAdminDashboard = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm" asChild title={t("super_admin.view_profile", "View user")}>
+                            <Button variant="ghost" size="sm" asChild title={t("super_admin.view_profile")}>
                               <Link to={ROUTES.ADMIN.USERS.DETAILS(user.id)}>
                                 <Eye className="h-4 w-4" />
                               </Link>
@@ -607,25 +607,25 @@ const SuperAdminDashboard = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              title={t("super_admin.deactivate_user", "Deactivate user")}
+                              title={t("super_admin.deactivate_user")}
                               onClick={() => setSuspendUserId(user.id)}
                             >
                               <Ban className="h-4 w-4" />
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" aria-label={t("super_admin.more_actions", "More")}>
+                                <Button variant="ghost" size="sm" aria-label={t("super_admin.more_actions")}>
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild>
                                   <Link to={ROUTES.ADMIN.USERS.DETAILS(user.id)}>
-                                    {t("super_admin.user_details", "User details")}
+                                    {t("super_admin.user_details")}
                                   </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                  <Link to={ROUTES.ADMIN.USERS.LIST}>{t("super_admin.all_users", "All users")}</Link>
+                                  <Link to={ROUTES.ADMIN.USERS.LIST}>{t("super_admin.all_users")}</Link>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -648,7 +648,7 @@ const SuperAdminDashboard = () => {
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" asChild>
                   <Link to={ROUTES.ADMIN.LISTINGS_MANAGEMENT}>
-                    {t("super_admin.all_listings", "All listings")}
+                    {t("super_admin.all_listings")}
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -702,7 +702,7 @@ const SuperAdminDashboard = () => {
                                 ) : (
                                   <>
                                     <XCircle className="h-4 w-4 mr-1" />
-                                    {t("super_admin.suspend_listing", "Suspend")}
+                                    {t("super_admin.suspend_listing")}
                                   </>
                                 )}
                               </Button>
@@ -721,7 +721,7 @@ const SuperAdminDashboard = () => {
                                 ) : (
                                   <>
                                     <CheckCircle className="h-4 w-4 mr-1" />
-                                    {t("super_admin.publish_active", "Set active")}
+                                    {t("super_admin.publish_active")}
                                   </>
                                 )}
                               </Button>
@@ -746,7 +746,7 @@ const SuperAdminDashboard = () => {
               </CardDescription>
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" asChild>
-                  <Link to={ROUTES.ADMIN.DISPUTES}>{t("super_admin.all_disputes", "All disputes")}</Link>
+                  <Link to={ROUTES.ADMIN.DISPUTES}>{t("super_admin.all_disputes")}</Link>
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => refetch()}>
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -791,7 +791,7 @@ const SuperAdminDashboard = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              title={t("super_admin.open_dispute_thread", "Open in disputes")}
+                              title={t("super_admin.open_dispute_thread")}
                               onClick={() =>
                                 navigate(ROUTES.ADMIN.DISPUTES, {
                                   state: { focusDisputeId: dispute.id },
@@ -800,7 +800,7 @@ const SuperAdminDashboard = () => {
                             >
                               <MessageSquare className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm" asChild title={t("super_admin.view_order", "View order")}>
+                            <Button variant="ghost" size="sm" asChild title={t("super_admin.view_order")}>
                               <Link to={ROUTES.ADMIN.ORDERS.DETAILS(dispute.order_id)}>
                                 <Eye className="h-4 w-4" />
                               </Link>
@@ -809,7 +809,7 @@ const SuperAdminDashboard = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                title={t("super_admin.resolve_dispute", "Resolve dispute")}
+                                title={t("super_admin.resolve_dispute")}
                                 onClick={() => setResolveDisputeId(dispute.id)}
                               >
                                 <CheckCircle className="h-4 w-4" />
@@ -926,7 +926,7 @@ const SuperAdminDashboard = () => {
                   ) : (
                     <Download className="h-4 w-4 mr-2" />
                   )}
-                  {t("super_admin.export_listings_csv", "Export listings (CSV)")}
+                  {t("super_admin.export_listings_csv")}
                 </Button>
                 <Button
                   variant="outline"
@@ -938,12 +938,12 @@ const SuperAdminDashboard = () => {
                   ) : (
                     <Download className="h-4 w-4 mr-2" />
                   )}
-                  {t("super_admin.export_orders_csv", "Export orders (CSV)")}
+                  {t("super_admin.export_orders_csv")}
                 </Button>
                 <Button variant="outline" asChild>
                   <Link to={ROUTES.ADMIN.REPORTS.OVERVIEW}>
                     <Activity className="h-4 w-4 mr-2" />
-                    {t("super_admin.open_reports", "Full reports")}
+                    {t("super_admin.open_reports")}
                   </Link>
                 </Button>
                 <Button variant="outline" onClick={() => refetch()}>
@@ -959,18 +959,15 @@ const SuperAdminDashboard = () => {
       <AlertDialog open={suspendUserId != null} onOpenChange={(open) => !open && setSuspendUserId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("super_admin.confirm_deactivate", "Deactivate user?")}</AlertDialogTitle>
+            <AlertDialogTitle>{t("super_admin.confirm_deactivate")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t(
-                "super_admin.confirm_deactivate_desc",
-                "The user will not be able to sign in until reactivated."
-              )}
+              {t("super_admin.confirm_deactivate_desc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", "Cancel")}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={() => void confirmDeactivateUser()} disabled={isDeactivating}>
-              {isDeactivating ? <Loader2 className="h-4 w-4 animate-spin" /> : t("super_admin.deactivate", "Deactivate")}
+              {isDeactivating ? <Loader2 className="h-4 w-4 animate-spin" /> : t("super_admin.deactivate")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -988,33 +985,30 @@ const SuperAdminDashboard = () => {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t("super_admin.resolve_dispute_title", "Resolve dispute")}</DialogTitle>
+            <DialogTitle>{t("super_admin.resolve_dispute_title")}</DialogTitle>
             <DialogDescription>
-              {t(
-                "super_admin.resolve_dispute_api_hint",
-                "Submits POST /disputes/{id}/resolve with your resolution notes (admin only)."
-              )}
+              {t("super_admin.resolve_dispute_api_hint")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div className="space-y-2">
-              <Label htmlFor="resolve-notes">{t("admin.disputes.resolution", "Resolution")}</Label>
+              <Label htmlFor="resolve-notes">{t("admin.disputes.resolution")}</Label>
               <Textarea
                 id="resolve-notes"
                 value={resolveNotes}
                 onChange={(e) => setResolveNotes(e.target.value)}
                 rows={4}
-                placeholder={t("super_admin.resolution_placeholder", "Describe the resolution…")}
+                placeholder={t("super_admin.resolution_placeholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label>{t("super_admin.resolution_action_optional", "Resolution action (optional)")}</Label>
+              <Label>{t("super_admin.resolution_action_optional")}</Label>
               <Select value={resolveAction || "__none__"} onValueChange={(v) => setResolveAction(v === "__none__" ? "" : v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t("common.select", "Select")} />
+                  <SelectValue placeholder={t("common.select")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">{t("common.none", "None")}</SelectItem>
+                  <SelectItem value="__none__">{t("common.none")}</SelectItem>
                   <SelectItem value="refund">refund</SelectItem>
                   <SelectItem value="partial_refund">partial_refund</SelectItem>
                   <SelectItem value="no_action">no_action</SelectItem>
@@ -1032,13 +1026,13 @@ const SuperAdminDashboard = () => {
                 setResolveAction("")
               }}
             >
-              {t("common.cancel", "Cancel")}
+              {t("common.cancel")}
             </Button>
             <Button
               disabled={!resolveNotes.trim() || isResolvingDispute}
               onClick={() => void submitResolveDispute()}
             >
-              {isResolvingDispute ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.disputes.resolve", "Resolve")}
+              {isResolvingDispute ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.disputes.resolve")}
             </Button>
           </DialogFooter>
         </DialogContent>

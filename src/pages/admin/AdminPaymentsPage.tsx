@@ -192,14 +192,14 @@ export default function AdminPaymentsPage() {
       {
         id: "id",
         accessorKey: "id",
-        header: t("admin.withdrawals.id", "ID"),
+        header: t("admin.withdrawals.id"),
         cell: ({ row }) => <span className="font-mono text-sm">#{row.id}</span>,
       },
       {
         id: "user",
         accessorKey: (row) =>
           row.user?.username ?? row.user?.email ?? row.user_id,
-        header: t("admin.withdrawals.user", "User"),
+        header: t("admin.withdrawals.user"),
         cell: ({ row }) =>
           row.user ? (
             <Link
@@ -215,7 +215,7 @@ export default function AdminPaymentsPage() {
       {
         id: "amount",
         accessorKey: "amount",
-        header: t("admin.withdrawals.amount", "Amount"),
+        header: t("admin.withdrawals.amount"),
         cell: ({ row }) => (
           <div>
             <span>{formatAmount(row.amount, row.currency)}</span>
@@ -230,7 +230,7 @@ export default function AdminPaymentsPage() {
       {
         id: "status",
         accessorKey: "status",
-        header: t("admin.withdrawals.status", "Status"),
+        header: t("admin.withdrawals.status"),
         cell: ({ row }) => (
           <span
             className={cn(
@@ -246,13 +246,13 @@ export default function AdminPaymentsPage() {
       {
         id: "payout_method",
         accessorKey: "payout_method",
-        header: t("admin.withdrawals.payout_method", "Payout method"),
+        header: t("admin.withdrawals.payout_method"),
         cell: ({ row }) => row.payout_method ?? "—",
       },
       {
         id: "requested_at",
         accessorKey: "requested_at",
-        header: t("admin.withdrawals.requested_at", "Requested"),
+        header: t("admin.withdrawals.requested_at"),
         cell: ({ row }) => formatDate(row.requested_at),
       },
     ],
@@ -293,7 +293,7 @@ export default function AdminPaymentsPage() {
       }).unwrap();
 
       toast({
-        title: t("admin.payments.updated", "Payment updated"),
+        title: t("admin.payments.updated"),
         description: t(
           "admin.payments.updated_desc",
           "Payment has been updated successfully.",
@@ -312,7 +312,7 @@ export default function AdminPaymentsPage() {
           ? (err as { data: { detail?: string } }).data?.detail
           : t("common.error");
       toast({
-        title: t("common.error", "Error"),
+        title: t("common.error"),
         description: String(detail),
         variant: "destructive",
       });
@@ -366,7 +366,7 @@ export default function AdminPaymentsPage() {
         },
       }).unwrap();
       toast({
-        title: t("admin.withdrawals.updated", "Withdrawal updated"),
+        title: t("admin.withdrawals.updated"),
         description: t(
           "admin.withdrawals.updated_desc",
           "Status has been updated successfully.",
@@ -381,7 +381,7 @@ export default function AdminPaymentsPage() {
         "data" in err &&
         (err as { data?: { detail?: string } }).data?.detail;
       toast({
-        title: t("common.error", "Error"),
+        title: t("common.error"),
         description: typeof detail === "string" ? detail : t("common.error"),
         variant: "destructive",
       });
@@ -393,7 +393,7 @@ export default function AdminPaymentsPage() {
       {
         id: "payment_number",
         accessorKey: "payment_number",
-        header: t("admin.payments.payment_number", "Payment #"),
+        header: t("admin.payments.payment_number"),
         cell: ({ row }) => (
           <Link
             to={ROUTES.ADMIN.PAYMENT_DETAILS(row.id)}
@@ -406,7 +406,7 @@ export default function AdminPaymentsPage() {
       {
         id: "order",
         accessorKey: (row) => row.order?.order_number ?? row.order_id,
-        header: t("admin.payments.order", "Order"),
+        header: t("admin.payments.order"),
         cell: ({ row }) =>
           row.order ? (
             <Link
@@ -422,7 +422,7 @@ export default function AdminPaymentsPage() {
       {
         id: "amount",
         accessorKey: "amount",
-        header: t("admin.payments.amount", "Amount"),
+        header: t("admin.payments.amount"),
         cell: ({ row }) => (
           <div>
             <span>{formatAmount(row.amount, row.currency)}</span>
@@ -437,12 +437,12 @@ export default function AdminPaymentsPage() {
       {
         id: "payment_method",
         accessorKey: "payment_method",
-        header: t("admin.payments.method", "Method"),
+        header: t("admin.payments.method"),
       },
       {
         id: "status",
         accessorKey: "status",
-        header: t("admin.payments.status", "Status"),
+        header: t("admin.payments.status"),
         cell: ({ row }) => (
           <span className={cn("capitalize", getStatusClass(row.status))}>
             {row.status}
@@ -452,7 +452,7 @@ export default function AdminPaymentsPage() {
       {
         id: "paid_at",
         accessorKey: "paid_at",
-        header: t("admin.payments.paid_at", "Paid at"),
+        header: t("admin.payments.paid_at"),
         cell: ({ row }) => (
           <span className="text-muted-foreground text-sm">
             {formatDate(row.paid_at)}
@@ -462,7 +462,7 @@ export default function AdminPaymentsPage() {
       {
         id: "created_at",
         accessorKey: "created_at",
-        header: t("admin.payments.created", "Created"),
+        header: t("admin.payments.created"),
         cell: ({ row }) => (
           <span className="text-muted-foreground text-sm">
             {formatDate(row.created_at)}
@@ -478,10 +478,10 @@ export default function AdminPaymentsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <CreditCard className="h-7 w-7" />
-          {t("admin.payments.title", "Payments")}
+          {t("admin.payments.title")}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {t("admin.payments.description", "View and manage all payments.")}
+          {t("admin.payments.description")}
         </p>
       </div>
 
@@ -489,11 +489,11 @@ export default function AdminPaymentsPage() {
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="payments" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" />
-            {t("admin.payments.tab_payments", "Payments")}
+            {t("admin.payments.tab_payments")}
           </TabsTrigger>
           <TabsTrigger value="withdrawals" className="flex items-center gap-2">
             <Banknote className="h-4 w-4" />
-            {t("admin.payments.tab_withdrawals", "Withdrawals")}
+            {t("admin.payments.tab_withdrawals")}
           </TabsTrigger>
         </TabsList>
 
@@ -502,7 +502,7 @@ export default function AdminPaymentsPage() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
                 <CardTitle>
-                  {t("admin.payments.list_title", "All Payments")}
+                  {t("admin.payments.list_title")}
                 </CardTitle>
                 <CardDescription>
                   {t(
@@ -514,7 +514,7 @@ export default function AdminPaymentsPage() {
               <div className="flex flex-wrap gap-4">
                 <div className="space-y-2">
                   <Label className="sr-only">
-                    {t("admin.payments.filter_status", "Status")}
+                    {t("admin.payments.filter_status")}
                   </Label>
                   <Select
                     value={statusFilter}
@@ -528,7 +528,7 @@ export default function AdminPaymentsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">
-                        {t("admin.payments.all_statuses", "All statuses")}
+                        {t("admin.payments.all_statuses")}
                       </SelectItem>
                       {STATUS_OPTIONS.map((s) => (
                         <SelectItem key={s} value={s}>
@@ -540,7 +540,7 @@ export default function AdminPaymentsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label className="sr-only">
-                    {t("admin.payments.filter_method", "Payment method")}
+                    {t("admin.payments.filter_method")}
                   </Label>
                   <Select
                     value={paymentMethodFilter}
@@ -554,7 +554,7 @@ export default function AdminPaymentsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">
-                        {t("admin.payments.all_methods", "All methods")}
+                        {t("admin.payments.all_methods")}
                       </SelectItem>
                       <SelectItem value="stripe">Stripe</SelectItem>
                       <SelectItem value="paypal">PayPal</SelectItem>
@@ -591,7 +591,7 @@ export default function AdminPaymentsPage() {
                     >
                       <Link
                         to={ROUTES.ADMIN.PAYMENT_DETAILS(row.id)}
-                        title={t("admin.payments.view", "View")}
+                        title={t("admin.payments.view")}
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
@@ -601,19 +601,19 @@ export default function AdminPaymentsPage() {
                       size="icon"
                       className="h-8 w-8"
                       onClick={() => handleOpenUpdate(row)}
-                      title={t("admin.payments.update", "Update")}
+                      title={t("admin.payments.update")}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
                   </div>
                 )}
-                actionsColumnHeader={t("admin.payments.actions", "Actions")}
+                actionsColumnHeader={t("admin.payments.actions")}
                 enableSorting={true}
                 pageSize={size}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
                 error={error}
-                errorTitle={t("common.error", "Error")}
+                errorTitle={t("common.error")}
                 errorDescription={t(
                   "admin.payments.error_desc",
                   "Failed to load payments.",
@@ -631,7 +631,7 @@ export default function AdminPaymentsPage() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
                 <CardTitle>
-                  {t("admin.withdrawals.list_title", "All Withdrawals")}
+                  {t("admin.withdrawals.list_title")}
                 </CardTitle>
                 <CardDescription>
                   {t(
@@ -642,7 +642,7 @@ export default function AdminPaymentsPage() {
               </div>
               <div className="space-y-2">
                 <Label className="sr-only">
-                  {t("admin.withdrawals.filter_status", "Status")}
+                  {t("admin.withdrawals.filter_status")}
                 </Label>
                 <Select
                   value={withdrawalStatusFilter}
@@ -656,7 +656,7 @@ export default function AdminPaymentsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">
-                      {t("admin.withdrawals.all_statuses", "All statuses")}
+                      {t("admin.withdrawals.all_statuses")}
                     </SelectItem>
                     {WITHDRAWAL_STATUS_OPTIONS.map((s) => (
                       <SelectItem key={s} value={s}>
@@ -697,13 +697,13 @@ export default function AdminPaymentsPage() {
                     </Button>
                   </div>
                 )}
-                actionsColumnHeader={t("admin.withdrawals.actions", "Actions")}
+                actionsColumnHeader={t("admin.withdrawals.actions")}
                 enableSorting={true}
                 pageSize={wSize}
                 onPageChange={handleWPageChange}
                 onPageSizeChange={handleWPageSizeChange}
                 error={withdrawalsError}
-                errorTitle={t("common.error", "Error")}
+                errorTitle={t("common.error")}
                 errorDescription={t(
                   "admin.withdrawals.error_desc",
                   "Failed to load withdrawals.",
@@ -724,7 +724,7 @@ export default function AdminPaymentsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {t("admin.payments.update_title", "Update Payment")}
+              {t("admin.payments.update_title")}
             </DialogTitle>
             <DialogDescription>
               {selectedPayment && (
@@ -741,7 +741,7 @@ export default function AdminPaymentsPage() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="update_status">
-                {t("admin.payments.status", "Status")}
+                {t("admin.payments.status")}
               </Label>
               <Select
                 value={updateForm.status ?? ""}
@@ -768,7 +768,7 @@ export default function AdminPaymentsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="update_transaction_id">
-                {t("admin.payments.transaction_id", "Transaction ID")}
+                {t("admin.payments.transaction_id")}
               </Label>
               <Input
                 id="update_transaction_id"
@@ -784,7 +784,7 @@ export default function AdminPaymentsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="update_refund_amount">
-                {t("admin.payments.refund_amount", "Refund amount")}
+                {t("admin.payments.refund_amount")}
               </Label>
               <Input
                 id="update_refund_amount"
@@ -804,7 +804,7 @@ export default function AdminPaymentsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="update_refund_reason">
-                {t("admin.payments.refund_reason", "Refund reason")}
+                {t("admin.payments.refund_reason")}
               </Label>
               <Input
                 id="update_refund_reason"
@@ -825,11 +825,11 @@ export default function AdminPaymentsPage() {
               onClick={handleCloseUpdate}
               disabled={isUpdating}
             >
-              {t("common.cancel", "Cancel")}
+              {t("common.cancel")}
             </Button>
             <Button onClick={handleSubmitUpdate} disabled={isUpdating}>
               {isUpdating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {t("common.save", "Save")}
+              {t("common.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -842,7 +842,7 @@ export default function AdminPaymentsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {t("admin.withdrawals.update_title", "Update Withdrawal")}
+              {t("admin.withdrawals.update_title")}
             </DialogTitle>
             <DialogDescription>
               {selectedWithdrawal && (
@@ -862,7 +862,7 @@ export default function AdminPaymentsPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>{t("admin.withdrawals.status", "Status")}</Label>
+              <Label>{t("admin.withdrawals.status")}</Label>
               <Select
                 value={withdrawalUpdateStatus}
                 onValueChange={(v) =>
@@ -876,13 +876,13 @@ export default function AdminPaymentsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="approved">
-                    {t("admin.withdrawals.status_approved", "Approved")}
+                    {t("admin.withdrawals.status_approved")}
                   </SelectItem>
                   <SelectItem value="rejected">
-                    {t("admin.withdrawals.status_rejected", "Rejected")}
+                    {t("admin.withdrawals.status_rejected")}
                   </SelectItem>
                   <SelectItem value="completed">
-                    {t("admin.withdrawals.status_completed", "Completed")}
+                    {t("admin.withdrawals.status_completed")}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -890,7 +890,7 @@ export default function AdminPaymentsPage() {
             {withdrawalUpdateStatus === "rejected" && (
               <div className="space-y-2">
                 <Label htmlFor="withdrawal_rejection_reason">
-                  {t("admin.withdrawals.rejection_reason", "Rejection reason")}{" "}
+                  {t("admin.withdrawals.rejection_reason")}{" "}
                   *
                 </Label>
                 <Input
@@ -906,7 +906,7 @@ export default function AdminPaymentsPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="withdrawal_admin_notes">
-                {t("admin.withdrawals.admin_notes", "Admin notes")}
+                {t("admin.withdrawals.admin_notes")}
               </Label>
               <Textarea
                 id="withdrawal_admin_notes"
@@ -926,7 +926,7 @@ export default function AdminPaymentsPage() {
               onClick={handleCloseWithdrawalUpdate}
               disabled={isUpdatingWithdrawal}
             >
-              {t("common.cancel", "Cancel")}
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleSubmitWithdrawalUpdate}
@@ -935,7 +935,7 @@ export default function AdminPaymentsPage() {
               {isUpdatingWithdrawal && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               )}
-              {t("common.save", "Save")}
+              {t("common.save")}
             </Button>
           </DialogFooter>
         </DialogContent>

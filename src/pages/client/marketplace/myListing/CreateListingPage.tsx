@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -42,6 +43,7 @@ import {
 } from "@/lib/tutorialStorage";
 
 export default function CreateListingPage() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -117,9 +119,14 @@ export default function CreateListingPage() {
             {
               element: "[data-tour='listing-stepper']",
               popover: {
-                title: "Listing creation requires verification",
-                description:
+                title: t(
+                  "create_listing.tour.verification_required.title",
+                  "Listing creation requires verification",
+                ),
+                description: t(
+                  "create_listing.tour.verification_required.description",
                   "First verify your domain or website, then return here to create your listing.",
+                ),
                 side: "bottom" as const,
                 align: "center" as const,
               },
@@ -127,9 +134,14 @@ export default function CreateListingPage() {
             {
               element: "[data-tour='go-verify-product']",
               popover: {
-                title: "Go to product verification",
-                description:
+                title: t(
+                  "create_listing.tour.go_verify.title",
+                  "Go to product verification",
+                ),
+                description: t(
+                  "create_listing.tour.go_verify.description",
                   "Use this button to add and verify a product before creating a listing.",
+                ),
                 side: "top" as const,
                 align: "start" as const,
               },
@@ -139,9 +151,14 @@ export default function CreateListingPage() {
             {
               element: "[data-tour='listing-stepper']",
               popover: {
-                title: "Step-by-step listing form",
-                description:
+                title: t(
+                  "create_listing.tour.stepper.title",
+                  "Step-by-step listing form",
+                ),
+                description: t(
+                  "create_listing.tour.stepper.description",
                   "Create listing is split into two steps: select a verified product, then complete listing details.",
+                ),
                 side: "bottom" as const,
                 align: "center" as const,
               },
@@ -149,9 +166,14 @@ export default function CreateListingPage() {
             {
               element: "[data-tour='verification-select']",
               popover: {
-                title: "Select verified product",
-                description:
+                title: t(
+                  "create_listing.tour.select_verified.title",
+                  "Select verified product",
+                ),
+                description: t(
+                  "create_listing.tour.select_verified.description",
                   "Pick a verified domain/website first. This links ownership and pre-fills listing details.",
+                ),
                 side: "bottom" as const,
                 align: "start" as const,
               },
@@ -159,9 +181,14 @@ export default function CreateListingPage() {
             {
               element: "[data-tour='listing-title-input']",
               popover: {
-                title: "Add core listing details",
-                description:
+                title: t(
+                  "create_listing.tour.core_details.title",
+                  "Add core listing details",
+                ),
+                description: t(
+                  "create_listing.tour.core_details.description",
                   "Set title, description, and pricing. Required fields must be filled before submission.",
+                ),
                 side: "bottom" as const,
                 align: "start" as const,
               },
@@ -169,9 +196,14 @@ export default function CreateListingPage() {
             {
               element: "[data-tour='create-listing-submit']",
               popover: {
-                title: "Create and publish later",
-                description:
+                title: t(
+                  "create_listing.tour.create_publish.title",
+                  "Create and publish later",
+                ),
+                description: t(
+                  "create_listing.tour.create_publish.description",
                   "Click Create Listing to save. You can keep it draft or set status to active before submit.",
+                ),
                 side: "top" as const,
                 align: "end" as const,
               },
@@ -181,9 +213,9 @@ export default function CreateListingPage() {
       const guide = driver({
         showProgress: true,
         allowClose: true,
-        nextBtnText: "Next",
-        prevBtnText: "Back",
-        doneBtnText: "Done",
+        nextBtnText: t("common.next"),
+        prevBtnText: t("common.back"),
+        doneBtnText: t("common.done"),
         onNextClick: (_element, _step, context) => {
           const currentIndex = context.state.activeIndex ?? 0;
           if (!hasNoVerifiedProducts && currentIndex === 1 && step === 1) {
@@ -269,8 +301,11 @@ export default function CreateListingPage() {
   const handleSubmit = async () => {
     if (!verificationId) {
       toast({
-        title: "Error",
-        description: "Please select a verified product",
+        title: t("common.error"),
+        description: t(
+          "create_listing.error.select_verified_product",
+          "Please select a verified product",
+        ),
         variant: "destructive",
       });
       return;
@@ -282,8 +317,11 @@ export default function CreateListingPage() {
       !formData.listing_type_id
     ) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
+        title: t("common.error"),
+        description: t(
+          "create_listing.error.required_fields",
+          "Please fill in all required fields",
+        ),
         variant: "destructive",
       });
       return;
@@ -296,16 +334,21 @@ export default function CreateListingPage() {
       }).unwrap();
 
       toast({
-        title: "Success",
-        description: "Listing created successfully!",
+        title: t("common.success"),
+        description: t(
+          "create_listing.success.created",
+          "Listing created successfully!",
+        ),
       });
 
       navigate(ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS_DETAILS(listing.slug));
     } catch (error: unknown) {
       const err = error as { data?: { message?: string } };
       toast({
-        title: "Error",
-        description: err?.data?.message ?? "Failed to create listing",
+        title: t("common.error"),
+        description:
+          err?.data?.message ??
+          t("create_listing.error.failed_create"),
         variant: "destructive",
       });
     }
@@ -316,8 +359,8 @@ export default function CreateListingPage() {
   );
 
   const steps = [
-    { number: 1, label: "Select product" },
-    { number: 2, label: "Listing details" },
+    { number: 1, label: t("create_listing.steps.select_product") },
+    { number: 2, label: t("create_listing.steps.listing_details") },
   ];
 
   return (
@@ -329,19 +372,22 @@ export default function CreateListingPage() {
             <div>
               <h1 className="md:text-2xl text-lg font-bold flex items-center gap-2">
                 <Package className="md:h-8 md:w-8 h-6 w-6 text-primary" />
-                Create New Listing
+                {t("create_listing.title")}
               </h1>
             </div>
           </div>
           <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
             <Button variant="outline">
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t("common.back")}
             </Button>
           </Link>
         </div>
         <p className="text-muted-foreground text-sm md:mt-6 mt-4">
-          Create a marketplace listing from your verified product
+          {t(
+            "create_listing.subtitle",
+            "Create a marketplace listing from your verified product",
+          )}
         </p>
       </div>
 
@@ -394,33 +440,46 @@ export default function CreateListingPage() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-lg">
-            {step === 1 ? "Select a verified product" : "Listing details"}
+            {step === 1
+              ? t("create_listing.card.select_verified")
+              : t("create_listing.card.listing_details")}
           </CardTitle>
           <CardDescription>
             {step === 1
-              ? "Choose a verified product to create a listing from"
-              : "Fill in the details for your listing"}
+              ? t(
+                  "create_listing.card.select_verified_desc",
+                  "Choose a verified product to create a listing from",
+                )
+              : t(
+                  "create_listing.card.listing_details_desc",
+                  "Fill in the details for your listing",
+                )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {step === 1 && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="verification">Select Verified Product *</Label>
+                <Label htmlFor="verification">
+                  {t("create_listing.select_verified_label")} *
+                </Label>
                 {loadingVerifications ? (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Loading verified products...
+                    {t("create_listing.loading_verified_products")}
                   </div>
                 ) : availableVerifications.length === 0 ? (
                   <div className="flex items-start gap-2 p-4 border rounded-lg bg-muted/50">
                     <AlertCircle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
                     <div className="space-y-3">
                       <p className="font-medium">
-                        No verified products available
+                        {t("create_listing.no_verified_products")}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Please verify a product first before creating a listing
+                        {t(
+                          "create_listing.verify_first",
+                          "Please verify a product first before creating a listing",
+                        )}
                       </p>
                       <Button
                         asChild
@@ -431,7 +490,7 @@ export default function CreateListingPage() {
                         <Link
                           to={ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}
                         >
-                          Add Verified Product
+                          {t("create_listing.add_verified_product")}
                         </Link>
                       </Button>
                     </div>
@@ -471,7 +530,12 @@ export default function CreateListingPage() {
                       id="verification"
                       data-tour="verification-select"
                     >
-                      <SelectValue placeholder="Select a verified product" />
+                      <SelectValue
+                        placeholder={t(
+                          "create_listing.select_verified_placeholder",
+                          "Select a verified product",
+                        )}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {availableVerifications.map((v) => (
@@ -493,17 +557,19 @@ export default function CreateListingPage() {
               {selectedVerification && (
                 <div className="p-4 border rounded-lg bg-muted/30 space-y-2">
                   <h4 className="font-semibold text-sm">
-                    Selected Product Details
+                    {t("create_listing.selected_product_details")}
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Type:</span>
+                      <span className="text-muted-foreground">{t("common.type")}:</span>
                       <span className="ml-2 font-medium capitalize">
                         {selectedVerification.product_type}
                       </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Verified:</span>
+                      <span className="text-muted-foreground">
+                        {t("create_listing.verified")}:
+                      </span>
                       <span className="ml-2 font-medium">
                         {selectedVerification.verified_at
                           ? new Date(
@@ -521,23 +587,27 @@ export default function CreateListingPage() {
           {step === 2 && (
             <div className="space-y-6">
               <div className="space-y-4">
-                <h3 className="font-semibold">Basic Information</h3>
+                <h3 className="font-semibold">
+                  {t("create_listing.basic_information")}
+                </h3>
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="title">{t("create_listing.title_label")} *</Label>
                   <Input
                     id="title"
                     data-tour="listing-title-input"
                     value={formData.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
-                    placeholder="Enter listing title"
+                    placeholder={t("create_listing.title_placeholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="listing_type">Listing Type *</Label>
+                  <Label htmlFor="listing_type">
+                    {t("create_listing.listing_type")} *
+                  </Label>
                   {loadingTypes ? (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading types...
+                      {t("create_listing.loading_types")}
                     </div>
                   ) : (
                     <Select
@@ -551,7 +621,12 @@ export default function CreateListingPage() {
                       disabled
                     >
                       <SelectTrigger id="listing_type">
-                        <SelectValue placeholder="Select listing type" />
+                        <SelectValue
+                          placeholder={t(
+                            "create_listing.select_listing_type",
+                            "Select listing type",
+                          )}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {listingTypes?.map((type) => (
@@ -564,35 +639,45 @@ export default function CreateListingPage() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="short_description">Short Description</Label>
+                  <Label htmlFor="short_description">
+                    {t("create_listing.short_description")}
+                  </Label>
                   <Input
                     id="short_description"
                     value={formData.short_description ?? ""}
                     onChange={(e) =>
                       handleInputChange("short_description", e.target.value)
                     }
-                    placeholder="Brief description (optional)"
+                    placeholder={t(
+                      "create_listing.short_description_placeholder",
+                      "Brief description (optional)",
+                    )}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description">
+                    {t("create_listing.description_label")} *
+                  </Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) =>
                       handleInputChange("description", e.target.value)
                     }
-                    placeholder="Detailed description of your listing"
+                    placeholder={t(
+                      "create_listing.description_placeholder",
+                      "Detailed description of your listing",
+                    )}
                     rows={4}
                   />
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-semibold">Pricing</h3>
+                <h3 className="font-semibold">{t("create_listing.pricing")}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="price">Price *</Label>
+                    <Label htmlFor="price">{t("create_listing.price")} *</Label>
                     <Input
                       id="price"
                       type="number"
@@ -604,7 +689,7 @@ export default function CreateListingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="currency">Currency</Label>
+                    <Label htmlFor="currency">{t("create_listing.currency")}</Label>
                     <Select
                       value={formData.currency}
                       onValueChange={(value) =>
@@ -631,18 +716,23 @@ export default function CreateListingPage() {
                     }
                   />
                   <Label htmlFor="negotiable" className="cursor-pointer">
-                    Price is negotiable
+                    {t("create_listing.price_negotiable")}
                   </Label>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <h3 className="font-semibold">
-                  Additional Information (Optional)
+                  {t(
+                    "create_listing.additional_information",
+                    "Additional Information (Optional)",
+                  )}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="domain_age">Domain Age (years)</Label>
+                    <Label htmlFor="domain_age">
+                      {t("create_listing.domain_age")}
+                    </Label>
                     <Input
                       id="domain_age"
                       type="number"
@@ -658,7 +748,9 @@ export default function CreateListingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="domain_authority">Domain Authority</Label>
+                    <Label htmlFor="domain_authority">
+                      {t("create_listing.domain_authority")}
+                    </Label>
                     <Input
                       id="domain_authority"
                       type="text"
@@ -673,7 +765,9 @@ export default function CreateListingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="traffic">Monthly Traffic</Label>
+                    <Label htmlFor="traffic">
+                      {t("create_listing.monthly_traffic")}
+                    </Label>
                     <Input
                       id="traffic"
                       type="number"
@@ -689,7 +783,9 @@ export default function CreateListingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="revenue">Monthly Revenue</Label>
+                    <Label htmlFor="revenue">
+                      {t("create_listing.monthly_revenue")}
+                    </Label>
                     <Input
                       id="revenue"
                       type="number"
@@ -705,7 +801,9 @@ export default function CreateListingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="profit">Monthly Profit</Label>
+                    <Label htmlFor="profit">
+                      {t("create_listing.monthly_profit")}
+                    </Label>
                     <Input
                       id="profit"
                       type="number"
@@ -721,7 +819,9 @@ export default function CreateListingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="backlinks">Domain Backlinks</Label>
+                    <Label htmlFor="backlinks">
+                      {t("create_listing.domain_backlinks")}
+                    </Label>
                     <Input
                       id="backlinks"
                       type="number"
@@ -737,34 +837,48 @@ export default function CreateListingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="technology">Website Technology</Label>
+                    <Label htmlFor="technology">
+                      {t("create_listing.website_technology")}
+                    </Label>
                     <Input
                       id="technology"
                       value={formData.website_technology ?? ""}
                       onChange={(e) =>
                         handleInputChange("website_technology", e.target.value)
                       }
-                      placeholder="e.g., WordPress, React, etc."
+                      placeholder={t(
+                        "create_listing.website_technology_placeholder",
+                        "e.g., WordPress, React, etc.",
+                      )}
                     />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-semibold">Images & SEO (Optional)</h3>
+                <h3 className="font-semibold">
+                  {t("create_listing.images_seo_optional")}
+                </h3>
                 <div className="space-y-2">
-                  <Label htmlFor="primary_image">Primary Image URL</Label>
+                  <Label htmlFor="primary_image">
+                    {t("create_listing.primary_image_url")}
+                  </Label>
                   <Input
                     id="primary_image"
                     value={formData.primary_image_url ?? ""}
                     onChange={(e) =>
                       handleInputChange("primary_image_url", e.target.value)
                     }
-                    placeholder="https://example.com/image.jpg"
+                    placeholder={t(
+                      "create_listing.primary_image_placeholder",
+                      "https://example.com/image.jpg",
+                    )}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="image_urls">Additional Image URLs</Label>
+                  <Label htmlFor="image_urls">
+                    {t("create_listing.additional_image_urls")}
+                  </Label>
                   <Input
                     id="image_urls"
                     value={formData.image_urls?.join(", ") ?? ""}
@@ -778,39 +892,55 @@ export default function CreateListingPage() {
                         urls.length > 0 ? urls : null,
                       );
                     }}
-                    placeholder="Comma-separated URLs"
+                    placeholder={t(
+                      "create_listing.comma_separated_urls",
+                      "Comma-separated URLs",
+                    )}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Separate multiple URLs with commas
+                    {t(
+                      "create_listing.urls_with_commas",
+                      "Separate multiple URLs with commas",
+                    )}
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="meta_title">Meta Title</Label>
+                  <Label htmlFor="meta_title">
+                    {t("create_listing.meta_title")}
+                  </Label>
                   <Input
                     id="meta_title"
                     value={formData.meta_title ?? ""}
                     onChange={(e) =>
                       handleInputChange("meta_title", e.target.value)
                     }
-                    placeholder="SEO title for search engines"
+                    placeholder={t(
+                      "create_listing.meta_title_placeholder",
+                      "SEO title for search engines",
+                    )}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="meta_description">Meta Description</Label>
+                  <Label htmlFor="meta_description">
+                    {t("create_listing.meta_description")}
+                  </Label>
                   <Textarea
                     id="meta_description"
                     value={formData.meta_description ?? ""}
                     onChange={(e) =>
                       handleInputChange("meta_description", e.target.value)
                     }
-                    placeholder="SEO description for search engines"
+                    placeholder={t(
+                      "create_listing.meta_description_placeholder",
+                      "SEO description for search engines",
+                    )}
                     rows={2}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="status">{t("common.status")}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value) => handleInputChange("status", value)}
@@ -819,8 +949,8 @@ export default function CreateListingPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="draft">{t("common.draft")}</SelectItem>
+                    <SelectItem value="active">{t("common.active")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -831,16 +961,18 @@ export default function CreateListingPage() {
             {step === 1 ? (
               <>
                 <Button variant="outline" asChild>
-                  <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>Cancel</Link>
+                  <Link to={ROUTES.CLIENT.MARKETPLACE.MY_LISTINGS}>
+                    {t("common.cancel")}
+                  </Link>
                 </Button>
                 <Button onClick={() => setStep(2)} disabled={!verificationId}>
-                  Next
+                  {t("common.next")}
                 </Button>
               </>
             ) : (
               <>
                 <Button variant="outline" onClick={() => setStep(1)}>
-                  Back
+                  {t("common.back")}
                 </Button>
                 <Button
                   onClick={handleSubmit}
@@ -850,7 +982,7 @@ export default function CreateListingPage() {
                   {creating && (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   )}
-                  Create Listing
+                  {t("create_listing.submit")}
                 </Button>
               </>
             )}

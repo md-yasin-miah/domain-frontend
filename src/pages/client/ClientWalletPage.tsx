@@ -131,10 +131,9 @@ export default function ClientWalletPage() {
     const amount = parseFloat(withdrawAmount);
     if (!Number.isFinite(amount) || amount <= 0) {
       toast({
-        title: t("wallet.withdraw.amount_required", "Invalid amount"),
+        title: t("wallet.withdraw.amount_required"),
         description: t(
           "wallet.withdraw.amount_required_desc",
-          "Enter a positive amount.",
         ),
         variant: "destructive",
       });
@@ -143,10 +142,9 @@ export default function ClientWalletPage() {
     const available = Number(withdrawalBalance?.earnings_available ?? 0);
     if (amount > available) {
       toast({
-        title: t("wallet.withdraw.insufficient", "Insufficient balance"),
+        title: t("wallet.withdraw.insufficient"),
         description: t(
           "wallet.withdraw.insufficient_desc",
-          "Available: {{amount}}",
           {
             amount: formatWalletBalance(available, currency),
           },
@@ -174,10 +172,9 @@ export default function ClientWalletPage() {
         payout_details,
       }).unwrap();
       toast({
-        title: t("wallet.withdraw.success", "Withdrawal requested"),
+        title: t("wallet.withdraw.success"),
         description: t(
           "wallet.withdraw.success_desc",
-          "Your withdrawal request has been submitted.",
         ),
       });
       setWithdrawAmount("");
@@ -190,7 +187,7 @@ export default function ClientWalletPage() {
         "data" in err &&
         (err as { data?: { detail?: string } }).data?.detail;
       toast({
-        title: t("common.error", "Error"),
+        title: t("common.error"),
         description: typeof detail === "string" ? detail : t("common.error"),
         variant: "destructive",
       });
@@ -206,19 +203,19 @@ export default function ClientWalletPage() {
     {
       id: "id",
       accessorKey: "id",
-      header: t("wallet.withdraw.table_id", "ID"),
+      header: t("wallet.withdraw.table_id"),
       cell: ({ row }) => <span className="font-mono text-sm">#{row.id}</span>,
     },
     {
       id: "amount",
       accessorKey: "amount",
-      header: t("wallet.withdraw.table_amount", "Amount"),
+      header: t("wallet.withdraw.table_amount"),
       cell: ({ row }) => formatWalletBalance(row.amount, row.currency),
     },
     {
       id: "net_amount",
       accessorKey: "net_amount",
-      header: t("wallet.withdraw.table_net", "Net"),
+      header: t("wallet.withdraw.table_net"),
       cell: ({ row }) =>
         row.net_amount != null
           ? formatWalletBalance(row.net_amount, row.currency)
@@ -227,7 +224,7 @@ export default function ClientWalletPage() {
     {
       id: "status",
       accessorKey: "status",
-      header: t("wallet.withdraw.table_status", "Status"),
+      header: t("wallet.withdraw.table_status"),
       cell: ({ row }) => (
         <span
           className={cn(
@@ -243,7 +240,7 @@ export default function ClientWalletPage() {
     {
       id: "requested_at",
       accessorKey: "requested_at",
-      header: t("wallet.withdraw.table_requested", "Requested"),
+      header: t("wallet.withdraw.table_requested"),
       cell: ({ row }) => formatDateTime(row.requested_at),
     },
   ];
@@ -280,11 +277,11 @@ export default function ClientWalletPage() {
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="balance" className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
-            {t("wallet.tab_balance", "Balance")}
+            {t("wallet.tab_balance")}
           </TabsTrigger>
           <TabsTrigger value="withdraw" className="flex items-center gap-2">
             <Banknote className="h-4 w-4" />
-            {t("wallet.tab_withdraw", "Withdraw")}
+            {t("wallet.tab_withdraw")}
           </TabsTrigger>
         </TabsList>
 
@@ -426,16 +423,10 @@ export default function ClientWalletPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Banknote className="h-5 w-5" />
-                {t(
-                  "wallet.withdraw.earnings_title",
-                  "Earnings available to withdraw",
-                )}
+                {t("wallet.withdraw.earnings_title")}
               </CardTitle>
               <CardDescription>
-                {t(
-                  "wallet.withdraw.earnings_desc",
-                  "Withdraw released escrow funds (seller earnings). Commission may apply.",
-                )}
+                {t("wallet.withdraw.earnings_desc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -446,10 +437,7 @@ export default function ClientWalletPage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="rounded-lg border bg-muted/30 p-4">
                       <p className="text-sm text-muted-foreground">
-                        {t(
-                          "wallet.withdraw.available",
-                          "Available to withdraw",
-                        )}
+                        {t("wallet.withdraw.available")}
                       </p>
                       <p className="text-2xl font-bold">
                         {formatWalletBalance(
@@ -460,7 +448,7 @@ export default function ClientWalletPage() {
                     </div>
                     <div className="rounded-lg border bg-muted/30 p-4">
                       <p className="text-sm text-muted-foreground">
-                        {t("wallet.withdraw.total_earned", "Total earned")}
+                        {t("wallet.withdraw.total_earned")}
                       </p>
                       <p className="text-2xl font-bold">
                         {formatWalletBalance(
@@ -472,12 +460,12 @@ export default function ClientWalletPage() {
                   </div>
                   <div className="space-y-4 rounded-lg border p-4">
                     <h4 className="font-medium">
-                      {t("wallet.withdraw.request_title", "Request withdrawal")}
+                      {t("wallet.withdraw.request_title")}
                     </h4>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="withdraw_amount">
-                          {t("wallet.withdraw.amount_label", "Amount")} (
+                          {t("wallet.withdraw.amount_label")} (
                           {currency})
                         </Label>
                         <Input
@@ -492,7 +480,7 @@ export default function ClientWalletPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="withdraw_method">
-                          {t("wallet.withdraw.payout_method", "Payout method")}
+                          {t("wallet.withdraw.payout_method")}
                         </Label>
                         <Select
                           value={withdrawPayoutMethod}
@@ -513,10 +501,7 @@ export default function ClientWalletPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="withdraw_details">
-                        {t(
-                          "wallet.withdraw.payout_details",
-                          "Payout details (optional JSON)",
-                        )}
+                        {t("wallet.withdraw.payout_details")}
                       </Label>
                       <Input
                         id="withdraw_details"
@@ -536,16 +521,13 @@ export default function ClientWalletPage() {
                       {isCreatingWithdrawal && (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       )}
-                      {t("wallet.withdraw.submit", "Request withdrawal")}
+                      {t("wallet.withdraw.submit")}
                     </Button>
                   </div>
                 </>
               ) : (
                 <p className="text-muted-foreground text-sm">
-                  {t(
-                    "wallet.withdraw.balance_unavailable",
-                    "Balance unavailable.",
-                  )}
+                  {t("wallet.withdraw.balance_unavailable")}
                 </p>
               )}
             </CardContent>
@@ -554,13 +536,10 @@ export default function ClientWalletPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {t("wallet.withdraw.history_title", "My withdrawal requests")}
+                {t("wallet.withdraw.history_title")}
               </CardTitle>
               <CardDescription>
-                {t(
-                  "wallet.withdraw.history_desc",
-                  "List of your withdrawal requests and their status.",
-                )}
+                {t("wallet.withdraw.history_desc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -569,10 +548,7 @@ export default function ClientWalletPage() {
                 columns={withdrawalColumns}
                 pagination={pagination}
                 isLoading={withdrawalsLoading}
-                emptyMessage={t(
-                  "wallet.withdraw.no_withdrawals",
-                  "No withdrawals yet",
-                )}
+                emptyMessage={t("wallet.withdraw.no_withdrawals")}
                 emptyIcon={
                   <Banknote className="w-16 h-16 text-muted-foreground" />
                 }

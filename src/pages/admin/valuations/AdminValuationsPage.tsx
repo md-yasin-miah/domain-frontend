@@ -95,7 +95,7 @@ export default function AdminValuationsPage() {
       toast({ title: t("admin.valuations.deleted") });
       setDeleteTarget(null);
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -122,7 +122,7 @@ export default function AdminValuationsPage() {
       {
         id: "domain_extension",
         accessorKey: "domain_extension",
-        header: t("admin.valuations.domain_extension", "Extension"),
+        header: t("admin.valuations.domain_extension"),
         cell: ({ row }) => (
           <span className="text-muted-foreground">
             {row.domain_extension ? `.${row.domain_extension}` : "—"}
@@ -170,22 +170,22 @@ export default function AdminValuationsPage() {
         <div className="relative flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <BarChart3 className="h-7 w-7 text-primary" />
-            {t("admin.valuations.title", "Valuations")}
+            {t("admin.valuations.title")}
           </h1>
           <p className="text-muted-foreground">
-            {t("admin.valuations.description", "Manage valuations, comparable sales, and market trends.")}
+            {t("admin.valuations.description")}
           </p>
           <div className="flex flex-wrap gap-2 mt-3">
             <Button variant="outline" size="sm" asChild>
               <Link to={ROUTES.ADMIN.VALUATIONS.COMPARABLE_SALES}>
                 <History className="h-4 w-4 mr-1" />
-                {t("admin.sidebar.valuations_comparable", "Comparable Sales")}
+                {t("admin.sidebar.valuations_comparable")}
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to={ROUTES.ADMIN.VALUATIONS.MARKET_TRENDS}>
                 <TrendingUp className="h-4 w-4 mr-1" />
-                {t("admin.sidebar.valuations_trends", "Market Trends")}
+                {t("admin.sidebar.valuations_trends")}
               </Link>
             </Button>
           </div>
@@ -197,7 +197,7 @@ export default function AdminValuationsPage() {
           <div>
             <CardTitle>{t("admin.valuations.tab_valuations")}</CardTitle>
             <CardDescription>
-              {pagination ? `${pagination.total} ${t("common.items", "items")}` : `${items.length} ${t("common.items", "items")}`}
+              {pagination ? `${pagination.total} ${t("common.items")}` : `${items.length} ${t("common.items")}`}
             </CardDescription>
           </div>
           <Select

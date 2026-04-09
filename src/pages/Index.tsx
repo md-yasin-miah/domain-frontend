@@ -67,7 +67,7 @@ const Index = () => {
         <div className="absolute inset-0">
           <img
             src="/uploads/hero-bg.png"
-            alt="El futuro del comercio digital"
+            alt={t("index.hero_bg_alt")}
             className="w-full h-full object-cover"
           />
           {/* Dark overlay for better text readability */}
@@ -83,14 +83,15 @@ const Index = () => {
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-roboto font-black text-white mb-6 sm:mb-8 tracking-tight leading-[0.95]">
               {t("hero.title").includes("futuro") ? (
                 <>
-                  El <FlipWords words={dynamicWords} className="text-primary" />{" "}
-                  del comercio digital
+                  {t("index.hero_prefix_es")}{" "}
+                  <FlipWords words={dynamicWords} className="text-primary" />{" "}
+                  {t("index.hero_suffix_es")}
                 </>
               ) : (
                 <>
-                  The{" "}
-                  <FlipWords words={dynamicWords} className="text-primary" /> of
-                  digital commerce
+                  {t("index.hero_prefix_en")}{" "}
+                  <FlipWords words={dynamicWords} className="text-primary" />{" "}
+                  {t("index.hero_suffix_en")}
                 </>
               )}
             </h1>
@@ -100,14 +101,14 @@ const Index = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-12">
               <Link
-                to="/auth"
+                to={ROUTES.AUTH.INDEX}
                 className="btn-primary w-full sm:w-auto justify-center flex items-center space-x-3 text-base sm:text-lg px-7 sm:px-10 py-3.5 sm:py-4 shadow-2xl hover:shadow-primary/25"
               >
                 <Wallet className="w-6 h-6" />
                 <span>{t("hero.cta_start")}</span>
               </Link>
               <Link
-                to="/marketplace"
+                to={ROUTES.APP.MARKETPLACE}
                 className="glass w-full sm:w-auto justify-center border-white/30 text-white hover:bg-white/20 flex items-center space-x-3 text-base sm:text-lg px-7 sm:px-10 py-3.5 sm:py-4 rounded-xl font-medium transition-all duration-300"
               >
                 <TrendingUp className="w-6 h-6" />
@@ -265,7 +266,7 @@ const Index = () => {
                       )}
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-muted-foreground">
-                          {t("categories.explore_listings", "Explore listings")}
+                          {t("categories.explore_listings")}
                         </span>
                         <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
@@ -334,13 +335,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-roboto font-black text-foreground mb-4 sm:mb-6">
-              {t("requirements.title", "Requirements to participate")}
+              {t("requirements.title")}
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground font-roboto max-w-2xl mx-auto">
-              {t(
-                "requirements.subtitle",
-                "What you need to buy or sell domains, websites, and digital assets on our marketplace.",
-              )}
+              {t("requirements.subtitle")}
             </p>
           </div>
 
@@ -348,7 +346,7 @@ const Index = () => {
             {/* For Buyers */}
             <div className="card-professional">
               <h3 className="text-3xl font-roboto font-bold mb-8 text-primary">
-                {t("requirements.buyers", "For buyers")}
+                {t("requirements.buyers")}
               </h3>
               <ul className="space-y-4 font-roboto">
                 <li className="flex items-start space-x-3">
@@ -377,7 +375,7 @@ const Index = () => {
             {/* For Sellers */}
             <div className="card-professional">
               <h3 className="text-3xl font-roboto font-bold mb-8 text-primary">
-                {t("requirements.sellers", "For sellers")}
+                {t("requirements.sellers")}
               </h3>
               <ul className="space-y-4 font-roboto">
                 <li className="flex items-start space-x-3">
@@ -420,27 +418,31 @@ const Index = () => {
             <div className="card-professional text-center">
               <Bitcoin className="w-12 h-12 text-primary mx-auto mb-4" />
               <h4 className="font-roboto font-bold">{t("payments.bitcoin")}</h4>
-              <p className="text-sm text-muted-foreground font-roboto">BTC</p>
+              <p className="text-sm text-muted-foreground font-roboto">
+                {t("index.payments.btc")}
+              </p>
             </div>
             <div className="card-professional text-center">
               <Gem className="w-12 h-12 text-primary mx-auto mb-4" />
               <h4 className="font-roboto font-bold">
                 {t("payments.ethereum")}
               </h4>
-              <p className="text-sm text-muted-foreground font-roboto">ETH</p>
+              <p className="text-sm text-muted-foreground font-roboto">
+                {t("index.payments.eth")}
+              </p>
             </div>
             <div className="card-professional text-center">
               <DollarSign className="w-12 h-12 text-primary mx-auto mb-4" />
               <h4 className="font-roboto font-bold">{t("payments.usdt")}</h4>
               <p className="text-sm text-muted-foreground font-roboto">
-                Tether
+                {t("index.payments.tether")}
               </p>
             </div>
             <div className="card-professional text-center">
               <CreditCard className="w-12 h-12 text-primary mx-auto mb-4" />
               <h4 className="font-roboto font-bold">{t("payments.cards")}</h4>
               <p className="text-sm text-muted-foreground font-roboto">
-                Visa/MC
+                {t("index.payments.cards_short")}
               </p>
             </div>
           </div>

@@ -28,6 +28,7 @@ import moment from "moment";
 import { ROUTES } from "@/lib/routes";
 import AiAgentLoadingScreen from "@/components/valuations/AiAgentLoadingScreen";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const normalizeDomain = (value: string): string => {
   return (
@@ -40,6 +41,7 @@ const normalizeDomain = (value: string): string => {
 };
 
 const AppValuationsIndex = () => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [domainInput, setDomainInput] = useState("");
   const [trigger, { data, isFetching, isSuccess, error }] =
@@ -65,14 +67,13 @@ const AppValuationsIndex = () => {
         <div className="relative mx-auto max-w-3xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary mb-6">
             <Sparkles className="h-4 w-4" />
-            <span>AI-powered domain valuation</span>
+            <span>{t("valuations.badge")}</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Discover your domain&apos;s worth
+            {t("valuations.hero_title")}
           </h1>
           <p className="mt-3 text-muted-foreground text-lg">
-            Enter a domain to get an instant estimate, market rank, and
-            comparable sales.
+            {t("valuations.hero_subtitle")}
           </p>
 
           <form
@@ -96,8 +97,8 @@ const AppValuationsIndex = () => {
                 <Pin className="h-3.5 w-3.5 text-red-500" />
                 <p className="text-xs text-muted-foreground text-center sm:text-left sm:max-w-md sm:mx-0 mx-auto">
                   {isAuthenticated
-                    ? "You can check unlimited domain valuations as a signed-in user."
-                    : "You can run up to 2 free valuation checks every 24 hours. Sign in to unlock unlimited checks."}
+                    ? t("valuations.note.authenticated")
+                    : t("valuations.note.guest")}
                 </p>
               </div>
             </div>
@@ -110,12 +111,12 @@ const AppValuationsIndex = () => {
               {isFetching ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Analyzing…
+                  {t("valuations.analyzing")}
                 </>
               ) : (
                 <>
                   <Search className="h-4 w-4" />
-                  Get valuation
+                  {t("valuations.cta_get_valuation")}
                 </>
               )}
             </Button>
@@ -127,16 +128,18 @@ const AppValuationsIndex = () => {
                 variant="destructive"
                 className="mt-6 text-left max-w-md mx-auto sm:mx-0"
               >
-                <AlertTitle>Valuation unavailable</AlertTitle>
+                <AlertTitle>
+                  {t("valuations.error.title")}
+                </AlertTitle>
                 <AlertDescription>
                   {"status" in error && error.status === 429
-                    ? "Rate limit reached. Sign in for unlimited valuations, or try again later."
+                    ? t("valuations.error.rate_limit")
                     : "data" in error &&
                         typeof error.data === "object" &&
                         error.data &&
                         "detail" in error.data
                       ? String((error.data as { detail?: string }).detail)
-                      : "Something went wrong. Please try again."}
+                      : t("valuations.error.generic")}
                 </AlertDescription>
               </Alert>
             </div>
@@ -164,6 +167,7 @@ function ValuationResults({
   data: AutoValuationResponse;
   isAuthenticated: boolean;
 }) {
+  const { t } = useTranslation();
   const currency = data.currency || "USD";
   const sellFlowPath = `${ROUTES.CLIENT.MARKETPLACE.PRODUCTS_VERIFICATION}?from_valuation=1&product_type=domain&domain_name=${encodeURIComponent(
     data.domain_name ?? "",
@@ -207,12 +211,14 @@ function ValuationResults({
             <Link to={sellHref}>
               <Button size="sm" variant="outline">
                 {isAuthenticated
-                  ? "Sell this domain"
-                  : "Sign in to sell this domain"}
+                  ? t("valuations.sell_cta.auth")
+                  : t("valuations.sell_cta.guest")}
               </Button>
             </Link>
           </div>
-          <CardDescription>Estimated value</CardDescription>
+          <CardDescription>
+            {t("valuations.estimated_value")}
+          </CardDescription>
           <CardTitle className="text-4xl sm:text-5xl font-bold text-foreground">
             {formatCurrency(data.estimated_value)}{" "}
             <span className="text-lg font-normal text-muted-foreground">
@@ -220,7 +226,7 @@ function ValuationResults({
             </span>
           </CardTitle>
           <p className="text-muted-foreground">
-            Range: {formatCurrency(data.min_estimate)} –{" "}
+            {t("valuations.range")}: {formatCurrency(data.min_estimate)} –{" "}
             {formatCurrency(data.max_estimate)} {currency}
           </p>
         </CardHeader>
@@ -233,9 +239,9 @@ function ValuationResults({
             {data.domain}
           </Badge>
           <span className="text-sm text-muted-foreground">
-            Name:{" "}
+            {t("valuations.name")}:{" "}
             <strong className="text-foreground">{data.domain_name}</strong> ·
-            Ext:{" "}
+            {t("valuations.ext")}:{" "}
             <strong className="text-foreground">
               .{data.domain_extension}
             </strong>
@@ -254,7 +260,8 @@ function ValuationResults({
             </Badge>
           )}
           <span className="text-sm text-muted-foreground">
-            Based on {data.comparable_sales_count} comparable sale
+            {t("valuations.based_on")} {data.comparable_sales_count}{" "}
+            {t("valuations.comparable_sale")}
             {data.comparable_sales_count !== 1 ? "s" : ""}
           </span>
         </CardContent>
@@ -267,19 +274,23 @@ function ValuationResults({
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-primary" />
-                Scores &amp; metrics
+                {t("valuations.scores_metrics")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               {data.domain_length_score != null && (
                 <p>
-                  <span className="text-muted-foreground">Length score:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.length_score")}:
+                  </span>{" "}
                   {data.domain_length_score}/100
                 </p>
               )}
               {data.domain_age_years != null && (
                 <p>
-                  <span className="text-muted-foreground">Age:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.age")}:
+                  </span>{" "}
                   {data.domain_age_years} year
                   {data.domain_age_years !== 1 ? "s" : ""}
                 </p>
@@ -287,21 +298,23 @@ function ValuationResults({
               {data.domain_authority_score != null && (
                 <p>
                   <span className="text-muted-foreground">
-                    Domain authority:
+                    {t("valuations.domain_authority")}:
                   </span>{" "}
                   {data.domain_authority_score}
                 </p>
               )}
               {data.backlinks_count != null && (
                 <p>
-                  <span className="text-muted-foreground">Backlinks:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.backlinks")}:
+                  </span>{" "}
                   {formatNumber(data.backlinks_count)}
                 </p>
               )}
               {data.monthly_traffic != null && (
                 <p>
                   <span className="text-muted-foreground">
-                    Monthly traffic:
+                    {t("valuations.monthly_traffic")}:
                   </span>{" "}
                   {formatNumber(data.monthly_traffic)}
                 </p>
@@ -309,7 +322,7 @@ function ValuationResults({
               {data.monthly_revenue != null && (
                 <p>
                   <span className="text-muted-foreground">
-                    Monthly revenue:
+                    {t("valuations.monthly_revenue")}:
                   </span>{" "}
                   {formatCurrency(Number(data.monthly_revenue))} {currency}
                 </p>
@@ -324,37 +337,46 @@ function ValuationResults({
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-primary" />
-                Market trend · {data.market_trend.trend_key}
+                {t("valuations.market_trend")} ·{" "}
+                {data.market_trend.trend_key}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p>
-                <span className="text-muted-foreground">Avg sale:</span>{" "}
+                <span className="text-muted-foreground">
+                  {t("valuations.avg_sale")}:
+                </span>{" "}
                 {formatCurrency(data.market_trend.average_sale_price)}{" "}
                 {data.market_trend.currency}
               </p>
               <p>
-                <span className="text-muted-foreground">Median:</span>{" "}
+                <span className="text-muted-foreground">
+                  {t("valuations.median")}:
+                </span>{" "}
                 {formatCurrency(data.market_trend.median_sale_price)}{" "}
                 {data.market_trend.currency}
               </p>
               {data.market_trend.total_sales_count != null && (
                 <p>
                   <span className="text-muted-foreground">
-                    Total sales (period):
+                    {t("valuations.total_sales_period")}:
                   </span>{" "}
                   {data.market_trend.total_sales_count}
                 </p>
               )}
               {data.market_trend.period_end && (
                 <p>
-                  <span className="text-muted-foreground">Period end:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.period_end")}:
+                  </span>{" "}
                   {moment(data.market_trend.period_end).format("lll")}
                 </p>
               )}
               {data.market_trend.price_change_percentage != null && (
                 <p>
-                  <span className="text-muted-foreground">Price change:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.price_change")}:
+                  </span>{" "}
                   <span
                     className={
                       data.market_trend.price_change_percentage >= 0
@@ -380,14 +402,14 @@ function ValuationResults({
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Globe className="h-4 w-4 text-primary" />
-                Domain info (WHOIS)
+                {t("valuations.domain_info")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               {data.domain_info.domain_age_years != null && (
                 <p>
                   <span className="text-muted-foreground">
-                    Age (from WHOIS):
+                    {t("valuations.whois_age")}:
                   </span>{" "}
                   {data.domain_info.domain_age_years} year
                   {data.domain_info.domain_age_years !== 1 ? "s" : ""}
@@ -395,31 +417,41 @@ function ValuationResults({
               )}
               {data.domain_info.creation_date != null && (
                 <p>
-                  <span className="text-muted-foreground">Created:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.created")}:
+                  </span>{" "}
                   {moment(data.domain_info.creation_date).format("lll")}
                 </p>
               )}
               {data.domain_info.expiration_date != null && (
                 <p>
-                  <span className="text-muted-foreground">Expires:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.expires")}:
+                  </span>{" "}
                   {moment(data.domain_info.expiration_date).format("lll")}
                 </p>
               )}
               {data.domain_info.updated_date != null && (
                 <p>
-                  <span className="text-muted-foreground">Updated:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.updated")}:
+                  </span>{" "}
                   {moment(data.domain_info.updated_date).format("lll")}
                 </p>
               )}
               {data.domain_info.registrar != null && (
                 <p>
-                  <span className="text-muted-foreground">Registrar:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.registrar")}:
+                  </span>{" "}
                   {data.domain_info.registrar}
                 </p>
               )}
               {data.domain_info.page_links_count != null && (
                 <p>
-                  <span className="text-muted-foreground">Page links:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("valuations.page_links")}:
+                  </span>{" "}
                   {data.domain_info.page_links_count}
                 </p>
               )}
@@ -428,7 +460,7 @@ function ValuationResults({
                   <div>
                     <span className="text-muted-foreground flex items-center gap-1">
                       <Server className="h-3.5 w-3.5" />
-                      Name servers:
+                      {t("valuations.name_servers")}:
                     </span>
                     <ul className="mt-1 list-inside list-disc text-muted-foreground">
                       {data.domain_info.name_servers.map((ns, i) => (
@@ -450,10 +482,10 @@ function ValuationResults({
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
-              AI valuation data
+              {t("valuations.ai_data")}
             </CardTitle>
             <CardDescription>
-              Additional data used or produced by the valuation model
+              {t("valuations.ai_data_desc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -482,10 +514,11 @@ function ValuationResults({
         data.recent_comparable_sales.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Recent comparable sales</CardTitle>
+              <CardTitle>
+                {t("valuations.recent_comparable_sales")}
+              </CardTitle>
               <CardDescription>
-                Similar domains in the same extension (domain_name,
-                domain_extension, sale_price, sale_date, currency)
+                {t("valuations.recent_comparable_sales_desc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -494,12 +527,14 @@ function ValuationResults({
                   <thead>
                     <tr className="border-b text-left text-muted-foreground">
                       <th className="pb-3 pr-4 font-medium">
-                        Domain (name · ext)
+                        {t("valuations.table_domain")}
                       </th>
                       <th className="pb-3 pr-4 font-medium text-right">
-                        Price
+                        {t("valuations.table_price")}
                       </th>
-                      <th className="pb-3 font-medium">Date</th>
+                      <th className="pb-3 font-medium">
+                        {t("valuations.table_date")}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>

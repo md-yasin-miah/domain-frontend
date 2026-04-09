@@ -320,10 +320,7 @@ export default function UserManagement() {
 
       toast({
         title: t("admin.user_management.messages.role_assigned"),
-        description: t(
-          "admin.user_management.assign_role_dialog.roles_updated",
-          "Roles updated successfully.",
-        ),
+        description: t("admin.user_management.assign_role_dialog.roles_updated"),
       });
 
       setShowAssignDialog(false);
@@ -333,7 +330,7 @@ export default function UserManagement() {
     } catch (error: unknown) {
       const err = error as { data?: { detail?: string }; message?: string };
       toast({
-        title: t("common.error", "Error"),
+        title: t("common.error"),
         description:
           err?.data?.detail ||
           err?.message ||
@@ -581,7 +578,6 @@ export default function UserManagement() {
                 )}
                 emptyMessage={t(
                   "admin.user_management.assign_role_dialog.no_roles_available",
-                  "No roles available",
                 )}
                 triggerClassName="w-full"
               />
@@ -897,14 +893,11 @@ export default function UserManagement() {
               >
                 <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue
-                    placeholder={t(
-                      "admin.user_management.filter_by_role",
-                      "Filter by role",
-                    )}
+                    placeholder={t("admin.user_management.filter_by_role")}
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("common.all", "All")}</SelectItem>
+                  <SelectItem value="all">{t("common.all")}</SelectItem>
                   {(rolesData ?? []).map((role: Role) => (
                     <SelectItem key={role.id} value={role.name}>
                       {role.name}
@@ -930,11 +923,8 @@ export default function UserManagement() {
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             error={usersError}
-            errorTitle={t("common.error.title", "Error")}
-            errorDescription={t(
-              "common.error.description",
-              "Something went wrong.",
-            )}
+            errorTitle={t("common.error.title")}
+            errorDescription={t("common.error.description")}
             errorIcon={<Users className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>

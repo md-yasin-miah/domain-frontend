@@ -116,7 +116,9 @@ const AllOrdersPage = () => {
         header: t("orders.table.listing"),
         cell: ({ row }) => (
           <div>
-            <div className="font-medium">{row.listing?.title || "N/A"}</div>
+            <div className="font-medium">
+              {row.listing?.title || t("common.not_available")}
+            </div>
             <div className="text-sm text-muted-foreground">
               {t("orders.table.listing_id")}: {row.listing_id}
             </div>
@@ -137,7 +139,9 @@ const AllOrdersPage = () => {
               </Avatar>
             ) : (
               <div className="font-medium">
-                {row.buyer?.username || row.buyer?.email || "N/A"}
+                {row.buyer?.username ||
+                  row.buyer?.email ||
+                  t("common.not_available")}
               </div>
             )}
           </div>
@@ -157,7 +161,9 @@ const AllOrdersPage = () => {
               </Avatar>
             ) : (
               <div className="font-medium">
-                {row.seller?.username || row.seller?.email || "N/A"}
+                {row.seller?.username ||
+                  row.seller?.email ||
+                  t("common.not_available")}
               </div>
             )}
           </div>
@@ -203,7 +209,7 @@ const AllOrdersPage = () => {
     <div className="flex items-center gap-1">
       {order.seller_id === user?.id && order.status === "payment_received" && (
         <CustomTooltip
-          content={t("orders.secure_box.secure_box_tooltip", "Secure Box")}
+          content={t("orders.secure_box.secure_box_tooltip")}
         >
           <Button
             size="icon"
@@ -216,7 +222,7 @@ const AllOrdersPage = () => {
       )}
       {order.buyer_id === user?.id && ["payment_received", "accessed"].includes(order.status) && (
         <CustomTooltip
-          content={t("orders.secure_box.view_secure_box", "View Secure Box")}
+          content={t("orders.secure_box.view_secure_box")}
         >
           <Button
             variant="ghost"

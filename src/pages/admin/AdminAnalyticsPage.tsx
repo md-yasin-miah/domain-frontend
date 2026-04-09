@@ -60,9 +60,9 @@ export default function AdminAnalyticsPage() {
       <div className="p-6">
         <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
           <ShieldAlert className="h-12 w-12 mx-auto text-destructive mb-2" />
-          <p className="font-medium">{t("common.error.title", "Error")}</p>
+          <p className="font-medium">{t("common.error.title")}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            {t("common.error.description", "Something went wrong.")}
+            {t("common.error.description")}
           </p>
         </div>
       </div>
@@ -75,13 +75,10 @@ export default function AdminAnalyticsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <ChartLine className="h-7 w-7" />
-            {t("admin.analytics.title", "Analytics")}
+            {t("admin.analytics.title")}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {t(
-              "admin.analytics.description",
-              "Platform overview and key metrics.",
-            )}
+            {t("admin.analytics.description")}
           </p>
         </div>
         <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>

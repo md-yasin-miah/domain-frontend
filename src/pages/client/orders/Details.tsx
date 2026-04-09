@@ -99,7 +99,7 @@ const ClientOrderDetailsPage = () => {
   } = useGetOrderQuery(orderId, {
     skip: !orderId || isNaN(orderId),
   });
-  console.log({order})
+  console.log({ order });
 
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
   const [completeOrder, { isLoading: isCompleting }] =
@@ -139,7 +139,7 @@ const ClientOrderDetailsPage = () => {
   } = useGetEscrowByOrderQuery(orderId, {
     skip: !orderId || isNaN(orderId),
   });
-  console.log({data})
+  console.log({ data });
   const escrow = data?.escrow;
   const [createPayment, { isLoading: isCreatingPayment }] = useCreatePaymentMutation();
 
@@ -239,14 +239,17 @@ const ClientOrderDetailsPage = () => {
       }).unwrap();
 
       toast({
-        title: t("orders.details.invoice_success") || "Invoice Generated",
+        title: t("orders.details.invoice_success"),
         description:
-          t("orders.details.invoice_success_desc") ||
-          `Invoice #${invoice.invoice_number} has been generated successfully.`,
+          t("orders.details.invoice_success_desc", {
+            invoiceNumber: invoice.invoice_number,
+          }),
       });
     } catch (error: unknown) {
       toast({
-        title: (error as ApiError)?.data?.detail || "Failed to generate invoice",
+        title:
+          (error as ApiError)?.data?.detail ||
+          t("orders.details.invoice_error"),
         variant: "destructive",
       });
     }
@@ -270,18 +273,14 @@ const ClientOrderDetailsPage = () => {
       );
 
       toast({
-        title: t("orders.details.invoice_download_success") || "Invoice Downloaded",
-        description:
-          t("orders.details.invoice_download_success_desc") ||
-          "Invoice has been downloaded successfully.",
+        title: t("orders.details.invoice_download_success"),
+        description: t("orders.details.invoice_download_success_desc"),
       });
     } catch (error: unknown) {
       console.error("Error generating PDF:", error);
       toast({
-        title: t("orders.details.invoice_download_error") || "Download Failed",
-        description:
-          t("orders.details.invoice_download_error_desc") ||
-          "Failed to download invoice. Please try again.",
+        title: t("orders.details.invoice_download_error"),
+        description: t("orders.details.invoice_download_error_desc"),
         variant: "destructive",
       });
     } finally {
@@ -375,7 +374,9 @@ const ClientOrderDetailsPage = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Final Price</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {t("orders.details.final_price")}
+                  </p>
                   <p className="text-xl font-semibold text-foreground">
                     {formatCurrency(order.final_price)}
                   </p>
@@ -392,7 +393,9 @@ const ClientOrderDetailsPage = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Listing Price</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {t("orders.details.listing_price")}
+                  </p>
                   <p className="text-xl font-semibold text-foreground">
                     {formatCurrency(order.listing_price)}
                   </p>
@@ -409,11 +412,17 @@ const ClientOrderDetailsPage = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Platform Fee</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {t("orders.details.platform_fee")}
+                  </p>
                   <p className="text-xl font-semibold text-foreground">
                     {formatCurrency(order.platform_fee)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{feePercentage}% of listing</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t("orders.details.platform_fee_percent", {
+                      percentage: feePercentage,
+                    })}
+                  </p>
                 </div>
                 <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                   <Receipt className="h-4 w-4 text-muted-foreground" />
@@ -426,11 +435,15 @@ const ClientOrderDetailsPage = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Order ID</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {t("orders.details.order_id")}
+                  </p>
                   <p className="text-xl font-semibold text-foreground">
                     #{order.id}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Unique identifier</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t("orders.details.unique_identifier")}
+                  </p>
                 </div>
                 <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
                   <Sparkles className="h-4 w-4 text-muted-foreground" />
@@ -452,7 +465,9 @@ const ClientOrderDetailsPage = () => {
                   </div>
                   <div>
                     <CardTitle className="text-lg font-semibold">{t("orders.details.order_information")}</CardTitle>
-                    <CardDescription className="text-xs">Complete order details and timeline</CardDescription>
+                    <CardDescription className="text-xs">
+                      {t("orders.details.order_information_desc")}
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -600,7 +615,9 @@ const ClientOrderDetailsPage = () => {
                   </div>
                   <div>
                     <CardTitle className="text-lg font-semibold">{t("orders.details.listing_information")}</CardTitle>
-                    <CardDescription className="text-xs">Product details and information</CardDescription>
+                    <CardDescription className="text-xs">
+                      {t("orders.details.listing_information_desc")}
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -610,7 +627,7 @@ const ClientOrderDetailsPage = () => {
                     {t("orders.details.listing_title")}
                   </label>
                   <p className="text-sm font-semibold text-foreground">
-                    {order.listing?.title || "N/A"}
+                    {order.listing?.title || t("common.not_available")}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -641,7 +658,9 @@ const ClientOrderDetailsPage = () => {
                   </div>
                   <div>
                     <CardTitle className="text-lg font-semibold">{t("orders.details.parties_information")}</CardTitle>
-                    <CardDescription className="text-xs">Buyer and seller details</CardDescription>
+                    <CardDescription className="text-xs">
+                      {t("orders.details.parties_information_desc")}
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -656,7 +675,7 @@ const ClientOrderDetailsPage = () => {
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground mb-0.5">
-                      {order.buyer?.username || order.buyer?.email || "N/A"}
+                      {order.buyer?.username || order.buyer?.email || t("common.not_available")}
                     </p>
                     {order.buyer?.email && (
                       <p className="text-xs text-muted-foreground">
@@ -674,7 +693,7 @@ const ClientOrderDetailsPage = () => {
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground mb-0.5">
-                      {order.seller?.username || order.seller?.email || "N/A"}
+                      {order.seller?.username || order.seller?.email || t("common.not_available")}
                     </p>
                     {order.seller?.email && (
                       <p className="text-xs text-muted-foreground">
@@ -698,7 +717,9 @@ const ClientOrderDetailsPage = () => {
                   </div>
                   <div>
                     <CardTitle className="text-lg font-semibold">{t("orders.details.pricing_summary")}</CardTitle>
-                    <CardDescription className="text-xs">Complete pricing breakdown</CardDescription>
+                    <CardDescription className="text-xs">
+                      {t("orders.details.pricing_summary_desc")}
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -1020,7 +1041,7 @@ const ClientOrderDetailsPage = () => {
                       size="sm"
                     >
                       <CreditCard className="w-3.5 h-3.5 mr-2" />
-                      {t("orders.details.make_payment") || "Make Payment"}
+                      {t("orders.details.make_payment")}
                     </Button>
                   )}
                 </CardContent>
@@ -1036,11 +1057,10 @@ const ClientOrderDetailsPage = () => {
                   </div>
                   <div>
                     <CardTitle className="text-lg font-semibold">
-                      {t("orders.details.invoice") || "Invoice"}
+                      {t("orders.details.invoice")}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                      {t("orders.details.invoice_description") ||
-                        "Generate invoice for this order"}
+                      {t("orders.details.invoice_description")}
                     </CardDescription>
                   </div>
                 </div>
@@ -1051,7 +1071,7 @@ const ClientOrderDetailsPage = () => {
                     <div className="flex items-center gap-2 mb-2">
                       <Receipt className="h-3.5 w-3.5 text-muted-foreground" />
                       <label className="text-xs font-medium text-muted-foreground">
-                        {t("orders.details.invoice_number") || "Invoice Number"}
+                        {t("orders.details.invoice_number")}
                       </label>
                     </div>
                     <p className="text-sm font-semibold text-foreground mb-2">
@@ -1066,8 +1086,7 @@ const ClientOrderDetailsPage = () => {
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    {t("orders.details.no_invoice") ||
-                      "No invoice has been generated for this order yet."}
+                    {t("orders.details.no_invoice")}
                   </p>
                 )}
                 {/* download invoice button */}
@@ -1083,7 +1102,7 @@ const ClientOrderDetailsPage = () => {
                   ) : (
                     <Download className="w-3.5 h-3.5 mr-2" />
                   )}
-                  {t("orders.details.download_invoice") || "Download Invoice"}
+                  {t("orders.details.download_invoice")}
                 </Button>
                 <Button
                   variant="outline"
@@ -1098,10 +1117,8 @@ const ClientOrderDetailsPage = () => {
                     <File className="w-3.5 h-3.5 mr-2" />
                   )}
                   {existingInvoice
-                    ? t("orders.details.regenerate_invoice") ||
-                    "Regenerate Invoice"
-                    : t("orders.details.generate_invoice") ||
-                    "Generate Invoice"}
+                    ? t("orders.details.regenerate_invoice")
+                    : t("orders.details.generate_invoice")}
                 </Button>
               </CardContent>
             </Card>

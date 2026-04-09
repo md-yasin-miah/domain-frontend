@@ -108,13 +108,13 @@ export default function AdminGuideCategoriesPage() {
       {
         id: "name",
         accessorKey: "name",
-        header: t("admin.guides.name", "Name"),
+        header: t("admin.guides.name"),
         cell: ({ row }) => <span className="font-medium">{row.name}</span>,
       },
       {
         id: "slug",
         accessorKey: "slug",
-        header: t("admin.guides.slug", "Slug"),
+        header: t("admin.guides.slug"),
         cell: ({ row }) => (
           <span className="text-muted-foreground">{row.slug}</span>
         ),
@@ -122,13 +122,13 @@ export default function AdminGuideCategoriesPage() {
       {
         id: "order",
         accessorKey: "order",
-        header: t("admin.guides.order", "Order"),
+        header: t("admin.guides.order"),
         cell: ({ row }) => row.order,
       },
       {
         id: "is_active",
         accessorKey: "is_active",
-        header: t("admin.guides.active", "Active"),
+        header: t("admin.guides.active"),
         cell: ({ row }) =>
           row.is_active ? t("common.yes") : t("common.no"),
       },
@@ -233,10 +233,10 @@ export default function AdminGuideCategoriesPage() {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <BookOpen className="h-6 w-6" />
-              {t("admin.sidebar.guides_categories", "Guide Categories")}
+              {t("admin.sidebar.guides_categories")}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {t("admin.guides.categories_description", "Manage guide categories")}
+              {t("admin.guides.categories_description")}
             </p>
           </div>
         </div>
@@ -244,32 +244,32 @@ export default function AdminGuideCategoriesPage() {
           <DialogTrigger asChild>
             <Button onClick={() => openModal("create")}>
               <Plus className="h-4 w-4 mr-2" />
-              {t("admin.guides.add_category", "Add Category")}
+              {t("admin.guides.add_category")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
                 {modalMode === "create"
-                  ? t("admin.guides.add_category", "Add Category")
-                  : t("admin.guides.edit_category", "Edit Category")}
+                  ? t("admin.guides.add_category")
+                  : t("admin.guides.edit_category")}
               </DialogTitle>
               <DialogDescription>
-                {t("admin.guides.category_form_description", "Name and slug are required.")}
+                {t("admin.guides.category_form_description")}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">{t("admin.guides.name", "Name")} *</Label>
+                <Label htmlFor="name">{t("admin.guides.name")} *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder={t("admin.guides.name_placeholder", "Category name")}
+                  placeholder={t("admin.guides.name_placeholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="slug">{t("admin.guides.slug", "Slug")}</Label>
+                <Label htmlFor="slug">{t("admin.guides.slug")}</Label>
                 <Input
                   id="slug"
                   value={formData.slug}
@@ -278,7 +278,7 @@ export default function AdminGuideCategoriesPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">{t("admin.guides.description", "Description")}</Label>
+                <Label htmlFor="description">{t("admin.guides.description")}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
@@ -287,7 +287,7 @@ export default function AdminGuideCategoriesPage() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="order">{t("admin.guides.order", "Order")}</Label>
+                <Label htmlFor="order">{t("admin.guides.order")}</Label>
                 <Input
                   id="order"
                   type="number"
@@ -299,7 +299,7 @@ export default function AdminGuideCategoriesPage() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="is_active">{t("admin.guides.active", "Active")}</Label>
+                <Label htmlFor="is_active">{t("admin.guides.active")}</Label>
                 <Switch
                   id="is_active"
                   checked={formData.is_active}
@@ -328,7 +328,7 @@ export default function AdminGuideCategoriesPage() {
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder={t("common.search", "Search")}
+                placeholder={t("common.search")}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -346,7 +346,7 @@ export default function AdminGuideCategoriesPage() {
                     setSearchTerm("");
                     handlePageChange(1);
                   }}
-                  aria-label={t("admin.translations.clear_search", "Clear search")}
+                  aria-label={t("admin.translations.clear_search")}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -388,8 +388,8 @@ export default function AdminGuideCategoriesPage() {
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               error={error}
-              errorTitle={t("common.error.title", "Error")}
-              errorDescription={t("common.error.description", "Something went wrong.")}
+              errorTitle={t("common.error.title")}
+              errorDescription={t("common.error.description")}
               errorIcon={<BookOpen className="w-16 h-16 text-muted-foreground" />}
             />
         </CardContent>
