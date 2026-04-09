@@ -121,7 +121,6 @@ export default function AdminGuideArticleEditPage() {
         title: t("admin.guides.errors.required"),
         description: t(
           "admin.guides.errors.title_content_required",
-          "Title and content are required.",
         ),
         variant: "destructive",
       });
@@ -149,7 +148,6 @@ export default function AdminGuideArticleEditPage() {
           title: t("admin.guides.created"),
           description: t(
             "admin.guides.created_desc",
-            "Guide article was created successfully.",
           ),
         });
       } else if (articleId) {
@@ -158,7 +156,6 @@ export default function AdminGuideArticleEditPage() {
           title: t("admin.guides.updated"),
           description: t(
             "admin.guides.updated_desc",
-            "Guide article was updated successfully.",
           ),
         });
       }
@@ -206,14 +203,8 @@ export default function AdminGuideArticleEditPage() {
             </h1>
             <p className="text-muted-foreground text-sm">
               {isNew
-                ? t(
-                    "admin.guides.edit_article_create_desc",
-                    "Create a new guide article",
-                  )
-                : t(
-                    "admin.guides.edit_article_edit_desc",
-                    "Edit this guide article",
-                  )}
+                ? t("admin.guides.edit_article_create_desc")
+                : t("admin.guides.edit_article_edit_desc")}
             </p>
           </div>
         </div>
@@ -265,7 +256,6 @@ export default function AdminGuideArticleEditPage() {
                   onChange={(e) => handleTitleChange(e.target.value)}
                   placeholder={t(
                     "admin.guides.form.title_placeholder",
-                    "Article title",
                   )}
                 />
               </div>
@@ -279,7 +269,6 @@ export default function AdminGuideArticleEditPage() {
                   }
                   placeholder={t(
                     "admin.guides.form.slug_placeholder",
-                    "url-slug",
                   )}
                 />
               </div>
@@ -298,7 +287,6 @@ export default function AdminGuideArticleEditPage() {
                   }
                   placeholder={t(
                     "admin.guides.form.excerpt_placeholder",
-                    "Short summary",
                   )}
                   rows={3}
                 />
@@ -314,7 +302,6 @@ export default function AdminGuideArticleEditPage() {
                   }
                   placeholder={t(
                     "admin.guides.form.content_placeholder",
-                    "Article content...",
                   )}
                 />
               </div>
@@ -430,7 +417,6 @@ export default function AdminGuideArticleEditPage() {
                   <SelectValue
                     placeholder={t(
                       "admin.guides.form.select_category",
-                      "Select category",
                     )}
                   />
                 </SelectTrigger>
@@ -468,7 +454,6 @@ export default function AdminGuideArticleEditPage() {
                   }
                   placeholder={t(
                     "admin.guides.form.meta_title_placeholder",
-                    "SEO title",
                   )}
                 />
               </div>
@@ -487,7 +472,6 @@ export default function AdminGuideArticleEditPage() {
                   }
                   placeholder={t(
                     "admin.guides.form.meta_description_placeholder",
-                    "SEO description",
                   )}
                   rows={3}
                 />

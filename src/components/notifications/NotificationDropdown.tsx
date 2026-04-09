@@ -74,7 +74,7 @@ export function NotificationDropdown() {
           variant="ghost"
           size="icon"
           className="relative h-9 w-9 rounded-full group bg-gray-100 hover:bg-primary/10"
-          aria-label={t("notifications.aria_label", "Notifications")}
+          aria-label={t("notifications.aria_label")}
         >
           <Bell className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
           {unreadCount > 0 && (
@@ -95,7 +95,7 @@ export function NotificationDropdown() {
       >
         <div className="flex items-center justify-between border-b px-4 py-3">
           <h3 className="text-sm font-semibold">
-            {t("notifications.title", "Notifications")}
+            {t("notifications.title")}
           </h3>
           {unreadCount > 0 && (
             <Button
@@ -110,7 +110,7 @@ export function NotificationDropdown() {
               ) : (
                 <>
                   <CheckCheck className="h-3.5 w-3.5 mr-1" />
-                  {t("notifications.mark_all_read", "Mark all read")}
+                  {t("notifications.mark_all_read")}
                 </>
               )}
             </Button>
@@ -125,7 +125,7 @@ export function NotificationDropdown() {
             <div className="flex flex-col items-center justify-center py-12 text-center px-4">
               <Bell className="h-10 w-10 text-muted-foreground/50 mb-2" />
               <p className="text-sm text-muted-foreground">
-                {t("notifications.empty", "No notifications yet.")}
+                {t("notifications.empty")}
               </p>
             </div>
           ) : (

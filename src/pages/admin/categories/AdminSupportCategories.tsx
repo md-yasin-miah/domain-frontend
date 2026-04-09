@@ -299,13 +299,10 @@ export default function AdminSupportCategories() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <MessageSquare className="h-6 w-6" />
-              {t("admin.categories.support_title", "Support Categories")}
+              {t("admin.categories.support_title")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {t(
-                "admin.categories.support_description",
-                "Manage support ticket categories",
-              )}
+              {t("admin.categories.support_description")}
             </p>
           </div>
         </div>

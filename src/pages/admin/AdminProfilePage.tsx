@@ -151,8 +151,8 @@ export default function AdminProfilePage() {
       } else {
         await createProfile(cleanedData as Parameters<typeof createProfile>[0]).unwrap();
         toast({
-          title: t("profile.admin.profile_created", "Profile created"),
-          description: t("profile.admin.profile_created_desc", "Your profile has been created successfully."),
+          title: t("profile.admin.profile_created"),
+          description: t("profile.admin.profile_created_desc"),
         });
       }
       setIsEditing(false);
@@ -176,7 +176,7 @@ export default function AdminProfilePage() {
   if (isError && !is404) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">{t("profile.admin.title", "Admin Profile")}</h1>
+        <h1 className="text-3xl font-bold">{t("profile.admin.title")}</h1>
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">{t("profile.client.error_loading_desc")}</p>
@@ -208,10 +208,10 @@ export default function AdminProfilePage() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Shield className="h-8 w-8" />
-            {t("profile.admin.title", "Admin Profile")}
+            {t("profile.admin.title")}
           </h1>
           <p className="text-muted-foreground">
-            {t("profile.admin.subtitle", "Manage your personal profile")}
+            {t("profile.admin.subtitle")}
           </p>
         </div>
         <div className="flex gap-2 items-center">
@@ -230,7 +230,7 @@ export default function AdminProfilePage() {
           )}
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)}>
-              {hasProfile ? t("profile.client.edit_profile") : t("profile.admin.create_profile", "Create Profile")}
+              {hasProfile ? t("profile.client.edit_profile") : t("profile.admin.create_profile")}
             </Button>
           ) : (
             <div className="flex gap-2">

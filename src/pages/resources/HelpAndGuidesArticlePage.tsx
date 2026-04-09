@@ -27,7 +27,7 @@ export default function GuideArticlePage() {
   if (!slug) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">{t("guides.not_found", "Article not found.")}</p>
+        <p className="text-muted-foreground">{t("guides.not_found")}</p>
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function GuideArticlePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <span className="ml-2 text-muted-foreground">{t("common.loading", "Loading...")}</span>
+        <span className="ml-2 text-muted-foreground">{t("common.loading")}</span>
       </div>
     );
   }
@@ -48,19 +48,19 @@ export default function GuideArticlePage() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">
           {is401
-            ? t("guides.login_required", "Please log in to view this guide.")
-            : t("guides.not_found", "Article not found.")}
+            ? t("guides.login_required")
+            : t("guides.not_found")}
         </p>
         <div className="flex gap-2">
           {is401 && (
             <Button asChild variant="default">
-              <Link to="/auth">{t("auth.login", "Log in")}</Link>
+              <Link to="/auth">{t("auth.login")}</Link>
             </Button>
           )}
           <Button asChild variant="outline">
             <Link to={ROUTES.APP.HELP_GUIDES.ROOT}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {t("guides.back_to_guides", "Back to Guides")}
+              {t("guides.back_to_guides")}
             </Link>
           </Button>
         </div>
@@ -74,7 +74,7 @@ export default function GuideArticlePage() {
         <Button asChild variant="ghost" size="sm" className="mb-8 -ml-2">
           <Link to={ROUTES.APP.HELP_GUIDES.ROOT} className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
-            {t("guides.back_to_guides", "Back to Guides")}
+            {t("guides.back_to_guides")}
           </Link>
         </Button>
 
@@ -100,7 +100,7 @@ export default function GuideArticlePage() {
           {article.view_count != null && article.view_count > 0 && (
             <span className="flex items-center gap-1">
               <Eye className="w-4 h-4" />
-              {article.view_count} {t("guides.views", "views")}
+              {article.view_count} {t("guides.views")}
             </span>
           )}
           {article.created_by?.name && (

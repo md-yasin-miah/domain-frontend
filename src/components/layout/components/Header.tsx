@@ -87,7 +87,7 @@ export function Header({
             {leftSlot}
             {navigationType === "admin" ? (
               <span className="text-base font-medium text-primary uppercase">
-                {t("admin.admin_panel_title", "Admin Panel")}
+                {t("admin.admin_panel_title")}
               </span>
             ) : (
               //logo

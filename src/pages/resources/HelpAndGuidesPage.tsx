@@ -73,22 +73,16 @@ export default function GuidesPage() {
             <BookOpen className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            {t("guides.title", "Guides & Help")}
+            {t("guides.title")}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            {t(
-              "guides.subtitle",
-              "Browse categories and articles to get started.",
-            )}
+            {t("guides.subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder={t(
-                  "guides.search_placeholder",
-                  "Search articles...",
-                )}
+                placeholder={t("guides.search_placeholder")}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -106,7 +100,7 @@ export default function GuidesPage() {
                 className="bg-gradient-to-r from-primary to-secondary hover:shadow-xl"
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                {t("help_guides.create_support_ticket", "Create Support Ticket")}
+                {t("help_guides.create_support_ticket")}
               </Button>
             </Link>
             <Link to={ROUTES.CLIENT.CHAT.ROOT}>
@@ -116,7 +110,7 @@ export default function GuidesPage() {
                 className="border-primary/20 hover:bg-primary/5"
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                {t("help_guides.live_chat", "Live Chat")}
+                {t("help_guides.live_chat")}
               </Button>
             </Link>
           </div>
@@ -145,7 +139,7 @@ export default function GuidesPage() {
                 size="sm"
                 onClick={() => navigate(ROUTES.APP.HELP_GUIDES.ROOT)}
               >
-                {t("guides.all_categories", "All")}
+                {t("guides.all_categories")}
               </Button>
               {categories.map((cat) => (
                 <Button
@@ -188,7 +182,7 @@ export default function GuidesPage() {
           ) : articles.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <FolderOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>{t("guides.no_articles", "No articles found.")}</p>
+              <p>{t("guides.no_articles")}</p>
             </div>
           ) : (
             <>
@@ -222,7 +216,7 @@ export default function GuidesPage() {
                               : ""}
                           </span>
                           <span className="flex items-center gap-1">
-                            {t("guides.read", "Read")}
+                            {t("guides.read")}
                             <ArrowRight className="w-3 h-3" />
                           </span>
                         </div>
@@ -239,14 +233,14 @@ export default function GuidesPage() {
                       disabled={!pagination.has_previous}
                       onClick={() => setPage((p) => Math.max(0, p - 1))}
                     >
-                      {t("common.previous", "Previous")}
+                      {t("common.previous")}
                     </Button>
                     <Button
                       variant="outline"
                       disabled={!pagination.has_next}
                       onClick={() => setPage((p) => p + 1)}
                     >
-                      {t("common.next", "Next")}
+                      {t("common.next")}
                     </Button>
                   </div>
                 )}
@@ -264,30 +258,24 @@ export default function GuidesPage() {
       <section className="py-20 px-6 bg-gradient-to-r from-primary/10 via-background to-secondary/10">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-roboto font-bold text-foreground mb-6">
-            {t("help_guides.need_more_help", "Need More Help?")}
+            {t("help_guides.need_more_help")}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t(
-              "help_guides.support_team_desc",
-              "Our specialized support team is available 24/7 to help you with any specific inquiry."
-            )}
+            {t("help_guides.support_team_desc")}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="text-center p-6">
               <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
               <h3 className="font-semibold mb-2">
-                {t("help_guides.live_chat", "Live Chat")}
+                {t("help_guides.live_chat")}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                {t(
-                  "help_guides.live_chat_desc",
-                  "Immediate response for urgent inquiries"
-                )}
+                {t("help_guides.live_chat_desc")}
               </p>
               <Link to={ROUTES.CLIENT.CHAT.ROOT}>
                 <Button variant="outline" size="sm">
-                  {t("help_guides.start_chat", "Start Chat")}
+                  {t("help_guides.start_chat")}
                 </Button>
               </Link>
             </Card>
@@ -295,14 +283,14 @@ export default function GuidesPage() {
             <Card className="text-center p-6">
               <Mail className="w-12 h-12 text-primary mx-auto mb-4" />
               <h3 className="font-semibold mb-2">
-                {t("help_guides.email", "Email")}
+                {t("help_guides.email")}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
                 support@adominioz.com
               </p>
               <Link to={`mailto:support@adominioz.com`}>
                 <Button variant="outline" size="sm">
-                  {t("help_guides.send_email", "Send Email")}
+                  {t("help_guides.send_email")}
                 </Button>
               </Link>
             </Card>
@@ -310,17 +298,14 @@ export default function GuidesPage() {
             <Card className="text-center p-6">
               <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
               <h3 className="font-semibold mb-2">
-                {t("help_guides.tickets", "Tickets")}
+                {t("help_guides.tickets")}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                {t(
-                  "help_guides.tickets_desc",
-                  "Ticket system for detailed follow-up"
-                )}
+                {t("help_guides.tickets_desc")}
               </p>
               <Link to={ROUTES.CLIENT.SUPPORT}>
                 <Button variant="outline" size="sm">
-                  {t("help_guides.create_ticket", "Create Ticket")}
+                  {t("help_guides.create_ticket")}
                 </Button>
               </Link>
             </Card>

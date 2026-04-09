@@ -165,11 +165,11 @@ export default function AdminOffersPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
-            <CardTitle>{t("offers.all_offers", "All Offers")}</CardTitle>
+            <CardTitle>{t("offers.all_offers")}</CardTitle>
             <CardDescription>
-              {t("offers.description", "Manage offers")}{" "}
+              {t("offers.description")}{" "}
               <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                {total} {t("offers.table.total_offers", "total")}
+                {total} {t("offers.table.total_offers")}
               </span>
             </CardDescription>
           </div>
@@ -181,7 +181,7 @@ export default function AdminOffersPage() {
             }}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={t("offers.filter_by_status", "Status")} />
+              <SelectValue placeholder={t("offers.filter_by_status")} />
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((opt) => (
@@ -198,7 +198,7 @@ export default function AdminOffersPage() {
             columns={columns}
             pagination={offersData?.pagination}
             isLoading={isLoading}
-            emptyMessage={t("offers.empty.no_offers", "No offers found.")}
+            emptyMessage={t("offers.empty.no_offers")}
             emptyIcon={<Handshake className="h-12 w-12 mx-auto opacity-50" />}
             getRowId={(row) => String(row.id)}
             renderActions={(row) => (
@@ -229,10 +229,10 @@ export default function AdminOffersPage() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {t("offers.detail.title", "Offer")} #{selectedOffer?.id}
+              {t("offers.detail.title")} #{selectedOffer?.id}
             </DialogTitle>
             <DialogDescription>
-              {t("offers.detail.description", "Offer details")}
+              {t("offers.detail.description")}
             </DialogDescription>
           </DialogHeader>
           {selectedOffer && (
@@ -279,7 +279,7 @@ export default function AdminOffersPage() {
               {selectedOffer.message && (
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    {t("offers.detail.message", "Message")}
+                    {t("offers.detail.message")}
                   </p>
                   <p className="text-sm whitespace-pre-wrap">
                     {selectedOffer.message}
@@ -302,7 +302,7 @@ export default function AdminOffersPage() {
                   <p className="text-sm">
                     {selectedOffer.expires_at
                       ? timeFormat(selectedOffer.expires_at, "lll")
-                      : t("offers.table.no_expiry", "No expiry")}
+                      : t("offers.table.no_expiry")}
                   </p>
                 </div>
               </div>

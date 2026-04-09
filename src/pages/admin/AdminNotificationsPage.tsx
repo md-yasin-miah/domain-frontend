@@ -95,7 +95,7 @@ export default function AdminNotificationsPage() {
       await markAsRead(id).unwrap();
       toast({ title: t("notifications.marked_read") });
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -104,7 +104,7 @@ export default function AdminNotificationsPage() {
       await markAllAsRead().unwrap();
       toast({ title: t("notifications.all_marked_read") });
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -113,7 +113,7 @@ export default function AdminNotificationsPage() {
       await deleteNotification(id).unwrap();
       toast({ title: t("notifications.deleted") });
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -123,7 +123,7 @@ export default function AdminNotificationsPage() {
       setDeleteAllDialogOpen(false);
       toast({ title: t("notifications.all_deleted") });
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -171,8 +171,8 @@ export default function AdminNotificationsPage() {
             className="capitalize"
           >
             {row.is_read
-              ? t("notifications.read", "Read")
-              : t("notifications.unread", "Unread")}
+              ? t("notifications.read")
+              : t("notifications.unread")}
           </Badge>
         ),
       },
@@ -195,23 +195,23 @@ export default function AdminNotificationsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Bell className="h-7 w-7" />
-          {t("admin.notifications.title", "Notifications")}
+          {t("admin.notifications.title")}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {t("admin.notifications.description", "View and manage your notifications.")}
+          {t("admin.notifications.description")}
         </p>
       </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
-            <CardTitle>{t("notifications.title", "Notifications")}</CardTitle>
+            <CardTitle>{t("notifications.title")}</CardTitle>
             <CardDescription>
               {t("admin.notifications.manage")}{" "}
               <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                {total} {t("notifications.total", "total")}
+                {total} {t("notifications.total")}
                 {unreadCount > 0 && (
-                  <> · {unreadCount} {t("notifications.unread", "unread")}</>
+                  <> · {unreadCount} {t("notifications.unread_count")}</>
                 )}
               </span>
             </CardDescription>
@@ -311,8 +311,8 @@ export default function AdminNotificationsPage() {
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             error={error}
-            errorTitle={t("common.error.title", "Error")}
-            errorDescription={t("common.error.description", "Something went wrong.")}
+            errorTitle={t("common.error.title")}
+            errorDescription={t("common.error.description")}
             errorIcon={<Bell className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>

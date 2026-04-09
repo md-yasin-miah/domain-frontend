@@ -158,10 +158,10 @@ export default function AdminReportsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <FileText className="h-7 w-7" />
-            {t("admin.reports.title", "Reports")}
+            {t("admin.reports.title")}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {t("admin.reports.description", "Admin-only reports. Use the period selector for time-based data.")}
+            {t("admin.reports.description")}
           </p>
         </div>
         <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>

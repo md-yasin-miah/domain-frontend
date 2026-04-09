@@ -297,10 +297,10 @@ export default function AdminFAQCategories() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <HelpCircle className="h-6 w-6" />
-              {t("admin.categories.faq_title", "FAQ Categories")}
+              {t("admin.categories.faq_title")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {t("admin.categories.faq_description", "Manage FAQ categories")}
+              {t("admin.categories.faq_description")}
             </p>
           </div>
         </div>

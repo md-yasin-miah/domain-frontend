@@ -92,7 +92,7 @@ const SupportTicketDetailsModal: React.FC<SupportTicketDetailsModalProps> = ({
           {/* Priority */}
           <div>
             <h3 className="text-sm font-semibold mb-2">
-              {t("support.detail.priority", "Priority")}
+              {t("support.detail.priority")}
             </h3>
             <p className="text-sm text-muted-foreground capitalize">
               {ticket.priority ?? "medium"}

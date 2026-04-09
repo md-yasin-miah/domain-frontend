@@ -109,11 +109,8 @@ export default function SupportTicketConversationPage() {
         data: { message: trimmed, is_internal: isAdmin ? isInternal : false },
       }).unwrap();
       toast({
-        title: t("support.reply.sent", "Reply sent"),
-        description: t(
-          "support.reply.sent_description",
-          "Your message has been added to the ticket.",
-        ),
+        title: t("support.reply.sent"),
+        description: t("support.reply.sent_description"),
       });
       setMessage("");
       setIsInternal(false);
@@ -126,10 +123,10 @@ export default function SupportTicketConversationPage() {
         err.data &&
         typeof (err.data as { detail?: string }).detail === "string"
           ? (err.data as { detail: string }).detail
-          : t("common.error", "Something went wrong");
+          : t("common.error.description");
       toast({
         variant: "destructive",
-        title: t("common.error", "Error"),
+        title: t("common.error"),
         description: detail,
       });
     }
@@ -145,11 +142,11 @@ export default function SupportTicketConversationPage() {
           <div className="text-center space-y-4">
             <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground" />
             <p className="text-muted-foreground">
-              {t("support.invalid_ticket", "Invalid ticket ID")}
+              {t("support.invalid_ticket")}
             </p>
             <Button variant="outline" onClick={() => navigate(backRoute)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t("common.back", "Back")}
+              {t("common.back")}
             </Button>
           </div>
         </div>
@@ -172,11 +169,11 @@ export default function SupportTicketConversationPage() {
           <div className="text-center space-y-4">
             <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground" />
             <p className="text-muted-foreground">
-              {t("support.ticket_not_found", "Ticket not found")}
+              {t("support.ticket_not_found")}
             </p>
             <Button variant="outline" onClick={() => navigate(backRoute)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t("common.back", "Back")}
+              {t("common.back")}
             </Button>
           </div>
         </div>
@@ -208,7 +205,7 @@ export default function SupportTicketConversationPage() {
                 <span>
                   {t("support.detail.assigned_to")}:{" "}
                   {getUserLabel(ticket.assigned_to) ||
-                    t("support.unknown_user", "Unknown")}
+                    t("support.unknown_user")}
                 </span>
               </>
             )}
@@ -239,8 +236,8 @@ export default function SupportTicketConversationPage() {
               <span className="font-medium text-sm">
                 {ticket.created_by
                   ? getUserLabel(ticket.created_by) ||
-                    t("support.unknown_user", "Unknown")
-                  : t("support.ticket_author", "Ticket author")}
+                    t("support.unknown_user")
+                  : t("support.ticket_author")}
               </span>
               <span className="text-xs text-muted-foreground">
                 {timeFormat(ticket.created_at, "lll")}
@@ -250,7 +247,7 @@ export default function SupportTicketConversationPage() {
               {ticket.description}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {t("support.detail.description_label", "Description")}
+              {t("support.detail.description_label")}
             </p>
           </div>
         </div>
@@ -296,7 +293,7 @@ export default function SupportTicketConversationPage() {
                   {reply.is_internal && (
                     <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 text-xs font-medium mb-1.5">
                       <Lock className="h-3.5 w-3.5" />
-                      {t("support.internal_note", "Internal note")}
+                      {t("support.internal_note")}
                     </div>
                   )}
                   <p
@@ -335,10 +332,7 @@ export default function SupportTicketConversationPage() {
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex gap-2">
               <Textarea
-                placeholder={t(
-                  "support.reply.placeholder",
-                  "Type your reply...",
-                )}
+                placeholder={t("support.reply.placeholder")}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={2}
@@ -371,10 +365,7 @@ export default function SupportTicketConversationPage() {
                   className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1.5"
                 >
                   <Lock className="h-3.5 w-3.5" />
-                  {t(
-                    "support.reply.internal_note",
-                    "Internal note (visible only to staff)",
-                  )}
+                  {t("support.reply.internal_note")}
                 </label>
               </div>
             )}
@@ -383,10 +374,7 @@ export default function SupportTicketConversationPage() {
       ) : (
         <footer className="shrink-0 border-t bg-muted/30 px-4 py-3">
           <p className="text-sm text-muted-foreground italic text-center">
-            {t(
-              "support.ticket_closed_no_reply",
-              "This ticket is closed. You cannot add new replies.",
-            )}
+            {t("support.ticket_closed_no_reply")}
           </p>
         </footer>
       )}

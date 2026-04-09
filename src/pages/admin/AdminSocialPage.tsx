@@ -127,7 +127,7 @@ export default function AdminSocialPage() {
       toast({ title: t("admin.social.share_deleted") });
       setShareToDelete(null);
     } catch {
-      toast({ title: t("common.error", "Error"), variant: "destructive" });
+      toast({ title: t("common.error"), variant: "destructive" });
     }
   };
 
@@ -136,10 +136,10 @@ export default function AdminSocialPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Users className="h-7 w-7" />
-          {t("admin.social.title", "Social")}
+          {t("admin.social.title")}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {t("admin.social.description", "View seller stats, followers, and listing shares.")}
+          {t("admin.social.description")}
         </p>
       </div>
 
@@ -172,9 +172,9 @@ export default function AdminSocialPage() {
                         fetchOptions={fetchSellerOptions}
                         getOptionLabel={(u) => u.username ?? u.email ?? String(u.id)}
                         getOptionValue={(u) => u.id}
-                        placeholder={t("admin.social.select_seller", "Select seller")}
-                        searchPlaceholder={t("admin.social.search_seller", "Search by username or email")}
-                        emptyMessage={t("admin.social.no_sellers", "No sellers found.")}
+                        placeholder={t("admin.social.select_seller")}
+                        searchPlaceholder={t("admin.social.search_seller")}
+                        emptyMessage={t("admin.social.no_sellers")}
                         pageSize={25}
                         triggerClassName="w-[280px]"
                       />
@@ -234,8 +234,8 @@ export default function AdminSocialPage() {
                           <CardContent>
                             <div className="text-2xl font-bold">
                               {sellerStats.is_following
-                                ? t("common.yes", "Yes")
-                                : t("common.no", "No")}
+                                ? t("common.yes")
+                                : t("common.no")}
                             </div>
                           </CardContent>
                         </Card>

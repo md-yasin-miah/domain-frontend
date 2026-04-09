@@ -135,11 +135,9 @@ export default function AdminSecureBoxPage() {
       toast({
         title: t(
           "admin.secure_box.rejection_required",
-          "Rejection reason required",
         ),
         description: t(
           "admin.secure_box.rejection_required_desc",
-          "Please provide a reason when rejecting.",
         ),
         variant: "destructive",
       });
@@ -245,7 +243,6 @@ export default function AdminSecureBoxPage() {
             className="max-w-[200px] truncate block cursor-pointer hover:text-primary transition-colors"
             title={t(
               "admin.secure_box.click_to_view",
-              "Click to view full content",
             )}
             onClick={() => setViewedContent(row.content)}
           >
@@ -275,10 +272,7 @@ export default function AdminSecureBoxPage() {
           {t("admin.secure_box.title")}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {t(
-            "admin.secure_box.description",
-            "Review and approve pending secure box submissions.",
-          )}
+          {t("admin.secure_box.description")}
         </p>
       </div>
 
@@ -289,10 +283,7 @@ export default function AdminSecureBoxPage() {
               {t("admin.secure_box.list_title")}
             </CardTitle>
             <CardDescription>
-              {t(
-                "admin.secure_box.list_desc",
-                "Full list of secure boxes. Filter by status.",
-              )}
+              {t("admin.secure_box.list_desc")}
             </CardDescription>
           </div>
           <div className="space-y-2">
@@ -328,10 +319,7 @@ export default function AdminSecureBoxPage() {
             columns={columns}
             pagination={pagination}
             isLoading={isLoading}
-            emptyMessage={t(
-              "admin.secure_box.no_items",
-              "No secure boxes found.",
-            )}
+            emptyMessage={t("admin.secure_box.no_items")}
             emptyIcon={<LockIcon className="w-16 h-16 text-muted-foreground" />}
             getRowId={(row) => String(row.id)}
             renderActions={(row) =>
@@ -365,10 +353,7 @@ export default function AdminSecureBoxPage() {
             onPageSizeChange={handlePageSizeChange}
             error={error}
             errorTitle={t("common.error")}
-            errorDescription={t(
-              "admin.secure_box.error_desc",
-              "Failed to load secure boxes.",
-            )}
+            errorDescription={t("admin.secure_box.error_desc")}
             errorIcon={<LockIcon className="w-16 h-16 text-muted-foreground" />}
           />
         </CardContent>
@@ -387,14 +372,8 @@ export default function AdminSecureBoxPage() {
             </DialogTitle>
             <DialogDescription>
               {actionType === "approved"
-                ? t(
-                    "admin.secure_box.approve_desc",
-                    "This will allow the buyer to request OTP and access the secure box content.",
-                  )
-                : t(
-                    "admin.secure_box.reject_desc",
-                    "The seller will need to update the content and resubmit for review.",
-                  )}
+                ? t("admin.secure_box.approve_desc")
+                : t("admin.secure_box.reject_desc")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -415,7 +394,6 @@ export default function AdminSecureBoxPage() {
                 id="admin_notes"
                 placeholder={t(
                   "admin.secure_box.admin_notes_placeholder",
-                  "Internal notes (not shown to user)",
                 )}
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
@@ -431,7 +409,6 @@ export default function AdminSecureBoxPage() {
                   id="rejection_reason"
                   placeholder={t(
                     "admin.secure_box.rejection_reason_placeholder",
-                    "Reason shown to seller",
                   )}
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
@@ -475,10 +452,7 @@ export default function AdminSecureBoxPage() {
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {t(
-                "admin.secure_box.content_details",
-                "Secure Box Content Details",
-              )}
+              {t("admin.secure_box.content_details")}
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">

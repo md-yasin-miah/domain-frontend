@@ -551,7 +551,7 @@ const SupportPage = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            {t("support.detail.priority", "Priority")}
+                            {t("support.detail.priority")}
                           </FormLabel>
                           <Select
                             onValueChange={field.onChange}
@@ -564,13 +564,13 @@ const SupportPage = () => {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="low">
-                                {t("support.priority.low", "Low")}
+                                {t("support.priority.low")}
                               </SelectItem>
                               <SelectItem value="medium">
-                                {t("support.priority.medium", "Medium")}
+                                {t("support.priority.medium")}
                               </SelectItem>
                               <SelectItem value="high">
-                                {t("support.priority.high", "High")}
+                                {t("support.priority.high")}
                               </SelectItem>
                             </SelectContent>
                           </Select>
@@ -712,7 +712,7 @@ const SupportPage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {t("support.detail.priority", "Priority")}
+                          {t("support.detail.priority")}
                         </FormLabel>
                         <Select
                           onValueChange={field.onChange}
@@ -725,13 +725,13 @@ const SupportPage = () => {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="low">
-                              {t("support.priority.low", "Low")}
+                              {t("support.priority.low")}
                             </SelectItem>
                             <SelectItem value="medium">
-                              {t("support.priority.medium", "Medium")}
+                              {t("support.priority.medium")}
                             </SelectItem>
                             <SelectItem value="high">
-                              {t("support.priority.high", "High")}
+                              {t("support.priority.high")}
                             </SelectItem>
                           </SelectContent>
                         </Select>

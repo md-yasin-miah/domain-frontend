@@ -296,7 +296,6 @@ export default function AdminPaymentsPage() {
         title: t("admin.payments.updated"),
         description: t(
           "admin.payments.updated_desc",
-          "Payment has been updated successfully.",
         ),
       });
 
@@ -343,11 +342,9 @@ export default function AdminPaymentsPage() {
       toast({
         title: t(
           "admin.withdrawals.rejection_required",
-          "Rejection reason required",
         ),
         description: t(
           "admin.withdrawals.rejection_required_desc",
-          "Please provide a reason when rejecting.",
         ),
         variant: "destructive",
       });
@@ -369,7 +366,6 @@ export default function AdminPaymentsPage() {
         title: t("admin.withdrawals.updated"),
         description: t(
           "admin.withdrawals.updated_desc",
-          "Status has been updated successfully.",
         ),
       });
       handleCloseWithdrawalUpdate();
@@ -507,7 +503,6 @@ export default function AdminPaymentsPage() {
                 <CardDescription>
                   {t(
                     "admin.payments.list_desc",
-                    "Payments across all orders. Filter by status or method.",
                   )}
                 </CardDescription>
               </div>
@@ -575,7 +570,6 @@ export default function AdminPaymentsPage() {
                 isLoading={isLoading}
                 emptyMessage={t(
                   "admin.payments.no_payments",
-                  "No payments found.",
                 )}
                 emptyIcon={
                   <CreditCard className="w-16 h-16 text-muted-foreground" />
@@ -616,7 +610,6 @@ export default function AdminPaymentsPage() {
                 errorTitle={t("common.error")}
                 errorDescription={t(
                   "admin.payments.error_desc",
-                  "Failed to load payments.",
                 )}
                 errorIcon={
                   <CreditCard className="w-16 h-16 text-muted-foreground" />
@@ -636,7 +629,6 @@ export default function AdminPaymentsPage() {
                 <CardDescription>
                   {t(
                     "admin.withdrawals.list_desc",
-                    "Seller withdrawal requests. Approve, reject, or mark as completed.",
                   )}
                 </CardDescription>
               </div>
@@ -675,7 +667,6 @@ export default function AdminPaymentsPage() {
                 isLoading={withdrawalsLoading}
                 emptyMessage={t(
                   "admin.withdrawals.no_withdrawals",
-                  "No withdrawals found.",
                 )}
                 emptyIcon={
                   <Banknote className="w-16 h-16 text-muted-foreground" />
@@ -690,7 +681,6 @@ export default function AdminPaymentsPage() {
                       onClick={() => handleOpenWithdrawalUpdate(row)}
                       title={t(
                         "admin.withdrawals.update_status",
-                        "Update status",
                       )}
                     >
                       <Pencil className="h-4 w-4" />
@@ -706,7 +696,6 @@ export default function AdminPaymentsPage() {
                 errorTitle={t("common.error")}
                 errorDescription={t(
                   "admin.withdrawals.error_desc",
-                  "Failed to load withdrawals.",
                 )}
                 errorIcon={
                   <Banknote className="w-16 h-16 text-muted-foreground" />
@@ -753,7 +742,6 @@ export default function AdminPaymentsPage() {
                   <SelectValue
                     placeholder={t(
                       "admin.payments.select_status",
-                      "Select status",
                     )}
                   />
                 </SelectTrigger>
@@ -899,7 +887,6 @@ export default function AdminPaymentsPage() {
                   onChange={(e) => setWithdrawalRejectionReason(e.target.value)}
                   placeholder={t(
                     "admin.withdrawals.rejection_placeholder",
-                    "Reason shown to seller",
                   )}
                 />
               </div>
@@ -914,7 +901,6 @@ export default function AdminPaymentsPage() {
                 onChange={(e) => setWithdrawalAdminNotes(e.target.value)}
                 placeholder={t(
                   "admin.withdrawals.admin_notes_placeholder",
-                  "Internal notes (optional)",
                 )}
                 rows={2}
               />
