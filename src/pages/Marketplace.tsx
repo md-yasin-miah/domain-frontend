@@ -207,9 +207,7 @@ const Marketplace = () => {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-background/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50">
               <div className="col-span-12 md:col-span-6 relative">
                 <Input
-                  placeholder={t(
-                    "marketplace.search.placeholder"
-                  )}
+                  placeholder={t("marketplace.search.placeholder")}
                   className="w-full h-12"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -241,9 +239,7 @@ const Marketplace = () => {
               <div className="col-span-12 md:col-span-3">
                 <Select value={priceRange} onValueChange={setPriceRange}>
                   <SelectTrigger className="h-12 min-w-[160px]">
-                    <SelectValue
-                      placeholder={t("marketplace.filters.price")}
-                    />
+                    <SelectValue placeholder={t("marketplace.filters.price")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">
@@ -336,22 +332,22 @@ const Marketplace = () => {
               );
               return (
                 <div className="space-y-8">
-                  {newestLoading
-                    ? skeleton
-                    : newestListings.length === 0
-                      ? empty
-                      : (
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {newestListings.map((listing: MarketplaceListing) => (
-                              <MarketplaceListingCard
-                                key={listing.id}
-                                listing={listing}
-                                detailUrl={ROUTES.APP.LISTING_DETAIL(listing.slug)}
-                                onViewClick={incrementViews}
-                              />
-                            ))}
-                          </div>
-                        )}
+                  {newestLoading ? (
+                    skeleton
+                  ) : newestListings.length === 0 ? (
+                    empty
+                  ) : (
+                    <div className="grid grid-cols-1 gap-8">
+                      {newestListings.map((listing: MarketplaceListing) => (
+                        <MarketplaceListingCard
+                          key={listing.id}
+                          listing={listing}
+                          detailUrl={ROUTES.APP.LISTING_DETAIL(listing.slug)}
+                          onViewClick={incrementViews}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })()
@@ -390,7 +386,7 @@ const Marketplace = () => {
                   </div>
                 );
                 const grid = (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 gap-8">
                     {list.map((listing: MarketplaceListing) => (
                       <MarketplaceListingCard
                         key={listing.id}
@@ -430,7 +426,8 @@ const Marketplace = () => {
                     <TabsContent value="newest" className="space-y-8">
                       {listingsTab === "newest" && newestLoading
                         ? skeleton
-                        : listingsTab === "newest" && newestListings.length === 0
+                        : listingsTab === "newest" &&
+                            newestListings.length === 0
                           ? empty
                           : grid}
                     </TabsContent>
