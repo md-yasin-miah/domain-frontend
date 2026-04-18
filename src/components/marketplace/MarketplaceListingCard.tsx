@@ -117,7 +117,7 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
       className="group cursor-pointer rounded-xl border bg-card p-4 transition-all duration-300 hover:border-primary/30 hover:shadow-lg"
       onClick={handleCardClick}
     >
-      <div className="grid gap-4 lg:grid-cols-[260px_1fr_270px] justify-center">
+      <div className="grid gap-4 lg:grid-cols-[260px_1fr_200px] justify-center">
         <div className="space-y-2">
           <div className="h-40 w-full overflow-hidden rounded-md bg-muted">
             <img
@@ -193,17 +193,6 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
           </div>
 
           <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full min-w-[120px]"
-              onClick={handleToggleFavorite}
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              {isFavorite
-                ? t("marketplace_domains.actions.watching", "Watching")
-                : t("marketplace_domains.actions.watch", "Watch")}
-            </Button>
             <Link to={detailUrl} onClick={(e) => e.stopPropagation()}>
               <Button className="w-full min-w-[140px]">
                 {t("marketplace_domains.actions.view_listing", "View Listing")}

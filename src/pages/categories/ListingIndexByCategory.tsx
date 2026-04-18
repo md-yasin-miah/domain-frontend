@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { Globe } from "lucide-react";
 import MarketplaceListingCard from "@/components/marketplace/MarketplaceListingCard";
@@ -52,33 +52,76 @@ const ListingIndexByCategory = () => {
         </div>
 
         {listingsLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="border-2">
-                <CardHeader className="pb-4">
-                  <Skeleton className="h-6 w-3/4" />
-                  <div className="flex gap-2 mt-2">
-                    <Skeleton className="h-5 w-20" />
-                    <Skeleton className="h-5 w-12" />
+          <div className="grid grid-cols-12 gap-6">
+            <div className="col-span-12 lg:col-span-2">
+              <div className="space-y-4 rounded-lg border bg-card p-4 md:p-5">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-28" />
+                  <Skeleton className="h-4 w-14" />
+                </div>
+                <div className="h-px w-full bg-border" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="h-px w-full bg-border" />
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-4 rounded-sm" />
+                    </div>
+                    <div className="space-y-2 pl-1">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-4/5" />
+                    </div>
+                    {i < 3 && <div className="h-px w-full bg-border" />}
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-8 w-20" />
-                    <Skeleton className="h-4 w-16" />
+                ))}
+              </div>
+            </div>
+            <div className="col-span-12 space-y-6 lg:col-span-10">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card
+                  key={i}
+                  className="rounded-xl border bg-card p-4"
+                >
+                  <div className="grid gap-4 lg:grid-cols-[260px_1fr_270px]">
+                    <div className="space-y-2">
+                      <Skeleton className="h-40 w-full rounded-md" />
+                      <div className="flex flex-wrap gap-2">
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                        <Skeleton className="h-5 w-24 rounded-full" />
+                      </div>
+                    </div>
+                    <div className="min-w-0 space-y-3">
+                      <Skeleton className="h-8 w-4/5 max-w-md" />
+                      <Skeleton className="h-4 w-36" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-11/12" />
+                      <div className="flex flex-wrap gap-4 pt-1">
+                        {Array.from({ length: 5 }).map((_, j) => (
+                          <div key={j} className="space-y-1.5">
+                            <Skeleton className="h-3 w-14" />
+                            <Skeleton className="h-4 w-24" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col justify-between gap-4 lg:items-end">
+                      <div className="w-full space-y-2 lg:w-auto lg:text-right">
+                        <Skeleton className="h-3 w-28 lg:ml-auto" />
+                        <Skeleton className="h-10 w-40 lg:ml-auto" />
+                      </div>
+                      <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+                        <Skeleton className="h-10 w-full min-w-[120px] sm:flex-1" />
+                        <Skeleton className="h-10 w-full min-w-[140px] sm:flex-1" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Skeleton className="h-12 w-full" />
-                    <Skeleton className="h-12 w-full" />
-                  </div>
-                  <Skeleton className="h-4 w-32" />
-                  <div className="flex gap-2 pt-2">
-                    <Skeleton className="h-10 flex-1" />
-                    <Skeleton className="h-10 flex-1" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-12 gap-6">
