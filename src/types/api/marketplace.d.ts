@@ -1,73 +1,73 @@
 interface MarketplaceListingFilters extends PaginationParams {
-  status?: 'draft' | 'active' | 'pending' | 'sold' | 'expired' | 'suspended';
+  status?: "draft" | "active" | "pending" | "sold" | "expired" | "suspended";
   listing_type_id?: number;
   seller_id?: number;
   min_price?: number;
   max_price?: number;
   search?: string;
   is_featured?: boolean;
-  sort_by?: 'price' | 'created_at' | 'view_count' | 'favorite_count';
-  sort_order?: 'asc' | 'desc';
+  sort_by?: "price" | "created_at" | "view_count" | "favorite_count";
+  sort_order?: "asc" | "desc";
 }
 interface MarketplaceListingType {
-  id: number,
-  name: string,
-  slug: string,
-  icon: string,
-  description: string,
-  is_active: boolean,
-  created_at: string,
-  updated_at: string
+  id: number;
+  name: string;
+  slug: string;
+  icon: string;
+  description: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 interface MarketplaceListing {
-  id: number,
-  title: string,
-  slug: string,
-  description: string,
-  short_description: string,
-  listing_type_id: number,
-  price: number | string,
-  currency: 'USD' | string,
-  is_price_negotiable: boolean,
-  domain_name: string | null,
-  domain_extension: string | null,
-  domain_age_years: number | null,
-  domain_authority: number | null,
-  domain_backlinks: number | null,
-  website_url: string,
-  website_traffic_monthly: number,
-  website_revenue_monthly: number | string,
-  website_profit_monthly: number | string,
-  website_technology: string,
-  status: 'draft' | 'active' | 'pending' | 'sold' | 'expired' | 'suspended',
-  is_featured: boolean,
-  primary_image_url: string,
-  image_urls: string[] | null,
-  meta_title: string | null,
-  meta_description: string | null,
-  additional_metadata: object | null,
-  expires_at: string | null,
-  seller_id: number,
-  view_count: number,
-  favorite_count: number,
-  sold_at: string | null,
-  sold_to_user_id: number | null,
-  sold_price: number | null,
-  created_at: string,
-  updated_at: string,
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  short_description: string;
+  listing_type_id: number;
+  price: number | string;
+  currency: "USD" | string;
+  is_price_negotiable: boolean;
+  domain_name: string | null;
+  domain_extension: string | null;
+  domain_age_years: number | null;
+  domain_authority: number | null;
+  domain_backlinks: number | null;
+  website_url: string;
+  website_traffic_monthly: number;
+  website_revenue_monthly: number | string;
+  website_profit_monthly: number | string;
+  website_technology: string;
+  status: "draft" | "active" | "pending" | "sold" | "expired" | "suspended";
+  is_featured: boolean;
+  primary_image_url: string;
+  image_urls: string[] | null;
+  meta_title: string | null;
+  meta_description: string | null;
+  additional_metadata: object | null;
+  expires_at: string | null;
+  seller_id: number;
+  view_count: number;
+  favorite_count: number;
+  sold_at: string | null;
+  sold_to_user_id: number | null;
+  sold_price: number | null;
+  created_at: string;
+  updated_at: string;
   seller: {
-    id: number,
-    username: string,
-    email: string
-    name: string
-  },
-  listing_type: MarketplaceListingType,
-  is_favorited: boolean,
+    id: number;
+    username: string;
+    email: string;
+    name: string;
+  };
+  listing_type: MarketplaceListingType;
+  is_favorited: boolean;
   public_url?: string | null;
 
   // self added asper UI design
-  is_auto_renew: boolean,
-  dns_records: string,
+  is_auto_renew: boolean;
+  dns_records: string;
 }
 
 interface ListingCreateRequest {
@@ -89,7 +89,7 @@ interface ListingCreateRequest {
   website_revenue_monthly?: number;
   website_profit_monthly?: number;
   website_technology?: string;
-  status?: 'draft' | 'active' | 'pending' | 'sold' | 'expired' | 'suspended';
+  status?: "draft" | "active" | "pending" | "sold" | "expired" | "suspended";
   is_featured?: boolean;
   primary_image_url?: string;
   image_urls?: string[];
@@ -142,7 +142,7 @@ interface Payment {
   amount: number;
   currency: string;
   payment_method: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+  status: "pending" | "processing" | "completed" | "failed" | "refunded";
   transaction_id: string | null;
   paid_at: string | null;
   created_at: string;
@@ -165,7 +165,7 @@ interface Escrow {
   amount: number;
   platform_fee: number;
   seller_amount: number;
-  status: 'pending' | 'released' | 'refunded' | 'disputed';
+  status: "pending" | "released" | "refunded" | "disputed";
   held_at: string;
   released_at: string | null;
   refunded_at: string | null;
@@ -188,7 +188,7 @@ interface Auction {
   current_bid: number | null;
   reserve_price: number | null;
   end_date: string;
-  status: 'active' | 'ended' | 'cancelled';
+  status: "active" | "ended" | "cancelled";
   created_at: string;
 }
 
@@ -215,7 +215,7 @@ interface AuctionUpdateRequest {
   starting_bid?: number;
   reserve_price?: number;
   end_date?: string;
-  status?: 'active' | 'ended' | 'cancelled';
+  status?: "active" | "ended" | "cancelled";
 }
 
 // ============ Message Types ============
@@ -274,7 +274,7 @@ interface Dispute {
   seller_id: number;
   reason: string;
   description: string;
-  status: 'open' | 'in_review' | 'resolved' | 'closed';
+  status: "open" | "in_review" | "resolved" | "closed";
   resolution: string | null;
   created_at: string;
   updated_at: string;
@@ -303,7 +303,7 @@ interface AdminDashboard {
   pending_orders: number;
   active_disputes: number;
   recent_orders: Order[];
-  recent_users: import('./user').UserResponse[];
+  recent_users: import("./user").UserResponse[];
 }
 
 interface SellerDashboard {
@@ -326,4 +326,3 @@ interface BuyerDashboard {
   recent_orders: Order[];
   favorite_listings_data: Listing[];
 }
-

@@ -117,7 +117,7 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
       className="group cursor-pointer rounded-xl border bg-card p-4 transition-all duration-300 hover:border-primary/30 hover:shadow-lg"
       onClick={handleCardClick}
     >
-      <div className="grid gap-4 lg:grid-cols-[260px_1fr_220px]">
+      <div className="grid gap-4 lg:grid-cols-[260px_1fr_270px] justify-center">
         <div className="space-y-2">
           <div className="h-40 w-full overflow-hidden rounded-md bg-muted">
             <img
@@ -130,22 +130,27 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
               }}
             />
           </div>
-          <div className="flex flex-wrap gap-2 text-xs">
-            {listing.is_featured && (
-              <Badge variant="secondary" className="bg-amber-50 text-amber-700">
-                <Award className="mr-1 h-3 w-3" />
-                {t("marketplace_domains.labels.featured", "Featured")}
-              </Badge>
-            )}
-            {listing.is_price_negotiable && (
-              <Badge
-                variant="secondary"
-                className="bg-violet-50 text-violet-700"
-              >
-                {t("marketplace_domains.labels.negotiable", "Negotiable")}
-              </Badge>
-            )}
-          </div>
+          {(listing.is_featured || listing.is_price_negotiable) && (
+            <div className="flex flex-wrap gap-2 text-xs">
+              {listing.is_featured && (
+                <Badge
+                  variant="secondary"
+                  className="bg-amber-50 text-amber-700"
+                >
+                  <Award className="mr-1 h-3 w-3" />
+                  {t("marketplace_domains.labels.featured", "Featured")}
+                </Badge>
+              )}
+              {listing.is_price_negotiable && (
+                <Badge
+                  variant="secondary"
+                  className="bg-violet-50 text-violet-700"
+                >
+                  {t("marketplace_domains.labels.negotiable", "Negotiable")}
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="min-w-0 space-y-3">

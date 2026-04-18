@@ -1,9 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import { Search, Filter, Globe, ArrowRight } from "lucide-react";
+import { Globe } from "lucide-react";
 import MarketplaceListingCard from "@/components/marketplace/MarketplaceListingCard";
 import {
   useMarketplaceListingsById,
@@ -13,6 +10,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
 import { useParams } from "react-router-dom";
 import { useGetMarketplaceListingTypesQuery } from "@/store/api/marketplaceApi";
+import ListingFilters, {
+  type ListingFiltersValue,
+} from "../component/ListingFilters";
+import { applyMarketplaceListingFilters } from "@/lib/marketplaceListingFilters";
+import { useMemo, useState } from "react";
 
 const ListingIndexByCategory = () => {
   const { t } = useTranslation();
@@ -30,72 +32,23 @@ const ListingIndexByCategory = () => {
     useMarketplaceListingsById(listing_type_id);
   const incrementViews = useIncrementViews();
 
+  const [filters, setFilters] = useState<ListingFiltersValue>({});
+
+  const filteredListings = useMemo(() => {
+    return applyMarketplaceListingFilters(listings ?? [], filters);
+  }, [listings, filters]);
+
+  const noFilterMatches =
+    (listings?.length ?? 0) > 0 && filteredListings.length === 0;
+
   return (
     <div className="md:p-6 lg:p-8 p-4 container mx-auto space-y-8">
-      {/* Search and Filters */}
-      <div className="bg-card rounded-lg border p-6 shadow-sm">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t("marketplace_domains.search.placeholder")}
-              className="pl-10 h-12"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex items-center gap-2 h-12">
-              <Filter className="h-4 w-4" />
-              {t("common.filter")}
-            </Button>
-            <Button className="h-12 px-8">{t("common.search")}</Button>
-          </div>
-        </div>
-
-        {/* Quick Filters */}
-        <div className="flex flex-wrap gap-2 mt-4">
-          <Badge
-            variant="secondary"
-            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-          >
-            .com
-          </Badge>
-          <Badge
-            variant="secondary"
-            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-          >
-            .com
-          </Badge>
-          <Badge
-            variant="secondary"
-            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-          >
-            {t("marketplace_domains.quick_filters.under_5000")}
-          </Badge>
-          <Badge
-            variant="secondary"
-            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-          >
-            {t("marketplace_domains.quick_filters.premium")}
-          </Badge>
-          <Badge
-            variant="secondary"
-            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-          >
-            {t("marketplace_domains.quick_filters.short")}
-          </Badge>
-        </div>
-      </div>
-
       {/* Featured Domains */}
       <div>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">
             {t("marketplace_domains.featured.title")}
           </h2>
-          <Button variant="outline" className="flex items-center gap-2">
-            {t("marketplace_domains.featured.view_all")}
-            <ArrowRight className="h-4 w-4" />
-          </Button>
         </div>
 
         {listingsLoading ? (
@@ -128,32 +81,46 @@ const ListingIndexByCategory = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6">
-            {listings && listings.length > 0 ? (
-              listings.map((listing: MarketplaceListing) => {
-                const detailUrl = slug
-                  ? ROUTES.APP.CATEGORIES.LISTING_DETAIL(slug, listing.slug)
-                  : ROUTES.APP.MARKETPLACE;
-                return (
-                  <MarketplaceListingCard
-                    key={listing.id}
-                    listing={listing}
-                    detailUrl={detailUrl}
-                    onViewClick={incrementViews}
-                  />
-                );
-              })
-            ) : (
-              <div className="col-span-full text-center py-12">
-                <Globe className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("marketplace.empty.title")}
-                </h3>
-                <p className="text-muted-foreground">
-                  {t("marketplace.empty.description")}
-                </p>
-              </div>
-            )}
+          <div className="grid grid-cols-12 gap-6">
+            <div className="col-span-2">
+              <ListingFilters onFiltersChange={setFilters} />
+            </div>
+            <div className="space-y-6 col-span-10">
+              {filteredListings.length > 0 ? (
+                filteredListings.map((listing: MarketplaceListing) => {
+                  const detailUrl = slug
+                    ? ROUTES.APP.CATEGORIES.LISTING_DETAIL(slug, listing.slug)
+                    : ROUTES.APP.MARKETPLACE;
+                  return (
+                    <MarketplaceListingCard
+                      key={listing.id}
+                      listing={listing}
+                      detailUrl={detailUrl}
+                      onViewClick={incrementViews}
+                    />
+                  );
+                })
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <Globe className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    {noFilterMatches
+                      ? t("marketplace.empty.no_matches_title", {
+                          defaultValue: "No listings match your filters",
+                        })
+                      : t("marketplace.empty.title")}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {noFilterMatches
+                      ? t("marketplace.empty.no_matches_description", {
+                          defaultValue:
+                            "Try clearing or relaxing filters to see more results.",
+                        })
+                      : t("marketplace.empty.description")}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

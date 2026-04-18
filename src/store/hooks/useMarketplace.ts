@@ -10,7 +10,9 @@ export const useMarketplace = () => {
   return {
     items: Array.isArray(listings) ? listings : listings?.items || [],
     loading: isLoading,
-    error: error ? (error as any)?.data || error : null,
+    error: error
+      ? ((error as { data?: unknown }).data ?? error)
+      : null,
   };
 };
 
@@ -26,12 +28,11 @@ export const useMarketplaceListingsById = (listing_type_id: number) => {
   };
 };
 
-
 export const useIncrementViews = () => {
   // View incrementing is typically handled server-side when fetching listing details
   // If needed, this can be implemented as a separate endpoint
   return (id: number) => {
     // This would typically be handled by the backend when viewing a listing
-    console.log('Increment views for listing:', id);
+    console.log("Increment views for listing:", id);
   };
 };
