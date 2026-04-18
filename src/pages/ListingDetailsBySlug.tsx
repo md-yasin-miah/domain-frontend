@@ -45,8 +45,6 @@ import MakeOfferModal from "@/pages/client/marketplace/myListing/components/Make
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "AUD", "CAD", "JPY"] as const;
-
 function toNumber(value: number | string | null | undefined): number | null {
   if (value === null || value === undefined) return null;
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
@@ -85,7 +83,22 @@ export default function ListingDetailsBySlug() {
     isLoading,
     error,
   } = useGetMarketplaceListingBySlugQuery(listingSlug, { skip: !listingSlug });
-
+  const fallbackImage =
+    "data:image/svg+xml;utf8," +
+    encodeURIComponent(
+      `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'>
+      <defs>
+        <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+          <stop offset='0%' stop-color='#f3f4f6'/>
+          <stop offset='100%' stop-color='#e5e7eb'/>
+        </linearGradient>
+      </defs>
+      <rect width='800' height='400' fill='url(#g)'/>
+      <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#6b7280' font-family='Arial, sans-serif' font-size='28'>
+        No Image Available
+      </text>
+    </svg>`,
+    );
   useEffect(() => {
     if (listing?.currency) setDisplayCurrency(String(listing.currency));
   }, [listing?.currency]);
@@ -471,8 +484,12 @@ export default function ListingDetailsBySlug() {
             {heroImage && (
               <div className="aspect-video bg-muted">
                 <img
-                  src={heroImage}
-                  alt=""
+                  src={heroImage || fallbackImage}
+                  alt={displayTitle}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = fallbackImage;
+                  }}
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -723,8 +740,12 @@ export default function ListingDetailsBySlug() {
               {heroImage && (
                 <div className="aspect-video bg-muted">
                   <img
-                    src={heroImage}
-                    alt=""
+                    src={heroImage || fallbackImage}
+                    alt={displayTitle}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = fallbackImage;
+                    }}
                     className="h-full w-full object-cover"
                   />
                 </div>
