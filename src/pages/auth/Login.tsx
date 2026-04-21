@@ -174,7 +174,8 @@ export default function Login() {
 
         // Queue seller listing tutorial after login.
         const shouldQueueSellerTutorial = roleNames.some(
-          (roleName: string) => roleName === "seller" || roleName === "customer",
+          (roleName: string) =>
+            roleName === "seller" || roleName === "customer",
         );
         if (shouldQueueSellerTutorial) {
           localStorage.setItem("seller_listing_tutorial_pending", "1");
@@ -507,25 +508,27 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-        <div className="space-y-2 bg-primary/5 p-10 rounded-md">
-          <h5 className="text-center text-md font-semibold">
-            Login as different user
-          </h5>
-          {mockUser.map((user) => (
-            <Button
-              key={user.value}
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                loginForm.setValue("email", user.value);
-                loginForm.setValue("password", user.password);
-              }}
-            >
-              {user.label}
-            </Button>
-          ))}
-        </div>
+        {process.env.NODE_ENV === "development" && (
+          <div className="space-y-2 bg-primary/5 p-10 rounded-md">
+            <h5 className="text-center text-md font-semibold">
+              Login as different user
+            </h5>
+            {mockUser.map((user) => (
+              <Button
+                key={user.value}
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  loginForm.setValue("email", user.value);
+                  loginForm.setValue("password", user.password);
+                }}
+              >
+                {user.label}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

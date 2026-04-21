@@ -1,16 +1,33 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Search, Calendar, User, ArrowRight, Tag, TrendingUp, Eye, BookOpen, Clock } from "lucide-react";
+import {
+  Search,
+  Calendar,
+  User,
+  ArrowRight,
+  Tag,
+  TrendingUp,
+  Eye,
+  BookOpen,
+  Clock,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/store/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useGetBlogPostsQuery } from "@/store/api/blogApi";
 import { useGetBlogCategoriesQuery } from "@/store/api/categoryApi";
 import { Loader2 } from "lucide-react";
+import { FALLBACK_IMAGE_SVG } from "@/lib/constant";
 
 interface NewBlogPost {
   id: string;
@@ -55,14 +72,15 @@ const Blog = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const { data: postsData, isLoading: postsLoading } = useGetBlogPostsQuery({});
-  const { data: categoriesData, isLoading: categoriesLoading } = useGetBlogCategoriesQuery({});
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetBlogCategoriesQuery({});
 
   const loading = postsLoading || categoriesLoading;
 
   // Handle paginated response or array response
   const postsArray = Array.isArray(postsData)
     ? postsData
-    : (postsData?.items || []);
+    : postsData?.items || [];
 
   const posts: NewBlogPost[] = postsArray.map((post: BlogPost) => ({
     id: String(post.id),
@@ -77,9 +95,9 @@ const Blog = () => {
     author_id: String(post.author_id),
     author: {
       email: undefined,
-      profile: { full_name: 'Admin User' },
+      profile: { full_name: "Admin User" },
     },
-    is_published: post.status === 'published',
+    is_published: post.status === "published",
     is_featured: false, // Not in API response
     published_at: post.published_at || post.created_at,
     view_count: post.view_count || 0,
@@ -89,7 +107,7 @@ const Blog = () => {
   // Handle paginated response or array response for categories
   const categoriesArray = Array.isArray(categoriesData)
     ? categoriesData
-    : (categoriesData?.items || []);
+    : categoriesData?.items || [];
 
   const categories: BlogCategory[] = categoriesArray.map((cat: Category) => ({
     id: String(cat.id),
@@ -98,11 +116,13 @@ const Blog = () => {
     description: cat.description || null,
   }));
 
-  const filteredPosts = posts.filter(post => {
+  const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      post.tags.some((tag) =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
 
     const matchesCategory =
       selectedCategory === "all" ||
@@ -112,21 +132,21 @@ const Blog = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const featuredPosts = filteredPosts.filter(post => post.is_featured);
-  const regularPosts = filteredPosts.filter(post => !post.is_featured);
+  const featuredPosts = filteredPosts.filter((post) => post.is_featured);
+  const regularPosts = filteredPosts.filter((post) => !post.is_featured);
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const calculateReadTime = (content: string) => {
     const wordsPerMinute = 200;
-    const words = content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
     return Math.ceil(words / wordsPerMinute);
   };
 
@@ -139,10 +159,10 @@ const Blog = () => {
             <BookOpen className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-5xl md:text-6xl font-roboto font-black text-foreground mb-6 tracking-tight">
-            {t('blog.title')}
+            {t("blog.title")}
           </h1>
           <p className="text-xl text-muted-foreground font-roboto max-w-3xl mx-auto leading-relaxed mb-8">
-            {t('blog.subtitle')}
+            {t("blog.subtitle")}
           </p>
 
           {/* Search and Filter */}
@@ -150,7 +170,7 @@ const Blog = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder={t('blog.search_placeholder')}
+                placeholder={t("blog.search_placeholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12"
@@ -172,21 +192,25 @@ const Blog = () => {
               <Button
                 variant={selectedCategory === "all" ? "default" : "outline"}
                 onClick={() => setSelectedCategory("all")}
-                className={selectedCategory === "all"
-                  ? "bg-gradient-to-r from-primary to-secondary text-white"
-                  : "border-primary/20 hover:bg-primary/5"
+                className={
+                  selectedCategory === "all"
+                    ? "bg-gradient-to-r from-primary to-secondary text-white"
+                    : "border-primary/20 hover:bg-primary/5"
                 }
               >
-                {t('blog.category_all')}
+                {t("blog.category_all")}
               </Button>
               {categories.map((category) => (
                 <Button
                   key={category.id}
-                  variant={selectedCategory === category.id ? "default" : "outline"}
+                  variant={
+                    selectedCategory === category.id ? "default" : "outline"
+                  }
                   onClick={() => setSelectedCategory(category.id)}
-                  className={selectedCategory === category.id
-                    ? "bg-gradient-to-r from-primary to-secondary text-white"
-                    : "border-primary/20 hover:bg-primary/5"
+                  className={
+                    selectedCategory === category.id
+                      ? "bg-gradient-to-r from-primary to-secondary text-white"
+                      : "border-primary/20 hover:bg-primary/5"
                   }
                 >
                   {category.name}
@@ -201,18 +225,24 @@ const Blog = () => {
       {loading ? (
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-muted-foreground">{t('blog.loading')}</span>
+          <span className="ml-2 text-muted-foreground">
+            {t("blog.loading")}
+          </span>
         </div>
       ) : featuredPosts.length > 0 ? (
         <section className="py-16 px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold mb-8 flex items-center gap-2">
               <TrendingUp className="w-6 h-6 text-primary" />
-              {t('blog.featured')}
+              {t("blog.featured")}
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredPosts.slice(0, 3).map((post) => (
-                <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/blog/${post.slug}`)}>
+                <Card
+                  key={post.id}
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => navigate(`/blog/${post.slug}`)}
+                >
                   {post.og_image && (
                     <div className="aspect-video w-full overflow-hidden bg-muted">
                       <img
@@ -230,7 +260,9 @@ const Blog = () => {
                     )}
                     <CardTitle className="line-clamp-2">{post.title}</CardTitle>
                     <CardDescription className="line-clamp-2">
-                      {post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'}
+                      {post.excerpt ||
+                        post.content.replace(/<[^>]*>/g, "").substring(0, 150) +
+                          "..."}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -238,7 +270,11 @@ const Blog = () => {
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">
                           <User className="w-4 h-4" />
-                          <span>{post.author?.profile?.full_name || post.author?.email || 'Unknown'}</span>
+                          <span>
+                            {post.author?.profile?.full_name ||
+                              post.author?.email ||
+                              "Unknown"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
@@ -250,15 +286,17 @@ const Blog = () => {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          {calculateReadTime(post.content)} {t('blog.read_time')}
+                          {calculateReadTime(post.content)}{" "}
+                          {t("blog.read_time")}
                         </span>
                         <span className="flex items-center gap-1">
                           <Eye className="w-4 h-4" />
-                          {post.view_count || 0} {t('blog.views')}
+                          {post.view_count || 0} {t("blog.views")}
                         </span>
                       </div>
                       <Button variant="ghost" size="sm">
-                        {t('blog.read_more')} <ArrowRight className="w-4 h-4 ml-1" />
+                        {t("blog.read_more")}{" "}
+                        <ArrowRight className="w-4 h-4 ml-1" />
                       </Button>
                     </div>
                   </CardContent>
@@ -272,25 +310,31 @@ const Blog = () => {
       {/* Recent Posts */}
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8">{t('blog.recent')}</h2>
+          <h2 className="text-3xl font-bold mb-8">{t("blog.recent")}</h2>
 
           {filteredPosts.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              {searchTerm ? t('blog.no_results') : t('blog.no_posts')}
+              {searchTerm ? t("blog.no_results") : t("blog.no_posts")}
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularPosts.map((post) => (
-                <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/blog/${post.slug}`)}>
-                  {post.og_image && (
-                    <div className="aspect-video w-full overflow-hidden bg-muted">
-                      <img
-                        src={post.og_image}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
+                <Card
+                  key={post.id}
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => navigate(`/blog/${post.slug}`)}
+                >
+                  <div className="aspect-video w-full overflow-hidden bg-muted">
+                    <img
+                      src={post.og_image || FALLBACK_IMAGE_SVG}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = FALLBACK_IMAGE_SVG;
+                      }}
+                    />
+                  </div>
                   <CardHeader>
                     {post.category && (
                       <Badge variant="outline" className="mb-2 w-fit">
@@ -299,7 +343,9 @@ const Blog = () => {
                     )}
                     <CardTitle className="line-clamp-2">{post.title}</CardTitle>
                     <CardDescription className="line-clamp-2">
-                      {post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'}
+                      {post.excerpt ||
+                        post.content.replace(/<[^>]*>/g, "").substring(0, 150) +
+                          "..."}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -307,7 +353,11 @@ const Blog = () => {
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">
                           <User className="w-4 h-4" />
-                          <span>{post.author?.profile?.full_name || post.author?.email || 'Unknown'}</span>
+                          <span>
+                            {post.author?.profile?.full_name ||
+                              post.author?.email ||
+                              "Unknown"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
@@ -318,7 +368,11 @@ const Blog = () => {
                     {post.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-4">
                         {post.tags.slice(0, 3).map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             <Tag className="w-3 h-3 mr-1" />
                             {tag}
                           </Badge>
@@ -329,15 +383,17 @@ const Blog = () => {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          {calculateReadTime(post.content)} {t('blog.read_time')}
+                          {calculateReadTime(post.content)}{" "}
+                          {t("blog.read_time")}
                         </span>
                         <span className="flex items-center gap-1">
                           <Eye className="w-4 h-4" />
-                          {post.view_count || 0} {t('blog.views')}
+                          {post.view_count || 0} {t("blog.views")}
                         </span>
                       </div>
                       <Button variant="ghost" size="sm">
-                        {t('blog.read_more')} <ArrowRight className="w-4 h-4 ml-1" />
+                        {t("blog.read_more")}{" "}
+                        <ArrowRight className="w-4 h-4 ml-1" />
                       </Button>
                     </div>
                   </CardContent>

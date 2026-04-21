@@ -5,6 +5,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Award, MapPin } from "lucide-react";
+import { FALLBACK_IMAGE_SVG } from "@/lib/constant";
 
 export interface MarketplaceListingCardProps {
   listing: MarketplaceListing;
@@ -69,23 +70,6 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
     (typeof listingData.website_profit_monthly === "string" &&
       listingData.website_profit_monthly) ||
     t("common.not_available", "N/A");
-  const fallbackImage =
-    "data:image/svg+xml;utf8," +
-    encodeURIComponent(
-      `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'>
-        <defs>
-          <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-            <stop offset='0%' stop-color='#f3f4f6'/>
-            <stop offset='100%' stop-color='#e5e7eb'/>
-          </linearGradient>
-        </defs>
-        <rect width='800' height='400' fill='url(#g)'/>
-        <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#6b7280' font-family='Arial, sans-serif' font-size='28'>
-          No Image Available
-        </text>
-      </svg>`,
-    );
-
   const stats = [
     {
       label: t("marketplace_domains.labels.domain", "Type"),
@@ -121,12 +105,12 @@ const MarketplaceListingCard: React.FC<MarketplaceListingCardProps> = ({
         <div className="space-y-2">
           <div className="h-40 w-full overflow-hidden rounded-md bg-muted">
             <img
-              src={listing.primary_image_url || fallbackImage}
+              src={listing.primary_image_url || FALLBACK_IMAGE_SVG}
               alt={displayTitle}
               className="h-full w-full object-cover"
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = fallbackImage;
+                e.currentTarget.src = FALLBACK_IMAGE_SVG;
               }}
             />
           </div>

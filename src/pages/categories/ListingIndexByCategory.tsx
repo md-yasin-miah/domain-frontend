@@ -46,9 +46,7 @@ const ListingIndexByCategory = () => {
       {/* Featured Domains */}
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">
-            {t("marketplace_domains.featured.title")}
-          </h2>
+          <h2 className="text-2xl font-semibold">Featured {slug}</h2>
         </div>
 
         {listingsLoading ? (
@@ -82,10 +80,7 @@ const ListingIndexByCategory = () => {
             </div>
             <div className="col-span-12 space-y-6 lg:col-span-10">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Card
-                  key={i}
-                  className="rounded-xl border bg-card p-4"
-                >
+                <Card key={i} className="rounded-xl border bg-card p-4">
                   <div className="grid gap-4 lg:grid-cols-[260px_1fr_270px]">
                     <div className="space-y-2">
                       <Skeleton className="h-40 w-full rounded-md" />
