@@ -51,10 +51,18 @@ export default function Login() {
     password: z.string().min(6, t("auth.login_page.password_min_length")),
   });
 
-  const signupSchema = z.object({
-    email: z.string().email(t("auth.login_page.invalid_email")),
-    password: z.string().min(6, t("auth.login_page.password_min_length")),
-  });
+  const signupSchema = z
+    .object({
+      email: z.string().email(t("auth.login_page.invalid_email")),
+      password: z.string().min(6, t("auth.login_page.password_min_length")),
+      confirm_password: z
+        .string()
+        .min(1, t("auth.login_page.confirm_password_required")),
+    })
+    .refine((data) => data.password === data.confirm_password, {
+      message: t("auth.login_page.passwords_must_match"),
+      path: ["confirm_password"],
+    });
 
   type LoginFormData = z.infer<typeof loginSchema>;
   type SignupFormData = z.infer<typeof signupSchema>;
@@ -72,6 +80,7 @@ export default function Login() {
     defaultValues: {
       email: "",
       password: "",
+      confirm_password: "",
     },
   });
 
@@ -443,6 +452,41 @@ export default function Login() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>{t("auth.login_page.password")}</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder={t(
+                                  "auth.login_page.password_placeholder",
+                                )}
+                                {...field}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {/* Confirm Password */}
+                    <FormField
+                      control={signupForm.control}
+                      name="confirm_password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Input
